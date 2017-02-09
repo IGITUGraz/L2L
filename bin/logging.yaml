@@ -1,0 +1,29 @@
+version: 1
+formatters:
+  simple:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    stream: ext://sys.stdout
+    formatter: simple
+  file:
+    class: logging.handlers.WatchedFileHandler
+    formatter: simple
+    filename: /home/anand/output/LTL/output.log
+loggers:
+  ltl-lsm:
+    level: INFO
+    handlers: [file]
+    propagate: no
+  ltl-ga:
+    level: INFO
+    handlers: [file]
+    propagate: no
+  ltl-lsm-ga:
+    level: INFO
+    handlers: [file]
+    propagate: no
+root:
+  level: INFO
+  handlers: [console]
