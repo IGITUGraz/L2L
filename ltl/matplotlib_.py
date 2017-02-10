@@ -1,3 +1,9 @@
+"""
+This is a utility class that imports matplotlib and does the right things e.g. supress warnings and setting the right
+matplotlib backend. In the rest of the code always use ``from ltl.matplotlib_ import plt`` to get the equivalent of
+```import matplotlib.pyplot as plt```
+"""
+
 import warnings
 import socket
 

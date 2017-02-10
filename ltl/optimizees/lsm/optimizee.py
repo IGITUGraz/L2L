@@ -17,6 +17,7 @@ _DEBUG = False
 
 class LSMOptimizee(Optimizee):
     def __init__(self):
+        super().__init__()
         self._initialize()
 
     def _initialize(self):

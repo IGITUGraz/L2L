@@ -4,7 +4,6 @@ from collections import namedtuple
 
 from deap import base, creator, tools
 from deap.tools import HallOfFame
-from pypet import cartesian_product
 
 from ltl.optimizers.optimizer import Optimizer
 

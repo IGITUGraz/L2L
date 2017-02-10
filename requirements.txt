@@ -1,0 +1,8 @@
+matplotlib==1.5.3
+numpy==1.11.2
+pandas==0.19.2
+pypet==0.4.0
+scipy==0.18.1
+scoop==0.7.1.1
+PyYAML==3.11
+
