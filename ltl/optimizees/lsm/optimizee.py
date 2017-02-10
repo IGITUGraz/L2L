@@ -1,17 +1,14 @@
-## NNB 2015, ex4A
 import logging
 
-from ltl import DummyTrajectory
-from ltl.matplotlib_ import plt
+import numpy as np
 
 import nest
 import nest.raster_plot
 
-import numpy as np
-
 from ltl.optimizees.lsm.tools import generate_stimuls_mem, get_spike_times, get_liquid_states, train_readout, \
     test_readout, divide_train_test, generate_stimuls_xor
 from ltl.optimizees.optimizee import Optimizee
+from ltl.matplotlib_ import plt
 
 logger = logging.getLogger("ltl-lsm")
 
@@ -19,7 +16,10 @@ _DEBUG = False
 
 
 class LSMOptimizee(Optimizee):
-    def initialize(self):
+    def __init__(self):
+        self._initialize()
+
+    def _initialize(self):
         # Set parameters of the NEST simulation kernel
         nest.SetKernelStatus({'print_time': False,
                               'local_num_threads': 1})
@@ -114,7 +114,7 @@ class LSMOptimizee(Optimizee):
 
         # Create nodes -------------------------------------------------
         nest.ResetKernel()
-        self.initialize()
+        self._initialize()
         nest.SetDefaults('iaf_psc_exp',
                          {'C_m': 30.0,  # 1.0,
                           'tau_m': 30.0,
@@ -296,6 +296,7 @@ def main():
     Contains code to run simulation independently
     :return:
     """
+    from ltl import DummyTrajectory
     global _DEBUG
     _DEBUG = True
     optimizee = LSMOptimizee()
