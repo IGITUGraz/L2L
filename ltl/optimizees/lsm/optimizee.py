@@ -10,7 +10,7 @@ import nest.raster_plot
 import numpy as np
 
 from ltl.optimizees.lsm.tools import generate_stimuls_mem, get_spike_times, get_liquid_states, train_readout, \
-    test_readout, divide_train_test
+    test_readout, divide_train_test, generate_stimuls_xor
 from ltl.optimizees.optimizee import Optimizee
 
 logger = logging.getLogger("ltl-lsm")
@@ -146,8 +146,8 @@ class LSMOptimizee(Optimizee):
         dt_stim = 300.  #[ms]
         stim_len = 50.  #[ms]
         Rs = 200.  #[Hz]
-        # inp_spikes, targets = generate_stimuls_xor(dt_stim, stim_len, Rs, simtime)
-        inp_spikes, targets = generate_stimuls_mem(dt_stim, stim_len, Rs, simtime)
+        inp_spikes, targets = generate_stimuls_xor(dt_stim, stim_len, Rs, simtime)
+        # inp_spikes, targets = generate_stimuls_mem(dt_stim, stim_len, Rs, simtime)
 
         # create two spike generators,
         # set their spike_times of i-th generator to inp_spikes[i]
@@ -281,9 +281,9 @@ class LSMOptimizee(Optimizee):
         training_error_mean, training_error_std = np.mean(err_train) * 100, np.std(err_train * 100)
         testing_error_mean, testing_error_std = np.mean(err_test) * 100, np.std(err_test * 100)
 
-        logger.info("Done running. Training error was %f %% +- %f and Testing error was %f %% +- %f"
+        logger.info("Done running. Training error was %f %% +- %f and Testing error was %f %% +- %f "
                     "for weights %.2f, %.2f, %.2f, %.2f",
-                    training_error_mean, training_error_std, testing_error_mean, training_error_std, jee, jei, jie, jii)
+                    training_error_mean, training_error_std, testing_error_mean, testing_error_std, jee, jei, jie, jii)
         return (testing_error_mean,)
 
     def end(self):
