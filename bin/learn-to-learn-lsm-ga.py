@@ -8,7 +8,7 @@ from pypet import Environment
 from pypet import pypetconstants
 
 from ltl.optimizees.lsm.optimizee import LSMOptimizee
-from ltl.optimizers.ga.optimizer import GeneticAlgorithmOptimizer
+from ltl.optimizers.evolution.optimizer import GeneticAlgorithmOptimizer, GeneticAlgorithmParameters
 from ltl.paths import Paths
 
 warnings.filterwarnings("ignore")
@@ -46,8 +46,10 @@ def main():
     lsm = LSMOptimizee()
 
     # NOTE: Outerloop optimizer initialization
+    parameters = GeneticAlgorithmParameters(seed=42, popsize=200, CXPB=0.6, MUTPB=0.2, NGEN=200, indpb=0.05,
+                                            tournsize=3, matepar=10., mutpar=10.)
     ga = GeneticAlgorithmOptimizer(traj, optimizee_create_individual=lsm.create_individual,
-                                   optimizee_fitness_weights=(-1.0,))
+                                   optimizee_fitness_weights=(-1.0,), parameters=parameters)
 
     # Add post processing
     env.add_postprocessing(ga.post_process)

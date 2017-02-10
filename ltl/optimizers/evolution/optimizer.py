@@ -1,5 +1,6 @@
 import logging
 import random
+from collections import namedtuple
 
 from deap import base, creator, tools
 from deap.tools import HallOfFame
@@ -9,22 +10,25 @@ from ltl.optimizers.optimizer import Optimizer
 
 logger = logging.getLogger("ltl-ga")
 
+GeneticAlgorithmParameters = namedtuple('GeneticAlgorithmParameters',
+                                        ['seed', 'popsize', 'CXPB', 'MUTPB', 'NGEN', 'indpb', 'tournsize', 'matepar',
+                                         'mutpar'])
+
 
 class GeneticAlgorithmOptimizer(Optimizer):
-    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights):
-        traj.f_add_parameter('popsize', 16, comment='Population size')  # 185
-        traj.f_add_parameter('CXPB', 0.6, comment='Crossover term')
-        traj.f_add_parameter('MUTPB', 0.2, comment='Mutation probability')
-        traj.f_add_parameter('NGEN', 200, comment='Number of generations')
+    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters):
+        super().__init__()
+        traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
+        traj.f_add_parameter('popsize', parameters.popsize, comment='Population size')  # 185
+        traj.f_add_parameter('CXPB', parameters.CXPB, comment='Crossover term')
+        traj.f_add_parameter('MUTPB', parameters.MUTPB, comment='Mutation probability')
+        traj.f_add_parameter('NGEN', parameters.NGEN, comment='Number of generations')
 
         traj.f_add_parameter('generation', 0, comment='Current generation')
         traj.f_add_parameter('ind_idx', 0, comment='Index of individual')
-        # traj.f_add_parameter('ind_len', 5, comment='Length of individual')  # ee, ei, ie, ii, w_scale
 
-        traj.f_add_parameter('indpb', 0.05, comment='Mutation parameter')
-        traj.f_add_parameter('tournsize', 3, comment='Selection parameter')
-
-        traj.f_add_parameter('seed', 42, comment='Seed for RNG')
+        traj.f_add_parameter('indpb', parameters.indpb, comment='Mutation parameter')
+        traj.f_add_parameter('tournsize', parameters.tournsize, comment='Selection parameter')
 
         # Placeholders for individuals and results that are about to be explored
         traj.f_add_derived_parameter('individual', optimizee_create_individual(),
@@ -42,13 +46,13 @@ class GeneticAlgorithmOptimizer(Optimizer):
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
         # Operator registering
-        toolbox.register("mate", tools.cxBlend, alpha=10.)
-        toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=10., indpb=traj.indpb)
+        toolbox.register("mate", tools.cxBlend, alpha=parameters.matepar)
+        toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=parameters.mutpar, indpb=traj.indpb)
         toolbox.register("select", tools.selTournament, tournsize=traj.tournsize)
 
         # ------- Initialize Population and Trajectory -------- #
         self.pop = toolbox.population(n=traj.popsize)
-        eval_pop = [ind for ind in self.pop if not ind.fitness.valid]
+        eval_pop = [list(ind) for ind in self.pop if not ind.fitness.valid]
 
         self.g = 0  # the current generation
         self.toolbox = toolbox  # the DEAP toolbox
@@ -64,20 +68,21 @@ class GeneticAlgorithmOptimizer(Optimizer):
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
         while fitnesses_results:
             result = fitnesses_results.pop()
-            # Update fitnesses
+            # Update fitness
             run_index, fitness = result  # The environment returns tuples: [(run_idx, run), ...]
             # We need to convert the current run index into an ind_idx
             # (index of individual within one generation)
             traj.v_idx = run_index
             ind_index = traj.par.ind_idx
-            # Use the ind_idx to update the fintess
-            self.eval_pop[ind_index].fitness.values = fitness
-        traj.v_idx = -1  # set the trajectory back to default
+            # Use the ind_idx to update the fitness
+            individual = self.eval_pop[ind_index]
+            individual.fitness.values = fitness
 
-        # Append all fitnesses (note that DEAP fitnesses are tuples of length 1
-        # but we are only interested in the value)
-        # DOES NOT WORK 'coz fitness values are tuples
-        # traj.fitnesses.extend([x.fitness.values for x in self.eval_pop])
+            # Record
+            traj.f_add_result('$set.$.individual', list(individual))
+            traj.f_add_result('$set.$.fitness', list(fitness))
+
+        traj.v_idx = -1  # set the trajectory back to default
 
         logger.info("-- End of generation {} --".format(self.g))
         best_inds = tools.selBest(self.eval_pop, 2)
@@ -120,16 +125,8 @@ class GeneticAlgorithmOptimizer(Optimizer):
             # The population is entirely replaced by the offspring
             self.pop[:] = offspring
 
-            self.eval_pop = [ind for ind in self.pop if not ind.fitness.valid]
+            self.eval_pop = [list(ind) for ind in self.pop if not ind.fitness.valid]
 
-            # Add as many explored runs as individuals that need to be evaluated.
-            # Furthermore, add the individuals as explored parameters.
-            # We need to convert them to lists or write our own custom IndividualParameter ;-)
-            # Note the second argument to `cartesian_product`:
-            # This is for only having the cartesian product
-            # between ``generation x (ind_idx AND individual)``,
-            # so that every individual has just one
-            # unique index within a generation.
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 
@@ -143,9 +140,3 @@ class GeneticAlgorithmOptimizer(Optimizer):
         logger.info("-- Hall of fame --")
         for hof_ind in self.postproc.hall_of_fame:
             logger.info("HOF individual is %s, %s" % (hof_ind, hof_ind.fitness.values))
-
-    def _expand_trajectory(self, traj):
-        traj.f_expand(cartesian_product({'generation': [self.g],
-                                         'ind_idx': range(len(self.eval_pop)),
-                                         'individual': [list(x) for x in self.eval_pop]},
-                                        [('ind_idx', 'individual'), 'generation']))
