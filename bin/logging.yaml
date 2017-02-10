@@ -20,7 +20,15 @@ loggers:
     level: INFO
     handlers: [file]
     propagate: no
+  ltl-sa:
+    level: DEBUG
+    handlers: [file]
+    propagate: no
   ltl-lsm-ga:
+    level: INFO
+    handlers: [file]
+    propagate: no
+  ltl-lsm-sa:
     level: INFO
     handlers: [file]
     propagate: no
