@@ -1,23 +1,11 @@
 LTL Experiments
 ===============
 
+This is template script for setting up an experiment using an arbitrary Optimizer and Optimizee.
+For actual examples, see :file:`bin/ltl-fun-sa.py` or :file:`bin/ltl-lsm-sa.py`.
 
-.. automodule:: ltl-template
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. include:: ../bin/ltl-template.py
+    :code: python
 
-.. automodule:: ltl-fun-sa
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    
-.. automodule:: ltl-lsm-sa
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
-.. automodule:: ltl-lsm-ga
-    :members:
-    :undoc-members:
-    :show-inheritance:
+

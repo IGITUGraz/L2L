@@ -21,6 +21,7 @@ def static_vars(**kwargs):
 
 class sdictm(object):
     """
+    A dictionary which allows accessing it's values using a dot notation. i.e. `d['a']` can be accessed as `d.a`
     Mutable version
     """
     _INSTANCE_VAR_LIST = ['_data']
@@ -147,7 +148,7 @@ class sdictm(object):
 
 class sdict(sdictm):
     """
-    Immutable version
+    Immutable version of :class:`~ltl.sdictm`
     """
     def __set__(self, attr, value):
         raise RuntimeError("Immutable dictionary")

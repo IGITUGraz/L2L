@@ -1,14 +1,14 @@
 import numpy as np
 import pylab
 from pylab import find
-import nest
 
 
 def get_spike_times(spike_rec):
     """
-       Takes a spike recorder spike_rec and returns the spikes in a list of numpy arrays.
-       Each array has all spike times of one sender (neuron) in units of [sec]
+   Takes a spike recorder spike_rec and returns the spikes in a list of numpy arrays.
+   Each array has all spike times of one sender (neuron) in units of [sec]
     """
+    import nest
     events = nest.GetStatus(spike_rec)[0]['events']
     min_idx = min(events['senders'])
     max_idx = max(events['senders'])
@@ -20,8 +20,16 @@ def get_spike_times(spike_rec):
 
 
 def cross_correlate_spikes(s1, s2, binsize, corr_range):
+    """
     # Compute cross-correlation between two spike trains
     # The implementation is rather inefficient
+    :param s1:
+    :param s2:
+    :param binsize:
+    :param corr_range:
+    :return:
+    """
+
     cr_lo = corr_range[0]
     cr_hi = corr_range[1]
     ttt = corr_range[1] - corr_range[0]
@@ -83,19 +91,14 @@ def poisson_generator(rate, t_start=0.0, t_stop=1000.0, rng=None):
     Note: t_start is always 0.0, thus all realizations are as if 
     they spiked at t=0.0, though this spike is not included in the SpikeList.
 
-    Inputs:
-        rate    - the rate of the discharge (in Hz)
-        t_start - the beginning of the SpikeTrain (in ms)
-        t_stop  - the end of the SpikeTrain (in ms)
-        array   - if True, a numpy array of sorted spikes is returned,
-                  rather than a SpikeTrain object.
+    :param rate: the rate of the discharge (in Hz)
+    :param t_start: the beginning of the SpikeTrain (in ms)
+    :param t_stop: the end of the SpikeTrain (in ms)
+    :param rng: A random number generator
 
     Examples:
         >> gen.poisson_generator(50, 0, 1000)
         >> gen.poisson_generator(20, 5000, 10000, array=True)
-     
-    See also:
-        inh_poisson_generator
     """
 
     if rng == None:
@@ -140,6 +143,7 @@ def poisson_generator(rate, t_start=0.0, t_stop=1000.0, rng=None):
 
 
 def generate_stimuls_mem(dt_stim, stim_len, Rs, Tsim):
+    """
     # Creates stimulus spikes for two input neurons
     # dt_stim...stimulus bursts come everey dt_stim ms
     # stim_len..length of stimulus burst in [ms]
@@ -147,6 +151,7 @@ def generate_stimuls_mem(dt_stim, stim_len, Rs, Tsim):
     # Tsim......simulation time [ms]
     # returns
     # spikes....s[i] spike times of i-th neuron [ms]
+    """
     spikes = [np.array([]), np.array([])]
     Nstim = int(np.floor((Tsim - stim_len) / dt_stim))
     targets = np.random.randint(2, size=Nstim)
@@ -164,6 +169,7 @@ def generate_stimuls_mem(dt_stim, stim_len, Rs, Tsim):
 
 
 def generate_stimuls_xor(dt_stim, stim_len, Rs, Tsim):
+    """
     # Creates stimulus spikes for two input neurons
     # dt_stim...stimulus bursts come everey dt_stim ms
     # stim_len..length of stimulus burst in [ms]
@@ -171,6 +177,7 @@ def generate_stimuls_xor(dt_stim, stim_len, Rs, Tsim):
     # Tsim......simulation time [ms]
     # returns
     # spikes....s[i] spike times of i-th neuron [ms]
+    """
     spikes = [np.array([]), np.array([])]
     Nstim = int(np.floor((Tsim - stim_len) / dt_stim))
     in1 = np.random.randint(2, size=Nstim)
@@ -198,12 +205,14 @@ def generate_stimuls_xor(dt_stim, stim_len, Rs, Tsim):
 
 
 def get_liquid_states(spike_times, times, tau):
+    """
     # returns the liquid states
     # spike_times[i]...numpy-array of spike-times of neuron i in [sec]
     # times............tunes when liquid states should be extracted [sec]
     # tau..............time constant for liquid state filter [sec]
     # returns:
     # states... numpy array with states[i,j] the state of neuron j in example i
+    """
     N = np.size(spike_times, 0)
     T = np.size(times, 0)
     states = np.zeros((T, N))
@@ -222,6 +231,7 @@ def get_liquid_states(spike_times, times, tau):
 
 
 def divide_train_test(states, targets, train_frac):
+    """
     # divides liquid states and targets into
     # training set and test set
     # randomly chooses round(train_frac*len(targets)) exmaples for training, rest for testing
@@ -233,6 +243,7 @@ def divide_train_test(states, targets, train_frac):
     #    states_test...test states in same format as states
     #    targets_train..training targets in same format as targets
     #    targets_test...test targets in same format as targets
+    """
     Nstates = np.size(states, 0)
     Ntrain = round(Nstates * train_frac)
     Ntest = Nstates - Ntrain
@@ -247,12 +258,14 @@ def divide_train_test(states, targets, train_frac):
 
 
 def train_readout(states, targets, reg_fact=0):
+    """
     # train readout with linear regression
     # states... numpy array with states[i,j] the state of neuron j in example i
     # targets.. the targets for training/testing. targets[i] is target of example i
     # reg_fact..regularization factor. If set to 0, no regularization is performed
     # returns:
     #    w...weight vector
+    """
     if reg_fact == 0:
         w = np.linalg.lstsq(states, targets)[0]
     else:
@@ -262,11 +275,13 @@ def train_readout(states, targets, reg_fact=0):
 
 
 def test_readout(w, states, targets):
+    """
     # compute misclassification rate of linear readout with weights w
     # states... numpy array with states[i,j] the state of neuron j in example i
     # targets.. the targets for training/testing. targets[i] is target of example i
     # returns:
     #   err...the misclassification rate
+    """
     yr = np.dot(states, w)  # compute prediction
     # compute error
     y = np.zeros(np.size(yr))

@@ -19,14 +19,20 @@ warnings.filterwarnings("ignore")
 
 logger = logging.getLogger('ltl-lsm-ga')
 
-with open("bin/logging.yaml") as f:
-    logging.config.dictConfig(yaml.load(f))
-
 
 def main():
     name = 'LTL-FUN-SA'
 
-    paths = Paths(name, dict(run_no='test'), root_dir_path='/home/anand/output')
+    paths = Paths(name, dict(run='test'), root_dir_path='/home/anand/output')
+    print("All output can be found in file ", paths.output_dir_path)
+    print("Change the values in logging.yaml to control log level and destination")
+    print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
+
+    with open("bin/logging.yaml") as f:
+        l_dict = yaml.load(f)
+        l_dict['handlers']['file']['filename'] = os.path.join(paths.output_dir_path,
+                                                              l_dict['handlers']['file']['filename'])
+        logging.config.dictConfig(l_dict)
 
     traj_file = os.path.join(paths.output_dir_path, 'data.h5')
 

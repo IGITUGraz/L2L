@@ -1,4 +1,8 @@
+from collections import namedtuple
+
 from pypet import cartesian_product
+
+OptimizerParameters = namedtuple('OptimizerParamters', [])
 
 
 class Optimizer:

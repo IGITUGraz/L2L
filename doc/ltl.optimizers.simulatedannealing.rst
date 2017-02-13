@@ -1,13 +1,17 @@
-ltl.optimizers.simulatedannealing package
-=========================================
+Optimizer using Simulated Annealing
+===================================
 
-Submodules
-----------
+SimulatedAnnealingOptimizer class
+---------------------------------
 
-ltl.optimizers.simulatedannealing.optimizer module
---------------------------------------------------
+.. autoclass:: ltl.optimizers.evolution.optimizer.GeneticAlgorithmOptimizer
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-.. automodule:: ltl.optimizers.simulatedannealing.optimizer
+SimulatedAnnealingParameters namedtuple
+---------------------------------------
+.. autoclass:: ltl.optimizers.evolution.optimizer.GeneticAlgorithmParameters
     :members:
     :undoc-members:
     :show-inheritance:

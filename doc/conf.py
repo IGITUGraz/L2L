@@ -20,6 +20,7 @@
 import os
 import sys
 
+sys.path.insert(0, os.path.abspath('../bin'))
 sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration ------------------------------------------------
@@ -137,8 +138,8 @@ html_theme = 'alabaster'
 # documentation.
 #
 html_theme_options = {
-        'page_width': '1024px'
-        }
+    'page_width': '1024px'
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
@@ -187,7 +188,7 @@ html_static_path = ['_static']
 
 # Custom sidebar templates, maps document names to template names.
 #
-# html_sidebars = {}
+html_sidebars = {'**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'], }
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.

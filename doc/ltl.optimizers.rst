@@ -1,30 +1,19 @@
-ltl.optimizers package
-======================
+Optimizers
+==========
 
-Subpackages
------------
+
+Optimizer Base Module
+---------------------
+
+.. autoclass:: ltl.optimizers.optimizer.Optimizer
+    :members:
+    :undoc-members:
+
+Implemented Examples
+--------------------
 
 .. toctree::
+    :maxdepth: 1
 
     ltl.optimizers.evolution
     ltl.optimizers.simulatedannealing
-
-Submodules
-----------
-
-ltl.optimizers.optimizer module
--------------------------------
-
-.. automodule:: ltl.optimizers.optimizer
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-.. Module contents
-.. ---------------
-..
-.. .. automodule:: ltl.optimizers
-..     :members:
-..     :undoc-members:
-..     :show-inheritance:

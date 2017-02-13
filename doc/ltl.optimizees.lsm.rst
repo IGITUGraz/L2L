@@ -1,30 +1,20 @@
-ltl.optimizees.lsm package
-==========================
+Optimizee for Liquid state machine
+==================================
+The fitness function to optimize is the fading memory or performance in XOR problem. The implementation uses `NEST <nest-simulator.org>`_.
 
-Submodules
-----------
+LSMOptimizee class
+------------------
 
-ltl.optimizees.lsm.optimizee module
------------------------------------
-
-.. automodule:: ltl.optimizees.lsm.optimizee
+.. autoclass:: ltl.optimizees.lsm.optimizee.LSMOptimizee
     :members:
     :undoc-members:
     :show-inheritance:
 
 ltl.optimizees.lsm.tools module
 -------------------------------
+Contains some tools used by the LSM implementation.
 
 .. automodule:: ltl.optimizees.lsm.tools
     :members:
     :undoc-members:
     :show-inheritance:
-
-
-.. Module contents
-.. ---------------
-..
-.. .. automodule:: ltl.optimizees.lsm
-..     :members:
-..     :undoc-members:
-..     :show-inheritance:

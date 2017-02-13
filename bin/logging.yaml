@@ -10,7 +10,7 @@ handlers:
   file:
     class: logging.handlers.WatchedFileHandler
     formatter: simple
-    filename: /home/anand/output/LTL/output.log
+    filename: output.log
 loggers:
   ltl-lsm:
     level: INFO

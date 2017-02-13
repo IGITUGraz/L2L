@@ -1,22 +1,17 @@
-ltl.optimizers.evolution package
-================================
+Optimizer using Evolutionary Algorithm
+======================================
 
-Submodules
-----------
+GeneticAlgorithmOptimizer class
+-------------------------------
 
-ltl.optimizers.evolution.optimizer module
------------------------------------------
-
-.. automodule:: ltl.optimizers.evolution.optimizer
+.. autoclass:: ltl.optimizers.evolution.optimizer.GeneticAlgorithmOptimizer
     :members:
     :undoc-members:
     :show-inheritance:
 
-
-.. Module contents
-.. ---------------
-..
-.. .. automodule:: ltl.optimizers.evolution
-..     :members:
-..     :undoc-members:
-..     :show-inheritance:
+GeneticAlgorithmParameters namedtuple
+-------------------------------------
+.. autoclass:: ltl.optimizers.evolution.optimizer.GeneticAlgorithmParameters
+    :members:
+    :undoc-members:
+    :show-inheritance:
