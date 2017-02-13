@@ -2,7 +2,6 @@ import logging
 from collections import namedtuple
 
 import numpy as np
-from pypet import cartesian_product
 
 from ltl.optimizers.optimizer import Optimizer
 
@@ -11,11 +10,34 @@ logger = logging.getLogger("ltl-sa")
 SimulatedAnnealingParameters = namedtuple('SimulatedAnnealingParameters',
                                           ['noisy_step', 'temp_decay', 'n_iteration', 'stop_criterion', 'bound',
                                            'seed'])
+SimulatedAnnealingParameters.__doc__ = """
+:param noisy_step: Size of the random step
+:param temp_decay: A function of the form f(t) = temperature at time t
+:param n_iteration: number of iteration to perform
+:param stop_criterion: Stop if change in fitness is below this value
+:param bound: bound of the function
+:param seed: Random seed
+"""
 
 
 class SimulatedAnnealingOptimizer(Optimizer):
+    """
+    Class for a generic simulate annealing solver.
+    In the pseudo code the algorithm does:
+
+    For n iterations do:
+        - Take a step of size noisy step in a random direction
+        - If it reduces the cost, keep the solution
+        - Otherwise keep with probability exp(- (f_new - f) / T)
+
+    :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs. The parameters should be initialized based on the values in `parameters`
+    :param optimizee_create_individual: Function that creates a new individual
+    :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each element of the fitness vector)
+    :param parameters: Instance of :func:`~collections.namedtuple` :class:`SimulatedAnnealingParameters` containing the parameters needed by the Optimizer
+    """
     def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters):
         # The following parameters are recorded
+        super().__init__(traj, optimizee_create_individual, optimizee_fitness_weights, parameters)
         traj.f_add_parameter('noisy_step', parameters.noisy_step, comment='Size of the random step')
         traj.f_add_parameter('temp_decay', parameters.temp_decay,
                              comment='A temperature decay parameter (multiplicative)')
@@ -49,7 +71,9 @@ class SimulatedAnnealingOptimizer(Optimizer):
         self._expand_trajectory(traj)
 
     def post_process(self, traj, fitnesses_results):
-        """Implements post-processing"""
+        """
+        See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
+        """
         noisy_step, temp_decay, n_iteration, stop_criterion, bound = \
             traj.noisy_step, traj.temp_decay, traj.n_iteration, traj.stop_criterion, traj.bound
         old_eval_pop = self.eval_pop.copy()
@@ -104,8 +128,9 @@ class SimulatedAnnealingOptimizer(Optimizer):
             self._expand_trajectory(traj)
 
     def end(self):
+        """
+        See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
+        """
         # ------------ Finished all runs and print result --------------- #
         # TODO: Maype print some individuals here?
         logger.info("-- End of (successful) annealing --")
-
-

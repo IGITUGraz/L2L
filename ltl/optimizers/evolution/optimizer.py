@@ -12,11 +12,37 @@ logger = logging.getLogger("ltl-ga")
 GeneticAlgorithmParameters = namedtuple('GeneticAlgorithmParameters',
                                         ['seed', 'popsize', 'CXPB', 'MUTPB', 'NGEN', 'indpb', 'tournsize', 'matepar',
                                          'mutpar'])
+GeneticAlgorithmParameters.__doc__ = """
+:param seed: Random seed
+:param popsize: Size of the population
+:param CXPB: Crossover probability
+:param MUTPB: Mutation probability
+:param NGEN: Number of generations simulation should run for
+:param indpb: Probability of mutation of each element in individual
+:param tournsize: Size of the tournamaent used for fitness evaluation and selection
+:param matepar: Paramter used for blending two values during mating
+"""
 
 
 class GeneticAlgorithmOptimizer(Optimizer):
+    """
+    Implements evolutionary algorithm
+
+    :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs.
+    The parameters should be initialized based on the values in :param parameters:
+
+    :param optimizee_create_individual: Function that creates a new individual
+
+    :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these
+    values (one for each element of the fitness vector)
+
+    :param parameters: Instance of :class:`namedtuple` :class:`GeneticAlgorithmParameters` containing the parameters
+    needed by the Optimizer
+    """
+
     def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters):
-        super().__init__()
+
+        super().__init__(traj, optimizee_create_individual, optimizee_fitness_weights, parameters)
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
         traj.f_add_parameter('popsize', parameters.popsize, comment='Population size')  # 185
         traj.f_add_parameter('CXPB', parameters.CXPB, comment='Crossover term')
@@ -61,7 +87,9 @@ class GeneticAlgorithmOptimizer(Optimizer):
         self._expand_trajectory(traj)
 
     def post_process(self, traj, fitnesses_results):
-        """Implements post-processing"""
+        """
+        See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
+        """
         CXPB, MUTPB, NGEN = traj.CXPB, traj.MUTPB, traj.NGEN
 
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
@@ -130,6 +158,9 @@ class GeneticAlgorithmOptimizer(Optimizer):
             self._expand_trajectory(traj)
 
     def end(self):
+        """
+        See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
+        """
         # ------------ Finished all runs and print result --------------- #
         logger.info("-- End of (successful) evolution --")
         best_inds = tools.selBest(self.pop, 10)

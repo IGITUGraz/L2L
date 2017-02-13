@@ -2,11 +2,15 @@ import os
 import warnings
 
 import logging.config
+
+import numpy as np
 import yaml
 
 from pypet import Environment
 from pypet import pypetconstants
 
+from ltl.optimizees.functions.optimizee import FunctionOptimizee
+from ltl.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParameters, SimulatedAnnealingOptimizer
 from ltl.paths import Paths
 from ltl.optimizees.optimizee import Optimizee
 from ltl.optimizers.optimizer import Optimizer
@@ -20,10 +24,8 @@ with open("bin/logging.yaml") as f:
 
 
 def main():
-    # TODO: Give some *meaningful* name here
-    name = 'LTL'
+    name = 'LTL-FUN_SA'
 
-    # TODO: Change the `root_dir_path` here
     paths = Paths(name, dict(run_no='test'), root_dir_path='/home/anand/output')
 
     traj_file = os.path.join(paths.output_dir_path, 'data.h5')
@@ -33,10 +35,10 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      freeze_input=True,
-                      multiproc=True,
-                      use_scoop=True,
-                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                      # freeze_input=True,
+                      # multiproc=True,
+                      # use_scoop=True,
+                      # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=True,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
@@ -46,12 +48,14 @@ def main():
     traj = env.trajectory
 
     # NOTE: Innerloop simulator
-    # TODO: Change the optimizee to the appropriate Optimizee class
-    optimizee = Optimizee()
+    optimizee = FunctionOptimizee('rastrigin')
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    optimizer = Optimizer(traj, ...)
+    parameters = SimulatedAnnealingParameters(noisy_step=.3, temp_decay=.99, n_iteration=1000, stop_criterion=-np.Inf,
+                                              bound=optimizee.bound, seed=42)
+    optimizer = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
+                                            optimizee_fitness_weights=(-1.0,), parameters=parameters)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)

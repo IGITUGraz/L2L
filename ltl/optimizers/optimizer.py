@@ -8,9 +8,19 @@ class Optimizer:
 
     """
 
-    def __init__(self):
+    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters):
         """
         Initialize the Optimizer (run one time code)
+
+        :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs.
+        The parameters should be initialized based on the values in :param parameters:
+
+        :param optimizee_create_individual: A function which when called returns one instance of parameter (or "individual")
+
+        :param optimizee_fitness_weights: The weights which should be multiplied with the fitness returned from the
+        :class:`~Optimizee`. If negative, the Optimizer minimizes instead of maximizing.
+
+        :param parameters: A named tuple containing the parameters for the Optimizer class
         """
         self.g = None
         self.eval_pop = None
@@ -31,6 +41,8 @@ class Optimizer:
 
         """
         # NOTE: Always remember to keep the following two lines.
+        # TODO: Set eval_pop to the values of parameters you want to evaluate in the next cycle
+        # self.eval_pop = ...
         self.g += 1
         self._expand_trajectory(traj)
 
