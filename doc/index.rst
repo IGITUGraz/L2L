@@ -45,7 +45,7 @@ Writing new algorithms
 
 * For a new **Optimizee**: Create a copy of the class :class:`~ltl.optimizees.optimizee.Optimizee` with an appropriate name and fill in the functions.
 * For a new **Optimizer**: Create a copy of the class :class:`~ltl.optimizers.optimizer.Optimizer` with an appropriate name and fill in the functions.
-* For a new **experiment**: Create a copy of the file :mod:`ltl-template` with an appropriate name and fill in the *TODOs*.
+* For a new **experiment**: Create a copy of the file :file:`bin/ltl-template.py` with an appropriate name and fill in the *TODOs*.
 
 Examples
 +++++++++++++
