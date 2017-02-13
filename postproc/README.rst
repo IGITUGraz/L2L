@@ -1,0 +1,1 @@
+Use this directory to put scripts for processing the data produced from simulation.

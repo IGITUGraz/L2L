@@ -32,6 +32,10 @@ loggers:
     level: INFO
     handlers: [file]
     propagate: no
+  pypet:
+    level: ERROR
+    handlers: [console]
+    propagate: no
 root:
   level: INFO
   handlers: [console]

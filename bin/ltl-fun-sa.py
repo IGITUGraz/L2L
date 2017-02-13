@@ -24,7 +24,7 @@ with open("bin/logging.yaml") as f:
 
 
 def main():
-    name = 'LTL-FUN_SA'
+    name = 'LTL-FUN-SA'
 
     paths = Paths(name, dict(run_no='test'), root_dir_path='/home/anand/output')
 
@@ -52,8 +52,8 @@ def main():
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = SimulatedAnnealingParameters(noisy_step=.3, temp_decay=.99, n_iteration=1000, stop_criterion=-np.Inf,
-                                              bound=optimizee.bound, seed=42)
+    parameters = SimulatedAnnealingParameters(noisy_step=.3, temp_decay=.99, n_iteration=1000, stop_criterion=np.Inf,
+                                              bound=optimizee.bound, seed=np.random.randint(1e5))
     optimizer = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                             optimizee_fitness_weights=(-1.0,), parameters=parameters)
 

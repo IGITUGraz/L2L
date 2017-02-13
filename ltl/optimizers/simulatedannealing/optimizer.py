@@ -35,6 +35,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
     :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each element of the fitness vector)
     :param parameters: Instance of :func:`~collections.namedtuple` :class:`SimulatedAnnealingParameters` containing the parameters needed by the Optimizer
     """
+
     def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters):
         # The following parameters are recorded
         super().__init__(traj, optimizee_create_individual, optimizee_fitness_weights, parameters)
@@ -101,12 +102,13 @@ class SimulatedAnnealingOptimizer(Optimizer):
 
             # Accept or reject the new solution
             r = np.random.rand()
-            p = np.exp(-(weighted_fitness - self.current_fitness_value) / self.T)
+            p = np.exp((weighted_fitness - self.current_fitness_value) / self.T)
 
             traj.f_add_result('$set.$.individual', list(individual))
             # Watchout! if weighted fitness is a tuple/np array it should be converted to a list first here
             traj.f_add_result('$set.$.fitness', weighted_fitness)
 
+            # Accept
             if r < p or weighted_fitness >= self.current_fitness_value:
                 self.current_fitness_value = weighted_fitness
                 self.current_individual = individual
@@ -123,7 +125,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
 
         # ------- Create the next generation by crossover and mutation -------- #
         # not necessary for the last generation
-        if self.g < n_iteration - 1 and stop_criterion < self.current_fitness_value:
+        if self.g < n_iteration - 1 and stop_criterion > self.current_fitness_value:
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 
@@ -132,5 +134,5 @@ class SimulatedAnnealingOptimizer(Optimizer):
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
         # ------------ Finished all runs and print result --------------- #
-        # TODO: Maype print some individuals here?
+        logger.info("The last individual was %s with fitness %s", self.current_individual, self.current_fitness_value)
         logger.info("-- End of (successful) annealing --")
