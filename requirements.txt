@@ -1,7 +1,8 @@
 numpy
 scipy
+PyYAML
 matplotlib
 pypet==0.4.0
 scoop==0.7.1.1
-PyYAML==3.11
+Sphinx
 

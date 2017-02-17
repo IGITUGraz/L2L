@@ -8,6 +8,7 @@ Optimizer Base Module
 .. autoclass:: ltl.optimizers.optimizer.Optimizer
     :members:
     :undoc-members:
+    :private-members:
 
 Implemented Examples
 --------------------
