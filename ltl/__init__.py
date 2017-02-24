@@ -1,6 +1,5 @@
 from collections import OrderedDict
 from warnings import warn
-from collections import Mapping
 
 import functools
 
@@ -61,12 +60,6 @@ class sdictm(object):
         return self.__getattr__(key)
 
     def __set__(self, key, value):
-        if '.' in key:
-            curr_key, remainingprop = key.split('.', maxsplit=1)
-            if curr_key not in self._data:
-                self._data[curr_key] = self.__class__({})
-            self._data[curr_key][remainingprop] = value
-        else:
             self._data[key] = value
 
     def __setitem__(self, key, value):
