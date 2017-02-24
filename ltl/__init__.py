@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from warnings import warn
+from collections import Mapping
 
 import functools
 
@@ -60,7 +61,13 @@ class sdictm(object):
         return self.__getattr__(key)
 
     def __set__(self, key, value):
-        self._data[key] = value
+        if '.' in key:
+            curr_key, remainingprop = key.split('.', maxsplit=1)
+            if curr_key not in self._data:
+                self._data[curr_key] = self.__class__({})
+            self._data[curr_key][remainingprop] = value
+        else:
+            self._data[key] = value
 
     def __setitem__(self, key, value):
         self.__set__(key, value)
@@ -164,6 +171,82 @@ class sdict(sdictm):
 
     def apply(self, fn):
         raise RuntimeError("Immutable dictionary")
+
+
+class Translator:
+    """
+    This is a service that translates between a parameter dict and a list based individual based
+    on the given specifications
+
+    This allows for convenient specification of parameters for the optimizers via their names.
+    The names must bedot separated identifiers representing the parameters full names in the
+    pypet trajectory It borrows the sdict interface completely 
+    """
+    existing_translators = {}
+
+    def __new__(cls, name, spec_tuple_list):
+        if name not in Translator.existing_translators:
+            # Initializing class params_spec
+            params_spec = []
+            for spec_tuple in spec_tuple_list:
+                param_name = spec_tuple[0]
+                param_type = spec_tuple[1]
+                assert spec_tuple[1] in ['seq', 'scalar'], "The Param type can only be either 'seq' or 'scalar'"
+                if spec_tuple[1] == 'seq':
+                    param_len = spec_tuple[2]
+                else:
+                    param_len = 1
+                params_spec.append((param_name, param_type, param_len))
+        
+            new_obj = super(Translator, cls).__new__(cls)
+            new_obj.name = name
+            new_obj.params_spec = params_spec
+            Translator.existing_translators[name] = new_obj
+        else:
+            new_obj = Translator.existing_translators[name]
+
+        return new_obj
+
+    def __getnewargs__(self):
+        return (self.name, self.params_spec)
+
+    def params_to_list(self, ind_params_dict):
+        return_list = []
+        for par_name, par_type, par_len in self.params_spec:
+            if par_type == 'seq':
+                return_list.extend(ind_params_dict[par_name])
+            elif par_type == 'scalar':
+                return_list.append(ind_params_dict[par_name])
+        return return_list
+
+    def list_to_params(self, ind_params_list):
+        cursor = 0
+        return_dict = OrderedDict()
+        for par_name, par_type, par_len in self.params_spec:
+            if par_type == 'seq':
+                return_dict[par_name] = ind_params_list[cursor:cursor+par_len]
+                cursor += par_len
+            elif par_type == 'scalar':
+                return_dict[par_name] = ind_params_list[cursor]
+                cursor += 1
+        assert cursor == len(ind_params_list), "Incorrect Parameter List length, Somethings not right"
+        return return_dict
+
+    def get_param_names(self):
+        return tuple(x[0] for x in self.params_spec)
+        
+    def get_grouped_param_dict(self, paramdict_iter):
+        paramdicttuple = tuple(paramdict_iter)
+        
+        return_dict = OrderedDict({})
+        for par_name, _, __ in self.params_spec:
+            return_dict[par_name] = []
+
+        for param_dict in paramdicttuple:
+            for par_name, _, __ in self.params_spec:
+                return_dict[par_name].append(param_dict[par_name])
+
+        return return_dict
 
 
 def printq(s, quiet):

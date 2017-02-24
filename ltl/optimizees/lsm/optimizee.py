@@ -9,6 +9,7 @@ from ltl.optimizees.lsm.tools import generate_stimuls_mem, get_spike_times, get_
     test_readout, divide_train_test, generate_stimuls_xor
 from ltl.optimizees.optimizee import Optimizee
 from ltl.matplotlib_ import plt
+from ltl import Translator
 
 logger = logging.getLogger("ltl-lsm")
 
@@ -18,12 +19,16 @@ _DEBUG = False
 class LSMOptimizee(Optimizee):
     def __init__(self):
         super().__init__()
+        self.translator = Translator('LSMParameters', (('jee', 'scalar'),
+                                                       ('jei', 'scalar'),
+                                                       ('jie', 'scalar'),
+                                                       ('jii', 'scalar')))
         self._initialize()
 
     def _initialize(self):
         # Set parameters of the NEST simulation kernel
         nest.SetKernelStatus({'print_time': False,
-                              'local_num_threads': 1})
+                              'local_num_threads': 11})
 
         # dynamic parameters
         f0 = 10.
@@ -77,11 +82,17 @@ class LSMOptimizee(Optimizee):
 
     def create_individual(self):
         jee, jei, jie, jii = np.random.randint(1, 20, 4).astype(np.float)
-        return [jee, jei, jie, jii]
+        return {'jee':jee,
+                'jei':jei,
+                'jie':jie,
+                'jii':jii}
 
     def simulate(self, traj):
 
-        jee, jei, jie, jii = traj.individual
+        jee = traj.individual.jee
+        jei = traj.individual.jei
+        jie = traj.individual.jie
+        jii = traj.individual.jii
 
         if jee < 0 or jei < 0 or jie < 0 or jii < 0:
             return (np.inf,)

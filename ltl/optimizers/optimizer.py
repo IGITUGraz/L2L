@@ -24,7 +24,9 @@ class Optimizer:
     
     """
 
-    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters):
+    def __init__(self, traj, optimizee, optimizee_fitness_weights, parameters):
+
+        self.translator = optimizee.translator
         #: The current generation number
         self.g = None
         #: The population (i.e. list of individuals) to be evaluated at the next iteration
@@ -69,11 +71,15 @@ class Optimizer:
         :return:
         """
 
+        grouped_params_dict = self.translator.get_grouped_param_dict(self.translator.list_to_params(x) for x in self.eval_pop)
+
+        final_params_dict = {'generation': [self.g],
+                             'ind_idx': range(len(self.eval_pop))}
+        final_params_dict.update(grouped_params_dict)
+
         # We need to convert them to lists or write our own custom IndividualParameter ;-)
         # Note the second argument to `cartesian_product`: This is for only having the cartesian product
         # between ``generation x (ind_idx AND individual)``, so that every individual has just one
         # unique index within a generation.
-        traj.f_expand(cartesian_product({'generation': [self.g],
-                                         'ind_idx': range(len(self.eval_pop)),
-                                         'individual': self.eval_pop},
-                                        [('ind_idx', 'individual'), 'generation']))
+        traj.f_expand(cartesian_product(final_params_dict,
+                                        [('ind_idx',) + tuple(grouped_params_dict.keys()), 'generation']))

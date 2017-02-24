@@ -2,7 +2,7 @@ import numpy as np
 
 from ltl.optimizees.functions.tools import get_cost_function
 from ltl.optimizees.optimizee import Optimizee
-
+from ltl import Translator
 
 class FunctionOptimizee(Optimizee):
     """
@@ -15,6 +15,7 @@ class FunctionOptimizee(Optimizee):
     """
 
     def __init__(self, cost_fn_name):
+        self.translator = Translator('FuncOptTranslator', [('coords', 'seq', 2)])
         super().__init__()
         self.cost_fn, self.bound = get_cost_function(cost_fn_name)
 
@@ -23,7 +24,7 @@ class FunctionOptimizee(Optimizee):
         Creates a random value of parameter within given bounds
         """
         # Define the first solution candidate ramdomly
-        return np.random.rand(2) * (self.bound[1] - self.bound[0]) + self.bound[0]
+        return {'coords':np.random.rand(2) * (self.bound[1] - self.bound[0]) + self.bound[0]}
 
     def simulate(self, traj):
         """
@@ -32,5 +33,5 @@ class FunctionOptimizee(Optimizee):
         :param ~pypet.trajectory.Trajectory traj: Trajectory
         :return: a single element :obj:`tuple` containing the value of the chosen function
         """
-        individual = traj.individual
+        individual = np.array(traj.individual.coords)
         return (self.cost_fn(individual),)

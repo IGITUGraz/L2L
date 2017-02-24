@@ -37,3 +37,9 @@ class Optimizee:
         Run any code required to clean-up, print final individuals etc.
         """
         pass
+
+    def create_individual_dict(self):
+        return self.create_individual()
+
+    def create_individual_list(self):
+        return self.translator.params_to_list(self.create_individual())

@@ -36,9 +36,9 @@ class SimulatedAnnealingOptimizer(Optimizer):
     :param parameters: Instance of :func:`~collections.namedtuple` :class:`SimulatedAnnealingParameters` containing the parameters needed by the Optimizer
     """
 
-    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters):
+    def __init__(self, traj, optimizee, optimizee_fitness_weights, parameters):
         # The following parameters are recorded
-        super().__init__(traj, optimizee_create_individual, optimizee_fitness_weights, parameters)
+        super().__init__(traj, optimizee, optimizee_fitness_weights, parameters)
         traj.f_add_parameter('noisy_step', parameters.noisy_step, comment='Size of the random step')
         traj.f_add_parameter('temp_decay', parameters.temp_decay,
                              comment='A temperature decay parameter (multiplicative)')
@@ -49,11 +49,16 @@ class SimulatedAnnealingOptimizer(Optimizer):
                                      'stay within [x_min,x_max]')
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
 
-        self.current_individual = np.array(optimizee_create_individual())
+        current_individual_dict = optimizee.create_individual_dict()
+        self.current_individual = optimizee.translator.params_to_list(current_individual_dict)
+        self.current_individual = np.array(self.current_individual)
+
         # Placeholders for individuals and results that are about to be explored
         traj.f_add_parameter('generation', 0, comment='Current generation')
         traj.f_add_parameter('ind_idx', 0, comment='Index of individual')
-        traj.f_add_derived_parameter('individual', self.current_individual, 'An individual of the population')
+        traj.f_add_parameter_group('individual', 'An individual of the population')
+        for pname, pval in current_individual_dict.items():
+            traj.par.individual.f_add_parameter(pname, pval)
 
         traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
 
