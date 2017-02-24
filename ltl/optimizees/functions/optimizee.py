@@ -2,7 +2,7 @@ import numpy as np
 
 from ltl.optimizees.functions.tools import get_cost_function
 from ltl.optimizees.optimizee import Optimizee
-from ltl import Translator
+from ltl import IndivParamSpec
 
 class FunctionOptimizee(Optimizee):
     """
@@ -15,7 +15,7 @@ class FunctionOptimizee(Optimizee):
     """
 
     def __init__(self, cost_fn_name):
-        self.translator = Translator('FuncOptTranslator', [('coords', 'seq', 2)])
+        self.translator = IndivParamSpec('FuncOptParameters', [('coords', 'seq', 2)])
         super().__init__()
         self.cost_fn, self.bound = get_cost_function(cost_fn_name)
 

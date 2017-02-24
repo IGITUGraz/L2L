@@ -166,7 +166,7 @@ class sdict(sdictm):
         raise RuntimeError("Immutable dictionary")
 
 
-class Translator:
+class IndivParamSpec:
     """
     This is a service that translates between a parameter dict and a list based individual based
     on the given specifications
@@ -178,7 +178,7 @@ class Translator:
     existing_translators = {}
 
     def __new__(cls, name, spec_tuple_list):
-        if name not in Translator.existing_translators:
+        if name not in IndivParamSpec.existing_translators:
             # Initializing class params_spec
             params_spec = []
             for spec_tuple in spec_tuple_list:
@@ -191,12 +191,12 @@ class Translator:
                     param_len = 1
                 params_spec.append((param_name, param_type, param_len))
         
-            new_obj = super(Translator, cls).__new__(cls)
+            new_obj = super(IndivParamSpec, cls).__new__(cls)
             new_obj.name = name
             new_obj.params_spec = params_spec
-            Translator.existing_translators[name] = new_obj
+            IndivParamSpec.existing_translators[name] = new_obj
         else:
-            new_obj = Translator.existing_translators[name]
+            new_obj = IndivParamSpec.existing_translators[name]
 
         return new_obj
 

@@ -9,7 +9,7 @@ from ltl.optimizees.lsm.tools import generate_stimuls_mem, get_spike_times, get_
     test_readout, divide_train_test, generate_stimuls_xor
 from ltl.optimizees.optimizee import Optimizee
 from ltl.matplotlib_ import plt
-from ltl import Translator
+from ltl import IndivParamSpec
 
 logger = logging.getLogger("ltl-lsm")
 
@@ -19,7 +19,7 @@ _DEBUG = False
 class LSMOptimizee(Optimizee):
     def __init__(self):
         super().__init__()
-        self.translator = Translator('LSMParameters', (('jee', 'scalar'),
+        self.translator = IndivParamSpec('LSMParameters', (('jee', 'scalar'),
                                                        ('jei', 'scalar'),
                                                        ('jie', 'scalar'),
                                                        ('jii', 'scalar')))
