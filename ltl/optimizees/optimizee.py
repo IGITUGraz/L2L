@@ -8,11 +8,13 @@ class Optimizee:
     def __init__(self):
         pass
 
-    def create_individual(self):
+    def create_individual_dict(self):
         """
-        Create one individual i.e. one instance of parameters. This is used by the :class:`ltl.optimizers.*` to
-        initialize the individual/parameters. After that, the change in parameters is model specific e.g. In simulated
-        annealing, it is perturbed on specific criteria
+        Create one individual i.e. one instance of parameters. This instance must be a dictionary
+        with dot-separated parameter names as keys and parameter values as values. This is used 
+        by the :class:`ltl.optimizers.*` via the function create_individual() to initialize the
+        individual/parameters. After that, the change in parameters is model specific e.g. In
+        simulated annealing, it is perturbed on specific criteria
 
         :return: a :class:`list`
         """
@@ -38,8 +40,5 @@ class Optimizee:
         """
         pass
 
-    def create_individual_dict(self):
-        return self.create_individual()
-
-    def create_individual_list(self):
-        return self.translator.params_to_list(self.create_individual())
+    def create_individual(self):
+        return self.translator.params_to_list(self.create_individual_dict())

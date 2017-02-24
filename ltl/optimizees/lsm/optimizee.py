@@ -80,7 +80,7 @@ class LSMOptimizee(Optimizee):
                        'excitatory_noise',
                        {'weight': J_noise})
 
-    def create_individual(self):
+    def create_individual_dict(self):
         jee, jei, jie, jii = np.random.randint(1, 20, 4).astype(np.float)
         return {'jee':jee,
                 'jei':jei,

@@ -64,7 +64,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
 
         toolbox = base.Toolbox()
         # Structure initializers
-        toolbox.register("individual", tools.initIterate, creator.Individual, optimizee.create_individual_list)
+        toolbox.register("individual", tools.initIterate, creator.Individual, optimizee.create_individual)
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
         # Operator registering

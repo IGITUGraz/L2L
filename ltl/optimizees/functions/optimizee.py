@@ -19,7 +19,7 @@ class FunctionOptimizee(Optimizee):
         super().__init__()
         self.cost_fn, self.bound = get_cost_function(cost_fn_name)
 
-    def create_individual(self):
+    def create_individual_dict(self):
         """
         Creates a random value of parameter within given bounds
         """
