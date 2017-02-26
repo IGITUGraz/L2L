@@ -2,6 +2,8 @@ from collections import namedtuple
 
 from pypet import cartesian_product
 
+from ltl import get_grouped_param_dict
+
 OptimizerParameters = namedtuple('OptimizerParamters', [])
 
 
@@ -24,9 +26,21 @@ class Optimizer:
     
     """
 
-    def __init__(self, traj, optimizee, optimizee_fitness_weights, parameters):
+    def __init__(self, traj, optee_create_indiv, optee_indiv_param_spec, optee_fitness_weights, parameters):
 
-        self.translator = optimizee.translator
+        # Creating Placeholders for individuals and results that are about to be explored
+        traj.f_add_parameter('generation', 0, comment='Current generation')
+        traj.f_add_parameter('ind_idx', 0, comment='Index of individual')
+        traj.f_add_parameter_group('individual', 'An individual of the population')
+        self.init_individual = optee_create_indiv()
+        for key, val in self.init_individual.items():
+            traj.par.individual.f_add_parameter(key, val)
+
+        # Initializing basic variables
+        self.optee_create_indiv = optee_create_indiv
+        self.optee_indiv_param_spec = optee_indiv_param_spec
+        self.optee_fitness_weights = optee_fitness_weights
+
         #: The current generation number
         self.g = None
         #: The population (i.e. list of individuals) to be evaluated at the next iteration
@@ -71,7 +85,7 @@ class Optimizer:
         :return:
         """
 
-        grouped_params_dict = self.translator.get_grouped_param_dict(self.translator.list_to_params(x) for x in self.eval_pop)
+        grouped_params_dict = get_grouped_param_dict(self.eval_pop, self.optee_indiv_param_spec)
 
         final_params_dict = {'generation': [self.g],
                              'ind_idx': range(len(self.eval_pop))}

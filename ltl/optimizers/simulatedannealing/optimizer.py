@@ -4,7 +4,7 @@ from collections import namedtuple
 import numpy as np
 
 from ltl.optimizers.optimizer import Optimizer
-
+from ltl import params_to_list, list_to_params
 logger = logging.getLogger("ltl-sa")
 
 SimulatedAnnealingParameters = namedtuple('SimulatedAnnealingParameters',
@@ -30,15 +30,22 @@ class SimulatedAnnealingOptimizer(Optimizer):
         - If it reduces the cost, keep the solution
         - Otherwise keep with probability exp(- (f_new - f) / T)
 
+    NOTE: This expects all parameters of the system to be of floating point
+
     :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs. The parameters should be initialized based on the values in `parameters`
     :param optimizee_create_individual: Function that creates a new individual
     :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each element of the fitness vector)
     :param parameters: Instance of :func:`~collections.namedtuple` :class:`SimulatedAnnealingParameters` containing the parameters needed by the Optimizer
     """
 
-    def __init__(self, traj, optimizee, optimizee_fitness_weights, parameters):
+    def __init__(self, traj, optee_create_indiv, optee_indiv_param_spec, optee_fitness_weights, parameters):
+        super().__init__(traj,
+                 optee_create_indiv=optee_create_indiv,
+                 optee_indiv_param_spec=optee_indiv_param_spec,
+                 optee_fitness_weights=optee_fitness_weights,
+                 parameters=parameters)
+
         # The following parameters are recorded
-        super().__init__(traj, optimizee, optimizee_fitness_weights, parameters)
         traj.f_add_parameter('noisy_step', parameters.noisy_step, comment='Size of the random step')
         traj.f_add_parameter('temp_decay', parameters.temp_decay,
                              comment='A temperature decay parameter (multiplicative)')
@@ -49,21 +56,11 @@ class SimulatedAnnealingOptimizer(Optimizer):
                                      'stay within [x_min,x_max]')
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
 
-        current_individual_dict = optimizee.create_individual_dict()
-        self.current_individual = optimizee.translator.params_to_list(current_individual_dict)
-        self.current_individual = np.array(self.current_individual)
-
-        # Placeholders for individuals and results that are about to be explored
-        traj.f_add_parameter('generation', 0, comment='Current generation')
-        traj.f_add_parameter('ind_idx', 0, comment='Index of individual')
-        traj.f_add_parameter_group('individual', 'An individual of the population')
-        for pname, pval in current_individual_dict.items():
-            traj.par.individual.f_add_parameter(pname, pval)
+        self.current_individual = np.array(params_to_list(self.init_individual, self.optee_indiv_param_spec))
 
         traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
 
         # The following parameters are NOT recorded
-        self.optimizee_fitness_weights = optimizee_fitness_weights
         self.T = 1.  # Initialize temperature
         self.g = 0  # the current generation
 
@@ -73,7 +70,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         new_individual = np.clip(
             self.current_individual + np.random.randn(self.current_individual.size) * parameters.noisy_step,
             parameters.bound[0], parameters.bound[1])
-        self.eval_pop = [new_individual]
+        self.eval_pop = [list_to_params(new_individual, self.optee_indiv_param_spec)]
         self._expand_trajectory(traj)
 
     def post_process(self, traj, fitnesses_results):
@@ -95,7 +92,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
             # Update fitnesses
             # NOTE: The fitness here is a tuple! For now, we'll only support fitnesses with one element
             run_index, fitness = result  # The environment returns tuples: [(run_idx, run), ...]
-            weighted_fitness = tuple(f * w for f, w in zip(fitness, self.optimizee_fitness_weights))
+            weighted_fitness = tuple(f * w for f, w in zip(fitness, self.optee_fitness_weights))
             assert len(weighted_fitness) == 1
             weighted_fitness = weighted_fitness[0]
 
@@ -109,21 +106,21 @@ class SimulatedAnnealingOptimizer(Optimizer):
             r = np.random.rand()
             p = np.exp((weighted_fitness - self.current_fitness_value) / self.T)
 
-            traj.f_add_result('$set.$.individual', list(individual))
+            traj.f_add_result('$set.$.individual', individual)
             # Watchout! if weighted fitness is a tuple/np array it should be converted to a list first here
             traj.f_add_result('$set.$.fitness', weighted_fitness)
 
             # Accept
             if r < p or weighted_fitness >= self.current_fitness_value:
                 self.current_fitness_value = weighted_fitness
-                self.current_individual = individual
+                self.current_individual = np.array(params_to_list(individual, self.optee_indiv_param_spec))
 
             new_individual = np.clip(
                 self.current_individual + np.random.randn(self.current_individual.size) * noisy_step,
                 bound[0], bound[1])
             logger.debug("Current best fitness is %.2f. New individual is %s", self.current_fitness_value,
                          new_individual)
-            self.eval_pop.append(new_individual)
+            self.eval_pop.append(list_to_params(new_individual, self.optee_indiv_param_spec))
         traj.v_idx = -1  # set the trajectory back to default
 
         logger.info("-- End of generation {} --".format(self.g))

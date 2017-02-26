@@ -2,7 +2,6 @@ import numpy as np
 
 from ltl.optimizees.functions.tools import get_cost_function
 from ltl.optimizees.optimizee import Optimizee
-from ltl import IndivParamSpec
 
 class FunctionOptimizee(Optimizee):
     """
@@ -15,11 +14,11 @@ class FunctionOptimizee(Optimizee):
     """
 
     def __init__(self, cost_fn_name):
-        self.translator = IndivParamSpec('FuncOptParameters', [('coords', 'seq', 2)])
+        self.indiv_param_spec = [('coords', 'seq', 2)]
         super().__init__()
         self.cost_fn, self.bound = get_cost_function(cost_fn_name)
 
-    def create_individual_dict(self):
+    def create_individual(self):
         """
         Creates a random value of parameter within given bounds
         """

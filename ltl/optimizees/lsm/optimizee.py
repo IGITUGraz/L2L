@@ -9,7 +9,6 @@ from ltl.optimizees.lsm.tools import generate_stimuls_mem, get_spike_times, get_
     test_readout, divide_train_test, generate_stimuls_xor
 from ltl.optimizees.optimizee import Optimizee
 from ltl.matplotlib_ import plt
-from ltl import IndivParamSpec
 
 logger = logging.getLogger("ltl-lsm")
 
@@ -19,10 +18,10 @@ _DEBUG = False
 class LSMOptimizee(Optimizee):
     def __init__(self):
         super().__init__()
-        self.translator = IndivParamSpec('LSMParameters', (('jee', 'scalar'),
-                                                       ('jei', 'scalar'),
-                                                       ('jie', 'scalar'),
-                                                       ('jii', 'scalar')))
+        self.indiv_param_spec = (('jee', 'scalar'),
+                                 ('jei', 'scalar'),
+                                 ('jie', 'scalar'),
+                                 ('jii', 'scalar'))
         self._initialize()
 
     def _initialize(self):
@@ -80,7 +79,7 @@ class LSMOptimizee(Optimizee):
                        'excitatory_noise',
                        {'weight': J_noise})
 
-    def create_individual_dict(self):
+    def create_individual(self):
         jee, jei, jie, jii = np.random.randint(1, 20, 4).astype(np.float)
         return {'jee':jee,
                 'jei':jei,

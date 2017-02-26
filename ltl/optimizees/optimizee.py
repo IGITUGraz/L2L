@@ -8,7 +8,7 @@ class Optimizee:
     def __init__(self):
         pass
 
-    def create_individual_dict(self):
+    def create_individual(self):
         """
         Create one individual i.e. one instance of parameters. This instance must be a dictionary
         with dot-separated parameter names as keys and parameter values as values. This is used 
@@ -39,6 +39,3 @@ class Optimizee:
         Run any code required to clean-up, print final individuals etc.
         """
         pass
-
-    def create_individual(self):
-        return self.translator.params_to_list(self.create_individual_dict())
