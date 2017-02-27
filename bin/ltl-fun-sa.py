@@ -22,17 +22,22 @@ logger = logging.getLogger('ltl-lsm-ga')
 
 def main():
     name = 'LTL-FUN-SA'
-
-    paths = Paths(name, dict(run='test'), root_dir_path='/home/anand/output')
-    print("All output can be found in file ", paths.output_dir_path)
-    print("Change the values in logging.yaml to control log level and destination")
-    print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
+    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+    assert root_dir_path is not None, \
+           "You have not set the root path to store your results." \
+           " Set it manually in the code (by setting the variable 'root_dir_path')" \
+           " before running the simulation"
+    paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
 
     with open("bin/logging.yaml") as f:
         l_dict = yaml.load(f)
-        l_dict['handlers']['file']['filename'] = os.path.join(paths.output_dir_path,
-                                                              l_dict['handlers']['file']['filename'])
+        log_output_file = os.path.join(paths.results_path, l_dict['handlers']['file']['filename'])
+        l_dict['handlers']['file']['filename'] = log_output_file
         logging.config.dictConfig(l_dict)
+
+    print("All output can be found in file ", log_output_file)
+    print("Change the values in logging.yaml to control log level and destination")
+    print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
 
     traj_file = os.path.join(paths.output_dir_path, 'data.h5')
 
@@ -58,10 +63,12 @@ def main():
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = SimulatedAnnealingParameters(noisy_step=.3, temp_decay=.99, n_iteration=1000, stop_criterion=np.Inf,
+    parameters = SimulatedAnnealingParameters(noisy_step=.3, temp_decay=.998, n_iteration=1000, stop_criterion=np.Inf,
                                               bound=optimizee.bound, seed=np.random.randint(1e5))
     optimizer = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                            optimizee_fitness_weights=(-1.0,), parameters=parameters)
+                                                  optimizee_fitness_weights=(-0.1,),
+                                                  optimizee_individual_param_spec=optimizee.indiv_param_spec, 
+                                                  parameters=parameters)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)

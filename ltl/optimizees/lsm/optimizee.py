@@ -16,18 +16,19 @@ _DEBUG = False
 
 
 class LSMOptimizee(Optimizee):
-    def __init__(self):
+    def __init__(self, *, n_NEST_threads=1):
         super().__init__()
         self.indiv_param_spec = (('jee', 'scalar'),
                                  ('jei', 'scalar'),
                                  ('jie', 'scalar'),
                                  ('jii', 'scalar'))
+        self.n_NEST_threads = n_NEST_threads
         self._initialize()
 
     def _initialize(self):
         # Set parameters of the NEST simulation kernel
         nest.SetKernelStatus({'print_time': False,
-                              'local_num_threads': 11})
+                              'local_num_threads': self.n_NEST_threads})
 
         # dynamic parameters
         f0 = 10.

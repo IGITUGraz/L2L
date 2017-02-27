@@ -18,18 +18,24 @@ logger = logging.getLogger('ltl-lsm-ga')
 
 def main():
     name = 'LSM-GA'
-    paths = Paths(name, dict(run_no='test'), root_dir_path='/home/anand/output')
-    print("All output can be found in file ", paths.output_dir_path)
-    print("Change the values in logging.yaml to control log level and destination")
-    print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
+    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+    assert root_dir_path is not None, \
+           "You have not set the root path to store your results." \
+           " Set it manually in the code (by setting the variable 'root_dir_path')" \
+           " before running the simulation"
+    paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
 
     with open("bin/logging.yaml") as f:
         l_dict = yaml.load(f)
-        l_dict['handlers']['file']['filename'] = os.path.join(paths.output_dir_path,
-                                                              l_dict['handlers']['file']['filename'])
+        log_output_file = os.path.join(paths.results_path, l_dict['handlers']['file']['filename'])
+        l_dict['handlers']['file']['filename'] = log_output_file
         logging.config.dictConfig(l_dict)
 
-    traj_file = os.path.join(paths.output_dir_path, 'data.h5')
+    print("All output can be found in file ", log_output_file)
+    print("Change the values in logging.yaml to control log level and destination")
+    print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
+
+    traj_file = os.path.join(paths.results_path, 'data.h5')
 
     # Create an environment that handles running our simulation
 
@@ -42,6 +48,7 @@ def main():
                       wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=True,  # Sends stdout to logs
+                      # only ok because output_dir_path is initialized by access of results_path
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
                       )
 
@@ -49,13 +56,15 @@ def main():
     traj = env.trajectory
 
     # NOTE: Innerloop simulator
-    lsm = LSMOptimizee()
+    lsm = LSMOptimizee(n_NEST_threads=12)
 
     # NOTE: Outerloop optimizer initialization
     parameters = GeneticAlgorithmParameters(seed=42, popsize=200, CXPB=0.6, MUTPB=0.2, NGEN=200, indpb=0.05,
                                             tournsize=3, matepar=10., mutpar=10.)
     ga = GeneticAlgorithmOptimizer(traj, optimizee_create_individual=lsm.create_individual,
-                                   optimizee_fitness_weights=(-1.0,), parameters=parameters)
+                                         optimizee_fitness_weights=(-1.0,),
+                                         optimizee_individual_param_spec=lsm.indiv_param_spec,
+                                         parameters=parameters)
 
     # Add post processing
     env.add_postprocessing(ga.post_process)
