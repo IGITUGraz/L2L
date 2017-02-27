@@ -15,7 +15,10 @@ warnings.filterwarnings("ignore")
 
 logger = logging.getLogger('ltl-lsm-ga')
 
-
+# WARNING: The population size used in the genetic algorithm is 8. The number of scoop
+# processes should thus be at-least as many for maximum speed. If not, then it should be
+# some factor of 8 for maximum efficiency of resources. Keep this in mind for other
+# population sizes too
 def main():
     name = 'LSM-GA'
     root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
@@ -59,7 +62,7 @@ def main():
     lsm = LSMOptimizee(n_NEST_threads=12)
 
     # NOTE: Outerloop optimizer initialization
-    parameters = GeneticAlgorithmParameters(seed=42, popsize=200, CXPB=0.6, MUTPB=0.2, NGEN=200, indpb=0.05,
+    parameters = GeneticAlgorithmParameters(seed=42, popsize=8, CXPB=0.6, MUTPB=0.2, NGEN=5, indpb=0.05,
                                             tournsize=3, matepar=10., mutpar=10.)
     ga = GeneticAlgorithmOptimizer(traj, optimizee_create_individual=lsm.create_individual,
                                          optimizee_fitness_weights=(-1.0,),
