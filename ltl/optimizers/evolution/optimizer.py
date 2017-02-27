@@ -35,12 +35,12 @@ class GeneticAlgorithmOptimizer(Optimizer):
     :param parameters: Instance of :class:`namedtuple` :class:`GeneticAlgorithmParameters` containing the parameters needed by the Optimizer
     """
 
-    def __init__(self, traj, optee_create_indiv, optee_indiv_param_spec, optee_fitness_weights, parameters):
+    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, optimizee_individual_param_spec, parameters):
 
         super().__init__(traj,
-                         optee_create_indiv=optee_create_indiv,
-                         optee_indiv_param_spec=optee_indiv_param_spec,
-                         optee_fitness_weights=optee_fitness_weights,
+                         optimizee_create_individual=optimizee_create_individual,
+                         optimizee_individual_param_spec=optimizee_individual_param_spec,
+                         optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters)
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
         traj.f_add_parameter('popsize', parameters.popsize, comment='Population size')  # 185
@@ -53,13 +53,13 @@ class GeneticAlgorithmOptimizer(Optimizer):
 
         # ------- Create and register functions with DEAP ------- #
         # delay_rate, slope, std_err, max_fraction_active
-        creator.create("FitnessMax", base.Fitness, weights=self.optee_fitness_weights)
+        creator.create("FitnessMax", base.Fitness, weights=self.optimizee_fitness_weights)
         creator.create("Individual", list, fitness=creator.FitnessMax)
 
         toolbox = base.Toolbox()
         # Structure initializers
         toolbox.register("individual", tools.initIterate, creator.Individual,
-                         lambda : params_to_list(optee_create_indiv(), self.optee_indiv_param_spec))
+                         lambda : params_to_list(optimizee_create_individual(), self.optimizee_individual_param_spec))
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
         # Operator registering
@@ -71,7 +71,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         # NOTE: The Individual object implements the list interface.
         self.pop = toolbox.population(n=traj.popsize)
         self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness.valid]
-        self.eval_pop = [list_to_params(ind, self.optee_indiv_param_spec)
+        self.eval_pop = [list_to_params(ind, self.optimizee_individual_param_spec)
                          for ind in self.eval_pop_inds]
         
         self.g = 0  # the current generation
@@ -108,14 +108,14 @@ class GeneticAlgorithmOptimizer(Optimizer):
         logger.info("-- End of generation {} --".format(self.g))
         best_inds = tools.selBest(self.eval_pop_inds, 2)
         for best_ind in best_inds:
-            print("Best individual is %s, %s" % (list_to_params(best_ind, self.optee_indiv_param_spec), 
+            print("Best individual is %s, %s" % (list_to_params(best_ind, self.optimizee_individual_param_spec), 
                                                  best_ind.fitness.values))
 
         self.hall_of_fame.update(self.eval_pop_inds)
 
         logger.info("-- Hall of fame --")
         for hof_ind in tools.selBest(self.hall_of_fame, 2):
-            logger.info("HOF individual is %s, %s" % (list_to_params(hof_ind, self.optee_indiv_param_spec),
+            logger.info("HOF individual is %s, %s" % (list_to_params(hof_ind, self.optimizee_individual_param_spec),
                                                       hof_ind.fitness.values))
 
         # ------- Create the next generation by crossover and mutation -------- #
@@ -149,7 +149,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
             self.pop[:] = offspring
 
             self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness.valid]
-            self.eval_pop = [list_to_params(ind, self.optee_indiv_param_spec)
+            self.eval_pop = [list_to_params(ind, self.optimizee_individual_param_spec)
                              for ind in self.eval_pop_inds]
             
             self.g += 1  # Update generation counter

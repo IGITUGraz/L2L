@@ -26,20 +26,20 @@ class Optimizer:
     
     """
 
-    def __init__(self, traj, optee_create_indiv, optee_indiv_param_spec, optee_fitness_weights, parameters):
+    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, optimizee_individual_param_spec, parameters):
 
         # Creating Placeholders for individuals and results that are about to be explored
         traj.f_add_parameter('generation', 0, comment='Current generation')
         traj.f_add_parameter('ind_idx', 0, comment='Index of individual')
         traj.f_add_parameter_group('individual', 'An individual of the population')
-        self.init_individual = optee_create_indiv()
+        self.init_individual = optimizee_create_individual()
         for key, val in self.init_individual.items():
             traj.par.individual.f_add_parameter(key, val)
 
         # Initializing basic variables
-        self.optee_create_indiv = optee_create_indiv
-        self.optee_indiv_param_spec = optee_indiv_param_spec
-        self.optee_fitness_weights = optee_fitness_weights
+        self.optimizee_create_individual = optimizee_create_individual
+        self.optimizee_individual_param_spec = optimizee_individual_param_spec
+        self.optimizee_fitness_weights = optimizee_fitness_weights
 
         #: The current generation number
         self.g = None
@@ -85,7 +85,7 @@ class Optimizer:
         :return:
         """
 
-        grouped_params_dict = get_grouped_param_dict(self.eval_pop, self.optee_indiv_param_spec)
+        grouped_params_dict = get_grouped_param_dict(self.eval_pop, self.optimizee_individual_param_spec)
 
         final_params_dict = {'generation': [self.g],
                              'ind_idx': range(len(self.eval_pop))}
