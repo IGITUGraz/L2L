@@ -25,6 +25,12 @@ class FunctionOptimizee(Optimizee):
         # Define the first solution candidate ramdomly
         return {'coords':np.random.rand(2) * (self.bound[1] - self.bound[0]) + self.bound[0]}
 
+    def bounding_func(self, individual):
+        """
+        Bounds the individual within the required bounds via coordinate clippping
+        """
+        return {'coords':np.clip(individual['coords'], a_min=self.bound[0], a_max=self.bound[1])}
+
     def simulate(self, traj):
         """
         Returns the value of the function chosen during initialization

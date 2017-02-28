@@ -64,11 +64,12 @@ def main():
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
     parameters = SimulatedAnnealingParameters(noisy_step=.3, temp_decay=.998, n_iteration=1000, stop_criterion=np.Inf,
-                                              bound=optimizee.bound, seed=np.random.randint(1e5))
+                                              seed=np.random.randint(1e5))
     optimizer = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                                   optimizee_fitness_weights=(-0.1,),
                                                   optimizee_individual_param_spec=optimizee.indiv_param_spec, 
-                                                  parameters=parameters)
+                                                  parameters=parameters,
+                                                  optimizee_bounding_func=optimizee.bounding_func)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)

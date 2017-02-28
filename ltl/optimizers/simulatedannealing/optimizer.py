@@ -1,3 +1,4 @@
+
 import logging
 from collections import namedtuple
 
@@ -8,14 +9,12 @@ from ltl import params_to_list, list_to_params
 logger = logging.getLogger("ltl-sa")
 
 SimulatedAnnealingParameters = namedtuple('SimulatedAnnealingParameters',
-                                          ['noisy_step', 'temp_decay', 'n_iteration', 'stop_criterion', 'bound',
-                                           'seed'])
+                                          ['noisy_step', 'temp_decay', 'n_iteration', 'stop_criterion', 'seed'])
 SimulatedAnnealingParameters.__doc__ = """
 :param noisy_step: Size of the random step
 :param temp_decay: A function of the form f(t) = temperature at time t
 :param n_iteration: number of iteration to perform
 :param stop_criterion: Stop if change in fitness is below this value
-:param bound: bound of the function
 :param seed: Random seed
 """
 
@@ -38,22 +37,25 @@ class SimulatedAnnealingOptimizer(Optimizer):
     :param parameters: Instance of :func:`~collections.namedtuple` :class:`SimulatedAnnealingParameters` containing the parameters needed by the Optimizer
     """
 
-    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, optimizee_individual_param_spec, parameters):
+    def __init__(self, traj,
+                 optimizee_create_individual,
+                 optimizee_fitness_weights,
+                 optimizee_individual_param_spec,
+                 parameters,
+                 optimizee_bounding_func=None):
         super().__init__(traj,
-                 optimizee_create_individual=optimizee_create_individual,
-                 optimizee_individual_param_spec=optimizee_individual_param_spec,
-                 optimizee_fitness_weights=optimizee_fitness_weights,
-                 parameters=parameters)
-
+                         optimizee_create_individual=optimizee_create_individual,
+                         optimizee_individual_param_spec=optimizee_individual_param_spec,
+                         optimizee_fitness_weights=optimizee_fitness_weights,
+                         parameters=parameters)
+        self.optimizee_bounding_func = optimizee_bounding_func
+        
         # The following parameters are recorded
         traj.f_add_parameter('noisy_step', parameters.noisy_step, comment='Size of the random step')
         traj.f_add_parameter('temp_decay', parameters.temp_decay,
                              comment='A temperature decay parameter (multiplicative)')
         traj.f_add_parameter('n_iteration', parameters.n_iteration, comment='Number of iteration to perform')
         traj.f_add_parameter('stop_criterion', parameters.stop_criterion, comment='Stopping criterion parameter')
-        traj.f_add_parameter('bound', parameters.bound,
-                             comment='Bound [x_min,x_max] of the solution space assuming that all coordinates must '
-                                     'stay within [x_min,x_max]')
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
 
         self.current_individual = np.array(params_to_list(self.init_individual, self.optimizee_individual_param_spec))
@@ -67,18 +69,21 @@ class SimulatedAnnealingOptimizer(Optimizer):
         # Keep track of current fitness value to decide whether we want the next individual to be accepted or not
         self.current_fitness_value = -np.Inf
 
-        new_individual = np.clip(
-            self.current_individual + np.random.randn(self.current_individual.size) * parameters.noisy_step,
-            parameters.bound[0], parameters.bound[1])
-        self.eval_pop = [list_to_params(new_individual, self.optimizee_individual_param_spec)]
+        new_individual = list_to_params(self.current_individual + 
+                                            np.random.randn(self.current_individual.size) * parameters.noisy_step,
+                                        self.optimizee_individual_param_spec)
+        if optimizee_bounding_func is not None:
+            new_individual = self.optimizee_bounding_func(new_individual)
+
+        self.eval_pop = [new_individual]
         self._expand_trajectory(traj)
 
     def post_process(self, traj, fitnesses_results):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
-        noisy_step, temp_decay, n_iteration, stop_criterion, bound = \
-            traj.noisy_step, traj.temp_decay, traj.n_iteration, traj.stop_criterion, traj.bound
+        noisy_step, temp_decay, n_iteration, stop_criterion = \
+            traj.noisy_step, traj.temp_decay, traj.n_iteration, traj.stop_criterion
         old_eval_pop = self.eval_pop.copy()
         self.eval_pop.clear()
         self.T *= temp_decay
@@ -115,12 +120,15 @@ class SimulatedAnnealingOptimizer(Optimizer):
                 self.current_fitness_value = weighted_fitness
                 self.current_individual = np.array(params_to_list(individual, self.optimizee_individual_param_spec))
 
-            new_individual = np.clip(
-                self.current_individual + np.random.randn(self.current_individual.size) * noisy_step,
-                bound[0], bound[1])
+            new_individual = list_to_params(self.current_individual + 
+                                                np.random.randn(self.current_individual.size) * noisy_step,
+                                            self.optimizee_individual_param_spec)
+            if self.optimizee_bounding_func is not None:
+                new_individual = self.optimizee_bounding_func(new_individual)
+
             logger.debug("Current best fitness is %.2f. New individual is %s", self.current_fitness_value,
                          new_individual)
-            self.eval_pop.append(list_to_params(new_individual, self.optimizee_individual_param_spec))
+            self.eval_pop.append(new_individual)
         traj.v_idx = -1  # set the trajectory back to default
 
         logger.info("-- End of generation {} --".format(self.g))

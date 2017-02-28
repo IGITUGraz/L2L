@@ -26,7 +26,11 @@ class Optimizer:
     
     """
 
-    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, optimizee_individual_param_spec, parameters):
+    def __init__(self, traj,
+                 optimizee_create_individual,
+                 optimizee_fitness_weights,
+                 optimizee_individual_param_spec,
+                 parameters):
 
         # Creating Placeholders for individuals and results that are about to be explored
         traj.f_add_parameter('generation', 0, comment='Current generation')
@@ -40,7 +44,7 @@ class Optimizer:
         self.optimizee_create_individual = optimizee_create_individual
         self.optimizee_individual_param_spec = optimizee_individual_param_spec
         self.optimizee_fitness_weights = optimizee_fitness_weights
-
+        
         #: The current generation number
         self.g = None
         #: The population (i.e. list of individuals) to be evaluated at the next iteration

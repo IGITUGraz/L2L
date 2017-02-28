@@ -25,18 +25,23 @@ def main():
     name = 'LTL'
 
     # TODO when using the template: Change the `root_dir_path` here
-    root_dir_path = '/home/anand/output'
+    root_dir_path = None
+    assert root_dir_path is not None, \
+           "You have not set the root path to store your results." \
+           " Set it manually in the code (by setting the variable 'root_dir_path')" \
+           " before running the simulation"
     paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
-    print("All output can be found in file ", paths.output_dir_path)
-    print("Change the values in logging.yaml to control log level and destination")
-    print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
 
     # Load the logging config which tells us where and what to log (loglevel, destination)
     with open("bin/logging.yaml") as f:
         l_dict = yaml.load(f)
-        l_dict['handlers']['file']['filename'] = os.path.join(paths.output_dir_path,
-                                                              l_dict['handlers']['file']['filename'])
+        log_output_file = os.path.join(paths.results_path, l_dict['handlers']['file']['filename'])
+        l_dict['handlers']['file']['filename'] = log_output_file
         logging.config.dictConfig(l_dict)
+
+    print("All output can be found in file ", log_output_file)
+    print("Change the values in logging.yaml to control log level and destination")
+    print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
 
     traj_file = os.path.join(paths.output_dir_path, 'data.h5')
 

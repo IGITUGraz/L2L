@@ -60,8 +60,9 @@ def main():
     lsm = LSMOptimizee(n_NEST_threads=12)
 
     # NOTE: Outerloop optimizer initialization
+    # Note hat no bounding function is specified
     parameters = SimulatedAnnealingParameters(noisy_step=.3, temp_decay=.9, n_iteration=10, stop_criterion=np.Inf,
-                                              bound=[-np.Inf, np.Inf], seed=42)
+                                              seed=42)
     sa = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=lsm.create_individual,
                                            optimizee_fitness_weights=(-1.0,),
                                            optimizee_individual_param_spec=lsm.indiv_param_spec,

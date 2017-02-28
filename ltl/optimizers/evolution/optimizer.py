@@ -35,13 +35,20 @@ class GeneticAlgorithmOptimizer(Optimizer):
     :param parameters: Instance of :class:`namedtuple` :class:`GeneticAlgorithmParameters` containing the parameters needed by the Optimizer
     """
 
-    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, optimizee_individual_param_spec, parameters):
+    def __init__(self, traj,
+                 optimizee_create_individual,
+                 optimizee_fitness_weights,
+                 optimizee_individual_param_spec,
+                 parameters,
+                 optimizee_bounding_func=None):
 
         super().__init__(traj,
                          optimizee_create_individual=optimizee_create_individual,
                          optimizee_individual_param_spec=optimizee_individual_param_spec,
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters)
+        self.optimizee_bounding_func = optimizee_bounding_func
+        
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
         traj.f_add_parameter('popsize', parameters.popsize, comment='Population size')  # 185
         traj.f_add_parameter('CXPB', parameters.CXPB, comment='Crossover term')
@@ -63,9 +70,32 @@ class GeneticAlgorithmOptimizer(Optimizer):
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
         # Operator registering
+        # This complex piece of code isonly necessary because we're using the
+        # DEAP framework and would like to decorate the DEAP mutation operator
+        def bounding_decorator(func):
+            def bounding_wrapper(*args, **kwargs):
+                if self.optimizee_bounding_func is None:
+                    return func(*args, **kwargs)
+                else:
+                    # Deap Functions modify individuals in-place, Hence we must do the same
+                    result_individuals_deap = func(*args, **kwargs)
+                    result_individuals = [list_to_params(x, self.optimizee_individual_param_spec)
+                                          for x in result_individuals_deap]
+                    bounded_individuals = [self.optimizee_bounding_func(x) for x in result_individuals]
+                    for i, deap_indiv in enumerate(result_individuals_deap):
+                        deap_indiv[:] = params_to_list(bounded_individuals[i],
+                                                       self.optimizee_individual_param_spec)
+                    print("Bounded Individual: {}".format(bounded_individuals))
+                    return result_individuals_deap
+
+            return bounding_wrapper
+
         toolbox.register("mate", tools.cxBlend, alpha=parameters.matepar)
+        toolbox.decorate("mate", bounding_decorator)
         toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=parameters.mutpar, indpb=traj.indpb)
+        toolbox.decorate("mutate", bounding_decorator)
         toolbox.register("select", tools.selTournament, tournsize=traj.tournsize)
+
 
         # ------- Initialize Population and Trajectory -------- #
         # NOTE: The Individual object implements the list interface.

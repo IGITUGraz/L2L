@@ -81,12 +81,16 @@ class LSMOptimizee(Optimizee):
                        {'weight': J_noise})
 
     def create_individual(self):
-        jee, jei, jie, jii = np.random.randint(1, 20, 4).astype(np.float)
+        jee, jei, jie, jii = np.random.randint(1, 20, 4).astype(np.float64)
         return {'jee':jee,
                 'jei':jei,
                 'jie':jie,
                 'jii':jii}
 
+    def bounding_func(self, individual):
+        individual = {key:np.float64(value if value > 0.01 else 0.01) for key, value in individual.items()}
+        return individual
+        
     def simulate(self, traj):
 
         jee = traj.individual.jee
