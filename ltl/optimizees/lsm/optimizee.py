@@ -16,14 +16,19 @@ _DEBUG = False
 
 
 class LSMOptimizee(Optimizee):
-    def __init__(self, *, n_NEST_threads=1):
-        super().__init__()
+    def __init__(self, traj, *, n_NEST_threads=1):
+        super().__init__(traj)
         self.indiv_param_spec = (('jee', 'scalar'),
                                  ('jei', 'scalar'),
                                  ('jie', 'scalar'),
                                  ('jii', 'scalar'))
         self.n_NEST_threads = n_NEST_threads
         self._initialize()
+
+        # create_individual can be called because __init__ is complete except for traj initializtion
+        indiv_dict = self.create_individual()
+        for key, val in indiv_dict.items():
+            traj.individual.f_add_parameter(key, val)
 
     def _initialize(self):
         # Set parameters of the NEST simulation kernel

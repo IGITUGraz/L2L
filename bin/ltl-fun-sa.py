@@ -59,7 +59,7 @@ def main():
     traj = env.trajectory
 
     # NOTE: Innerloop simulator
-    optimizee = FunctionOptimizee('rastrigin')
+    optimizee = FunctionOptimizee(traj, 'rastrigin')
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class

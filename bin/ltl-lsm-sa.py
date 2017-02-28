@@ -57,7 +57,7 @@ def main():
     traj = env.trajectory
 
     # NOTE: Innerloop simulator
-    lsm = LSMOptimizee(n_NEST_threads=12)
+    lsm = LSMOptimizee(traj, n_NEST_threads=12)
 
     # NOTE: Outerloop optimizer initialization
     # Note hat no bounding function is specified

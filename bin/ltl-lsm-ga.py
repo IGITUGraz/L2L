@@ -59,7 +59,7 @@ def main():
     traj = env.trajectory
 
     # NOTE: Innerloop simulator
-    lsm = LSMOptimizee(n_NEST_threads=12)
+    lsm = LSMOptimizee(traj, n_NEST_threads=12)
 
     # NOTE: Outerloop optimizer initialization
     parameters = GeneticAlgorithmParameters(seed=42, popsize=8, CXPB=0.6, MUTPB=0.2, NGEN=5, indpb=0.05,

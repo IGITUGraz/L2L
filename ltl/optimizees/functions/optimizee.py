@@ -13,10 +13,16 @@ class FunctionOptimizee(Optimizee):
     :param str cost_fn_name: one of 'rastrigin', 'rosenbrock', 'ackley', 'chasm'
     """
 
-    def __init__(self, cost_fn_name):
+    def __init__(self, traj, cost_fn_name):
+        super().__init__(traj)
+        
         self.indiv_param_spec = [('coords', 'seq', 2)]
-        super().__init__()
         self.cost_fn, self.bound = get_cost_function(cost_fn_name)
+
+        # create_individual can be called because __init__ is complete except for traj initializtion
+        indiv_dict = self.create_individual()
+        for key, val in indiv_dict.items():
+            traj.individual.f_add_parameter(key, val)
 
     def create_individual(self):
         """

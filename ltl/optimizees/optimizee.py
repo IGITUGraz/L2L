@@ -5,7 +5,14 @@ class Optimizee:
     achieved with those parameters.
     """
 
-    def __init__(self):
+    def __init__(self, traj):
+        """
+        This is the base class init function. Any implementation must in this class add a
+        parameter add its parameters to this trajectory under the parameter group 'individual'
+        which is created here in the base class. It is especially necessary to add all explored
+        parameters (i.e. parameters that are returned via create_individual) to the trajectory.
+        """
+        traj.f_add_parameter_group('individual', 'Contains parameters of the optimizee')
         pass
 
     def create_individual(self):

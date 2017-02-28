@@ -58,7 +58,8 @@ class SimulatedAnnealingOptimizer(Optimizer):
         traj.f_add_parameter('stop_criterion', parameters.stop_criterion, comment='Stopping criterion parameter')
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
 
-        self.current_individual = np.array(params_to_list(self.init_individual, self.optimizee_individual_param_spec))
+        self.current_individual = np.array(params_to_list(self.optimizee_create_individual(),
+                                                          self.optimizee_individual_param_spec))
 
         traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
 

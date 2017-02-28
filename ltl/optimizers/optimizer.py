@@ -35,11 +35,7 @@ class Optimizer:
         # Creating Placeholders for individuals and results that are about to be explored
         traj.f_add_parameter('generation', 0, comment='Current generation')
         traj.f_add_parameter('ind_idx', 0, comment='Index of individual')
-        traj.f_add_parameter_group('individual', 'An individual of the population')
-        self.init_individual = optimizee_create_individual()
-        for key, val in self.init_individual.items():
-            traj.par.individual.f_add_parameter(key, val)
-
+        
         # Initializing basic variables
         self.optimizee_create_individual = optimizee_create_individual
         self.optimizee_individual_param_spec = optimizee_individual_param_spec
