@@ -119,6 +119,7 @@ Writing new algorithms
   module with an appropriate name and fill in the functions. (same as above)
 * For a new **experiment**: Create a copy of the file :file:`bin/ltl-template.py` with an appropriate name and fill in
   the *TODOs*.
+* Add an entry in :file:`bin/logging.yaml` for the new class/file you created. See logging_.
 
 Details for implementing the `Optimizer`, `Optimizee` and experiment follow.
 
@@ -361,15 +362,22 @@ Examples
 * See :class:`~ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer` for an example of an
   implementation of simulated annealing `Optimizer`.
 
-Coding Guidelines
-=================
-* Always use the `logger` object obtained from::
 
-    logger = logging.getLogger('logger-name')
+.. _logging:
 
-  to output messages to a
-  console/file. You can modify the :file:`bin/logging.yaml` file to choose the output level and to redirect messages to
-  console or file.
+Logging
+=======
+
+Always use the `logger` object obtained from::
+
+  logger = logging.getLogger('logger-name')
+
+to output messages to a console/file. 
+
+You can modify the :file:`bin/logging.yaml` file to choose the output level and to redirect messages to console or
+file.
+
+See the `Python logging tutorial <https://docs.python.org/3/howto/logging.html>`_ for more details.
 
 
 Other packages used

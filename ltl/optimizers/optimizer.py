@@ -84,6 +84,7 @@ class Optimizer:
         """
 
         grouped_params_dict = get_grouped_dict(self.eval_pop)
+        grouped_params_dict = {'individual.' + key: val for key, val in grouped_params_dict.items()}
 
         final_params_dict = {'generation': [self.g],
                              'ind_idx': range(len(self.eval_pop))}
