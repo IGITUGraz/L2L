@@ -35,7 +35,7 @@ Terminology
 *Individual*:
   An Individual refers to an instance of hyper-parameters used in the  `Optimizee`. This means that the `Optimizer`
   tests multiple individuals of an optimizee to perform an optimization. This terminology is borrowed from evolutionary
-  algorithms.
+  algorithms. It is equivalent to the hyper-parameters of the `Optimizee`.
 
 .. _generation:
 
@@ -237,7 +237,7 @@ See the class documentation for more details: :class:`~ltl.optimizees.optimizee.
 Optimizer
 ~~~~~~~~~
 
-The optimizer subclasses :class:`~ltl.optimizers.optimizer.Optimizer` with a class that contains two mandatory methods:
+The optimizer subclasses :class:`~ltl.optimizers.optimizer.Optimizer` with a class that contains three mandatory methods:
 
 1. :meth:`~ltl.optimizers.optimizer.Optimizer.__init__`: This is the constructor which performs the duties of
    initializing the trajectory and the initial generation_ of the simulation.
@@ -323,7 +323,11 @@ functions. These are detailed here
 dict-to-list-to-dict Conversion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The benefit of treating individuals_ as Individual-Dicts_ is that it allows properly named parameters in the optimizee, however this comes at the cost of the optimizer being unable to generalize across different Optimizee classes with different Individual-Dicts_ representing the individual. One solution for this is that most Optimizers prefer to behave like they are optimizing a vector (in the case of python, a list). Thus, the Optimizer requires the ability to convert back and forth between a list and a dictionary. For this purpose, we have the following functions
+The benefit of treating individuals_ as Individual-Dicts_ is that it allows properly named parameters in the optimizee,
+however this comes at the cost of the optimizer being unable to generalize across different Optimizee classes with
+different Individual-Dicts_ representing the individual. One solution for this is that most Optimizers prefer to behave
+like they are optimizing a vector (in the case of python, a list). Thus, the Optimizer requires the ability to convert
+back and forth between a list and a dictionary. For this purpose, we have the following functions
 
 1.  :meth:`~ltl.dict_to_list`
 2.  :meth:`~ltl.list_to_dict`
@@ -333,13 +337,20 @@ Check their documentation for more details.
 Parameter Bounding
 ~~~~~~~~~~~~~~~~~~
 
-Most optimizees impose bounds on their parameters in some form. For example the :class:`~ltl.optimizees.FunctionOptimizee` imposes a rectangular bound on the set of valid coordinates. Most Optimizers on the other hand do not have direct access to these bounds. Hence, If the optimizer wishes to support bounding, it must accept a bounding-function_ as an argument.
+Most optimizees impose bounds on their parameters in some form. For example the
+:class:`~ltl.optimizees.FunctionOptimizee` imposes a rectangular bound on the set of valid coordinates. Most Optimizers
+on the other hand do not have direct access to these bounds. Hence, If the optimizer wishes to support bounding, it must
+accept a bounding-function_ as an argument.
 
 .. _bounding-function:
 
 Bounding Function:
 
-  This is a function that takes as an argument an individual_ of the Optimizee (an Individual-Dict_) and returns an individual_ that is a 'bounded' version of the said individual. This bounding may for instance be implemented by means of clipping or normalization. Both the :class:`~ltl.optimizees.FunctionOptimizee` and the :class:`~ltl.optimizees.LSMOptimizee` implement bounding functions in their classes which may be used in case a function is required for bounding.
+  This is a function that takes as an argument an individual_ of the Optimizee (an Individual-Dict_) and returns an
+  individual_ that is a 'bounded' version of the said individual. This bounding may for instance be implemented by means
+  of clipping or normalization. Both the :class:`~ltl.optimizees.FunctionOptimizee` and the
+  :class:`~ltl.optimizees.LSMOptimizee` implement bounding functions in their classes which may be used in case a
+  function is required for bounding.
 
 
 Examples
