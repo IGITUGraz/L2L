@@ -6,6 +6,7 @@ from deap import base, creator, tools
 from deap.tools import HallOfFame
 
 from ltl.optimizers.optimizer import Optimizer
+from ltl import dict_to_list, list_to_dict
 
 logger = logging.getLogger("ltl-ga")
 
@@ -34,48 +35,75 @@ class GeneticAlgorithmOptimizer(Optimizer):
     :param parameters: Instance of :class:`namedtuple` :class:`GeneticAlgorithmParameters` containing the parameters needed by the Optimizer
     """
 
-    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters):
+    def __init__(self, traj,
+                 optimizee_create_individual,
+                 optimizee_fitness_weights,
+                 parameters,
+                 optimizee_bounding_func=None):
 
-        super().__init__(traj, optimizee_create_individual, optimizee_fitness_weights, parameters)
+        super().__init__(traj,
+                         optimizee_create_individual=optimizee_create_individual,
+                         optimizee_fitness_weights=optimizee_fitness_weights,
+                         parameters=parameters)
+        self.optimizee_bounding_func = optimizee_bounding_func
+        __, self.optimizee_individual_dict_spec = dict_to_list(optimizee_create_individual(), get_dict_spec=True)
+
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
         traj.f_add_parameter('popsize', parameters.popsize, comment='Population size')  # 185
         traj.f_add_parameter('CXPB', parameters.CXPB, comment='Crossover term')
         traj.f_add_parameter('MUTPB', parameters.MUTPB, comment='Mutation probability')
         traj.f_add_parameter('NGEN', parameters.NGEN, comment='Number of generations')
 
-        traj.f_add_parameter('generation', 0, comment='Current generation')
-        traj.f_add_parameter('ind_idx', 0, comment='Index of individual')
-
         traj.f_add_parameter('indpb', parameters.indpb, comment='Mutation parameter')
         traj.f_add_parameter('tournsize', parameters.tournsize, comment='Selection parameter')
 
-        # Placeholders for individuals and results that are about to be explored
-        traj.f_add_derived_parameter('individual', optimizee_create_individual(),
-                                     'An individual of the population')
-        traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
-
         # ------- Create and register functions with DEAP ------- #
         # delay_rate, slope, std_err, max_fraction_active
-        creator.create("FitnessMax", base.Fitness, weights=optimizee_fitness_weights)
+        creator.create("FitnessMax", base.Fitness, weights=self.optimizee_fitness_weights)
         creator.create("Individual", list, fitness=creator.FitnessMax)
 
         toolbox = base.Toolbox()
         # Structure initializers
-        toolbox.register("individual", tools.initIterate, creator.Individual, optimizee_create_individual)
+        toolbox.register("individual", tools.initIterate, creator.Individual,
+                         lambda : dict_to_list(optimizee_create_individual()))
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
         # Operator registering
+        # This complex piece of code isonly necessary because we're using the
+        # DEAP framework and would like to decorate the DEAP mutation operator
+        def bounding_decorator(func):
+            def bounding_wrapper(*args, **kwargs):
+                if self.optimizee_bounding_func is None:
+                    return func(*args, **kwargs)
+                else:
+                    # Deap Functions modify individuals in-place, Hence we must do the same
+                    result_individuals_deap = func(*args, **kwargs)
+                    result_individuals = [list_to_dict(x, self.optimizee_individual_dict_spec)
+                                          for x in result_individuals_deap]
+                    bounded_individuals = [self.optimizee_bounding_func(x) for x in result_individuals]
+                    for i, deap_indiv in enumerate(result_individuals_deap):
+                        deap_indiv[:] = dict_to_list(bounded_individuals[i])
+                    print("Bounded Individual: {}".format(bounded_individuals))
+                    return result_individuals_deap
+
+            return bounding_wrapper
+
         toolbox.register("mate", tools.cxBlend, alpha=parameters.matepar)
+        toolbox.decorate("mate", bounding_decorator)
         toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=parameters.mutpar, indpb=traj.indpb)
+        toolbox.decorate("mutate", bounding_decorator)
         toolbox.register("select", tools.selTournament, tournsize=traj.tournsize)
 
-        # ------- Initialize Population and Trajectory -------- #
-        self.pop = toolbox.population(n=traj.popsize)
-        eval_pop = [list(ind) for ind in self.pop if not ind.fitness.valid]
 
+        # ------- Initialize Population and Trajectory -------- #
+        # NOTE: The Individual object implements the list interface.
+        self.pop = toolbox.population(n=traj.popsize)
+        self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness.valid]
+        self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec)
+                         for ind in self.eval_pop_inds]
+        
         self.g = 0  # the current generation
         self.toolbox = toolbox  # the DEAP toolbox
-        self.eval_pop = eval_pop  # the currently evaluated population
         self.hall_of_fame = HallOfFame(20)
 
         self._expand_trajectory(traj)
@@ -96,25 +124,27 @@ class GeneticAlgorithmOptimizer(Optimizer):
             traj.v_idx = run_index
             ind_index = traj.par.ind_idx
             # Use the ind_idx to update the fitness
-            individual = self.eval_pop[ind_index]
+            individual = self.eval_pop_inds[ind_index]
             individual.fitness.values = fitness
 
             # Record
-            traj.f_add_result('$set.$.individual', list(individual))
-            traj.f_add_result('$set.$.fitness', list(fitness))
+            traj.f_add_result('$set.$.individual', self.eval_pop[ind_index])
+            traj.f_add_result('$set.$.fitness', individual.fitness.values)
 
         traj.v_idx = -1  # set the trajectory back to default
 
         logger.info("-- End of generation {} --".format(self.g))
-        best_inds = tools.selBest(self.eval_pop, 2)
+        best_inds = tools.selBest(self.eval_pop_inds, 2)
         for best_ind in best_inds:
-            print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
+            print("Best individual is %s, %s" % (list_to_dict(best_ind, self.optimizee_individual_dict_spec), 
+                                                 best_ind.fitness.values))
 
-        self.hall_of_fame.update(self.eval_pop)
+        self.hall_of_fame.update(self.eval_pop_inds)
 
         logger.info("-- Hall of fame --")
         for hof_ind in tools.selBest(self.hall_of_fame, 2):
-            logger.info("HOF individual is %s, %s" % (hof_ind, hof_ind.fitness.values))
+            logger.info("HOF individual is %s, %s" % (list_to_dict(hof_ind, self.optimizee_individual_dict_spec),
+                                                      hof_ind.fitness.values))
 
         # ------- Create the next generation by crossover and mutation -------- #
         if self.g < NGEN - 1:  # not necessary for the last generation
@@ -146,8 +176,10 @@ class GeneticAlgorithmOptimizer(Optimizer):
             # The population is entirely replaced by the offspring
             self.pop[:] = offspring
 
-            self.eval_pop = [list(ind) for ind in self.pop if not ind.fitness.valid]
-
+            self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness.valid]
+            self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec)
+                             for ind in self.eval_pop_inds]
+            
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 
@@ -162,5 +194,5 @@ class GeneticAlgorithmOptimizer(Optimizer):
             logger.info("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
 
         logger.info("-- Hall of fame --")
-        for hof_ind in self.postproc.hall_of_fame:
+        for hof_ind in self.hall_of_fame:
             logger.info("HOF individual is %s, %s" % (hof_ind, hof_ind.fitness.values))

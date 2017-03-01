@@ -2,6 +2,8 @@ from collections import namedtuple
 
 from pypet import cartesian_product
 
+from ltl import get_grouped_dict
+
 OptimizerParameters = namedtuple('OptimizerParamters', [])
 
 
@@ -24,7 +26,19 @@ class Optimizer:
     
     """
 
-    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters):
+    def __init__(self, traj,
+                 optimizee_create_individual,
+                 optimizee_fitness_weights,
+                 parameters):
+
+        # Creating Placeholders for individuals and results that are about to be explored
+        traj.f_add_parameter('generation', 0, comment='Current generation')
+        traj.f_add_parameter('ind_idx', 0, comment='Index of individual')
+        
+        # Initializing basic variables
+        self.optimizee_create_individual = optimizee_create_individual
+        self.optimizee_fitness_weights = optimizee_fitness_weights
+        
         #: The current generation number
         self.g = None
         #: The population (i.e. list of individuals) to be evaluated at the next iteration
@@ -69,11 +83,16 @@ class Optimizer:
         :return:
         """
 
+        grouped_params_dict = get_grouped_dict(self.eval_pop)
+        grouped_params_dict = {'individual.' + key: val for key, val in grouped_params_dict.items()}
+
+        final_params_dict = {'generation': [self.g],
+                             'ind_idx': range(len(self.eval_pop))}
+        final_params_dict.update(grouped_params_dict)
+
         # We need to convert them to lists or write our own custom IndividualParameter ;-)
         # Note the second argument to `cartesian_product`: This is for only having the cartesian product
         # between ``generation x (ind_idx AND individual)``, so that every individual has just one
         # unique index within a generation.
-        traj.f_expand(cartesian_product({'generation': [self.g],
-                                         'ind_idx': range(len(self.eval_pop)),
-                                         'individual': self.eval_pop},
-                                        [('ind_idx', 'individual'), 'generation']))
+        traj.f_expand(cartesian_product(final_params_dict,
+                                        [('ind_idx',) + tuple(grouped_params_dict.keys()), 'generation']))

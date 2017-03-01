@@ -16,14 +16,20 @@ _DEBUG = False
 
 
 class LSMOptimizee(Optimizee):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, traj, *, n_NEST_threads=1):
+        super().__init__(traj)
+        self.n_NEST_threads = n_NEST_threads
         self._initialize()
+
+        # create_individual can be called because __init__ is complete except for traj initializtion
+        indiv_dict = self.create_individual()
+        for key, val in indiv_dict.items():
+            traj.individual.f_add_parameter(key, val)
 
     def _initialize(self):
         # Set parameters of the NEST simulation kernel
         nest.SetKernelStatus({'print_time': False,
-                              'local_num_threads': 1})
+                              'local_num_threads': self.n_NEST_threads})
 
         # dynamic parameters
         f0 = 10.
@@ -76,12 +82,22 @@ class LSMOptimizee(Optimizee):
                        {'weight': J_noise})
 
     def create_individual(self):
-        jee, jei, jie, jii = np.random.randint(1, 20, 4).astype(np.float)
-        return [jee, jei, jie, jii]
+        jee, jei, jie, jii = np.random.randint(1, 20, 4).astype(np.float64)
+        return {'jee':jee,
+                'jei':jei,
+                'jie':jie,
+                'jii':jii}
 
+    def bounding_func(self, individual):
+        individual = {key:np.float64(value if value > 0.01 else 0.01) for key, value in individual.items()}
+        return individual
+        
     def simulate(self, traj):
 
-        jee, jei, jie, jii = traj.individual
+        jee = traj.individual.jee
+        jei = traj.individual.jei
+        jie = traj.individual.jie
+        jii = traj.individual.jii
 
         if jee < 0 or jei < 0 or jie < 0 or jii < 0:
             return (np.inf,)

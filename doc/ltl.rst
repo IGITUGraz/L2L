@@ -19,3 +19,12 @@ Other module functions
     :members:
     :undoc-members:
     :show-inheritance:
+
+.. autoclass:: ltl.DictEntryType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autofunction:: ltl.list_to_dict
+
+.. autofunction:: ltl.dict_to_list
