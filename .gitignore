@@ -49,3 +49,6 @@ dpca/.ipynb_checkpoints/dPCA_demo-checkpoint.ipynb
 _build/
 
 **/.nfs*
+
+# unison temp files
+**/.unison*
