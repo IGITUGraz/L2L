@@ -18,10 +18,6 @@ _DEBUG = False
 class LSMOptimizee(Optimizee):
     def __init__(self, traj, *, n_NEST_threads=1):
         super().__init__(traj)
-        self.indiv_param_spec = (('jee', 'scalar'),
-                                 ('jei', 'scalar'),
-                                 ('jie', 'scalar'),
-                                 ('jii', 'scalar'))
         self.n_NEST_threads = n_NEST_threads
         self._initialize()
 

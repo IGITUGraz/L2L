@@ -6,7 +6,7 @@ from deap import base, creator, tools
 from deap.tools import HallOfFame
 
 from ltl.optimizers.optimizer import Optimizer
-from ltl import params_to_list, list_to_params
+from ltl import dict_to_list, list_to_dict
 
 logger = logging.getLogger("ltl-ga")
 
@@ -38,7 +38,6 @@ class GeneticAlgorithmOptimizer(Optimizer):
     def __init__(self, traj,
                  optimizee_create_individual,
                  optimizee_fitness_weights,
-                 optimizee_individual_param_spec,
                  parameters,
                  optimizee_bounding_func=None):
 
@@ -47,7 +46,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters)
         self.optimizee_bounding_func = optimizee_bounding_func
-        self.optimizee_individual_param_spec = optimizee_individual_param_spec
+        __, self.optimizee_individual_dict_spec = dict_to_list(optimizee_create_individual(), get_dict_spec=True)
 
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
         traj.f_add_parameter('popsize', parameters.popsize, comment='Population size')  # 185
@@ -66,7 +65,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         toolbox = base.Toolbox()
         # Structure initializers
         toolbox.register("individual", tools.initIterate, creator.Individual,
-                         lambda : params_to_list(optimizee_create_individual(), self.optimizee_individual_param_spec))
+                         lambda : dict_to_list(optimizee_create_individual()))
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
         # Operator registering
@@ -79,12 +78,11 @@ class GeneticAlgorithmOptimizer(Optimizer):
                 else:
                     # Deap Functions modify individuals in-place, Hence we must do the same
                     result_individuals_deap = func(*args, **kwargs)
-                    result_individuals = [list_to_params(x, self.optimizee_individual_param_spec)
+                    result_individuals = [list_to_dict(x, self.optimizee_individual_dict_spec)
                                           for x in result_individuals_deap]
                     bounded_individuals = [self.optimizee_bounding_func(x) for x in result_individuals]
                     for i, deap_indiv in enumerate(result_individuals_deap):
-                        deap_indiv[:] = params_to_list(bounded_individuals[i],
-                                                       self.optimizee_individual_param_spec)
+                        deap_indiv[:] = dict_to_list(bounded_individuals[i])
                     print("Bounded Individual: {}".format(bounded_individuals))
                     return result_individuals_deap
 
@@ -101,7 +99,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         # NOTE: The Individual object implements the list interface.
         self.pop = toolbox.population(n=traj.popsize)
         self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness.valid]
-        self.eval_pop = [list_to_params(ind, self.optimizee_individual_param_spec)
+        self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec)
                          for ind in self.eval_pop_inds]
         
         self.g = 0  # the current generation
@@ -138,14 +136,14 @@ class GeneticAlgorithmOptimizer(Optimizer):
         logger.info("-- End of generation {} --".format(self.g))
         best_inds = tools.selBest(self.eval_pop_inds, 2)
         for best_ind in best_inds:
-            print("Best individual is %s, %s" % (list_to_params(best_ind, self.optimizee_individual_param_spec), 
+            print("Best individual is %s, %s" % (list_to_dict(best_ind, self.optimizee_individual_dict_spec), 
                                                  best_ind.fitness.values))
 
         self.hall_of_fame.update(self.eval_pop_inds)
 
         logger.info("-- Hall of fame --")
         for hof_ind in tools.selBest(self.hall_of_fame, 2):
-            logger.info("HOF individual is %s, %s" % (list_to_params(hof_ind, self.optimizee_individual_param_spec),
+            logger.info("HOF individual is %s, %s" % (list_to_dict(hof_ind, self.optimizee_individual_dict_spec),
                                                       hof_ind.fitness.values))
 
         # ------- Create the next generation by crossover and mutation -------- #
@@ -179,7 +177,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
             self.pop[:] = offspring
 
             self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness.valid]
-            self.eval_pop = [list_to_params(ind, self.optimizee_individual_param_spec)
+            self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec)
                              for ind in self.eval_pop_inds]
             
             self.g += 1  # Update generation counter

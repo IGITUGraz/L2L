@@ -67,7 +67,6 @@ def main():
     ga = GeneticAlgorithmOptimizer(traj, optimizee_create_individual=lsm.create_individual,
                                          optimizee_fitness_weights=(-1.0,),
                                          optimizee_bounding_func=lsm.bounding_func,
-                                         optimizee_individual_param_spec=lsm.indiv_param_spec,
                                          parameters=parameters)
 
     # Add post processing

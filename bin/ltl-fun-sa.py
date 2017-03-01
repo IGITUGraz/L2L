@@ -67,7 +67,6 @@ def main():
                                               seed=np.random.randint(1e5))
     optimizer = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                                   optimizee_fitness_weights=(-0.1,),
-                                                  optimizee_individual_param_spec=optimizee.indiv_param_spec, 
                                                   parameters=parameters,
                                                   optimizee_bounding_func=optimizee.bounding_func)
 

@@ -2,7 +2,7 @@ from collections import namedtuple
 
 from pypet import cartesian_product
 
-from ltl import get_grouped_param_dict
+from ltl import get_grouped_dict
 
 OptimizerParameters = namedtuple('OptimizerParamters', [])
 
@@ -83,7 +83,7 @@ class Optimizer:
         :return:
         """
 
-        grouped_params_dict = get_grouped_param_dict(self.eval_pop)
+        grouped_params_dict = get_grouped_dict(self.eval_pop)
 
         final_params_dict = {'generation': [self.g],
                              'ind_idx': range(len(self.eval_pop))}

@@ -16,7 +16,6 @@ class FunctionOptimizee(Optimizee):
     def __init__(self, traj, cost_fn_name):
         super().__init__(traj)
         
-        self.indiv_param_spec = [('coords', 'seq', 2)]
         self.cost_fn, self.bound = get_cost_function(cost_fn_name)
 
         # create_individual can be called because __init__ is complete except for traj initializtion

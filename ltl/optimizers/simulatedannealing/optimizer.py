@@ -5,7 +5,7 @@ from collections import namedtuple
 import numpy as np
 
 from ltl.optimizers.optimizer import Optimizer
-from ltl import params_to_list, list_to_params
+from ltl import dict_to_list, list_to_dict
 logger = logging.getLogger("ltl-sa")
 
 SimulatedAnnealingParameters = namedtuple('SimulatedAnnealingParameters',
@@ -31,16 +31,30 @@ class SimulatedAnnealingOptimizer(Optimizer):
 
     NOTE: This expects all parameters of the system to be of floating point
 
-    :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs. The parameters should be initialized based on the values in `parameters`
-    :param optimizee_create_individual: Function that creates a new individual
-    :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each element of the fitness vector)
-    :param parameters: Instance of :func:`~collections.namedtuple` :class:`SimulatedAnnealingParameters` containing the parameters needed by the Optimizer
+    :param  ~pypet.trajectory.Trajectory traj:
+      Use this pypet trajectory to store the parameters of the specific runs. The parameters should be
+      initialized based on the values in `parameters`
+    
+    :param optimizee_create_individual:
+      Function that creates a new individual
+    
+    :param optimizee_fitness_weights: 
+      Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each
+      element of the fitness vector)
+    
+    :param parameters: 
+      Instance of :func:`~collections.namedtuple` :class:`SimulatedAnnealingParameters` containing the
+      parameters needed by the Optimizer
+    
+    :param optimizee_bounding_func:
+      This is a function that takes an individual as argument and returns another individual that is
+      within bounds (The bounds are defined by the function itself). If not provided, the individuals
+      are not bounded.
     """
 
     def __init__(self, traj,
                  optimizee_create_individual,
                  optimizee_fitness_weights,
-                 optimizee_individual_param_spec,
                  parameters,
                  optimizee_bounding_func=None):
         super().__init__(traj,
@@ -48,7 +62,6 @@ class SimulatedAnnealingOptimizer(Optimizer):
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters)
         self.optimizee_bounding_func = optimizee_bounding_func
-        self.optimizee_individual_param_spec = optimizee_individual_param_spec
         
         # The following parameters are recorded
         traj.f_add_parameter('noisy_step', parameters.noisy_step, comment='Size of the random step')
@@ -58,8 +71,9 @@ class SimulatedAnnealingOptimizer(Optimizer):
         traj.f_add_parameter('stop_criterion', parameters.stop_criterion, comment='Stopping criterion parameter')
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
 
-        self.current_individual = np.array(params_to_list(self.optimizee_create_individual(),
-                                                          self.optimizee_individual_param_spec))
+        self.current_individual, self.optimizee_individual_dict_spec = \
+            dict_to_list(self.optimizee_create_individual(), get_dict_spec=True)
+        self.current_individual = np.array(self.current_individual)
 
         traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
 
@@ -70,9 +84,9 @@ class SimulatedAnnealingOptimizer(Optimizer):
         # Keep track of current fitness value to decide whether we want the next individual to be accepted or not
         self.current_fitness_value = -np.Inf
 
-        new_individual = list_to_params(self.current_individual + 
-                                            np.random.randn(self.current_individual.size) * parameters.noisy_step,
-                                        self.optimizee_individual_param_spec)
+        new_individual = list_to_dict(self.current_individual + 
+                                          np.random.randn(self.current_individual.size) * parameters.noisy_step,
+                                      self.optimizee_individual_dict_spec)
         if optimizee_bounding_func is not None:
             new_individual = self.optimizee_bounding_func(new_individual)
 
@@ -119,11 +133,11 @@ class SimulatedAnnealingOptimizer(Optimizer):
             # Accept
             if r < p or weighted_fitness >= self.current_fitness_value:
                 self.current_fitness_value = weighted_fitness
-                self.current_individual = np.array(params_to_list(individual, self.optimizee_individual_param_spec))
+                self.current_individual = np.array(dict_to_list(individual))
 
-            new_individual = list_to_params(self.current_individual + 
-                                                np.random.randn(self.current_individual.size) * noisy_step,
-                                            self.optimizee_individual_param_spec)
+            new_individual = list_to_dict(self.current_individual + 
+                                              np.random.randn(self.current_individual.size) * noisy_step,
+                                          self.optimizee_individual_dict_spec)
             if self.optimizee_bounding_func is not None:
                 new_individual = self.optimizee_bounding_func(new_individual)
 
