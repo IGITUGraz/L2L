@@ -33,8 +33,9 @@ Terminology
 .. _individuals:
 
 *Individual*:
-  An Individual refers to an instance of parameters of the optimizee. This means that the `Optimizer` tests multiple
-  individuals of an optimizee to perform an optimization. This terminology is borrowed from evolutionary algorithms.
+  An Individual refers to an instance of hyper-parameters used in the  `Optimizee`. This means that the `Optimizer`
+  tests multiple individuals of an optimizee to perform an optimization. This terminology is borrowed from evolutionary
+  algorithms.
 
 .. _generation:
 
@@ -49,10 +50,49 @@ Terminology
 
 Other terms such as Trajectory, individual-dict, are defined as they are introduced below.
 
+
+.. _iteration-loop:
+
+Iteration loop
+~~~~~~~~~~~~~~~~
+
+
+The progress of execution in the script shown in :doc:`ltl-bin` goes as follows:
+
+1. At the beginning, a *population* of *individuals*  is created by the `Optimizer` by calling the `Optimizee`'s
+   :meth:`~.Optimizee.create_individual` method.
+2. The `Optimizer` then puts these *individuals* in its member variable :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop` 
+   and calls its :meth:`~ltl.optimizers.optimizer.Optimizer._expand_trajectory` method. This is the \*key\* step to
+   starting and continuing the loop and should be done in all new `Optimizer` s added.
+
+   .. _third-step:
+
+3. :ref:`Pypet <Pypet-Section>`  creates one `Optimizee` run for each *individual* (parameter) 
+   in :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop` by calling the `Optimizee`'s :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` 
+   method.  Each `Optimizee` run can happen in parallel across cores and even across nodes if enabled as described in
+   :ref:`parallelization`. 
+4. the `Optimizee`'s :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` method runs whatever simulation it has to run
+   with the given *individual* (parameter) and returns a Python :obj:`tuple` with one or more fitness values [#]_.
+5. Once the runs are done, :ref:`Pypet <Pypet-Section>` calls the `Optimizer`'s 
+   :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` method [#]_ with the list of *individuals* and their fitness
+   values as returned by the `Optimizee`'s :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` method.
+   The `Optimizer` can choose to do whatever it wants with the fitnesses, and use
+   it to create a new set of *individuals* which it puts into its :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop`
+   attribute (after clearing it of the old *population*). 
+6. The loop continues from :ref:`3. <third-step>`
+
+   
+.. [#] **NOTE:** Even if there is only one fitness value, this function should still return a :obj:`tuple`
+.. [#] This is done using `PyPet <https://pythonhosted.org/pypet/>`_'s postprocessing facility and its
+   :meth:`~pypet.trajectory.Trajectory.f_expand()` function as documented `here
+   <http://pythonhosted.org/pypet/cookbook/environment.html#expanding-your-trajectory-via-post-processing>`_. 
+
+.. _Pypet-Section:
+
 Usage of PyPet
 ~~~~~~~~~~~~~~
 
-`PyPet <https://pypet.readthedocs.io/en/latest/>`_'s interface is used extensively to:
+`PyPet <https://pythonhosted.org/pypet/>`_'s interface is used extensively to:
 
 1. Run the :ref:`iteration-loop` that:
 
@@ -67,51 +107,27 @@ Usage of PyPet
 
 Note that most of the pypet functionality, especially those regarding the usage of trajectories is NOT abstracted
 out. The user is therefore engouraged to familiarize himself with the working of pypet trajectories.
-
-NTW Link to pypet documentation
-
-.. _iteration-loop:
-
-Iteration loop
-~~~~~~~~~~~~~~
-
-The progress of execution in the script shown in :doc:`ltl-bin` goes as follows:
-
-1. At the beginning, a population of *individuals*  is created by the `Optimizer` by calling the `Optimizee`'s
-   :meth:`~.Optimizee.create_individual` method.
-2. The `Optimizer` then puts these *individuals* in its member variable :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop` 
-   and calls its :meth:`~ltl.optimizers.optimizer.Optimizer._expand_trajectory` method. This is the \*key\* step to
-   starting and continuing the loop and should be done in all new `Optimizer` s added.
-
-   .. _third-step:
-
-3. `PyPet <https://pypet.readthedocs.io/en/latest/>`_  creates one `Optimizee` run for each *individual* (parameter) 
-   in :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop` by calling the `Optimizee`'s :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` 
-   method.  Each `Optimizee` run can happen in parallel across cores and even across nodes if enabled as described in
-   :ref:`parallelization`. 
-4. the `Optimizee`'s :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` method runs whatever simulation it has to run
-   with the given *individual* (parameter) and returns a Python :obj:`tuple` with one or more fitness values [#]_.
-5. Once the runs are done, `PyPet <https://pypet.readthedocs.io/en/latest/>`_ calls the `Optimizer`'s 
-   :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` method [#]_ with the list of *individuals* and their fitness
-   values as returned by the `Optimizee`'s :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` method.
-   The `Optimizer` can choose to do whatever it wants with the fitnesses, and use
-   it to create a new set of *individuals* which it puts into its :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop`
-   attribute (after clearing it of the old *population*). 
-6. The loop continues from :ref:`3. <third-step>`
-
    
-.. [#] **NOTE:** Even if there is only one fitness value, this function should still return a :obj:`tuple`
-.. [#] This is done using `PyPet <https://pypet.readthedocs.io/en/latest/>`_'s postprocessing facility and its
-   :meth:`~pypet.trajectory.Trajectory.f_expand()` function as documented `here
-   <http://pypet.readthedocs.io/en/latest/cookbook/environment.html#expanding-your-trajectory-via-post-processing>`_. 
-   
+
+Writing new algorithms
+**********************
+
+* For a new **Optimizee**: Create a copy of the class :class:`~ltl.optimizees.optimizee.Optimizee` into a new python
+  module with an appropriate name and fill in the functions. E.g. for a DMS task optimizee, you would create
+  a module (i.e. directory with a `__init__.py` file) as `ltl/optimizees/dms/` and copy the above class there.
+* For a new **Optimizer**: Create a copy of the class :class:`~ltl.optimizers.optimizer.Optimizer` into a new python
+  module with an appropriate name and fill in the functions. (same as above)
+* For a new **experiment**: Create a copy of the file :file:`bin/ltl-template.py` with an appropriate name and fill in
+  the *TODOs*.
+
+Details for implementing the `Optimizer`, `Optimizee` and experiment follow.
+
+
 .. _communication:
-
-Core Implementation Details
-***************************
 
 Important Data Structures
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 Trajectory:
 
@@ -126,16 +142,16 @@ Trajectory:
       bit more complex numpy arrays.
   
   In the simulations using the LTL Framework, there is a single :class:`~pypet.trajectory.Trajectory` object (called
-  :obj:`traj` hereon). This object forms the backbone of communication between the optimizer, optimizee, and the
+  :obj:`traj`). This object forms the backbone of communication between the optimizer, optimizee, and the
   PyPet framework. In short, it is used to acheive the following:
 
   1.  Storage of the parameters of the optimizer, optimizee, and individuals_ of the optimizee
   2.  Storage of the results of our simulation
   3.  Adaptive exploration of parameters via trajectory expansion.
 
-  :obj:`traj` object is passed as a mandatory argument to the constructors of both the Optimizee and Optimizer, as
-  well as to the functions :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` and 
-  :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
+  :obj:`traj` object is passed as a mandatory argument to the constructors of both the Optimizee and Optimizer.
+  Additionally, PyPet automatically passes this object as an argument to the functions
+  :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` and :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
 
 .. _Individual-Dict:
 .. _Individual-Dicts:
@@ -163,8 +179,15 @@ Individual-Dict:
 
 .. _traj-interaction:
 
-Contracts (NTW A BETTER HEADING)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Optimizee
+~~~~~~~~~
+
+The optimizee subclasses :class:`~ltl.optimizees.optimizee.Optimizee` with a class that contains three mandatory methods
+(Documentation linked below):
+
+1. :meth:`~ltl.optimizees.optimizee.Optimizee.create_individual` : Called to return a random individual_ (returns an Individual-Dict_)
+2. :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` : Runs the actual simulation and returns a fitness vector
+3. :meth:`~ltl.optimizees.optimizee.Optimizee.end` : Tertiary method to do cleanup, printing results etc.
 
 .. _optimizee-constructor:
 
@@ -200,10 +223,35 @@ a valid random individual of the optimizee.
 The :meth:`~ltl.optimizers.optimizee.Optimizee.simulate` function:
 ------------------------------------------------------------------
 
-This function only receives as argument the trajectory :obj:`traj` set to a particular run. Thus it must source
-all required parameters from the :obj:`traj` and the member variables of the `Optimizee` class. It must run
-the inner loop with these parameters and return a tuple (even for 1-D fitness) representing the fitness to be
-used for optimizing.
+This function only receives as argument the trajectory :obj:`traj` set to a particular run. Thus it must source all
+required parameters from the :obj:`traj` and the member variables of the `Optimizee` class. It must run the inner loop
+with these parameters and always return a tuple (*even for 1-D fitness!!*) representing the fitness to be used for
+optimizing.
+_
+See the class documentation for more details: :class:`~ltl.optimizees.optimizee.Optimizee`
+
+Optimizer
+~~~~~~~~~
+
+The optimizer subclasses :class:`~ltl.optimizers.optimizer.Optimizer` with a class that contains two mandatory methods:
+
+1. :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` : knowing the fitness for the current parameters, it
+   generates a new set of parameters and runs the next batch of simulations.
+2. :meth:`~ltl.optimizers.optimizer.Optimizer.end` : Tertiary method to do cleanup, printing results etc.
+
+
+Some notes:
+
+NTW Merge this with below
+
+* The `Optimizer` should be written (and the existing ones are written) to always maximize the fitness. Set the
+  `optimizee_fitness_weights` to a tuple containing a negative value to make it minimize that fitness dimension.
+* New runs of the optimizer are trigerred by calls to :meth:`~ltl.optimizers.optimizer.Optimizer._expand_trajectory`
+  after setting :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop` to the new list of individuals_ that need to be
+  evaluated in the next cycle
+* All the (non-exploring) paramters to the `Optimizer` is passed in to its constructor through a
+  :func:`~collections.namedtuple` to keep the paramters documented. For examples see
+  :class:`.GeneticAlgorithmParameters` or :class:`.SimulatedAnnealingParameters`
 
 .. _optimizer-constructor:
 
@@ -240,72 +288,27 @@ In case one wishes to terminate the simulation after the current generation, one
 `self._expand_trajectory()`. Do not call `self._expand_trajectory()` with an empty `self.eval_pop` as it will
 raise an error
 
-See the `PyPet documentation <https://pypet.readthedocs.io/en/latest/manual/introduction.html#what-to-do-with-pypet>`_ for more
-documentation to understand how PyPet works.
-
-Writing new algorithms
-**********************
-
-* For a new **Optimizee**: Create a copy of the class :class:`~ltl.optimizees.optimizee.Optimizee` into a new python
-  module with an appropriate name and fill in the functions. E.g. for a DMS task optimizee, you would create
-  a module (i.e. directory with a `__init__.py` file) as `ltl/optimizees/dms/` and copy the above class there.
-* For a new **Optimizer**: Create a copy of the class :class:`~ltl.optimizers.optimizer.Optimizer` into a new python
-  module with an appropriate name and fill in the functions. (same as above)
-* For a new **experiment**: Create a copy of the file :file:`bin/ltl-template.py` with an appropriate name and fill in
-  the *TODOs*.
-
-Examples
-~~~~~~~~
-
-* See :class:`~ltl.optimizees.functions.optimizee.FunctionOptimizee` for an example of an `Optimizee` (based on simple
-  function minimization).
-* See :class:`~ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer` for an example of an
-  implementation of simulated annealing `Optimizer`.
-
-
-Optimizee
-~~~~~~~~~
-The optimizee subclasses :class:`~ltl.optimizees.optimizee.Optimizee` with a class that contains three mandatory methods
-(Documentation linked below):
-
-1. :meth:`~ltl.optimizees.optimizee.Optimizee.create_individual` : Called to return a random individual_ (returns an Individual-Dict_)
-2. :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` : Runs the actual simulation and returns a fitness vector
-3. :meth:`~ltl.optimizees.optimizee.Optimizee.end` : Tertiary method to do cleanup, printing results etc.
-
-See the class documentation for more details: :class:`~ltl.optimizees.optimizee.Optimizee`
-
-Some notes:
-
-* :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` should always return a tuple!
-
-Optimizer
-~~~~~~~~~
-The optimizer subclasses :class:`~ltl.optimizers.optimizer.Optimizer` with a class that contains two mandatory methods:
-
-1. :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` : knowing the fitness for the current parameters, it generates a new set of parameters and runs the next batch of simulations.
-2. :meth:`~ltl.optimizers.optimizer.Optimizer.end` : Tertiary method to do cleanup, printing results etc.
+.. See the `PyPet documentation <https://pythonhosted.org/pypet/manual/introduction.html#what-to-do-with-pypet>`_ for more
+.. documentation to understand how PyPet works.
 
 See the class documentation for more details: :class:`~ltl.optimizers.optimizer.Optimizer`
 
-Some notes:
-
-* The `Optimizer` should be written (and the existing ones are written) to always maximize the fitness. Set the
-  `optimizee_fitness_weights` to a tuple containing a negative value to make it minimize that fitness dimension.
-* New runs of the optimizer are trigerred by calls to :meth:`~ltl.optimizers.optimizer.Optimizer._expand_trajectory`
-  after setting :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop` to the new list of individuals_ that need to be
-  evaluated in the next cycle
-* All the (non-exploring) paramters to the `Optimizer` is passed in to its constructor through a
-  :func:`~collections.namedtuple` to keep the paramters documented. For examples see
-  :class:`.GeneticAlgorithmParameters` or :class:`.SimulatedAnnealingParameters`
 
 Running an LTL simulation
-*************************
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To run a LTL simulation, copy the file :file:`bin/ltl-template.py` (see :doc:`ltl-bin`) to
 :file:`bin/ltl-{optimizeeabbr}-{optimizerabbr}.py`. Then fill in all the **TODOs** . Especially the parts with the
 initialization of the appropriate `Optimizers` and `Optimizees`. The rest of the code should be left in place for
 logging and PyPet. See the source of :file:`bin/ltl-template.py` for more details.
 
+Examples
+********
+
+* See :class:`~ltl.optimizees.functions.optimizee.FunctionOptimizee` for an example of an `Optimizee` (based on simple
+  function minimization).
+* See :class:`~ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer` for an example of an
+  implementation of simulated annealing `Optimizer`.
 
 Coding Guidelines
 =================
@@ -320,7 +323,7 @@ Coding Guidelines
 
 Other packages used
 *******************
-* `PyPet <https://pypet.readthedocs.io/en/latest/>`_: This is a parameter exploration toolkit that managers exploration
+* `PyPet <https://pythonhosted.org/pypet/>`_: This is a parameter exploration toolkit that managers exploration
   of parameter space *and* storing the results in a standard format (HDF5).
 * `SCOOP <https://scoop.readthedocs.io/en/0.7/>`_: This is optionally used for distributing individual Optimizee
   simulations across multiple hosts in a cluster.
