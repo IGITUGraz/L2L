@@ -45,10 +45,10 @@ class SimulatedAnnealingOptimizer(Optimizer):
                  optimizee_bounding_func=None):
         super().__init__(traj,
                          optimizee_create_individual=optimizee_create_individual,
-                         optimizee_individual_param_spec=optimizee_individual_param_spec,
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters)
         self.optimizee_bounding_func = optimizee_bounding_func
+        self.optimizee_individual_param_spec = optimizee_individual_param_spec
         
         # The following parameters are recorded
         traj.f_add_parameter('noisy_step', parameters.noisy_step, comment='Size of the random step')

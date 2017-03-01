@@ -29,7 +29,6 @@ class Optimizer:
     def __init__(self, traj,
                  optimizee_create_individual,
                  optimizee_fitness_weights,
-                 optimizee_individual_param_spec,
                  parameters):
 
         # Creating Placeholders for individuals and results that are about to be explored
@@ -38,7 +37,6 @@ class Optimizer:
         
         # Initializing basic variables
         self.optimizee_create_individual = optimizee_create_individual
-        self.optimizee_individual_param_spec = optimizee_individual_param_spec
         self.optimizee_fitness_weights = optimizee_fitness_weights
         
         #: The current generation number
@@ -85,7 +83,7 @@ class Optimizer:
         :return:
         """
 
-        grouped_params_dict = get_grouped_param_dict(self.eval_pop, self.optimizee_individual_param_spec)
+        grouped_params_dict = get_grouped_param_dict(self.eval_pop)
 
         final_params_dict = {'generation': [self.g],
                              'ind_idx': range(len(self.eval_pop))}

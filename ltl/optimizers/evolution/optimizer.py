@@ -44,11 +44,11 @@ class GeneticAlgorithmOptimizer(Optimizer):
 
         super().__init__(traj,
                          optimizee_create_individual=optimizee_create_individual,
-                         optimizee_individual_param_spec=optimizee_individual_param_spec,
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters)
         self.optimizee_bounding_func = optimizee_bounding_func
-        
+        self.optimizee_individual_param_spec = optimizee_individual_param_spec
+
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
         traj.f_add_parameter('popsize', parameters.popsize, comment='Population size')  # 185
         traj.f_add_parameter('CXPB', parameters.CXPB, comment='Crossover term')

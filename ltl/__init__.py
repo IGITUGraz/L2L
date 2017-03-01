@@ -195,20 +195,21 @@ def list_to_params(ind_params_list, params_spec):
 def get_param_names(params_spec):
     return tuple(x[0] for x in params_spec)
     
-def get_grouped_param_dict(paramdict_iter, params_spec):
+def get_grouped_param_dict(paramdict_iter):
     """
-    This function can be made to not depend on params_spec but... meh
+    This function takes an iterator of Individual-Dicts and 
     """
-    paramdicttuple = tuple(paramdict_iter)
+    paramdict_tuple = tuple(paramdict_iter)
     
     return_dict = {}
-    param_names = [x[0] for x in params_spec]
-    for par_name in param_names:
-        return_dict[par_name] = []
-
-    for param_dict in paramdicttuple:
+    if paramdict_tuple:
+        param_names = list(paramdict_tuple[0].keys())
         for par_name in param_names:
-            return_dict[par_name].append(param_dict[par_name])
+            return_dict[par_name] = []
+
+        for param_dict in paramdict_tuple:
+            for par_name in param_names:
+                return_dict[par_name].append(param_dict[par_name])
 
     return return_dict
 
