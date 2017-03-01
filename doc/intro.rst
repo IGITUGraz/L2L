@@ -189,6 +189,10 @@ The optimizee subclasses :class:`~ltl.optimizees.optimizee.Optimizee` with a cla
 2. :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` : Runs the actual simulation and returns a fitness vector
 3. :meth:`~ltl.optimizees.optimizee.Optimizee.end` : Tertiary method to do cleanup, printing results etc.
 
+In order to maintain a consistent framework for communication between the optimizer, optimizee, and :ref:`PyPet <Pypet-Section>`
+it is required to enforce certain requirements on the behaviour of the above functions. The details of these requirements for the
+`Optimizee` functions are given below 
+
 .. _optimizee-constructor:
 
 Constructor of Optimizee
@@ -235,23 +239,15 @@ Optimizer
 
 The optimizer subclasses :class:`~ltl.optimizers.optimizer.Optimizer` with a class that contains two mandatory methods:
 
-1. :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` : knowing the fitness for the current parameters, it
+1. :meth:`~ltl.optimizers.optimizer.Optimizer.__init__`: This is the constructor which performs the duties of
+   initializing the trajectory and the initial generation_ of the simulation.
+2. :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` : knowing the fitness for the current parameters, it
    generates a new set of parameters and runs the next batch of simulations.
-2. :meth:`~ltl.optimizers.optimizer.Optimizer.end` : Tertiary method to do cleanup, printing results etc.
+3. :meth:`~ltl.optimizers.optimizer.Optimizer.end` : Tertiary method to do cleanup, printing results etc.
 
-
-Some notes:
-
-NTW Merge this with below
-
-* The `Optimizer` should be written (and the existing ones are written) to always maximize the fitness. Set the
-  `optimizee_fitness_weights` to a tuple containing a negative value to make it minimize that fitness dimension.
-* New runs of the optimizer are trigerred by calls to :meth:`~ltl.optimizers.optimizer.Optimizer._expand_trajectory`
-  after setting :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop` to the new list of individuals_ that need to be
-  evaluated in the next cycle
-* All the (non-exploring) paramters to the `Optimizer` is passed in to its constructor through a
-  :func:`~collections.namedtuple` to keep the paramters documented. For examples see
-  :class:`.GeneticAlgorithmParameters` or :class:`.SimulatedAnnealingParameters`
+Note that in order to maintain a consistent framework for communication between the optimizer, optimizee, and
+:ref:`PyPet <Pypet-Section>`, we enforce a certain protocol for the above function. The details of this protocol
+are outlined below
 
 .. _optimizer-constructor:
 
@@ -270,6 +266,9 @@ to these individuals.
 to access and assign the relevant optimizee parameters in the parameter group :obj:`traj.par.individual`. This is
 the reason for the contract enforced on the Optimizee constructor
 
+Note that all the (non-exploring) paramters to the `Optimizer` is passed in to its constructor through a
+:func:`~collections.namedtuple` to keep the paramters documented. For examples see :class:`.GeneticAlgorithmParameters`
+or :class:`.SimulatedAnnealingParameters`
 
 The :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` function:
 ----------------------------------------------------------------------
@@ -288,6 +287,17 @@ In case one wishes to terminate the simulation after the current generation, one
 `self._expand_trajectory()`. Do not call `self._expand_trajectory()` with an empty `self.eval_pop` as it will
 raise an error
 
+Some points to remember are the following:
+
+1.  The call to `self._expand_trajectory` not only causes the trajectory to store more parameter values to explore,
+    bu, due to the mechanism underlying :meth:`~pypet.trajectory.Trajectory.f_expand()`, also causes the 
+    :ref:`Pypet <Pypet-Section>` framework to run the optimizee :meth:`~ltl.optimizees.optimizee.Optimizee.simulate`
+    function on these parameters. Look at the documentation referenced in the footnote of iteration-loop_ for more
+    details on this
+
+2.  **Always** build the optimizer to maximize fitness. The weights that are passed in to the optimizer constructor
+    can be made negative if one wishes to perform minimization
+
 .. See the `PyPet documentation <https://pythonhosted.org/pypet/manual/introduction.html#what-to-do-with-pypet>`_ for more
 .. documentation to understand how PyPet works.
 
@@ -301,6 +311,36 @@ To run a LTL simulation, copy the file :file:`bin/ltl-template.py` (see :doc:`lt
 :file:`bin/ltl-{optimizeeabbr}-{optimizerabbr}.py`. Then fill in all the **TODOs** . Especially the parts with the
 initialization of the appropriate `Optimizers` and `Optimizees`. The rest of the code should be left in place for
 logging and PyPet. See the source of :file:`bin/ltl-template.py` for more details.
+
+
+Additional Utilities and Protocols
+**********************************
+
+While the essential interface between Optimizers, Optimizers, and :ref:`PyPet <Pypet-Section>` is completely defined
+above, The practical implementation of Optimizers and Optimizees demands certain frequently used data structures and
+functions. These are detailed here
+
+dict-to-list-to-dict Conversion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The benefit of treating individuals_ as Individual-Dicts_ is that it allows properly named parameters in the optimizee, however this comes at the cost of the optimizer being unable to generalize across different Optimizee classes with different Individual-Dicts_ representing the individual. One solution for this is that most Optimizers prefer to behave like they are optimizing a vector (in the case of python, a list). Thus, the Optimizer requires the ability to convert back and forth between a list and a dictionary. For this purpose, we have the following functions
+
+1.  :meth:`~ltl.dict_to_list`
+2.  :meth:`~ltl.list_to_dict`
+
+Check their documentation for more details.
+
+Parameter Bounding
+~~~~~~~~~~~~~~~~~~
+
+Most optimizees impose bounds on their parameters in some form. For example the :class:`~ltl.optimizees.FunctionOptimizee` imposes a rectangular bound on the set of valid coordinates. Most Optimizers on the other hand do not have direct access to these bounds. Hence, If the optimizer wishes to support bounding, it must accept a bounding-function_ as an argument.
+
+.. _bounding-function:
+
+Bounding Function:
+
+  This is a function that takes as an argument an individual_ of the Optimizee (an Individual-Dict_) and returns an individual_ that is a 'bounded' version of the said individual. This bounding may for instance be implemented by means of clipping or normalization. Both the :class:`~ltl.optimizees.FunctionOptimizee` and the :class:`~ltl.optimizees.LSMOptimizee` implement bounding functions in their classes which may be used in case a function is required for bounding.
+
 
 Examples
 ********
