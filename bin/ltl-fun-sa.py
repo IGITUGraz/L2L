@@ -46,10 +46,10 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      # freeze_input=True,
-                      # multiproc=True,
-                      # use_scoop=True,
-                      # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                      freeze_input=True,
+                      multiproc=True,
+                      use_scoop=True,
+                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=True,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
@@ -63,7 +63,7 @@ def main():
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = SimulatedAnnealingParameters(noisy_step=.3, temp_decay=.998, n_iteration=1000, stop_criterion=np.Inf,
+    parameters = SimulatedAnnealingParameters(pop_size=12, noisy_step=.3, temp_decay=.98, n_iteration=100, stop_criterion=np.Inf,
                                               seed=np.random.randint(1e5))
     optimizer = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                                   optimizee_fitness_weights=(-0.1,),
