@@ -1,6 +1,13 @@
 import numpy as np
 
 
+def square(x):
+    x = np.array(x)
+    return np.sum(x ** 2)
+
+bound_square = [-5, 5]
+
+
 def rastrigin(x):
     x = np.array(x)
     return np.sum(x ** 2 + 10 - 10 * np.cos(2 * np.pi * x))
@@ -44,9 +51,9 @@ def get_cost_function(name):
     cost_functions = {}
 
     # List the possible things to pack
-    name_list = ['rastrigin', 'rosenbrock', 'ackley', 'chasm']
-    function_list = [rastrigin, rosenbrock, ackley, chasm]
-    bound_list = [bound_rastrigin, bound_rosenbrock, bound_ackley, bound_chasm]
+    name_list = ['rastrigin', 'rosenbrock', 'ackley', 'chasm', 'square']
+    function_list = [rastrigin, rosenbrock, ackley, chasm, square]
+    bound_list = [bound_rastrigin, bound_rosenbrock, bound_ackley, bound_chasm, bound_square]
 
     # Create a dictionnary which associate the function and state bound to a cost name
     for n, f, bound in zip(name_list, function_list, bound_list):
