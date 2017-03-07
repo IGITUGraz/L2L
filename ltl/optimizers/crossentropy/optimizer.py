@@ -22,13 +22,15 @@ class CrossEntropyOptimizer(Optimizer):
     In the pseudo code the algorithm does:
 
     For n iterations do:
-        - Sample individuals from distribution
-        - evaluate individuals and get fitnesss
-        - pick rho * pop_size number of elite individuals
-        - Fit the distribution family to the new elite individuals by minimizing cross entropy
+      - Sample individuals from distribution
+      - evaluate individuals and get fitnesss
+      - pick rho * pop_size number of elite individuals
+      - Fit the distribution family to the new elite individuals by minimizing cross entropy.
+        (The distribution family used in the current implementation family is the gaussian
+        distribution)
     return final distribution parameters.
-    (These contain information regarding the location of the maxima)
-
+    (The final distribution parameters contain information regarding the location of the maxima)
+    
     NOTE: This expects all parameters of the system to be of numpy.float64. Note that this irritating
     restriction on the kind of floating point type rewuired is put in place due to PyPet's crankiness
     regarding types.
@@ -46,7 +48,7 @@ class CrossEntropyOptimizer(Optimizer):
       element of the fitness vector)
     
     :param parameters: 
-      Instance of :func:`~collections.namedtuple` :class:`SimulatedAnnealingParameters` containing the
+      Instance of :func:`~collections.namedtuple` :class:`CrossEntropyParameters` containing the
       parameters needed by the Optimizer
     
     :param optimizee_bounding_func:
