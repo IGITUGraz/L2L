@@ -9,7 +9,7 @@ from ltl import dict_to_list, list_to_dict, get_grouped_dict
 logger = logging.getLogger("ltl-sa")
 
 CrossEntropyParameters = namedtuple('CrossEntropyParameters',
-                                    ['pop_size', 'rho', 'smoothing', 'n_iteration'])
+                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration'])
 CrossEntropyParameters.__doc__ = """
 :param pop_size: Number of individuals per simulation / Number of parallel Simulated Annealing runs
 
@@ -21,6 +21,9 @@ CrossEntropyParameters.__doc__ = """
     
     new_params = smoothing*old_params + (1-smoothing)*optimal_new_params
 
+:param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
+  generation. To see the use of temperature, look at the documentation of :class:`CrossEntropyOptimizer`
+
 :param n_iteration: number of iterations to perform
 """
 
@@ -31,16 +34,22 @@ class CrossEntropyOptimizer(Optimizer):
 
     For n iterations do:
       - Sample individuals from distribution
-      - evaluate individuals and get fitnesss
+      - evaluate individuals and get fitness
       - pick rho * pop_size number of elite individuals
+      - Out of the remaining non-elite individuals, select them using a simulated-annealing style
+        selection based on the difference between their fitness and the `1-rho` quantile (*gamma*)
+        fitness, and the current temperature
       - Fit the distribution family to the new elite individuals by minimizing cross entropy.
-        (The distribution family used in the current implementation family is the gaussian
-        distribution)
+        The distribution fitting is smoothed to prevent premature convergence to local minima.
+        A weight equal to the `smoothing` parameter is assigned to the previous parameters when
+        smoothing. The distribution family used in the current implementation family is the *Gaussian
+        distribution* with independent components
+    
     return final distribution parameters.
     (The final distribution parameters contain information regarding the location of the maxima)
     
     NOTE: This expects all parameters of the system to be of numpy.float64. Note that this irritating
-    restriction on the kind of floating point type rewuired is put in place due to PyPet's crankiness
+    restriction on the kind of floating point type rewired is put in place due to PyPet's crankiness
     regarding types.
 
     :param  ~pypet.trajectory.Trajectory traj:
@@ -85,6 +94,8 @@ class CrossEntropyOptimizer(Optimizer):
                              comment='Number of iterations to run')
         traj.f_add_parameter('smoothing', parameters.smoothing,
                              comment='Weight of old parameters in smoothing')
+        traj.f_add_parameter('temp_decay', parameters.temp_decay,
+                             comment='Decay factor for temperature')        
 
         temp_indiv, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(),
                                                                        get_dict_spec=True)
@@ -103,13 +114,14 @@ class CrossEntropyOptimizer(Optimizer):
         self.g = 0  # the current generation
         self.gamma = -np.inf  # This is the value above which the samples are considered elite in the
                               # current generation
-        self.best_fitness = -np.inf # The best fitness acheived in this run
+        self.best_fitness = -np.inf # The best fitness achieved in this run
+        self.T = 1  # This is the temperature used to filter evaluated samples in this run
 
         # Distribution parameters
         self.gaussian_center = np.zeros((traj.dimension,), dtype=np.float64)
         self.gaussian_std = np.inf
 
-        # The first iteration does not pick the values out of the gaussian distribution. It picks randomly
+        # The first iteration does not pick the values out of the Gaussian distribution. It picks randomly
         # (or at-least as randomly as optimizee_create_individual creates individuals)
         
         # Note that this array stores individuals as an np.array of floats as opposed to Individual-Dicts
@@ -129,8 +141,8 @@ class CrossEntropyOptimizer(Optimizer):
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
 
-        pop_size, n_elite, n_iteration, dimension, smoothing = \
-            traj.pop_size, traj.n_elite, traj.n_iteration, traj.dimension, traj.smoothing
+        pop_size, n_elite, n_iteration, dimension, smoothing, temp_decay = \
+            traj.pop_size, traj.n_elite, traj.n_iteration, traj.dimension, traj.smoothing, traj.temp_decay
 
         old_eval_pop = self.eval_pop.copy()
         old_eval_pop_asarray = self.eval_pop_asarray
@@ -158,34 +170,46 @@ class CrossEntropyOptimizer(Optimizer):
         weighted_fitness_list = np.array([dot_product(fitness, self.optimizee_fitness_weights)
                                           for _, fitness in fitnesses_results])
 
-        # Performs descending arg-sort of weights
-        weight_sorted_indices = np.argsort(-weighted_fitness_list)
+        # Performs descending arg-sort of weighted fitness
+        fitness_sorted_indices = np.argsort(-weighted_fitness_list)
 
         generation_name = 'generation_{}'.format(self.g)
 
-        # Filtering, keeping only elite samples, note that this performs sorting as
+        # Sorting the data according to fitness
+        sorted_eval_pop_asarray = old_eval_pop_asarray[fitness_sorted_indices]
+        sorted_weighted_fitness_list = weighted_fitness_list[fitness_sorted_indices]
+
+        # Filtering, keeping all elite samples, note that this performs sorting as
         # well due to the indirection array used
-        old_eval_pop = [old_eval_pop[i] for i in weight_sorted_indices[:n_elite]]
-        old_eval_pop_asarray = old_eval_pop_asarray[weight_sorted_indices[:n_elite]]
-        weighted_fitness_list = weighted_fitness_list[weight_sorted_indices[:n_elite]]
+        elite_eval_pop_asarray = sorted_eval_pop_asarray[:n_elite]
 
-        # Fitting New distribution parameters. Fitting in smoothed manner
-        opt_gaussian_center = np.mean(old_eval_pop_asarray, axis=0)
-        opt_gaussian_std = np.std(old_eval_pop_asarray, axis=0)
+        self.gamma = sorted_weighted_fitness_list[n_elite-1]
 
-        self.gamma = weighted_fitness_list[-1]
+        # Keeping non-elite samples with certain probability dependent on temperature (like Simulated Annealing)
+        non_elite_selection_probs = np.exp((weighted_fitness_list[n_elite:] - self.gamma)/self.T)
+        non_elite_selected_indices = np.random.random(non_elite_selection_probs.size) < non_elite_selection_probs
+
+        non_elite_eval_pop_asarray = sorted_eval_pop_asarray[n_elite:][non_elite_selected_indices]
+
+        final_eval_pop_asarray = np.concatenate((elite_eval_pop_asarray, non_elite_eval_pop_asarray))
+
+        # Fitting New distribution parameters.
+        # If this is the first generation, then no smoothing is done, Else the distribution
+        # parameters are linearly smoothed
+        opt_gaussian_center = np.mean(final_eval_pop_asarray, axis=0)
+        opt_gaussian_std = np.std(final_eval_pop_asarray, axis=0)
         if self.g == 0:
             self.gaussian_center = opt_gaussian_center
             self.gaussian_std = opt_gaussian_std
         else:
             self.gaussian_center = smoothing*self.gaussian_center + (1-smoothing)*opt_gaussian_center
             self.gaussian_std = smoothing*self.gaussian_std + (1-smoothing)*opt_gaussian_std
-        self.best_fitness = weighted_fitness_list[0]
+        self.best_fitness = sorted_weighted_fitness_list[0]
 
         traj.v_idx = -1  # set the trajectory back to default
         logger.info("-- End of generation {} --".format(self.g))
         logger.info("  Evaluated %i individuals" % len(fitnesses_results))
-        logger.info('  Best Fitness Individual: {}'.format(old_eval_pop[0]))
+        logger.info('  Best Fitness Individual: {}'.format(old_eval_pop[fitness_sorted_indices[0]]))
         logger.info('  Maximum fitness value: {}'.format(self.best_fitness))
         logger.info('  Calculated gamma: {}'.format(self.gamma))
         logger.info('  Inferred gaussian center: {}'.format(self.gaussian_center))
@@ -207,6 +231,9 @@ class CrossEntropyOptimizer(Optimizer):
         traj.results.generation_params.f_add_result(generation_name + '.gaussian_std', self.gaussian_std,
                                                     comment='standard deviation of the gaussian distribution inferred'
                                                             ' from the evaluated generation')
+        traj.results.generation_params.f_add_result(generation_name + '.T', self.T,
+                                                    comment='Temperature used to select non-elite elements among the'
+                                                            'individuals of the evaluated generation')
         traj.results.generation_params.f_add_result(generation_name + '.best_fitness', self.best_fitness,
                                                     comment='The highest fitness among the individuals in the '
                                                             'evaluated generation')
@@ -224,6 +251,7 @@ class CrossEntropyOptimizer(Optimizer):
             self.eval_pop = [list_to_dict(ind_asarray, self.optimizee_individual_dict_spec)
                              for ind_asarray in self.eval_pop_asarray]
             self.g += 1  # Update generation counter
+            self.T *= temp_decay
             self._expand_trajectory(traj)
 
     def end(self):
