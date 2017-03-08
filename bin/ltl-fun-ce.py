@@ -64,7 +64,7 @@ def main():
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = CrossEntropyParameters(pop_size=20, rho=0.9, n_iteration=50)
+    parameters = CrossEntropyParameters(pop_size=20, rho=0.9, smoothing=0.0, n_iteration=50)
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                             optimizee_fitness_weights=(-0.1,),
                                             parameters=parameters,

@@ -9,10 +9,18 @@ from ltl import dict_to_list, list_to_dict, get_grouped_dict
 logger = logging.getLogger("ltl-sa")
 
 CrossEntropyParameters = namedtuple('CrossEntropyParameters',
-                                    ['pop_size', 'rho', 'n_iteration'])
+                                    ['pop_size', 'rho', 'smoothing', 'n_iteration'])
 CrossEntropyParameters.__doc__ = """
 :param pop_size: Number of individuals per simulation / Number of parallel Simulated Annealing runs
+
 :param rho: fraction of solutions to be considered elite in each iteration.
+
+:param smoothing: This is a factor between 0 and 1 that determines the weight assigned to the previous distribution
+  parameters while calculating the new distribution parameters. The smoothing is done as a linear combination of the 
+  optimal parameters for the current data, and the previous distribution as follows:
+    
+    new_params = smoothing*old_params + (1-smoothing)*optimal_new_params
+
 :param n_iteration: number of iterations to perform
 """
 
@@ -75,6 +83,8 @@ class CrossEntropyOptimizer(Optimizer):
                              comment='Fraction of individuals considered elite in each generation')
         traj.f_add_parameter('n_iteration', parameters.n_iteration,
                              comment='Number of iterations to run')
+        traj.f_add_parameter('smoothing', parameters.smoothing,
+                             comment='Weight of old parameters in smoothing')
 
         temp_indiv, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(),
                                                                        get_dict_spec=True)
@@ -119,8 +129,8 @@ class CrossEntropyOptimizer(Optimizer):
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
 
-        pop_size, n_elite, n_iteration, dimension = \
-            traj.pop_size, traj.n_elite, traj.n_iteration, traj.dimension
+        pop_size, n_elite, n_iteration, dimension, smoothing = \
+            traj.pop_size, traj.n_elite, traj.n_iteration, traj.dimension, traj.smoothing
 
         old_eval_pop = self.eval_pop.copy()
         old_eval_pop_asarray = self.eval_pop_asarray
@@ -159,10 +169,17 @@ class CrossEntropyOptimizer(Optimizer):
         old_eval_pop_asarray = old_eval_pop_asarray[weight_sorted_indices[:n_elite]]
         weighted_fitness_list = weighted_fitness_list[weight_sorted_indices[:n_elite]]
 
-        # Fitting New distribution parameters.
+        # Fitting New distribution parameters. Fitting in smoothed manner
+        opt_gaussian_center = np.mean(old_eval_pop_asarray, axis=0)
+        opt_gaussian_std = np.std(old_eval_pop_asarray, axis=0)
+
         self.gamma = weighted_fitness_list[-1]
-        self.gaussian_center = np.mean(old_eval_pop_asarray, axis=0)
-        self.gaussian_std = np.std(old_eval_pop_asarray, axis=0)
+        if self.g == 0:
+            self.gaussian_center = opt_gaussian_center
+            self.gaussian_std = opt_gaussian_std
+        else:
+            self.gaussian_center = smoothing*self.gaussian_center + (1-smoothing)*opt_gaussian_center
+            self.gaussian_std = smoothing*self.gaussian_std + (1-smoothing)*opt_gaussian_std
         self.best_fitness = weighted_fitness_list[0]
 
         traj.v_idx = -1  # set the trajectory back to default
