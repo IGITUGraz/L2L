@@ -9,9 +9,9 @@ from ltl import dict_to_list, list_to_dict, get_grouped_dict
 logger = logging.getLogger("ltl-sa")
 
 SimulatedAnnealingParameters = namedtuple('SimulatedAnnealingParameters',
-                                          ['pop_size', 'noisy_step', 'temp_decay', 'n_iteration', 'stop_criterion', 'seed'])
+                                          ['n_parallel_runs', 'noisy_step', 'temp_decay', 'n_iteration', 'stop_criterion', 'seed'])
 SimulatedAnnealingParameters.__doc__ = """
-:param pop_size: Number of individuals per simulation / Number of parallel Simulated Annealing runs
+:param n_parallel_runs: Number of individuals per simulation / Number of parallel Simulated Annealing runs
 :param noisy_step: Size of the random step
 :param temp_decay: A function of the form f(t) = temperature at time t
 :param n_iteration: number of iteration to perform
@@ -65,7 +65,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         self.optimizee_bounding_func = optimizee_bounding_func
         
         # The following parameters are recorded
-        traj.f_add_parameter('pop_size', parameters.pop_size,
+        traj.f_add_parameter('n_parallel_runs', parameters.n_parallel_runs,
                              comment='Number of parallel simulated annealing runs / Size of Population')
         traj.f_add_parameter('noisy_step', parameters.noisy_step, comment='Size of the random step')
         traj.f_add_parameter('temp_decay', parameters.temp_decay,
@@ -80,7 +80,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         # This is because this array is used within the context of the simulated annealing algorithm and
         # Thus needs to handle the optimizee individuals as vectors
         self.current_individual_list = [np.array(dict_to_list(self.optimizee_create_individual()))
-                                        for _ in range(parameters.pop_size)]
+                                        for _ in range(parameters.n_parallel_runs)]
 
         traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
 
@@ -89,7 +89,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         self.g = 0  # the current generation
 
         # Keep track of current fitness value to decide whether we want the next individual to be accepted or not
-        self.current_fitness_value_list = [-np.Inf] * parameters.pop_size
+        self.current_fitness_value_list = [-np.Inf] * parameters.n_parallel_runs
 
         new_individual_list = [
             list_to_dict(ind_as_list + np.random.normal(0.0, parameters.noisy_step, ind_as_list.size) * traj.noisy_step * self.T,
@@ -115,7 +115,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
         # NOTE: Currently works with only one individual at a time.
         # In principle, can be used with many different individuals evaluated in parallel
-        assert len(fitnesses_results) == traj.pop_size
+        assert len(fitnesses_results) == traj.n_parallel_runs
         weighted_fitness_list = []
         for i, (run_index, fitness) in enumerate(fitnesses_results):
             
@@ -151,9 +151,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
                 new_individual = self.optimizee_bounding_func(new_individual)
 
             logger.debug("Current best fitness for individual %d is %.2f. New individual is %s", 
-                         i,
-                         self.current_fitness_value_list[i],
-                         new_individual)
+                         i, self.current_fitness_value_list[i], new_individual)
             self.eval_pop.append(new_individual)
 
         logger.debug("Current best fitness within population is %.2f", max(self.current_fitness_value_list))
