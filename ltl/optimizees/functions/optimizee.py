@@ -3,6 +3,7 @@ import numpy as np
 from ltl.optimizees.functions.tools import get_cost_function
 from ltl.optimizees.optimizee import Optimizee
 
+
 class FunctionOptimizee(Optimizee):
     """
     Implements a simple function optimizer. (For ALS assignment 1 question 1)

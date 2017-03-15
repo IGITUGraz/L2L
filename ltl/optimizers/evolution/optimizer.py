@@ -65,7 +65,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         toolbox = base.Toolbox()
         # Structure initializers
         toolbox.register("individual", tools.initIterate, creator.Individual,
-                         lambda : dict_to_list(optimizee_create_individual()))
+                         lambda: dict_to_list(optimizee_create_individual()))
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
         # Operator registering
@@ -93,7 +93,6 @@ class GeneticAlgorithmOptimizer(Optimizer):
         toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=parameters.mutpar, indpb=traj.indpb)
         toolbox.decorate("mutate", bounding_decorator)
         toolbox.register("select", tools.selTournament, tournsize=traj.tournsize)
-
 
         # ------- Initialize Population and Trajectory -------- #
         # NOTE: The Individual object implements the list interface.

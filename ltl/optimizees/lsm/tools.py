@@ -101,7 +101,7 @@ def poisson_generator(rate, t_start=0.0, t_stop=1000.0, rng=None):
         >> gen.poisson_generator(20, 5000, 10000, array=True)
     """
 
-    if rng == None:
+    if rng is None:
         rng = np.random
 
     #number = int((t_stop-t_start)/1000.0*2.0*rate)
@@ -226,7 +226,7 @@ def get_liquid_states(spike_times, times, tau):
             cur_times = spt2[spt2 >= t - t_window]
             states[t_idx, n] = sum(np.exp(-(t - cur_times) / tau))
             t_idx -= 1
-        n += 1;
+        n += 1
     return states
 
 
@@ -246,7 +246,7 @@ def divide_train_test(states, targets, train_frac):
     """
     Nstates = np.size(states, 0)
     Ntrain = round(Nstates * train_frac)
-    Ntest = Nstates - Ntrain
+    Nstates - Ntrain
     idx_states = np.random.permutation(Nstates)
     idx_train = idx_states[:Ntrain]
     idx_test = idx_states[Ntrain:]

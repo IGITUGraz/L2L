@@ -13,7 +13,6 @@ class Optimizee:
         parameters (i.e. parameters that are returned via create_individual) to the trajectory.
         """
         traj.f_add_parameter_group('individual', 'Contains parameters of the optimizee')
-        pass
 
     def create_individual(self):
         """
@@ -25,7 +24,6 @@ class Optimizee:
 
         :return: a :class:`list`
         """
-        pass
 
     def simulate(self, traj):
         """
@@ -39,10 +37,8 @@ class Optimizee:
             multi-dimensional fitness function.
 
         """
-        pass
 
     def end(self):
         """
         Run any code required to clean-up, print final individuals etc.
         """
-        pass
