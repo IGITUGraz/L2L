@@ -12,8 +12,6 @@ from pypet import pypetconstants
 from ltl.optimizees.functions.optimizee import FunctionOptimizee
 from ltl.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParameters, SimulatedAnnealingOptimizer
 from ltl.paths import Paths
-from ltl.optimizees.optimizee import Optimizee
-from ltl.optimizers.optimizer import Optimizer
 
 warnings.filterwarnings("ignore")
 

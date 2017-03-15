@@ -7,7 +7,6 @@ import numpy as np
 import yaml
 
 from pypet import Environment
-from pypet import pypetconstants
 
 from ltl.optimizees.lsm.optimizee import LSMOptimizee
 from ltl.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParameters, SimulatedAnnealingOptimizer

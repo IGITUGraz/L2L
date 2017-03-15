@@ -354,6 +354,7 @@ texinfo_documents = [
 autodoc_mock_imports = ['nest', 'nest.raster_plot', 'deap', 'deap.tools']
 autodoc_member_order = 'bysource'
 
+
 def no_namedtuple_attrib_docstring(app, what, name, obj, options, lines):
     is_namedtuple_docstring = (
         len(lines) == 2 and lines[0].startswith('Alias for field number')
@@ -361,6 +362,7 @@ def no_namedtuple_attrib_docstring(app, what, name, obj, options, lines):
     if is_namedtuple_docstring:
         # We don't return, so we need to purge in-place
         del lines[:]
+
 
 def setup(app):
     app.connect(
