@@ -6,10 +6,11 @@ import numpy as np
 
 from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list, list_to_dict, get_grouped_dict
-logger = logging.getLogger("ltl-sa")
+from ltl.optimizers.crossentropy.distribution import DISTRIBUTION_DICT
+logger = logging.getLogger("ltl-ce")
 
 CrossEntropyParameters = namedtuple('CrossEntropyParameters',
-                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration'])
+                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distributionName'])
 CrossEntropyParameters.__doc__ = """
 :param pop_size: Number of individuals per simulation / Number of parallel Simulated Annealing runs
 
@@ -92,6 +93,8 @@ class CrossEntropyOptimizer(Optimizer):
                              comment='Fraction of individuals considered elite in each generation')
         traj.f_add_parameter('n_iteration', parameters.n_iteration,
                              comment='Number of iterations to run')
+        traj.f_add_parameter('distributionName', parameters.distributionName,
+                             comment='Distribution function')
         traj.f_add_parameter('smoothing', parameters.smoothing,
                              comment='Weight of old parameters in smoothing')
         traj.f_add_parameter('temp_decay', parameters.temp_decay,
@@ -117,10 +120,6 @@ class CrossEntropyOptimizer(Optimizer):
         self.best_fitness = -np.inf # The best fitness achieved in this run
         self.T = 1  # This is the temperature used to filter evaluated samples in this run
 
-        # Distribution parameters
-        self.gaussian_center = np.zeros((traj.dimension,), dtype=np.float64)
-        self.gaussian_std = np.inf
-
         # The first iteration does not pick the values out of the Gaussian distribution. It picks randomly
         # (or at-least as randomly as optimizee_create_individual creates individuals)
         
@@ -134,6 +133,10 @@ class CrossEntropyOptimizer(Optimizer):
 
         self.eval_pop = current_eval_pop
         self.eval_pop_asarray = np.array([dict_to_list(x) for x in self.eval_pop])
+        
+        # Max Likelihood
+        self.current_distribution = DISTRIBUTION_DICT[parameters.distributionName](self.eval_pop_asarray)
+        
         self._expand_trajectory(traj)
 
     def post_process(self, traj, fitnesses_results):
