@@ -1,0 +1,27 @@
+
+version: 2
+jobs:
+  build:
+    docker:
+      - image: python:3.5
+    working_directory: /home/ubuntu/cci-test
+    steps:
+      - checkout
+      - restore_cache:
+          key: projectname-{{ .Branch }}
+      - run:
+          name: Install flake8
+          command: pip install flake8
+      - run:
+          name: Run style check
+          command: ./run-style-check.sh
+      - save_cache:
+          key: projectname-{{ .Branch }}
+          paths:
+            - "~/.cache/pip"
+            - "/usr/local/lib/python3.5/site-packages"
+      - store_artifacts:
+          path: style-reports
+          destination: reports
+      - store_test_results:
+          path: "style-reports/"
