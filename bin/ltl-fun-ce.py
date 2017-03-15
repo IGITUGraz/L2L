@@ -1,19 +1,15 @@
 import os
 import warnings
-
 import logging.config
-
 import numpy as np
 import yaml
-
 from pypet import Environment
 from pypet import pypetconstants
-
 from ltl.optimizees.functions.optimizee import FunctionOptimizee
 from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
-
-import ipdb;
+import ipdb
+from ltl.optimizers.crossentropy.distribution import GAUSSIAN_DISTRIBUTION
 
 warnings.filterwarnings("ignore")
 
@@ -22,7 +18,8 @@ logger = logging.getLogger('ltl-fun-ce')
 
 def main():
     name = 'LTL-FUN-CE'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = 'results'  # CHANGE THIS to the directory where your simulation results are contained
+    os.chdir('/home/thomas/workspace/LTL/src/')
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
            " Set it manually in the code (by setting the variable 'root_dir_path')" \
@@ -63,7 +60,8 @@ def main():
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = CrossEntropyParameters(pop_size=30, rho=0.5, smoothing=0.0, temp_decay=0.9, n_iteration=30)
+    parameters = CrossEntropyParameters(pop_size=30, rho=0.5, smoothing=0.0, temp_decay=0.9, n_iteration=30,
+                                        distributionName=GAUSSIAN_DISTRIBUTION)
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                             optimizee_fitness_weights=(-0.1,),
                                             parameters=parameters,
