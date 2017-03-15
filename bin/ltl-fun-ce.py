@@ -10,18 +10,18 @@ from pypet import Environment
 from pypet import pypetconstants
 
 from ltl.optimizees.functions.optimizee import FunctionOptimizee
-from ltl.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParameters, SimulatedAnnealingOptimizer
+from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
-from ltl.optimizees.optimizee import Optimizee
-from ltl.optimizers.optimizer import Optimizer
+
+import ipdb;
 
 warnings.filterwarnings("ignore")
 
-logger = logging.getLogger('ltl-lsm-ga')
+logger = logging.getLogger('ltl-fun-ce')
 
 
 def main():
-    name = 'LTL-FUN-SA'
+    name = 'LTL-FUN-CE'
     root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
@@ -51,7 +51,7 @@ def main():
                       use_scoop=True,
                       wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
-                      log_stdout=True,  # Sends stdout to logs
+                      log_stdout=False,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
                       )
 
@@ -63,12 +63,11 @@ def main():
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = SimulatedAnnealingParameters(n_parallel_runs=12, noisy_step=.3, temp_decay=.98, n_iteration=100, stop_criterion=np.Inf,
-                                              seed=np.random.randint(1e5))
-    optimizer = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                                  optimizee_fitness_weights=(-0.1,),
-                                                  parameters=parameters,
-                                                  optimizee_bounding_func=optimizee.bounding_func)
+    parameters = CrossEntropyParameters(pop_size=30, rho=0.5, smoothing=0.0, temp_decay=0.9, n_iteration=30)
+    optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
+                                            optimizee_fitness_weights=(-0.1,),
+                                            parameters=parameters,
+                                            optimizee_bounding_func=optimizee.bounding_func)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
@@ -86,4 +85,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    with ipdb.launch_ipdb_on_exception():
+        main()
