@@ -5,7 +5,7 @@ import numpy as np
 import nest
 import nest.raster_plot
 
-from ltl.optimizees.lsm.tools import generate_stimuls_mem, get_spike_times, get_liquid_states, train_readout, \
+from ltl.optimizees.lsm.tools import get_spike_times, get_liquid_states, train_readout, \
     test_readout, divide_train_test, generate_stimuls_xor
 from ltl.optimizees.optimizee import Optimizee
 from ltl.matplotlib_ import plt

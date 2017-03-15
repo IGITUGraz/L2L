@@ -19,6 +19,8 @@ logger = logging.getLogger('ltl-lsm-ga')
 # processes should thus be at-least as many for maximum speed. If not, then it should be
 # some factor of 8 for maximum efficiency of resources. Keep this in mind for other
 # population sizes too
+
+
 def main():
     name = 'LSM-GA'
     root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
