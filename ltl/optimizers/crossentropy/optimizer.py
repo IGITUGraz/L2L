@@ -10,7 +10,7 @@ logger = logging.getLogger("ltl-ce")
 CrossEntropyParameters = namedtuple('CrossEntropyParameters',
                                     ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'stop_criterion', 'distribution'])
 CrossEntropyParameters.__doc__ = """
-:param pop_size: Number of individuals per simulation / Number of parallel Simulated Annealing runs
+:param pop_size: Number of individuals per simulation
 
 :param rho: fraction of solutions to be considered elite in each iteration.
 
@@ -169,8 +169,8 @@ class CrossEntropyOptimizer(Optimizer):
             weighted_fitness_list.append(np.dot(fitness, self.optimizee_fitness_weights))
         traj.v_idx = -1 # set trajectory back to default
 
-        # Performs descending arg-sort of weighted fitness in descending order
-        fitness_sorted_indices = np.argsort(weighted_fitness_list)[::-1]
+        # Performs descending arg-sort of weighted fitness
+        fitness_sorted_indices = np.argsort(-weighted_fitness_list)
 
         generation_name = 'generation_{}'.format(self.g)
 
