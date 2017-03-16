@@ -69,7 +69,6 @@ class Optimizer:
         """
         Run any code required to clean-up, print final individuals etc.
         """
-        pass
 
     def _expand_trajectory(self, traj):
         """

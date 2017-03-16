@@ -7,7 +7,6 @@ import numpy as np
 import yaml
 
 from pypet import Environment
-from pypet import pypetconstants
 
 from ltl.optimizees.lsm.optimizee import LSMOptimizee
 from ltl.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParameters, SimulatedAnnealingOptimizer
@@ -61,8 +60,8 @@ def main():
 
     # NOTE: Outerloop optimizer initialization
     # Note hat no bounding function is specified
-    parameters = SimulatedAnnealingParameters(noisy_step=.3, temp_decay=.9, n_iteration=10, stop_criterion=np.Inf,
-                                              seed=42)
+    parameters = SimulatedAnnealingParameters(n_parallel_runs=1, noisy_step=.3, temp_decay=.9, n_iteration=10,
+                                              stop_criterion=np.Inf, seed=42)
     sa = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=lsm.create_individual,
                                            optimizee_fitness_weights=(-1.0,),
                                            parameters=parameters)
