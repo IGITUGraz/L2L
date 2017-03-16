@@ -19,7 +19,7 @@ logger = logging.getLogger('ltl-fun-ce')
 def main():
     name = 'LTL-FUN-CE'
     root_dir_path = 'results'  # CHANGE THIS to the directory where your simulation results are contained
-    os.chdir('/home/thomas/workspace/LTL/src/')
+    #os.chdir('/home/thomas/workspace/LTL/src/')
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
            " Set it manually in the code (by setting the variable 'root_dir_path')" \
