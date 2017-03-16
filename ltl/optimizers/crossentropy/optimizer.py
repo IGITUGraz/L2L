@@ -1,16 +1,14 @@
-
 import logging
 from collections import namedtuple
 
 import numpy as np
 
 from ltl.optimizers.optimizer import Optimizer
-from ltl import dict_to_list, list_to_dict, get_grouped_dict
-from ltl.optimizers.crossentropy.distribution import DISTRIBUTION_DICT
+from ltl import dict_to_list, list_to_dict
 logger = logging.getLogger("ltl-ce")
 
 CrossEntropyParameters = namedtuple('CrossEntropyParameters',
-                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distribution_name'])
+                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'stop_criterion', 'distribution'])
 CrossEntropyParameters.__doc__ = """
 :param pop_size: Number of individuals per simulation / Number of parallel Simulated Annealing runs
 
@@ -25,8 +23,13 @@ CrossEntropyParameters.__doc__ = """
 :param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
   generation. To see the use of temperature, look at the documentation of :class:`CrossEntropyOptimizer`
 
-:param n_iteration: number of iterations to perform
+:param n_iteration: Number of iterations to perform
+
+:param stop_criterion: Stop if this fitness is reached.
+
+:param distribution: Distribution class to use. Has to implement a fit and sample function.
 """
+
 
 class CrossEntropyOptimizer(Optimizer):
     """
@@ -43,9 +46,8 @@ class CrossEntropyOptimizer(Optimizer):
       - Fit the distribution family to the new elite individuals by minimizing cross entropy.
         The distribution fitting is smoothed to prevent premature convergence to local minima.
         A weight equal to the `smoothing` parameter is assigned to the previous parameters when
-        smoothing. The distribution family used in the current implementation family is the *Gaussian
-        distribution* with independent components
-    
+        smoothing.     
+
     return final distribution parameters.
     (The final distribution parameters contain information regarding the location of the maxima)
     
@@ -93,8 +95,11 @@ class CrossEntropyOptimizer(Optimizer):
                              comment='Fraction of individuals considered elite in each generation')
         traj.f_add_parameter('n_iteration', parameters.n_iteration,
                              comment='Number of iterations to run')
-        traj.f_add_parameter('distribution_name', parameters.distribution_name,
-                             comment='Distribution function')
+        traj.f_add_parameter('stop_criterion', parameters.stop_criterion,
+                             comment='Stop if best individual reaches this fitness')
+        # cannot keep track of class type
+        #traj.f_add_parameter('distribution', parameters.distribution,
+        #                     comment='Distribution function')
         traj.f_add_parameter('smoothing', parameters.smoothing,
                              comment='Weight of old parameters in smoothing')
         traj.f_add_parameter('temp_decay', parameters.temp_decay,
@@ -135,7 +140,7 @@ class CrossEntropyOptimizer(Optimizer):
         self.eval_pop_asarray = np.array([dict_to_list(x) for x in self.eval_pop])
         
         # Max Likelihood
-        self.current_distribution = DISTRIBUTION_DICT[parameters.distribution_name](self.eval_pop_asarray)
+        self.current_distribution = parameters.distribution(self.eval_pop_asarray)
         
         self._expand_trajectory(traj)
 
@@ -147,13 +152,10 @@ class CrossEntropyOptimizer(Optimizer):
         pop_size, n_elite, n_iteration, dimension, smoothing, temp_decay = \
             traj.pop_size, traj.n_elite, traj.n_iteration, traj.dimension, traj.smoothing, traj.temp_decay
 
-        old_eval_pop = self.eval_pop.copy()
-        old_eval_pop_asarray = self.eval_pop_asarray
-
-        self.eval_pop.clear()
-
+        weighted_fitness_list = []
         #**************************************************************************************************************
         # Storing run-information in the trajectory
+        # Reading fitnesses and performing distribution update
         #**************************************************************************************************************
         for run_index, fitness in fitnesses_results:
             # We need to convert the current run index into an ind_idx
@@ -161,25 +163,19 @@ class CrossEntropyOptimizer(Optimizer):
             traj.v_idx = run_index
             ind_index = traj.par.ind_idx
             
-            traj.f_add_result('$set.$.individual', old_eval_pop[ind_index])
+            traj.f_add_result('$set.$.individual', self.eval_pop[ind_index])
             traj.f_add_result('$set.$.fitness', fitness)
-        traj.v_idx = -1
 
-        #**************************************************************************************************************
-        # Reading fitnesses and performing distribution update
-        #**************************************************************************************************************
-        
-        weighted_fitness_list = []
-        for _, fitness_vector in fitnesses_results:
-            weighted_fitness_list.append(np.dot(fitness_vector, self.optimizee_fitness_weights))
+            weighted_fitness_list.append(np.dot(fitness, self.optimizee_fitness_weights))
+        traj.v_idx = -1 # set trajectory back to default
 
-        # Performs descending arg-sort of weighted fitness
-        fitness_sorted_indices = np.argsort(weighted_fitness_list)
+        # Performs descending arg-sort of weighted fitness in descending order
+        fitness_sorted_indices = np.argsort(weighted_fitness_list)[::-1]
 
         generation_name = 'generation_{}'.format(self.g)
 
         # Sorting the data according to fitness
-        sorted_eval_pop_asarray = old_eval_pop_asarray[fitness_sorted_indices]
+        sorted_eval_pop_asarray = self.eval_pop_asarray[fitness_sorted_indices]
         sorted_weighted_fitness_list = np.asarray(weighted_fitness_list)[fitness_sorted_indices]
 
         # Filtering, keeping all elite samples, note that this performs sorting as
@@ -197,20 +193,12 @@ class CrossEntropyOptimizer(Optimizer):
         final_eval_pop_asarray = np.concatenate((elite_eval_pop_asarray, non_elite_eval_pop_asarray))
 
         # Fitting New distribution parameters.
-        # If this is the first generation, then no smoothing is done, Else the distribution
-        # parameters are linearly smoothed
-#         opt_gaussian_center = np.mean(final_eval_pop_asarray, axis=0)
-#         opt_gaussian_std = np.std(final_eval_pop_asarray, axis=0)
-        if self.g == 0:
-            self.current_distribution.fit(final_eval_pop_asarray)
-        else:
-            self.current_distribution.fit(final_eval_pop_asarray, smoothing)
+        self.current_distribution.fit(final_eval_pop_asarray, smoothing)
         self.best_fitness = sorted_weighted_fitness_list[0]
 
-        traj.v_idx = -1  # set the trajectory back to default
         logger.info("-- End of generation {} --".format(self.g))
         logger.info("  Evaluated %i individuals" % len(fitnesses_results))
-        logger.info('  Best Fitness Individual: {}'.format(old_eval_pop[fitness_sorted_indices[0]]))
+        logger.info('  Best Fitness Individual: {}'.format(self.eval_pop[fitness_sorted_indices[0]]))
         logger.info('  Maximum fitness value: {}'.format(self.best_fitness))
         logger.info('  Calculated gamma: {}'.format(self.gamma))
         self.current_distribution.log(logger)
@@ -231,7 +219,7 @@ class CrossEntropyOptimizer(Optimizer):
         traj.results.generation_params.f_add_result(generation_name + '.best_fitness', self.best_fitness,
                                                     comment='The highest fitness among the individuals in the '
                                                             'evaluated generation')
-        self.current_distribution.addResults(generation_name, traj)
+        self.current_distribution.add_results(generation_name, traj)
 
         #**************************************************************************************************************
         # Create the next generation by sampling the inferred distribution
@@ -239,8 +227,9 @@ class CrossEntropyOptimizer(Optimizer):
         # Note that this is only done in case the evaluated run is not the last run
 
         fitnesses_results.clear()
+        self.eval_pop.clear()
         # Not necessary for the last generation
-        if self.g < n_iteration - 1:
+        if self.g < n_iteration - 1 and self.best_fitness < traj.stop_criterion:
             #Sample from the constructed distribution
             self.eval_pop_asarray = self.current_distribution.sample(pop_size)
             self.eval_pop = [list_to_dict(ind_asarray, self.optimizee_individual_dict_spec)
