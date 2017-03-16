@@ -5,7 +5,8 @@ from collections import namedtuple
 import numpy as np
 
 from ltl.optimizers.optimizer import Optimizer
-from ltl import dict_to_list, list_to_dict, get_grouped_dict
+from ltl import dict_to_list
+from ltl import list_to_dict
 logger = logging.getLogger("ltl-sa")
 
 SimulatedAnnealingParameters = namedtuple('SimulatedAnnealingParameters',
@@ -157,6 +158,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         logger.debug("Current best fitness within population is %.2f", max(self.current_fitness_value_list))
 
         traj.v_idx = -1  # set the trajectory back to default
+
         logger.info("-- End of generation {} --".format(self.g))
 
         # ------- Create the next generation by crossover and mutation -------- #
