@@ -8,19 +8,19 @@ class RBF:
         name_list = ['gaussian']
         function_list = [Gaussian]
 
-        # Create a dictionnary which associate the function and state bound to a cost name
+        # Create a dictionary which associate the function and state bound to a cost name
         for n, f in zip(name_list, function_list):
             cost_functions[n] = f
 
-        self.gen_function = []
+        self.gen_functions = []
         for param in rbf_params:
             f_name = param["name"]
             function_class = cost_functions[f_name](param["params"], dims)
-            self.gen_function.append(function_class.call)
+            self.gen_functions.append(function_class.call)
 
     def cost_function(self, x):
         res = 0.
-        for f in self.gen_function:
+        for f in self.gen_functions:
             res += f(x)
 
         return res
@@ -29,12 +29,12 @@ class RBF:
 class Gaussian:
     def __init__(self, params, dims):
         if not len(params) == 2:
-            raise Exception("Number of paramaters does not equal 2.")
+            raise Exception("Number of parameters does not equal 2.")
         sigma = np.array(params[0])
         mean = np.array(params[1])
 
         if (dims > 1 and (not sigma.shape[0] == sigma.shape[1] == mean.shape[0] == dims)) or \
-                (dims == 1 and (not sigma.shape == mean.shape == tuple() )):
+                (dims == 1 and (not sigma.shape == mean.shape == tuple())):
             raise Exception("Shapes do not match the given dimensionality.")
         self.dims = dims
         self.sigma = sigma
@@ -44,12 +44,4 @@ class Gaussian:
         x = np.array(x)
         value = 1 / np.sqrt((2*np.pi)**self.dims * np.linalg.det(self.sigma))
         value = value * np.exp(-0.5 * (np.transpose(x - self.mean).dot(np.linalg.inv(self.sigma))).dot((x - self.mean)))
-        print("rbfcall")
         return value
-#
-# rbf_params = [{'name' : 'gaussian', 'params' : [ [[1.,0.],[0.,1.]], [1.,1.]]}]
-# inst = RBF(rbf_params, 2)
-# func = RBF.cost_function
-# print(func(inst,x=[0,0]))
-# print(func(inst,x=[1,1]))
-# print(func(inst,x=[2,2]))
