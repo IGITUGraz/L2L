@@ -158,7 +158,6 @@ class SimulatedAnnealingOptimizer(Optimizer):
         logger.debug("Current best fitness within population is %.2f", max(self.current_fitness_value_list))
 
         traj.v_idx = -1  # set the trajectory back to default
-
         logger.info("-- End of generation {} --".format(self.g))
 
         # ------- Create the next generation by crossover and mutation -------- #
