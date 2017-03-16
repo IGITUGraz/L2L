@@ -10,7 +10,7 @@ from ltl.optimizers.crossentropy.distribution import DISTRIBUTION_DICT
 logger = logging.getLogger("ltl-ce")
 
 CrossEntropyParameters = namedtuple('CrossEntropyParameters',
-                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distributionName'])
+                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distribution_name'])
 CrossEntropyParameters.__doc__ = """
 :param pop_size: Number of individuals per simulation / Number of parallel Simulated Annealing runs
 
@@ -93,7 +93,7 @@ class CrossEntropyOptimizer(Optimizer):
                              comment='Fraction of individuals considered elite in each generation')
         traj.f_add_parameter('n_iteration', parameters.n_iteration,
                              comment='Number of iterations to run')
-        traj.f_add_parameter('distributionName', parameters.distributionName,
+        traj.f_add_parameter('distribution_name', parameters.distribution_name,
                              comment='Distribution function')
         traj.f_add_parameter('smoothing', parameters.smoothing,
                              comment='Weight of old parameters in smoothing')
@@ -135,7 +135,7 @@ class CrossEntropyOptimizer(Optimizer):
         self.eval_pop_asarray = np.array([dict_to_list(x) for x in self.eval_pop])
         
         # Max Likelihood
-        self.current_distribution = DISTRIBUTION_DICT[parameters.distributionName](self.eval_pop_asarray)
+        self.current_distribution = DISTRIBUTION_DICT[parameters.distribution_name](self.eval_pop_asarray)
         
         self._expand_trajectory(traj)
 
@@ -169,18 +169,22 @@ class CrossEntropyOptimizer(Optimizer):
         # Reading fitnesses and performing distribution update
         #**************************************************************************************************************
         
-        dot_product = lambda x, y: sum(f * w for f, w in zip(x, y))
-        weighted_fitness_list = np.array([dot_product(fitness, self.optimizee_fitness_weights)
-                                          for _, fitness in fitnesses_results])
+        weighted_fitness_list = []
+        for _, fitness_vector in fitnesses_results:
+            weighted_fitness_list.append(np.dot(fitness_vector, self.optimizee_fitness_weights))
+            
+#         dot_product = lambda x, y: sum(f * w for f, w in zip(x, y))
+#         weighted_fitness_list = np.array([dot_product(fitness, self.optimizee_fitness_weights)
+#                                           for _, fitness in fitnesses_results])
 
         # Performs descending arg-sort of weighted fitness
-        fitness_sorted_indices = np.argsort(-weighted_fitness_list)
+        fitness_sorted_indices = np.argsort(weighted_fitness_list)
 
         generation_name = 'generation_{}'.format(self.g)
 
         # Sorting the data according to fitness
         sorted_eval_pop_asarray = old_eval_pop_asarray[fitness_sorted_indices]
-        sorted_weighted_fitness_list = weighted_fitness_list[fitness_sorted_indices]
+        sorted_weighted_fitness_list = np.asarray(weighted_fitness_list)[fitness_sorted_indices]
 
         # Filtering, keeping all elite samples, note that this performs sorting as
         # well due to the indirection array used
@@ -199,14 +203,16 @@ class CrossEntropyOptimizer(Optimizer):
         # Fitting New distribution parameters.
         # If this is the first generation, then no smoothing is done, Else the distribution
         # parameters are linearly smoothed
-        opt_gaussian_center = np.mean(final_eval_pop_asarray, axis=0)
-        opt_gaussian_std = np.std(final_eval_pop_asarray, axis=0)
+#         opt_gaussian_center = np.mean(final_eval_pop_asarray, axis=0)
+#         opt_gaussian_std = np.std(final_eval_pop_asarray, axis=0)
         if self.g == 0:
-            self.gaussian_center = opt_gaussian_center
-            self.gaussian_std = opt_gaussian_std
+#             self.gaussian_center = opt_gaussian_center
+#             self.gaussian_std = opt_gaussian_std
+            self.current_distribution.fit(final_eval_pop_asarray)
         else:
-            self.gaussian_center = smoothing*self.gaussian_center + (1-smoothing)*opt_gaussian_center
-            self.gaussian_std = smoothing*self.gaussian_std + (1-smoothing)*opt_gaussian_std
+            self.current_distribution.fit(final_eval_pop_asarray, smoothing)
+#             self.gaussian_center = smoothing*self.gaussian_center + (1-smoothing)*opt_gaussian_center
+#             self.gaussian_std = smoothing*self.gaussian_std + (1-smoothing)*opt_gaussian_std
         self.best_fitness = sorted_weighted_fitness_list[0]
 
         traj.v_idx = -1  # set the trajectory back to default
@@ -215,8 +221,7 @@ class CrossEntropyOptimizer(Optimizer):
         logger.info('  Best Fitness Individual: {}'.format(old_eval_pop[fitness_sorted_indices[0]]))
         logger.info('  Maximum fitness value: {}'.format(self.best_fitness))
         logger.info('  Calculated gamma: {}'.format(self.gamma))
-        logger.info('  Inferred gaussian center: {}'.format(self.gaussian_center))
-        logger.info('  Inferred gaussian std   : {}'.format(self.gaussian_std))
+        self.current_distribution.log(logger)
         
         #**************************************************************************************************************
         # Storing Generation Parameters / Results in the trajectory
@@ -228,18 +233,13 @@ class CrossEntropyOptimizer(Optimizer):
         traj.results.generation_params.f_add_result(generation_name + '.gamma', self.gamma,
                                                     comment='The fitness threshold inferred from the evaluated '
                                                             'generation (This is used in sampling the next generation')
-        traj.results.generation_params.f_add_result(generation_name + '.gaussian_center', self.gaussian_center,
-                                                    comment='center of gaussian distribution estimated from the '
-                                                            'evaluated generation')
-        traj.results.generation_params.f_add_result(generation_name + '.gaussian_std', self.gaussian_std,
-                                                    comment='standard deviation of the gaussian distribution inferred'
-                                                            ' from the evaluated generation')
         traj.results.generation_params.f_add_result(generation_name + '.T', self.T,
                                                     comment='Temperature used to select non-elite elements among the'
                                                             'individuals of the evaluated generation')
         traj.results.generation_params.f_add_result(generation_name + '.best_fitness', self.best_fitness,
                                                     comment='The highest fitness among the individuals in the '
                                                             'evaluated generation')
+        self.current_distribution.addResults(generation_name, traj)
 
         #**************************************************************************************************************
         # Create the next generation by sampling the inferred distribution
