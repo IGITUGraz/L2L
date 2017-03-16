@@ -167,9 +167,11 @@ class sdict(sdictm):
     def apply(self, fn):
         raise RuntimeError("Immutable dictionary")
 
+
 class DictEntryType(Enum):
-    Sequence=0
-    Scalar=1
+    Sequence = 0
+    Scalar = 1
+
 
 def dict_to_list(input_dict, get_dict_spec=False):
     """
@@ -215,6 +217,7 @@ def dict_to_list(input_dict, get_dict_spec=False):
     else:
         return return_list
 
+
 def list_to_dict(input_list, dict_spec):
     """
     This function converts a list back into a dict.
@@ -236,13 +239,14 @@ def list_to_dict(input_list, dict_spec):
         value_type = dict_entry[1]
         value_len = dict_entry[2]
         if value_type == DictEntryType.Sequence:
-            return_dict[key] = input_list[cursor:cursor+value_len]
+            return_dict[key] = input_list[cursor:cursor + value_len]
         elif value_type == DictEntryType.Scalar:
             return_dict[key] = input_list[cursor]
         cursor += value_len
     assert cursor == len(input_list), "Incorrect Parameter List length, Somethings not right"
     return return_dict
     
+
 def get_grouped_dict(dict_iter):
     """
     This function takes an iterator of :class:`dict` objects and returns a grouped dict. It
