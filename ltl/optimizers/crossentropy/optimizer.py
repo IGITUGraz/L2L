@@ -172,10 +172,6 @@ class CrossEntropyOptimizer(Optimizer):
         weighted_fitness_list = []
         for _, fitness_vector in fitnesses_results:
             weighted_fitness_list.append(np.dot(fitness_vector, self.optimizee_fitness_weights))
-            
-#         dot_product = lambda x, y: sum(f * w for f, w in zip(x, y))
-#         weighted_fitness_list = np.array([dot_product(fitness, self.optimizee_fitness_weights)
-#                                           for _, fitness in fitnesses_results])
 
         # Performs descending arg-sort of weighted fitness
         fitness_sorted_indices = np.argsort(weighted_fitness_list)
@@ -206,13 +202,9 @@ class CrossEntropyOptimizer(Optimizer):
 #         opt_gaussian_center = np.mean(final_eval_pop_asarray, axis=0)
 #         opt_gaussian_std = np.std(final_eval_pop_asarray, axis=0)
         if self.g == 0:
-#             self.gaussian_center = opt_gaussian_center
-#             self.gaussian_std = opt_gaussian_std
             self.current_distribution.fit(final_eval_pop_asarray)
         else:
             self.current_distribution.fit(final_eval_pop_asarray, smoothing)
-#             self.gaussian_center = smoothing*self.gaussian_center + (1-smoothing)*opt_gaussian_center
-#             self.gaussian_std = smoothing*self.gaussian_std + (1-smoothing)*opt_gaussian_std
         self.best_fitness = sorted_weighted_fitness_list[0]
 
         traj.v_idx = -1  # set the trajectory back to default
@@ -249,8 +241,8 @@ class CrossEntropyOptimizer(Optimizer):
         fitnesses_results.clear()
         # Not necessary for the last generation
         if self.g < n_iteration - 1:
-            self.eval_pop_asarray = np.random.normal(loc=self.gaussian_center, scale=self.gaussian_std,
-                                                 size=(pop_size, dimension))
+            #Sample from the constructed distribution
+            self.eval_pop_asarray = self.current_distribution.sample(pop_size)
             self.eval_pop = [list_to_dict(ind_asarray, self.optimizee_individual_dict_spec)
                              for ind_asarray in self.eval_pop_asarray]
             self.g += 1  # Update generation counter
