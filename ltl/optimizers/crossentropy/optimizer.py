@@ -108,7 +108,7 @@ class CrossEntropyOptimizer(Optimizer):
         temp_indiv, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(),
                                                                        get_dict_spec=True)
 
-        traj.f_add_derived_parameter('n_elite', int(parameters.rho*parameters.pop_size + 0.5),
+        traj.f_add_derived_parameter('n_elite', int(parameters.rho * parameters.pop_size + 0.5),
                                      comment='Actual number of elite individuals per generation')
         traj.f_add_derived_parameter('dimension', len(temp_indiv),
                                      comment='The dimension of the parameter space of the optimizee')
@@ -120,9 +120,10 @@ class CrossEntropyOptimizer(Optimizer):
 
         # The following parameters are recorded as generation parameters i.e. once per generation
         self.g = 0  # the current generation
-        self.gamma = -np.inf  # This is the value above which the samples are considered elite in the
-                              # current generation
-        self.best_fitness = -np.inf # The best fitness achieved in this run
+        # This is the value above which the samples are considered elite in the
+        # current generation
+        self.gamma = -np.inf
+        self.best_fitness = -np.inf  # The best fitness achieved in this run
         self.T = 1  # This is the temperature used to filter evaluated samples in this run
 
         # The first iteration does not pick the values out of the Gaussian distribution. It picks randomly
@@ -149,8 +150,8 @@ class CrossEntropyOptimizer(Optimizer):
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
 
-        pop_size, n_elite, n_iteration, dimension, smoothing, temp_decay = \
-            traj.pop_size, traj.n_elite, traj.n_iteration, traj.dimension, traj.smoothing, traj.temp_decay
+        pop_size, n_elite, n_iteration, smoothing, temp_decay = \
+            traj.pop_size, traj.n_elite, traj.n_iteration, traj.smoothing, traj.temp_decay
 
         weighted_fitness_list = []
         #**************************************************************************************************************
@@ -167,7 +168,7 @@ class CrossEntropyOptimizer(Optimizer):
             traj.f_add_result('$set.$.fitness', fitness)
 
             weighted_fitness_list.append(np.dot(fitness, self.optimizee_fitness_weights))
-        traj.v_idx = -1 # set trajectory back to default
+        traj.v_idx = -1  # set trajectory back to default
 
         # Performs descending arg-sort of weighted fitness
         fitness_sorted_indices = np.argsort(-weighted_fitness_list)
@@ -182,10 +183,10 @@ class CrossEntropyOptimizer(Optimizer):
         # well due to the indirection array used
         elite_eval_pop_asarray = sorted_eval_pop_asarray[:n_elite]
 
-        self.gamma = sorted_weighted_fitness_list[n_elite-1]
+        self.gamma = sorted_weighted_fitness_list[n_elite - 1]
 
         # Keeping non-elite samples with certain probability dependent on temperature (like Simulated Annealing)
-        non_elite_selection_probs = np.exp((weighted_fitness_list[n_elite:] - self.gamma)/self.T)
+        non_elite_selection_probs = np.exp((weighted_fitness_list[n_elite:] - self.gamma) / self.T)
         non_elite_selected_indices = np.random.random(non_elite_selection_probs.size) < non_elite_selection_probs
 
         non_elite_eval_pop_asarray = sorted_eval_pop_asarray[n_elite:][non_elite_selected_indices]
@@ -244,4 +245,3 @@ class CrossEntropyOptimizer(Optimizer):
         """
         # ------------ Finished all runs and print result --------------- #
         logger.info("-- End of (successful) CE optimization --")
-
