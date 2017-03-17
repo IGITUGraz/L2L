@@ -1,5 +1,5 @@
 # This file installs the ltl package. Note that it does not perform any installation of the documentation. For this, follow the specified procedure in the README
-from setuptools import setup, find_packages
+from setuptools import setup
 setup(
     name="learntolearn",
     version="0.1.0",
