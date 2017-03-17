@@ -8,8 +8,6 @@ setup(
     author_email="arjun@igi.tugraz.at",
     description="This module provides the infrastructure create optimizers and "
                 "optimizees in order to implement learning-to-learn",
-    license="MIT",
-    keywords="Generic Builder builder generic",
     install_requires=['numpy',
                       'scipy',
                       'pyyaml',
