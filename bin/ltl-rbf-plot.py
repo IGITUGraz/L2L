@@ -35,8 +35,10 @@ def main():
     rbf_params = [{'name': 'gaussian', 'params': [[[1.5, .1], [.1, .3]], [-1., -1.]]},
                   {'name': 'gaussian', 'params': [[[.25, .3], [.3, 1.]], [1., 1.]]},
                   {'name': 'gaussian', 'params': [[[.5, .25], [.25, 1.3]], [2., -2.]]}]
-    rbf_instance = RBF(rbf_params, 2)
-    rbf_instance.plot()
+    RBF(rbf_params, 2).plot()
+
+    rbf_params = [{'name': 'permutation', 'params': [0.005]}]
+    RBF(rbf_params, 2).plot()
 
 if __name__ == '__main__':
     main()

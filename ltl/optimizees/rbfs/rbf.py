@@ -39,6 +39,18 @@ class RBF:
         Y = np.arange(self.bound[0], self.bound[1], 0.05)
         X, Y = np.meshgrid(X, Y)
         Z = [self.cost_function([x, y]) for x, y in zip(X.ravel(), Y.ravel())]
+        # Z = []
+        # i = 0
+        # # print(self.cost_function([1., 2., 3.]))
+        # print("computing cost function [", sep='', end='')
+        # for x, y in zip(X.ravel(), Y.ravel()):
+        #     Z.append(self.cost_function([x, y]))
+        #     i += 1
+        #     if i % (X.size / 100) == 0:
+        #         perc = (i / X.size) * 100
+        #         # print("%d%%" % (perc,))
+        #         print(".", sep='', end='', flush=True)
+        # print("]")
         Z = np.array(Z).reshape(X.shape)
         # print(Z)
 
@@ -54,6 +66,7 @@ class RBF:
         fig.colorbar(surf, shrink=0.5, aspect=5)
 
         plt.show()
+
 
 class Permutation:
     def __init__(self, params, dims):
@@ -71,7 +84,7 @@ class Permutation:
         x = np.array(x)
         ks = np.array(range(1, self.dims+1))
         i = np.array(range(1, self.dims+1))
-        value = [np.sum((i**k + self.beta) * (x / i)**(k - 1)) for k in ks]
+        value = np.array([np.sum((i**k + self.beta) * ((x / i)**k - 1), axis=0) for k in ks])
         value = np.sum(value**2)
         return value
 
