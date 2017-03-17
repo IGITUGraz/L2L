@@ -40,5 +40,8 @@ def main():
     rbf_params = [{'name': 'permutation', 'params': [0.005]}]
     RBF(rbf_params, 2).plot()
 
+    rbf_params = [{'name': 'easom', 'params': None}]
+    RBF(rbf_params, 3).plot()
+
 if __name__ == '__main__':
     main()

@@ -2,14 +2,14 @@ import numpy as np
 
 
 class RBF:
-    def __init__(self, rbf_params, dims, noise=False, mu=0., sigma=0.01, ):
+    def __init__(self, rbf_params, dims=2, noise=False, mu=0., sigma=0.01):
         cost_functions = {}
         self.bound = [-5., 5.]
         self.noise = noise
         self.mu = mu
         self.sigma = sigma
-        name_list = ['gaussian', 'permutation']
-        function_list = [Gaussian, Permutation]
+        name_list = ['gaussian', 'permutation', 'easom']
+        function_list = [Gaussian, Permutation, Easom]
 
         # Create a dictionary which associate the function and state bound to a cost name
         for n, f in zip(name_list, function_list):
@@ -72,6 +72,21 @@ class RBF:
         fig.colorbar(surf, shrink=0.5, aspect=5)
 
         plt.show()
+
+
+class Easom:
+    def __init__(self, params, dims):
+        if params is not None:
+            raise Exception("Function does not take parameters.")
+
+        self.dims = dims
+
+    def call(self, x):
+        x = np.array(x)
+        cos_x = np.cos(x)
+        x_min_pi = (x - np.pi)**2
+        value = -cos_x.prod() * np.exp(-np.sum(x_min_pi))
+        return value
 
 
 class Permutation:
