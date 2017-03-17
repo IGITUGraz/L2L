@@ -4,7 +4,7 @@ import numpy as np
 class RBF:
     def __init__(self, rbf_params, dims):
         cost_functions = {}
-        self.bound = [-5, 5]
+        self.bound = [-5., 5.]
         name_list = ['gaussian']
         function_list = [Gaussian]
 
@@ -24,6 +24,36 @@ class RBF:
             res += f(x)
 
         return res
+
+    def plot(self):
+        from mpl_toolkits.mplot3d import Axes3D
+        import matplotlib.pyplot as plt
+        from matplotlib import cm
+        from matplotlib.ticker import LinearLocator, FormatStrFormatter
+
+        fig = plt.figure()
+        ax = fig.gca(projection='3d')
+
+        # Make data.
+        X = np.arange(self.bound[0], self.bound[1], 0.05)
+        Y = np.arange(self.bound[0], self.bound[1], 0.05)
+        X, Y = np.meshgrid(X, Y)
+        Z = [self.cost_function([x, y]) for x, y in zip(X.ravel(), Y.ravel())]
+        Z = np.array(Z).reshape(X.shape)
+        # print(Z)
+
+        # Plot the surface.
+        surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm, linewidth=0, antialiased=False)
+
+        # Customize the z axis.
+        # ax.set_zlim(-1.01, 1.01)
+        ax.zaxis.set_major_locator(LinearLocator(10))
+        ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+
+        # Add a color bar which maps values to colors.
+        fig.colorbar(surf, shrink=0.5, aspect=5)
+
+        plt.show()
 
 
 class Gaussian:
