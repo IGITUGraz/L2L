@@ -1,5 +1,6 @@
 import numpy as np
-
+import logging
+logger = logging.getLogger("ltl-distribution")
 
 class Distribution():
     """Generic base for a distribution. Needs to implement the functions fit and sample.
@@ -9,6 +10,7 @@ class Distribution():
         in maximum likelihood fashion.
 
         :param individuals: A list or array of individuals to fit to.
+        :returns tuple containing the inferred distribution parameters and a short description
         """
         pass
  
@@ -18,21 +20,6 @@ class Distribution():
         :param n_individuals: An integer specifiyng the amount of individuals to sample
 
         :returns: A list or array of n_individuals
-        """
-        pass
-
-    def log(self, logger):
-        """Additional callback for logging
-
-        :param logger: The logger
-        """
-        pass
-
-    def add_results(self, generation_name, traj):
-        """Callback to add the current parametrization to given PyPET trajectory.
-
-        :param generation_name: Current generation name
-        :param traj: PyPET trajectory
         """
         pass
 
@@ -56,13 +43,22 @@ class Gaussian(Distribution):
         :param smooth_update: determines to which extent the new samples
         account for the new distribution.
         default is 1 -> old parameters are fully discarded
+        
+        :returns tuple containing the inferred mean and covariance of the gaussian
         """
         mean = np.mean(data_list, axis=0)
-        # lookup np.cov
         cov_mat = np.cov(data_list, rowvar=False)
 
         self.mean = smooth_update * mean + (1 - smooth_update) * self.mean
         self.cov = smooth_update * cov_mat + (1 - smooth_update) * self.cov
+        
+        logger.debug('  Inferred gaussian center: {}'.format(self.mean))
+        logger.debug('  Inferred gaussian cov   : {}'.format(self.cov))
+        
+        return [('.gaussian_center', self.mean, 'center of gaussian distribution estimated from the '
+                                                'evaluated generation'), 
+                ('.gaussian_covariance_matrix', self.cov, 'covariance matrix from the evaluated generation')]
+        
 
     def sample(self, n_individuals):
         """Sample n_individuals individuals under the current parametrization
@@ -72,23 +68,3 @@ class Gaussian(Distribution):
         :returns numpy array with n_individual rows of individuals
         """
         return np.random.multivariate_normal(self.mean, self.cov, n_individuals)
-
-    def log(self, logger):
-        """Logs current parametrization
-
-        :param logger: The logger
-        """
-        logger.info('  Inferred gaussian center: {}'.format(self.mean))
-        logger.info('  Inferred gaussian cov   : {}'.format(self.cov))
-
-    def add_results(self, generation_name, traj):
-        """Adds the current parametrization to the trajectory
-
-        :param generation_name: Current generation_name
-        :param traj: PyPET trajectory
-        """
-        traj.results.generation_params.f_add_result(generation_name + '.gaussian_center', self.mean,
-                                                    comment='center of gaussian distribution estimated from the '
-                                                            'evaluated generation')
-        traj.results.generation_params.f_add_result(generation_name + '.gaussian_covariance_matrix', self.cov,
-                                                    comment='covariance matrix from the evaluated generation')
