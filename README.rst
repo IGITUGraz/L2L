@@ -1,6 +1,16 @@
 .. image:: https://circleci.com/gh/IGITUGraz/LTL.svg?style=svg&circle-token=227d26445f67e74ecc1c8904688859b1c49c292f
     :target: https://circleci.com/gh/IGITUGraz/LTL
-    
+   
+Installing Requirements
+-----------------------
+
+If one wishes to install LTL as a python package, then one may ignore this section and continue from the section `To Install The LTL Package`_. If you however, wish to use it as-is, without installing, then the relevant requirements must be installed. This can be done by running the following from the root directory of the repository:
+
+    pip3 install --user -r requirements.text
+
+Each optimizees and optimizers may have their own dependencies specified in the requirements.txt file within their
+respective package.
+
 To Install The LTL Package
 -------------------------
 
