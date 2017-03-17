@@ -2,9 +2,12 @@ import numpy as np
 
 
 class RBF:
-    def __init__(self, rbf_params, dims):
+    def __init__(self, rbf_params, dims, noise=False, mu=0., sigma=0.01, ):
         cost_functions = {}
         self.bound = [-5., 5.]
+        self.noise = noise
+        self.mu = mu
+        self.sigma = sigma
         name_list = ['gaussian', 'permutation']
         function_list = [Gaussian, Permutation]
 
@@ -22,6 +25,9 @@ class RBF:
         res = 0.
         for f in self.gen_functions:
             res += f(x)
+
+        if self.noise:
+            res += np.random.normal(self.mu, self.sigma)
 
         return res
 
