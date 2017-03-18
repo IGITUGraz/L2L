@@ -43,5 +43,8 @@ def main():
     rbf_params = [{'name': 'easom', 'params': None}]
     RBF(rbf_params, 3).plot()
 
+    rbf_params = [{'name': 'langermann', 'params': None}]
+    RBF(rbf_params, 2).plot()
+
 if __name__ == '__main__':
     main()
