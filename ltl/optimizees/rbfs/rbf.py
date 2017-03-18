@@ -2,9 +2,9 @@ import numpy as np
 
 
 class RBF:
-    def __init__(self, rbf_params, dims=2, noise=False, mu=0., sigma=0.01):
+    def __init__(self, rbf_params, dims=2, bound_min=0., bound_max=10., noise=False, mu=0., sigma=0.01):
         cost_functions = {}
-        self.bound = [0., 10.]
+        self.bound = [bound_min, bound_max]
         self.noise = noise
         self.mu = mu
         self.sigma = sigma
