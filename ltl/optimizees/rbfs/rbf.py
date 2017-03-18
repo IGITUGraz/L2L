@@ -8,8 +8,8 @@ class RBF:
         self.noise = noise
         self.mu = mu
         self.sigma = sigma
-        name_list = ['gaussian', 'permutation', 'easom', 'langermann']
-        function_list = [Gaussian, Permutation, Easom, Langermann]
+        name_list = ['gaussian', 'permutation', 'easom', 'langermann', 'michalewicz']
+        function_list = [Gaussian, Permutation, Easom, Langermann, Michalewicz]
 
         # Create a dictionary which associate the function and state bound to a cost name
         for n, f in zip(name_list, function_list):
@@ -72,6 +72,24 @@ class RBF:
         fig.colorbar(surf, shrink=0.5, aspect=5)
 
         plt.show()
+
+
+class Michalewicz:
+    def __init__(self, params, dims):
+        if params is None:
+            self.m = 10
+        else:
+            self.m = params["m"]
+
+        self.dims = dims
+
+    def call(self, x):
+        x = np.array(x)
+        i = np.arange(1, self.dims+1)
+        a = (i * x**2)/np.pi
+        b = np.sin(a)**(2*self.m)
+        value = -np.sum(np.sin(x) * b)
+        return value
 
 
 class Langermann:

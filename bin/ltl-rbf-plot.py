@@ -32,19 +32,33 @@ def main():
     print("Change the values in logging.yaml to control log level and destination")
     print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
 
-    rbf_params = [{'name': 'gaussian', 'params': [[[1.5, .1], [.1, .3]], [-1., -1.]]},
-                  {'name': 'gaussian', 'params': [[[.25, .3], [.3, 1.]], [1., 1.]]},
-                  {'name': 'gaussian', 'params': [[[.5, .25], [.25, 1.3]], [2., -2.]]}]
-    RBF(rbf_params, 2, noise=True).plot()
+    rbf_params = [{'name': 'gaussian', 'params': {"sigma": [[1.5, .1],
+                                                            [.1, .3]],
+                                                  "mean": [-1., -1.]}},
+                  {'name': 'gaussian', 'params': {"sigma": [[.25, .3],
+                                                            [.3, 1.]],
+                                                  "mean": [1., 1.]}},
+                  {'name': 'gaussian', 'params': {"sigma": [[.5, .25],
+                                                            [.25, 1.3]],
+                                                  "mean": [2., -2.]}}]
+    RBF(rbf_params, 2, noise=True, bound_min=-5., bound_max=5.).plot()
 
-    rbf_params = [{'name': 'permutation', 'params': [0.005]}]
-    RBF(rbf_params, 2).plot()
+    rbf_params = [{'name': 'permutation', 'params': {"beta": 0.005}}]
+    RBF(rbf_params, 2, bound_min=-5., bound_max=5.).plot()
 
     rbf_params = [{'name': 'easom', 'params': None}]
     RBF(rbf_params, 3).plot()
 
     rbf_params = [{'name': 'langermann', 'params': None}]
     RBF(rbf_params, 2).plot()
+
+    rbf_params = [{'name': 'langermann', 'params': {"A": [[3, 3],
+                                                          [7, 7]],
+                                                    "c": [5, 5]}}]
+    RBF(rbf_params, 2).plot()
+
+    rbf_params = [{'name': 'michalewicz', 'params': None}]
+    RBF(rbf_params, 2, bound_min=0., bound_max=3.14).plot()
 
 if __name__ == '__main__':
     main()
