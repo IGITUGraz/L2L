@@ -76,23 +76,31 @@ class RBF:
 
 class Langermann:
     def __init__(self, params, dims):
-        if params is not None:
-            raise Exception("Function does not take parameters.")
+        if params is None and dims == 2:
+            self.c = np.array([1, 2, 5, 2, 3])
+            self.A = np.array([[3, 5],
+                               [5, 2],
+                               [2, 1],
+                               [1, 4],
+                               [7, 9]])
+        elif params is not None:
+            self.c = np.array(params["c"])
+            self.A = np.array(params["A"])
+            if self.c.size != self.A.shape[0]:
+                raise Exception("Parameters A and c do not match.")
+            if self.A.shape[1] != dims:
+                raise Exception("Shape of parameter A does not match the dimensionality.")
+        else:
+            raise Exception("Parameters not defined.")
 
         self.dims = dims
 
     def call(self, x):
         x = np.array(x)
-        c = np.array([1, 2, 5, 2, 3])
-        A = np.array([[3, 5],
-                      [5, 2],
-                      [2, 1],
-                      [1, 4],
-                      [7, 9]])
         value = 0
-        for i in range(A.shape[0]):
-            sum_diff_sq = np.sum((x - A[i])**2)
-            value += c[i] * np.exp((-1/np.pi) * sum_diff_sq) * np.cos(np.pi * sum_diff_sq)
+        for i in range(self.A.shape[0]):
+            sum_diff_sq = np.sum((x - self.A[i])**2)
+            value += self.c[i] * np.exp((-1/np.pi) * sum_diff_sq) * np.cos(np.pi * sum_diff_sq)
         return value
 
 
@@ -115,7 +123,7 @@ class Permutation:
     def __init__(self, params, dims):
         if not len(params) == 1:
             raise Exception("Number of parameters does not equal 1.")
-        beta = np.array(params[0])
+        beta = np.array(params["beta"])
 
         if np.isscalar(beta):
             raise Exception("Beta paramater must always be a scalar value.")
@@ -136,8 +144,8 @@ class Gaussian:
     def __init__(self, params, dims):
         if not len(params) == 2:
             raise Exception("Number of parameters does not equal 2.")
-        sigma = np.array(params[0])
-        mean = np.array(params[1])
+        sigma = np.array(params["sigma"])
+        mean = np.array(params["mean"])
 
         if (dims > 1 and (not sigma.shape[0] == sigma.shape[1] == mean.shape[0] == dims)) or \
                 (dims == 1 and (not sigma.shape == mean.shape == tuple())):
