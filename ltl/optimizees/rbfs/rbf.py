@@ -8,8 +8,8 @@ class RBF:
         self.noise = noise
         self.mu = mu
         self.sigma = sigma
-        name_list = ['gaussian', 'permutation', 'easom', 'langermann', 'michalewicz']
-        function_list = [Gaussian, Permutation, Easom, Langermann, Michalewicz]
+        name_list = ['gaussian', 'permutation', 'easom', 'langermann', 'michalewicz', 'shekel']
+        function_list = [Gaussian, Permutation, Easom, Langermann, Michalewicz, Shekel]
 
         # Create a dictionary which associate the function and state bound to a cost name
         for n, f in zip(name_list, function_list):
@@ -72,6 +72,38 @@ class RBF:
         fig.colorbar(surf, shrink=0.5, aspect=5)
 
         plt.show()
+
+
+class Shekel:
+    def __init__(self, params, dims):
+        if params is None and dims == 2:
+            self.c = (1./10.) * np.array([1, 2, 5, 2, 3, 1, 1])
+            self.A = np.array([[3, 5],
+                               [5, 2],
+                               [2, 1],
+                               [3, 3],
+                               [2, 7],
+                               [1, 4],
+                               [7, 9]])
+        elif params is not None:
+            self.c = np.array(params["c"])
+            self.A = np.array(params["A"])
+            if self.c.size != self.A.shape[0]:
+                raise Exception("Parameters A and c do not match.")
+            if self.A.shape[1] != dims:
+                raise Exception("Shape of parameter A does not match the dimensionality.")
+        else:
+            raise Exception("Parameters not defined.")
+
+        self.dims = dims
+
+    def call(self, x):
+        x = np.array(x)
+        value = 0
+        for i in range(self.A.shape[0]):
+            sum_diff_sq = np.sum((x - self.A[i])**2 + self.c[i]) ** -1
+            value += sum_diff_sq
+        return -value
 
 
 class Michalewicz:

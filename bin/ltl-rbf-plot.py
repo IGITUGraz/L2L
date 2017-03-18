@@ -60,5 +60,8 @@ def main():
     rbf_params = [{'name': 'michalewicz', 'params': None}]
     RBF(rbf_params, 2, bound_min=0., bound_max=3.14).plot()
 
+    rbf_params = [{'name': 'shekel', 'params': None}]
+    RBF(rbf_params, 2, bound_min=0., bound_max=10.).plot()
+
 if __name__ == '__main__':
     main()
