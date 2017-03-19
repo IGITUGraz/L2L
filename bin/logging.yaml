@@ -24,11 +24,19 @@ loggers:
     level: DEBUG
     handlers: [file]
     propagate: no
+  ltl-lsrs:
+    level: DEBUG
+    handlers: [file]
+    propagate: no
   ltl-lsm-ga:
     level: INFO
     handlers: [file]
     propagate: no
   ltl-lsm-sa:
+    level: INFO
+    handlers: [file]
+    propagate: no
+  ltl-lsm-lsrs:
     level: INFO
     handlers: [file]
     propagate: no
