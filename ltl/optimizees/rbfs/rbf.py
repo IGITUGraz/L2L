@@ -2,9 +2,8 @@ import numpy as np
 
 
 class RBF:
-    def __init__(self, rbf_params, dims=2, bound_min=0., bound_max=10., noise=False, mu=0., sigma=0.01):
+    def __init__(self, rbf_params, dims=2, bound = None, noise=False, mu=0., sigma=0.01):
         cost_functions = {}
-        self.bound = [bound_min, bound_max]
         self.noise = noise
         self.mu = mu
         self.sigma = sigma
@@ -16,10 +15,21 @@ class RBF:
             cost_functions[n] = f
 
         self.gen_functions = []
+        gen_functions_classes = []
         for param in rbf_params:
             f_name = param["name"]
             function_class = cost_functions[f_name](param["params"], dims)
             self.gen_functions.append(function_class.call)
+            gen_functions_classes.append(function_class)
+
+        if bound != None:
+            self.bound = bound
+        else:
+            bounds_min = [function_class.bound[0] for function_class in gen_functions_classes]
+            bounds_max = [function_class.bound[1] for function_class in gen_functions_classes]
+            bound_min = np.min(bounds_min)
+            bound_max = np.max(bounds_max)
+            self.bound = [bound_min, bound_max]
 
     def cost_function(self, x):
         res = 0.
@@ -96,6 +106,7 @@ class Shekel:
             raise Exception("Parameters not defined.")
 
         self.dims = dims
+        self.bound = [0, 10]
 
     def call(self, x):
         x = np.array(x)
@@ -114,6 +125,7 @@ class Michalewicz:
             self.m = params["m"]
 
         self.dims = dims
+        self.bound = [0, np.pi]
 
     def call(self, x):
         x = np.array(x)
@@ -144,6 +156,7 @@ class Langermann:
             raise Exception("Parameters not defined.")
 
         self.dims = dims
+        self.bound = [0, 10]
 
     def call(self, x):
         x = np.array(x)
@@ -160,6 +173,7 @@ class Easom:
             raise Exception("Function does not take parameters.")
 
         self.dims = dims
+        self.bound = [-100, 100]
 
     def call(self, x):
         x = np.array(x)
@@ -179,6 +193,7 @@ class Permutation:
             raise Exception("Beta paramater must always be a scalar value.")
         self.dims = dims
         self.beta = beta
+        self.bound = [-dims, dims]
 
     def call(self, x):
         # sum_{k=1}^n (sum_{i=1}^n [i^k+beta][(x_i/i)^k-1])^2
@@ -197,12 +212,14 @@ class Gaussian:
         sigma = np.array(params["sigma"])
         mean = np.array(params["mean"])
 
+
         if (dims > 1 and (not sigma.shape[0] == sigma.shape[1] == mean.shape[0] == dims)) or \
                 (dims == 1 and (not sigma.shape == mean.shape == tuple())):
             raise Exception("Shapes do not match the given dimensionality.")
         self.dims = dims
         self.sigma = sigma
         self.mean = mean
+        self.bound = [-5, 5]
 
     def call(self, x):
         x = np.array(x)
