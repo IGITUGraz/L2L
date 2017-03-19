@@ -75,6 +75,17 @@ class RBF:
 
 
 class Shekel:
+    """
+    The Shekels (foxholes) function has variable number of local minima (length of c or A).
+    It can be customized by defining the coordinates of minima in matrix A,
+    and inverse of their intensities in c.
+    reference: https://www.sfu.ca/~ssurjano/shekel.html
+
+    :param params: a dictionary containing:
+        :key "A": matrix of coordinates of all minima
+        :key "c": list of inverse intensities of minima
+    :param dims: dimensionality of the function
+    """
     def __init__(self, params, dims):
         if params is None and dims == 2:
             self.c = (1./10.) * np.array([1, 2, 5, 2, 3, 1, 1])
@@ -107,6 +118,16 @@ class Shekel:
 
 
 class Michalewicz:
+    """
+    The Michalewicz function is multimodal with number of local minima equal to factoriel of the number of dimensions.
+    It accepts only a parameter m which defines the steepness of the valleys and ridges. Larger m leads to a more
+    difficult function to minimize. The recommended value for m is 10 which is defined if no parameters are given.
+    reference: https://www.sfu.ca/~ssurjano/michal.html
+
+    :param params: a dictionary containing:
+        :key "m": steepness factor
+    :param dims: dimensionality of the function
+    """
     def __init__(self, params, dims):
         if params is None:
             self.m = 10
@@ -125,6 +146,17 @@ class Michalewicz:
 
 
 class Langermann:
+    """
+    The Langermann function is multimodal, with many unevenly distributed local minima.
+    It can be customized by defining the coordinates of centers of sub-functions in matrix A,
+    and their intensities in c.
+    reference: https://www.sfu.ca/~ssurjano/langer.html
+
+    :param params: a dictionary containing:
+        :key "A": matrix of coordinates of all minima
+        :key "c": list of inverse intensities of minima
+    :param dims: dimensionality of the function
+    """
     def __init__(self, params, dims):
         if params is None and dims == 2:
             self.c = np.array([1, 2, 5, 2, 3])
@@ -155,6 +187,13 @@ class Langermann:
 
 
 class Easom:
+    """
+    The Easom function has several local minima. It is unimodal,
+    and the global minimum has a small area relative to the search space.
+    reference: https://www.sfu.ca/~ssurjano/easom.html
+
+    :param dims: dimensionality of the function
+    """
     def __init__(self, params, dims):
         if params is not None:
             raise Exception("Function does not take parameters.")
@@ -170,6 +209,18 @@ class Easom:
 
 
 class Permutation:
+    """
+    beta is a non-negative parameter. The smaller beta, the more difficult problem becomes since the global minimum
+    is difficult to distinguish from local minima near permuted solutions. For beta=0, every permuted solution is a
+    global minimum, too.
+    This problem therefore appear useful to test the ability of a global minimization algorithm to reach the global
+    minimum successfully and to discriminate it from other local minima.
+    reference: http://solon.cma.univie.ac.at/glopt/my_problems.html
+
+    :param params: a dictionary containing:
+        :key "beta": non-negative, difference between global and local minima (smaller means harder)
+    :param dims: dimensionality of the function
+    """
     def __init__(self, params, dims):
         if not len(params) == 1:
             raise Exception("Number of parameters does not equal 1.")
@@ -181,7 +232,6 @@ class Permutation:
         self.beta = beta
 
     def call(self, x):
-        # sum_{k=1}^n (sum_{i=1}^n [i^k+beta][(x_i/i)^k-1])^2
         x = np.array(x)
         ks = np.array(range(1, self.dims+1))
         i = np.array(range(1, self.dims+1))
@@ -191,6 +241,14 @@ class Permutation:
 
 
 class Gaussian:
+    """
+    The multi-dimensional Gaussian (normal) distribution function.
+
+    :param params: a dictionary containing:
+        :key "sigma": variance matrix
+        :key "mean": list containing coordinates of the peak (mean, median, mode)
+    :param dims: dimensionality of the function
+    """
     def __init__(self, params, dims):
         if not len(params) == 2:
             raise Exception("Number of parameters does not equal 2.")
