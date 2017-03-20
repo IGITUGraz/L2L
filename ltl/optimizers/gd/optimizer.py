@@ -113,7 +113,7 @@ class GradientDescentOptimizer(Optimizer):
         assert len(fitnesses_results) - 1 == traj.n_random_steps
 
         # We need to collect the directions of the random steps along with the fitness evaluated there
-        dx = np.zeros(n_random_steps)
+        dx = np.zeros((n_random_steps, len(self.current_individual))
         weighted_fitness = np.zeros(n_random_steps)
 
         for i, (run_index, fitness) in enumerate(fitnesses_results):
@@ -140,7 +140,7 @@ class GradientDescentOptimizer(Optimizer):
 
         if self.g < n_iteration - 1 and stop_criterion > self.current_fitness:
             # Create new individual using gradient descent
-            gradient = np.dot(np.linalg.pinv(dx), weighted_fitness)
+            gradient = np.dot(np.linalg.pinv(dx), weighted_fitness - self.current_fitness)
             current_individual += traj.learning_rate * gradient
             if optimizee_bounding_func is not None:
                 current_individual = self.optimizee_bounding_func(current_individual)

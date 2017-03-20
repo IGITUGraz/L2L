@@ -23,7 +23,7 @@ AdamParameters.__doc__ = """
 """
 
 
-class GradientDescentOptimizer(Optimizer):
+class AdamOptimizer(Optimizer):
     """
     Class for a generic ADAM gradient descent solver.
     In the pseudo code the algorithm does:
@@ -124,7 +124,7 @@ class GradientDescentOptimizer(Optimizer):
         assert len(fitnesses_results) - 1 == traj.n_random_steps
 
         # We need to collect the directions of the random steps along with the fitness evaluated there
-        dx = np.zeros(n_random_steps)
+        dx = np.zeros((n_random_steps, len(self.current_individual))
         weighted_fitness = np.zeros(n_random_steps)
 
         for i, (run_index, fitness) in enumerate(fitnesses_results):
@@ -151,7 +151,7 @@ class GradientDescentOptimizer(Optimizer):
 
         if self.g < n_iteration - 1 and stop_criterion > self.current_fitness:
             # Update momentum estimates and calculate gradient 
-            gradient = np.dot(np.linalg.pinv(dx), weighted_fitness)
+            gradient = np.dot(np.linalg.pinv(dx), weighted_fitness - self.current_fitness)
             self.s = first_order_decay * self.s + (1 - first_order_decay) * gradient
             self.r = second_order_decay * self.r + (1 - second_order_decay) * np.multiply(gradient, gradient)
             s_corrected = self.s / (1 - first_order_decay ^ g)
