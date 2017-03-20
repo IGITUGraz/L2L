@@ -40,47 +40,63 @@ def main():
 
     traj_file = os.path.join(paths.output_dir_path, 'data.h5')
 
-    # Create an environment that handles running our simulation
-    # This initializes a PyPet environment
-    env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
-                      comment='{} data'.format(name),
-                      add_time=True,
-                      freeze_input=True,
-                      multiproc=True,
-                      use_scoop=True,
-                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
-                      automatic_storing=True,
-                      log_stdout=True,  # Sends stdout to logs
-                      log_folder=os.path.join(paths.output_dir_path, 'logs')
-                      )
-
-    # Get the trajectory from the environment
-    traj = env.trajectory
-
-    # NOTE: Innerloop simulator
-    optimizee = FunctionOptimizee(traj, 'rastrigin')
-
-    # NOTE: Outerloop optimizer initialization
-    # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = LineSearchRestartParameters(n_iterations=100, pop_size=100, line_search_iterations=10, bounds_min=[-5, -5], bounds_max=[5, 5])
-    optimizer = LineSearchRestartOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                                  optimizee_fitness_weights=(-0.1,),
-                                                  parameters=parameters,
-                                                  optimizee_bounding_func=optimizee.bounding_func)
-
-    # Add post processing
-    env.add_postprocessing(optimizer.post_process)
-
-    # Run the simulation with all parameter combinations
-    env.run(optimizee.simulate)
-
-    # NOTE: Innerloop optimizee end
-    optimizee.end()
-    # NOTE: Outerloop optimizer end
-    optimizer.end()
-
-    # Finally disable logging and close all log-files
-    env.disable_logging()
+    rundict = [{'function': 'rastrigin',
+                'bound_min': [-5, -5],
+                'bound_max': [5, 5]},
+               {'function': 'chasm',
+                'bound_min': [-5, -5],
+                'bound_max': [5, 5]},
+               {'function': 'rosenbrock',
+                'bound_min': [-2, -2],
+                'bound_max': [2, 2]},
+               {'function': 'ackley',
+                'bound_min': [-2, -2],
+                'bound_max': [2, 2]}]
+    
+    for config in rundict:
+        
+        # Create an environment that handles running our simulation
+        # This initializes a PyPet environment
+        env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
+                          comment='{} data'.format(name),
+                          add_time=True,
+                          freeze_input=True,
+                          multiproc=True,
+                          use_scoop=True,
+                          wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                          automatic_storing=True,
+                          log_stdout=True,  # Sends stdout to logs
+                          log_folder=os.path.join(paths.output_dir_path, 'logs')
+                          )
+        
+        # Get the trajectory from the environment
+        traj = env.trajectory
+    
+        # NOTE: Innerloop simulator
+        optimizee = FunctionOptimizee(traj, config['function'])
+    
+        # NOTE: Outerloop optimizer initialization
+        # TODO: Change the optimizer to the appropriate Optimizer class
+        parameters = LineSearchRestartParameters(n_iterations=10, pop_size=50, line_search_iterations=10, 
+                                                 bounds_min=config['bound_min'], bounds_max=config['bound_max'])
+        optimizer = LineSearchRestartOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
+                                                      optimizee_fitness_weights=(-0.1,),
+                                                      parameters=parameters,
+                                                      optimizee_bounding_func=optimizee.bounding_func)
+    
+        # Add post processing
+        env.add_postprocessing(optimizer.post_process)
+    
+        # Run the simulation with all parameter combinations
+        env.run(optimizee.simulate)
+    
+        # NOTE: Innerloop optimizee end
+        optimizee.end()
+        # NOTE: Outerloop optimizer end
+        optimizer.end()
+    
+        # Finally disable logging and close all log-files
+        env.disable_logging()
 
 
 if __name__ == '__main__':

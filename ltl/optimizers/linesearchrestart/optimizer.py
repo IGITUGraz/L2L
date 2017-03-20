@@ -13,12 +13,11 @@ logger = logging.getLogger("ltl-lsrs")
 LineSearchRestartParameters = namedtuple('LineSearchRestartParameters',
                                           ['n_iterations', 'pop_size', 'line_search_iterations', 'bounds_min', 'bounds_max'])
 LineSearchRestartParameters.__doc__ = """
-:param n_parallel_runs: Number of individuals per simulation / Number of parallel Simulated Annealing runs
-:param noisy_step: Size of the random step
-:param temp_decay: A function of the form f(t) = temperature at time t
-:param n_iteration: number of iteration to perform
-:param stop_criterion: Stop if change in fitness is below this value
-:param seed: Random seed
+:param n_iterations: Number of restarts for the line search to perform
+:param pop_size: Number of individuals used for line search
+:param line_search_iterations: Number of line search iterations per run
+:param bounds_min: Minimum function boundaries
+:param bounds_max: Maximum function boundaries
 """
 
 
@@ -27,10 +26,11 @@ class LineSearchRestartOptimizer(Optimizer):
     Class for a gernic line search restart optimizer
     In the pseudo code the algorithm does:
 
-    For n iterations do:
-        - Take a step of size noisy step in a random direction
-        - If it reduces the cost, keep the solution
-        - Otherwise keep with probability exp(- (f_new - f) / T)
+    For n restarts do:
+        - Generate pop_size starting points within the boundaries bound_min and bound_max
+        - Perform line search with line_search_iterations steps
+        - Select the best individual, compute the gradient and adapt the new boundaries
+        - Restart the algorithm
 
     NOTE: This expects all parameters of the system to be of floating point
 
@@ -46,7 +46,7 @@ class LineSearchRestartOptimizer(Optimizer):
       element of the fitness vector)
     
     :param parameters: 
-      Instance of :func:`~collections.namedtuple` :class:`SimulatedAnnealingParameters` containing the
+      Instance of :func:`~collections.namedtuple` :class:`LineSearchRestartParameters` containing the
       parameters needed by the Optimizer
     
     :param optimizee_bounding_func:
@@ -183,11 +183,16 @@ class LineSearchRestartOptimizer(Optimizer):
                 
                 gradient = np.mean(np.divide(fitness_distances, distances), axis=0)
                 
+                logger.debug("Evaluated gradient: " + str(gradient))
+                
                 for dim in range(self.dimensions):
                     if gradient[dim] > 0:
                         self.bounds_max[dim] = self.old_eval_pop[0][dim]
                     else:
                         self.bounds_min[dim] = self.old_eval_pop[0][dim]
+                        
+                logger.debug("New minimum boundaries: " + str(self.bounds_min))
+                logger.debug("New minimum boundaries: " + str(self.bounds_max))
                 
                 #Generate new samples from new boundaries
                 self.eval_pop = self.generateIndividuals(pop_size, self.bounds_min, self.bounds_max)
@@ -217,6 +222,12 @@ class LineSearchRestartOptimizer(Optimizer):
                 best_last_indiv_index = np.argmax(self.old_fitness_value_list)
                 best_last_indiv = dict_to_list(self.old_eval_pop[best_last_indiv_index])
                 best_last_fitness = self.old_fitness_value_list[best_last_indiv_index]
+                
+                traj.f_add_result('$set.$.best', best_last_indiv)
+                traj.f_add_result('$set.$.fitness', best_last_fitness)
+                
+                logger.debug("Current best fitness for restart %d is %.2f. New individual is %s", 
+                        self.current_restart_iteration, best_last_fitness, best_last_indiv)
             
                 #Prepare the population to evaluate the gradient
                 self.old_fitness_value_list = [best_last_fitness]
@@ -227,65 +238,6 @@ class LineSearchRestartOptimizer(Optimizer):
                 traj.v_idx = -1  # set the trajectory back to default
                 fitnesses_results.clear()
                 self._expand_trajectory(traj)
-            
-            
-#         old_eval_pop = self.eval_pop.copy()
-#         self.eval_pop.clear()
-#         self.T *= temp_decay
-# 
-#         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
-#         # NOTE: Currently works with only one individual at a time.
-#         # In principle, can be used with many different individuals evaluated in parallel
-#         assert len(fitnesses_results) == traj.n_parallel_runs
-#         weighted_fitness_list = []
-#         for i, (run_index, fitness) in enumerate(fitnesses_results):
-#             
-#             # Update fitnesses
-#             # NOTE: The fitness here is a tuple! For now, we'll only support fitnesses with one element
-#             weighted_fitness = sum(f * w for f, w in zip(fitness, self.optimizee_fitness_weights))
-#             weighted_fitness_list.append(weighted_fitness)
-# 
-#             # We need to convert the current run index into an ind_idx
-#             # (index of individual within one generation)
-#             traj.v_idx = run_index
-#             ind_index = traj.par.ind_idx
-#             individual = old_eval_pop[ind_index]
-# 
-#             # Accept or reject the new solution
-#             current_fitness_value_i = self.current_fitness_value_list[i]
-#             r = np.random.rand()
-#             p = np.exp((weighted_fitness - current_fitness_value_i) / self.T)
-# 
-#             # Accept
-#             if r < p or weighted_fitness >= current_fitness_value_i:
-#                 self.current_fitness_value_list[i] = weighted_fitness
-#                 self.current_individual_list[i] = np.array(dict_to_list(individual))
-# 
-#             traj.f_add_result('$set.$.individual', individual)
-#             # Watchout! if weighted fitness is a tuple/np array it should be converted to a list first here
-#             traj.f_add_result('$set.$.fitness', weighted_fitness)
-# 
-#             current_individual = self.current_individual_list[i]
-#             new_individual = list_to_dict(current_individual + np.random.randn(current_individual.size) * noisy_step * self.T,
-#                                           self.optimizee_individual_dict_spec)
-#             if self.optimizee_bounding_func is not None:
-#                 new_individual = self.optimizee_bounding_func(new_individual)
-# 
-#             logger.debug("Current best fitness for individual %d is %.2f. New individual is %s", 
-#                          i, self.current_fitness_value_list[i], new_individual)
-#             self.eval_pop.append(new_individual)
-# 
-#         logger.debug("Current best fitness within population is %.2f", max(self.current_fitness_value_list))
-# 
-#         traj.v_idx = -1  # set the trajectory back to default
-#         logger.info("-- End of generation {} --".format(self.g))
-# 
-#         # ------- Create the next generation by crossover and mutation -------- #
-#         # not necessary for the last generation
-#         if self.g < n_iteration - 1 and stop_criterion > max(self.current_fitness_value_list):
-#             fitnesses_results.clear()
-#             self.g += 1  # Update generation counter
-#             self._expand_trajectory(traj)
 
     def end(self):
         """
@@ -297,7 +249,7 @@ class LineSearchRestartOptimizer(Optimizer):
         best_last_fitness = self.old_fitness_value_list[best_last_indiv_index]
 
         logger.info("The best last individual was %s with fitness %s", best_last_indiv, best_last_fitness)
-        logger.info("-- End of (successful) annealing --")
+        logger.info("-- End of (successful) line search restart --")
         
     def generateIndividuals(self, pop_size, bounds_min, bounds_max):
         
