@@ -7,30 +7,31 @@ import numpy as np
 from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list
 from ltl import list_to_dict
-logger = logging.getLogger("ltl-rmsprop")
+logger = logging.getLogger("ltl-stoch_gd")
 
-RMSPropParameters = namedtuple('RMSPropParameters',
-                                          ['learning_rate', 'exploration_rate', 'n_random_steps', 'momentum_decay', 'n_iteration', 'stop_criterion'])
-RMSPropParameters.__doc__ = """
+StochGradientDescentParameters = namedtuple('StochGradientDescentParameters',
+                                          ['learning_rate', 'stoch_deviation', 'stoch_decay', 'exploration_rate', 'n_random_steps', 'n_iteration', 'stop_criterion'])
+StochGradientDescentParameters.__doc__ = """
 :param learning_rate: The rate of learning per step of gradient descent
+:param stoch_deviation: The standard deviation of the random vector added to the gradient
+:param stoch_decay: The decay of the influence of the random vector that is added to the gradient
 :param exploration_rate: The standard deviation of random steps used for finite difference gradient
 :param n_random_steps: The amount of random steps used to estimate gradient
-:param momentum_decay: Specifies the decay of the historic momentum at each gradient descent step
 :param n_iteration: number of iteration to perform
 :param stop_criterion: Stop if change in fitness is below this value
 """
 
 
-class RMSPropOptimizer(Optimizer):
+class StochGradientDescentOptimizer(Optimizer):
     """
-    Class for a generic RMSProp gradient descent solver.
+    Class for a generic gradient descent solver.
     In the pseudo code the algorithm does:
 
     For n iterations do:
         - Explore the fitness of individuals in the close vicinity of the current one
         - Calculate the hyperplane that best fits the fitness values of those individuals in the parameter space
-        - Create the new 'current individual' by taking a step in the parameters using gradient information
-            and the momentum
+        - Create the new 'current individual' by taking a step in the parameters space along the direction
+            of the largest ascent of the plane and adding a random vector
 
     NOTE: This expects all parameters of the system to be of floating point
 
@@ -68,8 +69,9 @@ class RMSPropOptimizer(Optimizer):
         
         traj.f_add_parameter('learning_rate', parameters.learning_rate, comment='Value of learning rate')
         traj.f_add_parameter('exploration_rate', parameters.exploration_rate, comment='Standard deviation of the random steps')
+        traj.f_add_parameter('stoch_deviation', parameters.stoch_deviation, comment='Standard deviation of the random vector added to the gradient')
+        traj.f_add_parameter('stoch_decay', parameters.stoch_decay, comment='Decay of the random vector')
         traj.f_add_parameter('n_random_steps', parameters.n_random_steps, comment='Amount of random steps taken for calculating the gradient')
-        traj.f_add_parameter('momentum_decay', parameters.momentum_decay, comment='Decay of the historic momentum at each gradient descent step')
         traj.f_add_parameter('n_iteration', parameters.n_iteration, comment='Number of iteration to perform')
         traj.f_add_parameter('stop_criterion', parameters.stop_criterion, comment='Stopping criterion parameter')
 
@@ -79,11 +81,6 @@ class RMSPropOptimizer(Optimizer):
         # This is because this array is used within the context of the gradient descent algorithm and
         # Thus needs to handle the optimizee individuals as vectors
         self.current_individual = np.array(dict_to_list(self.optimizee_create_individual()))
-
-        # Initialize parameters for ADAM.
-        # delta is used for numerical stabilization, r stores the momentum
-        self.delta = 10^(-6)
-        self.r = np.zeros(len(self.current_individual)) 
 
         traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
 
@@ -110,8 +107,8 @@ class RMSPropOptimizer(Optimizer):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
-        learning_rate, exploration_rate, moment_decay,  n_random_steps, n_iteration, stop_criterion = \
-            traj.learning_rate, traj.exploration_rate, moment_decay, traj.n_random_steps, traj.n_iteration, traj.stop_criterion
+        learning_rate, exploration_rate, n_random_steps, n_iteration, stop_criterion = \
+            traj.learning_rate, traj.exploration_rate, traj.n_random_steps, traj.n_iteration, traj.stop_criterion
         old_eval_pop = self.eval_pop.copy()
         self.eval_pop.clear()
 
@@ -120,7 +117,7 @@ class RMSPropOptimizer(Optimizer):
         assert len(fitnesses_results) - 1 == traj.n_random_steps
 
         # We need to collect the directions of the random steps along with the fitness evaluated there
-        np.zeros((n_random_steps, len(self.current_individual))
+        dx = np.zeros((n_random_steps, len(self.current_individual))
         weighted_fitness = np.zeros(n_random_steps)
 
         for i, (run_index, fitness) in enumerate(fitnesses_results):
@@ -146,15 +143,14 @@ class RMSPropOptimizer(Optimizer):
         logger.info("-- End of iteration {} --".format(self.g))
 
         if self.g < n_iteration - 1 and stop_criterion > self.current_fitness:
-            # Update momentum estimates and calculate gradient 
+            # Create new individual using gradient descent
             gradient = np.dot(np.linalg.pinv(dx), weighted_fitness - self.current_fitness)
-            self.r = momentum_decay * self.r + (1 - momentum_decay) * np.multiply(gradient, gradient)
-
-            current_individual += np.multiply(traj.learning_rate / (np.sqrt(self.r + self.delta), gradient)
+            gradient = gradient + np.random.normal(0.0, traj.stoch_deviation, current_individual.size) * traj.stoch_decay^g
+            current_individual += traj.learning_rate * gradient
             if optimizee_bounding_func is not None:
                 current_individual = self.optimizee_bounding_func(current_individual)
-
-            # Explore neighbourhood of the new current individual
+        
+            # Explore the neighbourhood in the parameter space of the current individual
             new_individual_list = [
                 list_to_dict(self.current_individual + np.random.normal(0.0, parameters.exploration_rate, current_individual.size),
                              self.optimizee_individual_dict_spec)

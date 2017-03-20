@@ -10,16 +10,16 @@ from pypet import Environment
 from pypet import pypetconstants
 
 from ltl.optimizees.functions.optimizee import FunctionOptimizee
-from ltl.optimizers.gd.optimizer import GradientDescentParameters, GradientDescentOptimizer
+from ltl.optimizers.adam.optimizer import AdamParameters, AdamOptimizer
 from ltl.paths import Paths
 
 warnings.filterwarnings("ignore")
 
-logger = logging.getLogger('ltl-lsm-gd')
+logger = logging.getLogger('ltl-lsm-adam')
 
 
 def main():
-    name = 'LTL-FUN-GD'
+    name = 'LTL-FUN-ADAM'
     root_dir_path = '~/LTL/sim_results.txt'  # CHANGE THIS to the directory where your simulation results are contained
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
@@ -61,8 +61,8 @@ def main():
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = GradientDescentParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, n_iteration=100, stop_criterion=np.Inf)
-    optimizer = GradientDescentOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
+    parameters = AdamParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, first_order_decay=0.8, second_order_decay=0.8, n_iteration=100, stop_criterion=np.Inf)
+    optimizer = AdamOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                                   optimizee_fitness_weights=(0.1,),
                                                   parameters=parameters,
                                                   optimizee_bounding_func=optimizee.bounding_func)
