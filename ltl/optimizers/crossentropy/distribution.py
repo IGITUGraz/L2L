@@ -1,6 +1,6 @@
 import numpy as np
 import logging
-logger = logging.getLogger("ltl-distribution")
+logger = logging.getLogger('ltl-distribution')
 
 
 class Distribution():
@@ -28,14 +28,11 @@ class Distribution():
 class Gaussian(Distribution):
     """Gaussian distribution.
     """
-    def __init__(self, initial_individuals):
-        """Initializes the parameters with given individuals
-
-        :param initial_individuals: The initial individuals to fit to.
+    def __init__(self):
+        """Initializes the distributions members
         """
-        self.mean = np.zeros(initial_individuals[0].shape)
-        self.cov = np.zeros((initial_individuals[0].shape[0], initial_individuals[0].shape[0]))
-        self.fit(initial_individuals)
+        self.mean = None
+        self.cov = None
 
     def fit(self, data_list, smooth_update=0):
         """Fit a gaussian distribution to the given data
@@ -50,11 +47,15 @@ class Gaussian(Distribution):
         mean = np.mean(data_list, axis=0)
         cov_mat = np.cov(data_list, rowvar=False)
 
+        if self.mean is None:
+            self.mean = mean
+            self.cov = cov_mat
+
         self.mean = smooth_update * self.mean + (1 - smooth_update) * mean
         self.cov = smooth_update * self.cov + (1 - smooth_update) * cov_mat
-        
-        logger.debug('  Inferred gaussian center: {}'.format(self.mean))
-        logger.debug('  Inferred gaussian cov   : {}'.format(self.cov))
+
+        logger.info('Gaussian center\n{}'.format(self.mean))
+        logger.info('Gaussian cov\n{}'.format(self.cov))
         
         return [('.gaussian_center', self.mean, 'center of gaussian distribution estimated from the '
                                                 'evaluated generation'), 

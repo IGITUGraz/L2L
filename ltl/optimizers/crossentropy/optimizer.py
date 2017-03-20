@@ -9,9 +9,8 @@ import collections
 logger = logging.getLogger("ltl-ce")
 
 CrossEntropyParameters = namedtuple('CrossEntropyParameters',
-                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distribution', 'stop_criterion',
-                                     'n_sample_max', 'n_expand'])
-CrossEntropyParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0, 10, None, np.inf, -1, 5)
+                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distribution', 'stop_criterion'])
+CrossEntropyParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0, 10, None, np.inf)
 
 CrossEntropyParameters.__doc__ = """
 :param pop_size: Minimal number of individuals per simulation.
@@ -27,10 +26,8 @@ CrossEntropyParameters.__doc__ = """
   generation. To see the use of temperature, look at the documentation of :class:`CrossEntropyOptimizer`
 
 :param n_iteration: Number of iterations to perform
-:param distribution: Distribution class to use. Has to implement a fit and sample function.
+:param distribution: Distribution object to use. Has to implement a fit and sample function.
 :param stop_criterion: (Optional) Stop if this fitness is reached.
-:param n_sample_max: (Optional) This is the minimum amount of samples taken into account for the FACE algorithm
-:param n_expand: (Optional) This is the amount by which the sample size is increased if FACE becomes active
 """
 
 
@@ -94,16 +91,12 @@ class CrossEntropyOptimizer(Optimizer):
             raise ValueError("smoothing has to be in interval [0, 1)")
         
         # The following parameters are recorded
-        traj.f_add_parameter('min_pop_size', parameters.pop_size,
+        traj.f_add_parameter('pop_size', parameters.pop_size,
                                     comment='Number of minimal individuals simulated in each run')
         traj.f_add_parameter('rho', parameters.rho,
                                     comment='Fraction of individuals considered elite in each generation')
         traj.f_add_parameter('n_iteration', parameters.n_iteration,
                                     comment='Number of iterations to run')
-        traj.f_add_parameter('n_sample_max', parameters.n_sample_max,
-                                    comment='Maximum number of samples in population')
-        traj.f_add_parameter('n_expand', parameters.n_expand, 
-                                    comment='Expanding of population size in case of FACE')
         traj.f_add_parameter('stop_criterion', parameters.stop_criterion,
                                     comment='Stop if best individual reaches this fitness')
         traj.f_add_parameter('smoothing', parameters.smoothing,
@@ -115,14 +108,14 @@ class CrossEntropyOptimizer(Optimizer):
                                                                        get_dict_spec=True)
         traj.f_add_derived_parameter('dimension', len(temp_indiv),
                                      comment='The dimension of the parameter space of the optimizee')
+        traj.f_add_derived_parameter('n_elite', int(parameters.rho * parameters.pop_size),
+                                     comment='Number of samples to be considered as elite')
 
         # Added a generation-wise parameter logging
         traj.results.f_add_result_group('generation_params',
                                         comment='This contains the optimizer parameters that are'
                                                 ' common across a generation')
         
-        # Fixed fitness result list of last 5 timesteps
-        self.last_fitnesses = collections.deque(maxlen=5)
         # The following parameters are recorded as generation parameters i.e. once per generation
         self.g = 0  # the current generation
         # This is the value above which the samples are considered elite in the
@@ -147,7 +140,8 @@ class CrossEntropyOptimizer(Optimizer):
         self.eval_pop_asarray = np.array([dict_to_list(x) for x in self.eval_pop])
         
         # Max Likelihood
-        self.current_distribution = parameters.distribution(self.eval_pop_asarray)
+        self.current_distribution = parameters.distribution
+        self.current_distribution.fit(self.eval_pop_asarray)
         
         self._expand_trajectory(traj)
 
@@ -156,9 +150,9 @@ class CrossEntropyOptimizer(Optimizer):
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
 
-        rho, n_iteration, smoothing, temp_decay, n_min, n_max = \
-            traj.rho, traj.n_iteration, traj.smoothing, traj.temp_decay, traj.min_pop_size, traj.n_sample_max
-        stop_criterion, n_expand = traj.stop_criterion, traj.n_expand
+        rho, n_iteration, smoothing, temp_decay, n_min = \
+            traj.rho, traj.n_iteration, traj.smoothing, traj.temp_decay, traj.pop_size
+        stop_criterion, n_elite = traj.stop_criterion, traj.n_elite
             
         weighted_fitness_list = []
         #**************************************************************************************************************
@@ -188,12 +182,10 @@ class CrossEntropyOptimizer(Optimizer):
         
         # Elite individuals are with performance better than or equal to the (1-rho) quantile.
         # See original describtion of cross entropy for optimization
-        n_elite = int(rho * self.pop_size)
         elite_individuals = sorted_population[:n_elite]
 
         previous_best_fitness = self.best_fitness_in_run
         self.best_fitness_in_run = sorted_fitess[0]
-        self.last_fitnesses.append(self.best_fitness_in_run)
         previous_gamma = self.gamma
         self.gamma = sorted_fitess[n_elite - 1]
 
@@ -221,34 +213,19 @@ class CrossEntropyOptimizer(Optimizer):
         traj.results.generation_params.f_add_result(generation_name + '.pop_size', self.pop_size,
                                                     comment='Population size')
 
-        # Check stopping
-        if self.g >= n_iteration or self.best_fitness_in_run >= stop_criterion:
-            return
-        
-        expand = True
-        # If n_max is less than 0 no FACE algorithm
-        if n_max < 0 or sorted_fitess[0] > previous_best_fitness or sorted_fitess[n_elite - 1] > previous_gamma:
-            self.pop_size = n_min
-            # new distribution fit
-            individuals_to_be_fitted = elite_individuals
+        # new distribution fit
+        individuals_to_be_fitted = elite_individuals
 
-            # Temperature dependent sampling of non elite individuals
-            if temp_decay > 0:
-                # Keeping non-elite samples with certain probability dependent on temperature (like Simulated Annealing)
-                non_elite_selection_probs = np.exp((weighted_fitness_list[n_elite:] - self.gamma) / self.T)
-                non_elite_selected_indices = np.random.random(non_elite_selection_probs.size) < non_elite_selection_probs
-                non_elite_eval_pop_asarray = sorted_population[n_elite:][non_elite_selected_indices]
-                individuals_to_be_fitted = np.concatenate((elite_individuals, non_elite_eval_pop_asarray))
-            
-            # Fitting New distribution parameters.
-            self.distribution_results = self.current_distribution.fit(individuals_to_be_fitted, smoothing)
-        elif self.pop_size + n_expand <= n_max:
-            # Increase pop size by one, resample, FACE part
-            logger.info('  FACE increase population size by {}'.format(n_expand))
-            self.pop_size += n_expand
-        else:
-            # Stop algorithm
-            expand = False
+        # Temperature dependent sampling of non elite individuals
+        if temp_decay > 0:
+            # Keeping non-elite samples with certain probability dependent on temperature (like Simulated Annealing)
+            non_elite_selection_probs = np.exp((weighted_fitness_list[n_elite:] - self.gamma) / self.T)
+            non_elite_selected_indices = np.random.random(non_elite_selection_probs.size) < non_elite_selection_probs
+            non_elite_eval_pop_asarray = sorted_population[n_elite:][non_elite_selected_indices]
+            individuals_to_be_fitted = np.concatenate((elite_individuals, non_elite_eval_pop_asarray))
+        
+        # Fitting New distribution parameters.
+        self.distribution_results = self.current_distribution.fit(individuals_to_be_fitted, smoothing)
 
         #Add the results of the distribution fitting to the trajectory
         for result in self.distribution_results:
@@ -260,7 +237,9 @@ class CrossEntropyOptimizer(Optimizer):
         # Note that this is only done in case the evaluated run is not the last run
         fitnesses_results.clear()
         self.eval_pop.clear()
-        if expand:
+
+        # check if to stop
+        if self.g < n_iteration and self.best_fitness_in_run < stop_criterion:
             #Sample from the constructed distribution
             self.eval_pop_asarray = self.current_distribution.sample(self.pop_size)
             self.eval_pop = [list_to_dict(ind_asarray, self.optimizee_individual_dict_spec)
