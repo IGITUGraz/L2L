@@ -15,7 +15,7 @@ logger = logging.getLogger('ltl-fg-plot')
 
 def main():
     name = 'LTL-FunctionGenerator-PLOT'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = "/home/dsalaj/Documents/CI_project/new/LTL/results"  # CHANGE THIS to the directory where your simulation results are contained
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
            " Set it manually in the code (by setting the variable 'root_dir_path')" \
@@ -52,16 +52,17 @@ def main():
     fg_params = [{'name': 'langermann', 'params': None}]
     FunctionGenerator(fg_params, 2).plot()
 
-    fg_params = [{'name': 'langermann', 'params': {"A": [[3, 3],
-                                                         [7, 7]],
-                                                   "c": [5, 5]}}]
-    FunctionGenerator(fg_params, 2).plot()
-
     fg_params = [{'name': 'michalewicz', 'params': None}]
     FunctionGenerator(fg_params, 2).plot()
 
     fg_params = [{'name': 'shekel', 'params': None}]
     FunctionGenerator(fg_params, 2).plot()
+
+    # fg_params = [{'name': 'shekel', 'params': {'A': [[8, 5]],
+    #                                            'c': [0.08]}},
+    #              {'name': 'langermann', 'params': None}]
+    # FunctionGenerator(fg_params, 2).plot()
+
 
 if __name__ == '__main__':
     main()

@@ -37,7 +37,7 @@ class FunctionGenerator:
             self.gen_functions.append(function_class.call)
             gen_functions_classes.append(function_class)
 
-        if bound != None:
+        if bound is not None:
             self.bound = bound
         else:
             bounds_min = [function_class.bound[0] for function_class in gen_functions_classes]
@@ -57,7 +57,6 @@ class FunctionGenerator:
         return res
 
     def plot(self):
-        from mpl_toolkits.mplot3d import Axes3D
         import matplotlib.pyplot as plt
         from matplotlib import cm
         from matplotlib.ticker import LinearLocator, FormatStrFormatter
@@ -113,7 +112,7 @@ class Shekel:
     """
     def __init__(self, params, dims):
         if params is None and dims == 2:
-            self.c = (1./10.) * np.array([1, 2, 5, 2, 3, 1, 1])
+            self.c = (1. / 10.) * np.array([1, 2, 5, 2, 3, 1, 1])
             self.A = np.array([[3, 5],
                                [5, 2],
                                [2, 1],
@@ -165,9 +164,9 @@ class Michalewicz:
 
     def call(self, x):
         x = np.array(x)
-        i = np.arange(1, self.dims+1)
-        a = (i * x**2)/np.pi
-        b = np.sin(a)**(2*self.m)
+        i = np.arange(1, self.dims + 1)
+        a = (i * x**2) / np.pi
+        b = np.sin(a)**(2 * self.m)
         value = -np.sum(np.sin(x) * b)
         return value
 
@@ -210,7 +209,7 @@ class Langermann:
         value = 0
         for i in range(self.A.shape[0]):
             sum_diff_sq = np.sum((x - self.A[i])**2)
-            value += self.c[i] * np.exp((-1/np.pi) * sum_diff_sq) * np.cos(np.pi * sum_diff_sq)
+            value += self.c[i] * np.exp((-1 / np.pi) * sum_diff_sq) * np.cos(np.pi * sum_diff_sq)
         return value
 
 
@@ -263,8 +262,8 @@ class Permutation:
 
     def call(self, x):
         x = np.array(x)
-        ks = np.array(range(1, self.dims+1))
-        i = np.array(range(1, self.dims+1))
+        ks = np.array(range(1, self.dims + 1))
+        i = np.array(range(1, self.dims + 1))
         value = np.array([np.sum((i**k + self.beta) * ((x / i)**k - 1), axis=0) for k in ks])
         value = np.sum(value**2)
         return value
@@ -285,7 +284,6 @@ class Gaussian:
         sigma = np.array(params["sigma"])
         mean = np.array(params["mean"])
 
-
         if (dims > 1 and (not sigma.shape[0] == sigma.shape[1] == mean.shape[0] == dims)) or \
                 (dims == 1 and (not sigma.shape == mean.shape == tuple())):
             raise Exception("Shapes do not match the given dimensionality.")
@@ -296,6 +294,6 @@ class Gaussian:
 
     def call(self, x):
         x = np.array(x)
-        value = 1 / np.sqrt((2*np.pi)**self.dims * np.linalg.det(self.sigma))
+        value = 1 / np.sqrt((2 * np.pi)**self.dims * np.linalg.det(self.sigma))
         value = value * np.exp(-0.5 * (np.transpose(x - self.mean).dot(np.linalg.inv(self.sigma))).dot((x - self.mean)))
         return -value

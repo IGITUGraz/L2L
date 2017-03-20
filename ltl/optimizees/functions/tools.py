@@ -5,6 +5,7 @@ def square(x):
     x = np.array(x)
     return np.sum(x ** 2)
 
+
 bound_square = [-5, 5]
 
 
