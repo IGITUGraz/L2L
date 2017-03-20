@@ -22,7 +22,7 @@ logger = logging.getLogger('ltl-fg-sa')
 
 def main():
     name = 'LTL-FunctionGenerator-SA'
-    root_dir_path = "/home/dsalaj/Documents/CI_project/new/LTL/results"  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
            " Set it manually in the code (by setting the variable 'root_dir_path')" \
@@ -64,14 +64,14 @@ def main():
                                                  "mean": [1., 1.]}}]
     from ltl.optimizees.functiongenerator.tools import FunctionGenerator
     FunctionGenerator(fg_params, 2, bound=[0, 2]).plot()
-    optimizee = FunctionGeneratorOptimizee(traj, fg_params, 2)
+    optimizee = FunctionGeneratorOptimizee(traj, fg_params, 2, bound=[0, 2])
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = SimulatedAnnealingParameters(n_parallel_runs=1, noisy_step=.3, temp_decay=.998, n_iteration=1000,
+    parameters = SimulatedAnnealingParameters(n_parallel_runs=1, noisy_step=.03, temp_decay=.99, n_iteration=1000,
                                               stop_criterion=np.Inf, seed=np.random.randint(1e5))
     optimizer = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                                  optimizee_fitness_weights=(-0.1,),
+                                                  optimizee_fitness_weights=(-1,),
                                                   parameters=parameters,
                                                   optimizee_bounding_func=optimizee.bounding_func)
 

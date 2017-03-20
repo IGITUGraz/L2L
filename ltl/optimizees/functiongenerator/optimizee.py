@@ -13,10 +13,10 @@ class FunctionGeneratorOptimizee(Optimizee):
     :param dims: defines the dimensionality of the function inputs
     """
 
-    def __init__(self, traj, fg_params, dims):
+    def __init__(self, traj, fg_params, dims, bound=None, noise=False, mu=0., sigma=0.01):
         super().__init__(traj)
         self.dims = dims
-        fg_instance = FunctionGenerator(fg_params, dims)
+        fg_instance = FunctionGenerator(fg_params, dims, bound, noise, mu, sigma)
         self.cost_fn = fg_instance.cost_function
         self.bound = fg_instance.bound
 
@@ -30,13 +30,13 @@ class FunctionGeneratorOptimizee(Optimizee):
         Creates a random value of parameter within given bounds
         """
         # Define the first solution candidate randomly
-        return {'coords':(np.random.rand(self.dims) * (self.bound[1] - self.bound[0]) + self.bound[0])}
+        return {'coords': (np.random.rand(self.dims) * (self.bound[1] - self.bound[0]) + self.bound[0])}
 
     def bounding_func(self, individual):
         """
         Bounds the individual within the required bounds via coordinate clipping
         """
-        return {'coords':np.clip(individual['coords'], a_min=self.bound[0], a_max=self.bound[1])}
+        return {'coords': np.clip(individual['coords'], a_min=self.bound[0], a_max=self.bound[1])}
 
     def simulate(self, traj):
         """
