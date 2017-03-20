@@ -2,7 +2,17 @@ import numpy as np
 
 
 class RBF:
-    def __init__(self, rbf_params, dims=2, bound = None, noise=False, mu=0., sigma=0.01):
+    """
+    Implements a function generator that generates parametrized test functions from the given set of parameters.
+    Given the list of function descriptions in the constructor, the cost_function represents the sum of all those
+    functions.
+
+    :param rbf_params: List of parameters. Each parameter is a dictionary that describes a single test function.
+                       Each dictionary contains two keys ("name" and "params"), first expecting the name of the
+                       function, and the second the list of function specific parameters.
+    :param dims: dimensionality of the functions
+    """
+    def __init__(self, rbf_params, dims=2, bound=None, noise=False, mu=0., sigma=0.01):
         cost_functions = {}
         self.noise = noise
         self.mu = mu
@@ -92,7 +102,7 @@ class Shekel:
     reference: https://www.sfu.ca/~ssurjano/shekel.html
 
     :param params: a dictionary containing:
-        :key "A": matrix of coordinates of all minima
+        :key "A": matrix m*n of coordinates of all minima (m equals length of c, and n equals dims)
         :key "c": list of inverse intensities of minima
     :param dims: dimensionality of the function
     """
@@ -165,8 +175,8 @@ class Langermann:
     reference: https://www.sfu.ca/~ssurjano/langer.html
 
     :param params: a dictionary containing:
-        :key "A": matrix of coordinates of all minima
-        :key "c": list of inverse intensities of minima
+        :key "A": matrix m*n of coordinates of all minima, (m equals length of c, and n equals dims)
+        :key "c": list of intensities of minima
     :param dims: dimensionality of the function
     """
     def __init__(self, params, dims):
@@ -212,7 +222,7 @@ class Easom:
             raise Exception("Function does not take parameters.")
 
         self.dims = dims
-        self.bound = [-100, 100]
+        self.bound = [-10, 10]
 
     def call(self, x):
         x = np.array(x)
