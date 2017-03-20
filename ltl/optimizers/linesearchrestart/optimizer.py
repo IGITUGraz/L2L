@@ -3,6 +3,7 @@ import logging
 from collections import namedtuple, Counter
 
 import numpy as np
+import sys
 
 from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list
@@ -95,7 +96,7 @@ class LineSearchRestartOptimizer(Optimizer):
         self.old_fitness_value_list = [-np.Inf] * parameters.pop_size
 
         self.eval_pop = self.generateIndividuals(parameters.pop_size, parameters.bounds_min, parameters.bounds_max)
-        self.old_eval_pop = self.eval_pop 
+        self.old_eval_pop = self.eval_pop
         self._expand_trajectory(traj)
 
     def post_process(self, traj, fitnesses_results):
@@ -179,7 +180,10 @@ class LineSearchRestartOptimizer(Optimizer):
                     distances.append(np.subtract(self.old_eval_pop[0], dict_to_list(self.eval_pop[i])))
                     
                 fitness_distances = np.reshape(np.subtract(weighted_fitness_list, self.old_fitness_value_list[0]), (pop_size, 1))
-                fitness_distances = np.hstack((fitness_distances, fitness_distances))
+                temp = fitness_distances
+                for dim in range(self.dimensions - 1):
+                    temp = np.hstack((temp, fitness_distances))
+                fitness_distances = temp
                 
                 gradient = np.mean(np.divide(fitness_distances, distances), axis=0)
                 

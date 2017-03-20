@@ -29,7 +29,7 @@ class FunctionOptimizee(Optimizee):
         Creates a random value of parameter within given bounds
         """
         # Define the first solution candidate ramdomly
-        return {'coords':np.random.rand(2) * (self.bound[1] - self.bound[0]) + self.bound[0]}
+        return {'coords':np.random.rand(6) * (self.bound[1] - self.bound[0]) + self.bound[0]}
 
     def bounding_func(self, individual):
         """

@@ -40,18 +40,9 @@ def main():
 
     traj_file = os.path.join(paths.output_dir_path, 'data.h5')
 
-    rundict = [{'function': 'rastrigin',
-                'bound_min': [-5, -5],
-                'bound_max': [5, 5]},
-               {'function': 'chasm',
-                'bound_min': [-5, -5],
-                'bound_max': [5, 5]},
-               {'function': 'rosenbrock',
-                'bound_min': [-2, -2],
-                'bound_max': [2, 2]},
-               {'function': 'ackley',
-                'bound_min': [-2, -2],
-                'bound_max': [2, 2]}]
+    rundict = [{'function': 'rosenbrock',
+                'bound_min': [-2, -2, -2, -2, -2, -2],
+                'bound_max': [2, 2, 2, 2, 2, 2]}]
     
     for config in rundict:
         
@@ -77,7 +68,7 @@ def main():
     
         # NOTE: Outerloop optimizer initialization
         # TODO: Change the optimizer to the appropriate Optimizer class
-        parameters = LineSearchRestartParameters(n_iterations=10, pop_size=50, line_search_iterations=10, 
+        parameters = LineSearchRestartParameters(n_iterations=50, pop_size=50, line_search_iterations=10, 
                                                  bounds_min=config['bound_min'], bounds_max=config['bound_max'])
         optimizer = LineSearchRestartOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                                       optimizee_fitness_weights=(-0.1,),
