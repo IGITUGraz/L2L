@@ -22,7 +22,7 @@ loggers:
     propagate: no
   ltl-sa:
     level: DEBUG
-    handlers: [file]
+    handlers: [file, console]
     propagate: no
   ltl-lsm-ga:
     level: INFO

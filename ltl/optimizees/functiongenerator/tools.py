@@ -1,18 +1,23 @@
 import numpy as np
 
 
-class RBF:
+class FunctionGenerator:
     """
     Implements a function generator that generates parametrized test functions from the given set of parameters.
     Given the list of function descriptions in the constructor, the cost_function represents the sum of all those
     functions.
 
-    :param rbf_params: List of parameters. Each parameter is a dictionary that describes a single test function.
+    :param fg_params: List of parameters. Each parameter is a dictionary that describes a single test function.
                        Each dictionary contains two keys ("name" and "params"), first expecting the name of the
                        function, and the second the list of function specific parameters.
-    :param dims: dimensionality of the functions
+    :param dims: Dimensionality of the functions.
+    :param bound: Two element list containing minimum and maximum value of function input. If None, the bound is
+                  computed from default bounds of given functions.
+    :param noise: Boolean value indicating if the Gaussian noise will be applied on the resulting function.
+    :param mu: Scalar indicating the mean of the Gaussian noise.
+    :param sigma: Scalar indicating the standard deviation of the Gaussian noise.
     """
-    def __init__(self, rbf_params, dims=2, bound=None, noise=False, mu=0., sigma=0.01):
+    def __init__(self, fg_params, dims=2, bound=None, noise=False, mu=0., sigma=0.01):
         cost_functions = {}
         self.noise = noise
         self.mu = mu
@@ -26,7 +31,7 @@ class RBF:
 
         self.gen_functions = []
         gen_functions_classes = []
-        for param in rbf_params:
+        for param in fg_params:
             f_name = param["name"]
             function_class = cost_functions[f_name](param["params"], dims)
             self.gen_functions.append(function_class.call)
@@ -293,4 +298,4 @@ class Gaussian:
         x = np.array(x)
         value = 1 / np.sqrt((2*np.pi)**self.dims * np.linalg.det(self.sigma))
         value = value * np.exp(-0.5 * (np.transpose(x - self.mean).dot(np.linalg.inv(self.sigma))).dot((x - self.mean)))
-        return value
+        return -value

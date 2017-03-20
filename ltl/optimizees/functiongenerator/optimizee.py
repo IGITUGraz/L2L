@@ -1,24 +1,24 @@
 import numpy as np
 
-from ltl.optimizees.rbfs.rbf import RBF
+from ltl.optimizees.functiongenerator.tools import FunctionGenerator
 from ltl.optimizees.optimizee import Optimizee
 
 
-class RBFOptimizee(Optimizee):
+class FunctionGeneratorOptimizee(Optimizee):
     """
-    Implements a simple function optimizee. Functions are generated using the RBF generator.
+    Implements a simple function optimizee. Functions are generated using the FunctionGenerator.
     NOTE: Make sure the optimizee_fitness_weights is set to (-1,) to minimize the value of the function
 
-    :param rbf_params: dictionary describing the functions to be generated (see syntax in RBF generator)
+    :param fg_params: dictionary describing the functions to be generated (see syntax in FunctionGenerator)
     :param dims: defines the dimensionality of the function inputs
     """
 
-    def __init__(self, traj, rbf_params, dims):
+    def __init__(self, traj, fg_params, dims):
         super().__init__(traj)
         self.dims = dims
-        rbf_instance = RBF(rbf_params, dims)
-        self.cost_fn = rbf_instance.cost_function
-        self.bound = rbf_instance.bound
+        fg_instance = FunctionGenerator(fg_params, dims)
+        self.cost_fn = fg_instance.cost_function
+        self.bound = fg_instance.bound
 
         # create_individual can be called because __init__ is complete except for traj initializtion
         indiv_dict = self.create_individual()
