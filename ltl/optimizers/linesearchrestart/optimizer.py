@@ -62,6 +62,8 @@ class LineSearchRestartOptimizer(Optimizer):
                          optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters)
         self.optimizee_bounding_func = optimizee_bounding_func
         
+        logger.setLevel(logging.INFO)
+        
         # The following parameters are recorded
         traj.f_add_parameter('n_iterations', parameters.n_iterations,
                              comment='Number of iterations to perform')
@@ -109,10 +111,10 @@ class LineSearchRestartOptimizer(Optimizer):
         #Check if a line search should still be performed
         if self.current_line_search_iteration < line_search_iterations:
             #Perform the line search           
-            k = self.current_line_search_iteration + self.current_restart_iteration * line_search_iterations
+            k = self.current_line_search_iteration# + self.current_restart_iteration * line_search_iterations
             ak = 2 + 3 / (2 ** (k ** 2) + 1)
-#             pk = -1;
-            pk = np.random.uniform(-self.line_search_variation_value, self.line_search_variation_value, (pop_size, self.dimensions))
+            pk = np.ones((pop_size, self.dimensions)) * -1;
+            #pk = np.random.uniform(-self.line_search_variation_value, self.line_search_variation_value, (pop_size, self.dimensions))
             update_list = (ak * pk).tolist()
             
             #Compare the points and take the better one
@@ -155,12 +157,15 @@ class LineSearchRestartOptimizer(Optimizer):
             
             self.current_line_search_iteration += 1
             
+            self.g += 1
             traj.v_idx = -1  # set the trajectory back to default
             fitnesses_results.clear()
             self._expand_trajectory(traj)
             
         elif self.current_restart_iteration < n_iterations:
-            #Perform the restarting procedure        
+            #Perform the restarting procedure     
+            
+            logger.info("Run performed: ")
             
             if self.gradient_evaluated:
                 #Reset the line search counter
@@ -196,7 +201,7 @@ class LineSearchRestartOptimizer(Optimizer):
                         self.bounds_min[dim] = self.old_eval_pop[0][dim]
                         
                 logger.debug("New minimum boundaries: " + str(self.bounds_min))
-                logger.debug("New minimum boundaries: " + str(self.bounds_max))
+                logger.debug("New maximum boundaries: " + str(self.bounds_max))
                 
                 #Generate new samples from new boundaries
                 self.eval_pop = self.generateIndividuals(pop_size, self.bounds_min, self.bounds_max)
@@ -227,8 +232,9 @@ class LineSearchRestartOptimizer(Optimizer):
                 best_last_indiv = dict_to_list(self.old_eval_pop[best_last_indiv_index])
                 best_last_fitness = self.old_fitness_value_list[best_last_indiv_index]
                 
-                traj.f_add_result('$set.$.best', best_last_indiv)
-                traj.f_add_result('$set.$.fitness', best_last_fitness)
+                #traj.f_shrink()
+                #traj.f_add_result('$set.$.best', best_last_indiv)
+                #traj.f_add_result('$set.$.fitness', best_last_fitness)
                 
                 logger.debug("Current best fitness for restart %d is %.2f. New individual is %s", 
                         self.current_restart_iteration, best_last_fitness, best_last_indiv)
