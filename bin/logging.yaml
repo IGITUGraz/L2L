@@ -44,6 +44,10 @@ loggers:
     level: INFO
     handlers: [file]
     propagate: no
+  ltl-fun-clone:
+    level: INFO
+    handlers: [file]
+    propagate: no
   pypet:
     level: ERROR
     handlers: [console]
