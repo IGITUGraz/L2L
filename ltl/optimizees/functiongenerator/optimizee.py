@@ -1,6 +1,5 @@
 import numpy as np
 
-from ltl.optimizees.functiongenerator.tools import FunctionGenerator
 from ltl.optimizees.optimizee import Optimizee
 
 
@@ -9,14 +8,12 @@ class FunctionGeneratorOptimizee(Optimizee):
     Implements a simple function optimizee. Functions are generated using the FunctionGenerator.
     NOTE: Make sure the optimizee_fitness_weights is set to (-1,) to minimize the value of the function
 
-    :param fg_params: dictionary describing the functions to be generated (see syntax in FunctionGenerator)
-    :param dims: defines the dimensionality of the function inputs
+    :param fg_instance: Instance of the FunctionGenerator class
     """
 
-    def __init__(self, traj, fg_params, dims, bound=None, noise=False, mu=0., sigma=0.01):
+    def __init__(self, traj, fg_instance):
         super().__init__(traj)
-        self.dims = dims
-        fg_instance = FunctionGenerator(fg_params, dims, bound, noise, mu, sigma)
+        self.dims = fg_instance.dims
         self.cost_fn = fg_instance.cost_function
         self.bound = fg_instance.bound
 

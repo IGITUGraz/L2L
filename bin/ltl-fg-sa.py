@@ -60,8 +60,9 @@ def main():
                                                            [0., 1.]],
                                                  "mean": [1., 1.]}}]
     from ltl.optimizees.functiongenerator.tools import FunctionGenerator
-    FunctionGenerator(fg_params, 2, bound=[0, 2]).plot()
-    optimizee = FunctionGeneratorOptimizee(traj, fg_params, 2, bound=[0, 2])
+    fg_instance = FunctionGenerator(fg_params, dims=2, bound=[0, 2])
+    fg_instance.plot()
+    optimizee = FunctionGeneratorOptimizee(traj, fg_instance)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class

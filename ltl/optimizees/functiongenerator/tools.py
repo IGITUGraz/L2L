@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import numpy as np
 
 
@@ -19,6 +20,7 @@ class FunctionGenerator:
     """
     def __init__(self, fg_params, dims=2, bound=None, noise=False, mu=0., sigma=0.01):
         cost_functions = {}
+        self.dims = dims
         self.noise = noise
         self.mu = mu
         self.sigma = sigma
@@ -57,6 +59,7 @@ class FunctionGenerator:
         return res
 
     def plot(self):
+        from mpl_toolkits.mplot3d import Axes3D
         import matplotlib.pyplot as plt
         from matplotlib import cm
         from matplotlib.ticker import LinearLocator, FormatStrFormatter
@@ -98,7 +101,20 @@ class FunctionGenerator:
         plt.show()
 
 
-class Shekel:
+class TestFunction(ABC):
+    """
+    Base class for all test functions.
+    """
+    @abstractmethod
+    def call(self, x):
+        """
+        :param x: input data vector with length equal to the function dimensionality
+        :return: the resulting scalar output of the function
+        """
+        pass
+
+
+class Shekel(TestFunction):
     """
     The Shekels (foxholes) function has variable number of local minima (length of c or A).
     It can be customized by defining the coordinates of minima in matrix A,
@@ -142,7 +158,7 @@ class Shekel:
         return -value
 
 
-class Michalewicz:
+class Michalewicz(TestFunction):
     """
     The Michalewicz function is multimodal with number of local minima equal to factoriel of the number of dimensions.
     It accepts only a parameter m which defines the steepness of the valleys and ridges. Larger m leads to a more
@@ -171,7 +187,7 @@ class Michalewicz:
         return value
 
 
-class Langermann:
+class Langermann(TestFunction):
     """
     The Langermann function is multimodal, with many unevenly distributed local minima.
     It can be customized by defining the coordinates of centers of sub-functions in matrix A,
@@ -213,7 +229,7 @@ class Langermann:
         return value
 
 
-class Easom:
+class Easom(TestFunction):
     """
     The Easom function has several local minima. It is unimodal,
     and the global minimum has a small area relative to the search space.
@@ -236,7 +252,7 @@ class Easom:
         return value
 
 
-class Permutation:
+class Permutation(TestFunction):
     """
     beta is a non-negative parameter. The smaller beta, the more difficult problem becomes since the global minimum
     is difficult to distinguish from local minima near permuted solutions. For beta=0, every permuted solution is a
@@ -269,7 +285,7 @@ class Permutation:
         return value
 
 
-class Gaussian:
+class Gaussian(TestFunction):
     """
     The multi-dimensional Gaussian (normal) distribution function.
 
