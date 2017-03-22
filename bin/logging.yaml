@@ -28,6 +28,14 @@ loggers:
     level: DEBUG
     handlers: [file]
     propagate: no
+  ltl-face:
+    level: DEBUG
+    handlers: [file]
+    propagate: no
+  ltl-noisy-ce:
+    level: DEBUG
+    handlers: [file]
+    propagate: no
   ltl-distribution:
     level: DEBUG
     handlers: [file]

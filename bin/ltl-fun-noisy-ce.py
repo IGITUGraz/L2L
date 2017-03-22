@@ -7,15 +7,15 @@ from pypet import pypetconstants
 from ltl.optimizees.functions.optimizee import FunctionOptimizee
 from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
-from ltl.optimizers.crossentropy.distribution import Gaussian
+from ltl.optimizers.crossentropy.distribution import NoisyGaussian
 
 warnings.filterwarnings("ignore")
 
-logger = logging.getLogger('ltl-fun-ce')
+logger = logging.getLogger('ltl-fun-noisy-ce')
 
 
 def main():
-    name = 'LTL-FUN-CE'
+    name = 'LTL-FUN-NOISY-CE'
     root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
 
     assert root_dir_path is not None, \
@@ -58,8 +58,8 @@ def main():
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=30, 
-                                        distribution=Gaussian())
+    parameters = CrossEntropyParameters(pop_size=50, rho=0.1, smoothing=0.3, temp_decay=0, n_iteration=50, 
+                                        distribution=NoisyGaussian(noise_decay=0.95, noise_bias=0.05))
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                             optimizee_fitness_weights=(-0.1,),
                                             parameters=parameters,

@@ -11,10 +11,10 @@ class Distribution():
         in maximum likelihood fashion.
 
         :param individuals: A list or array of individuals to fit to.
-        :returns tuple containing the inferred distribution parameters and a short description
+        :returns a dict describing the current parametrization
         """
         pass
- 
+
     def sample(self, n_individuals):
         """Samples n_individuals from the current parametrized distribution.
 
@@ -42,7 +42,7 @@ class Gaussian(Distribution):
         account for the new distribution.
         default is 0 -> old parameters are fully discarded
         
-        :returns tuple containing the inferred mean and covariance of the gaussian
+        :returns dict specifying current parametrization
         """
         mean = np.mean(data_list, axis=0)
         cov_mat = np.cov(data_list, rowvar=False)
@@ -57,9 +57,7 @@ class Gaussian(Distribution):
         logger.info('Gaussian center\n{}'.format(self.mean))
         logger.info('Gaussian cov\n{}'.format(self.cov))
         
-        return [('.gaussian_center', self.mean, 'center of gaussian distribution estimated from the '
-                                                'evaluated generation'), 
-                ('.gaussian_covariance_matrix', self.cov, 'covariance matrix from the evaluated generation')]
+        return {'mean': self.mean, 'covariance_matrix': self.cov}
         
     def sample(self, n_individuals):
         """Sample n_individuals individuals under the current parametrization
@@ -69,3 +67,57 @@ class Gaussian(Distribution):
         :returns numpy array with n_individual rows of individuals
         """
         return np.random.multivariate_normal(self.mean, self.cov, n_individuals)
+
+
+class NoisyGaussian(Gaussian):
+    """Additive Noisy Gaussian distribution. The initialization of its noise components
+    happens during the first fit where the magnitude of the noise in each
+    diagonalized component is estimated.
+    """
+    def __init__(self, noise_decay=0.99, noise_bias=0.05):
+        """Initializes the noisy distribution
+
+        :param noise_decay: Multiplicative decay of the noise components
+        :param noise_bias: Factor to the variance of the first fit. This is then used as
+                           additive noise.
+
+                noise_var = noise_bias * var(first_fit)
+        """
+        Gaussian.__init__(self)
+        self.noise_decay = noise_decay
+        self.noise_bias = noise_bias
+        self.noisy_cov = None
+        self.noise = None
+
+    def fit(self, data_list, smooth_update=0):
+        """Fits the parameters to the given data (see .Gaussian) and additionally
+        adds noise in form of variance to the covariance matrix. Also, the noise
+        is decayed after each step
+
+        :param data_list: Data to be fitted to
+        :param smooth_update: Smooth the parameter update with regard to the
+            previous configuration
+
+        :returns dict describing parameter configuration
+        """
+        Gaussian.fit(self, data_list, smooth_update)
+        eigenvalues, eigenvectors = np.linalg.eig(self.cov)
+
+        # determine noise variance
+        if self.noise is None:
+            self.noise = self.noise_bias * eigenvalues
+            self.noise /= self.noise_decay
+
+        self.noise *= self.noise_decay
+        diagonalized_covariance = np.diag(eigenvalues + self.noise)
+        self.noisy_cov = eigenvectors.dot(diagonalized_covariance.dot(eigenvectors.T))
+
+        logger.info('Noisy cov\n{}'.format(self.noisy_cov))
+        return {'mean': self.mean, 'covariance_matrix': self.noisy_cov}
+
+    def sample(self, n_individuals):
+        """Samples from current parametrization
+
+        :returns n_individuals Individuals
+        """
+        return np.random.multivariate_normal(self.mean, self.noisy_cov, n_individuals)
