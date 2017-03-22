@@ -54,11 +54,11 @@ def main():
     traj = env.trajectory
 
     # NOTE: Innerloop simulator
-    optimizee = FunctionOptimizee(traj, 'rastrigin')
+    optimizee = FunctionOptimizee(traj, 'rosenbrock')
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = CloneParameters(pop_size=50, rho=0.1, n_iteration=30, burn_in=3)
+    parameters = CloneParameters(pop_size=100, rho=0.1, n_iteration=50, burn_in=3)
     optimizer = CloneOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                             optimizee_fitness_weights=(-0.1,),
                                             parameters=parameters,

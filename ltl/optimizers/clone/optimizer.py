@@ -6,6 +6,7 @@ import numpy as np
 from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list, list_to_dict
 import collections
+import random
 logger = logging.getLogger("ltl-clone")
 
 CloneParameters = namedtuple('CrossEntropyParameters',
@@ -163,7 +164,6 @@ class CloneOptimizer(Optimizer):
 
         # Performs descending arg-sort of weighted fitness
         fitness_sorting_indices = list(reversed(np.argsort(weighted_fitness_list)))
-
         generation_name = 'generation_{}'.format(self.g)
 
         # Sorting the data according to fitness
@@ -182,8 +182,11 @@ class CloneOptimizer(Optimizer):
         previous_gamma = self.gamma
         self.gamma = sorted_fitess[n_elite - 1]
         
+        print('Gamma: ' + str(self.gamma) + ' n_elite: ' + str(n_elite))
+        
         #Stopping rule
-        if self.gamma == previous_gamma or self.g >= n_iteration:
+        if self.best_fitness_in_run >= -0.03:
+        #if self.gamma == previous_gamma or self.g >= n_iteration:
             self.best_indv = sorted_population[0]
             self.best_fitness = sorted_fitess[0]
             return
@@ -192,103 +195,36 @@ class CloneOptimizer(Optimizer):
         cloning_parameter = int(pop_size / (burn_in * n_elite) - 1)
         
         #Generate the new cloned population
-        cloned_population = []
+        cloned_population = elite_individuals.tolist().copy()
         for i in range(n_elite):
             for j in range(cloning_parameter):
                 cloned_population.append(elite_individuals[i])
+        
+        random.shuffle(cloned_population)
+        sampled_population = cloned_population.copy()
                 
         #Apply gibbs sampling for the entire cloned population
         for i in range(len(cloned_population)):
             individual = cloned_population[i]
             for j in range(burn_in):
                 for z in range(dimension):
-                    rand = np.random.randint(0, len(cloned_population))
-                    individual[z] = cloned_population[rand][z]
-            cloned_population[i] = individual
+                    rand = np.random.randint(0, len(cloned_population) - 1)
+                    
+                    if rand < i:
+                        #Sample from newly generated ones
+                        individual[z] = sampled_population[rand][z]
+                    else:
+                        #sample from old ones
+                        rand += 1
+                        individual[z] = cloned_population[rand][z]
+            sampled_population[i] = individual
             
         fitnesses_results.clear()
         self.eval_pop.clear()
         self.eval_pop = [list_to_dict(ind_asarray, self.optimizee_individual_dict_spec)
-                         for ind_asarray in cloned_population]
+                         for ind_asarray in np.asarray(sampled_population)]
         self.g += 1  # Update generation counter
         self._expand_trajectory(traj)
-                    
-        
-        #Perform the estimating step
-        
-        #Perform the stopping rule
-
-#         logger.info("-- End of generation {} --".format(self.g))
-#         logger.info("  Evaluated %i individuals" % len(fitnesses_results))
-#         logger.info('  Best Fitness Individual: {}'.format(self.eval_pop[fitness_sorting_indices[0]]))
-#         logger.debug('  Calculated gamma: {}'.format(self.gamma))
-# 
-#         #**************************************************************************************************************
-#         # Storing Generation Parameters / Results in the trajectory
-#         #**************************************************************************************************************
-#         # These entries correspond to the generation that has been simulated prior to this post-processing run
-# 
-#         traj.results.generation_params.f_add_result(generation_name + '.g', self.g,
-#                                                     comment='The index of the evaluated generation')
-#         traj.results.generation_params.f_add_result(generation_name + '.gamma', self.gamma,
-#                                                     comment='The fitness threshold inferred from the evaluated '
-#                                                             'generation (This is used in sampling the next generation')
-#         traj.results.generation_params.f_add_result(generation_name + '.T', self.T,
-#                                                     comment='Temperature used to select non-elite elements among the'
-#                                                             'individuals of the evaluated generation')
-#         traj.results.generation_params.f_add_result(generation_name + '.best_fitness_in_run', self.best_fitness_in_run,
-#                                                     comment='The highest fitness among the individuals in the '
-#                                                             'evaluated generation')
-#         traj.results.generation_params.f_add_result(generation_name + '.pop_size', self.pop_size,
-#                                                     comment='Population size')
-
-#         # Check stopping
-#         if self.g >= n_iteration or self.best_fitness_in_run >= stop_criterion:
-#             return
-#         
-#         expand = True
-#         # If n_max is less than 0 no FACE algorithm
-#         if n_max < 0 or sorted_fitess[0] > previous_best_fitness or sorted_fitess[n_elite - 1] > previous_gamma:
-#             self.pop_size = n_min
-#             # new distribution fit
-#             individuals_to_be_fitted = elite_individuals
-# 
-#             # Temperature dependent sampling of non elite individuals
-#             if temp_decay > 0:
-#                 # Keeping non-elite samples with certain probability dependent on temperature (like Simulated Annealing)
-#                 non_elite_selection_probs = np.exp((weighted_fitness_list[n_elite:] - self.gamma) / self.T)
-#                 non_elite_selected_indices = np.random.random(non_elite_selection_probs.size) < non_elite_selection_probs
-#                 non_elite_eval_pop_asarray = sorted_population[n_elite:][non_elite_selected_indices]
-#                 individuals_to_be_fitted = np.concatenate((elite_individuals, non_elite_eval_pop_asarray))
-#             
-#             # Fitting New distribution parameters.
-#             self.distribution_results = self.current_distribution.fit(individuals_to_be_fitted, smoothing)
-#         elif self.pop_size + n_expand <= n_max:
-#             # Increase pop size by one, resample, FACE part
-#             logger.info('  FACE increase population size by {}'.format(n_expand))
-#             self.pop_size += n_expand
-#         else:
-#             # Stop algorithm
-#             expand = False
-# 
-#         #Add the results of the distribution fitting to the trajectory
-#         for result in self.distribution_results:
-#             traj.results.generation_params.f_add_result(generation_name + result[0], result[1], comment=result[2])
-# 
-#         #**************************************************************************************************************
-#         # Create the next generation by sampling the inferred distribution
-#         #**************************************************************************************************************
-#         # Note that this is only done in case the evaluated run is not the last run
-#         fitnesses_results.clear()
-#         self.eval_pop.clear()
-#         if expand:
-#             #Sample from the constructed distribution
-#             self.eval_pop_asarray = self.current_distribution.sample(self.pop_size)
-#             self.eval_pop = [list_to_dict(ind_asarray, self.optimizee_individual_dict_spec)
-#                              for ind_asarray in self.eval_pop_asarray]
-#             self.g += 1  # Update generation counter
-#             self.T *= temp_decay
-#             self._expand_trajectory(traj)
 
     def end(self):
         """
