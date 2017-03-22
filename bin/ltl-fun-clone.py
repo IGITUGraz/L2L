@@ -58,7 +58,7 @@ def main():
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = CloneParameters(pop_size=50, rho=0.2, smoothing=0.0, n_iteration=30)
+    parameters = CloneParameters(pop_size=50, rho=0.1, n_iteration=30, burn_in=3)
     optimizer = CloneOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                             optimizee_fitness_weights=(-0.1,),
                                             parameters=parameters,
