@@ -8,8 +8,9 @@ from ltl import dict_to_list, list_to_dict
 logger = logging.getLogger("ltl-ce")
 
 ClonceParameters = namedtuple('CloneceParameters',
-                                    ['pop_size', 'rho', 'smoothing', 'b_1', 'b_2', 'burn_in', 'distribution'])
-ClonceParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0.1, 0.9, 5, None)
+                                    ['pop_size', 'rho', 'smoothing', 'burn_in', 'distribution', 
+                                     'parameterDistribution', 'stop_criterion', 'n_iteration'])
+ClonceParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0.1, None, None, 0.0, 30)
 
 ClonceParameters.__doc__ = """
 :param pop_size: Minimal number of individuals per simulation.
@@ -21,18 +22,16 @@ ClonceParameters.__doc__ = """
     
     new_params = smoothing*old_params + (1-smoothing)*optimal_new_params
 
-:param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
-  generation. To see the use of temperature, look at the documentation of :class:`CrossEntropyOptimizer`
-
-:param n_iteration: Number of iterations to perform
+:param burn_in: 
 :param distribution: Distribution object to use. Has to implement a fit and sample function.
+:param parameterDistribution: Distribution object to use for parameter distribution. Has to implement a fit and sample function.
 :param stop_criterion: (Optional) Stop if this fitness is reached.
 """
 
 
 class ClonCEOptimizer(Optimizer):
     """
-    Class for a generic cross entropy optimizer.
+    Class for a generic CLONCE optimizer.
     In the pseudo code the algorithm does:
 
     For n iterations do:
@@ -94,14 +93,14 @@ class ClonCEOptimizer(Optimizer):
                                     comment='Number of minimal individuals simulated in each run')
         traj.f_add_parameter('rho', parameters.rho,
                                     comment='Fraction of individuals considered elite in each generation')
-        traj.f_add_parameter('b_1', parameters.b_1,
-                                    comment='Number of iterations to run')
-        traj.f_add_parameter('b_2', parameters.b_2,
-                                    comment='Stop if best individual reaches this fitness')
         traj.f_add_parameter('smoothing', parameters.smoothing,
                                     comment='Weight of old parameters in smoothing')
         traj.f_add_parameter('burn_in', parameters.burn_in,
-                                    comment='Decay factor for temperature')        
+                                    comment='Decay factor for temperature')
+        traj.f_add_parameter('stop_criterion', parameters.stop_criterion,
+                                    comment='Stop if best individual reaches this fitness')
+        traj.f_add_parameter('n_iteration', parameters.n_iteration,
+                                    comment='Number of iterations to run')       
 
         temp_indiv, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(),
                                                                        get_dict_spec=True)
@@ -118,8 +117,7 @@ class ClonCEOptimizer(Optimizer):
         # This is the value above which the samples are considered elite in the
         # current generation
         self.gamma = -np.inf
-        self.T = 1  # This is the temperature used to filter evaluated samples in this run
-        self.pop_size = parameters.pop_size  # Population size is dynamic in FACE
+        self.pop_size = parameters.pop_size
         self.best_fitness_in_run = -np.inf
 
         # The first iteration does not pick the values out of the Gaussian distribution. It picks randomly
@@ -140,7 +138,7 @@ class ClonCEOptimizer(Optimizer):
         self.current_distribution = parameters.distribution
         self.current_distribution.fit(self.eval_pop_asarray)
         
-        self.parameterDistribution = Gaussian()
+        self.parameterDistribution = parameters.parameterDistribution
         
         self._expand_trajectory(traj)
 
@@ -149,8 +147,8 @@ class ClonCEOptimizer(Optimizer):
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
 
-        rho, pop_size, smoothing, b_1, b_2, burn_in, dimension = \
-            traj.rho, traj.pop_size, traj.smoothing, traj.b_1, traj.b_2, traj.burn_in, traj.dimension
+        rho, pop_size, smoothing, burn_in, dimension, stop_criterion, n_iteration = \
+            traj.rho, traj.pop_size, traj.smoothing, traj.burn_in, traj.dimension, traj.stop_criterion, traj.n_iteration
             
         weighted_fitness_list = []
         #**************************************************************************************************************
@@ -173,7 +171,6 @@ class ClonCEOptimizer(Optimizer):
         fitness_sorting_indices = list(reversed(np.argsort(weighted_fitness_list)))
 
         generation_name = 'generation_{}'.format(self.g)
-        self.eval_pop_asarray = np.array([dict_to_list(x) for x in self.eval_pop])
 
         # Sorting the data according to fitness
         sorted_population = self.eval_pop_asarray[fitness_sorting_indices]
@@ -183,9 +180,13 @@ class ClonCEOptimizer(Optimizer):
         # See original describtion of cross entropy for optimization
         n_elite = int(rho * pop_size)
         elite_individuals = sorted_population[:n_elite]
-
         self.best_fitness_in_run = sorted_fitess[0]
+        self.best_indv = sorted_population[0]
         self.gamma = sorted_fitess[n_elite - 1]
+        
+        #Check for stopping criterion
+        if self.g > n_iteration or self.best_fitness_in_run > stop_criterion:
+            return
         
         print('Gamma: ' + str(self.gamma) + ' n_elite: ' + str(n_elite))      
 
@@ -199,25 +200,26 @@ class ClonCEOptimizer(Optimizer):
         #**************************************************************************************************************
         # These entries correspond to the generation that has been simulated prior to this post-processing run
 
-#         traj.results.generation_params.f_add_result(generation_name + '.g', self.g,
-#                                                     comment='The index of the evaluated generation')
-#         traj.results.generation_params.f_add_result(generation_name + '.gamma', self.gamma,
-#                                                     comment='The fitness threshold inferred from the evaluated '
-#                                                             'generation (This is used in sampling the next generation')
-#         traj.results.generation_params.f_add_result(generation_name + '.T', self.T,
-#                                                     comment='Temperature used to select non-elite elements among the'
-#                                                             'individuals of the evaluated generation')
-#         traj.results.generation_params.f_add_result(generation_name + '.best_fitness_in_run', self.best_fitness_in_run,
-#                                                     comment='The highest fitness among the individuals in the '
-#                                                             'evaluated generation')
-#         traj.results.generation_params.f_add_result(generation_name + '.pop_size', self.pop_size,
-#                                                     comment='Population size')
+        traj.results.generation_params.f_add_result(generation_name + '.g', self.g,
+                                                    comment='The index of the evaluated generation')
+        traj.results.generation_params.f_add_result(generation_name + '.gamma', self.gamma,
+                                                    comment='The fitness threshold inferred from the evaluated '
+                                                            'generation (This is used in sampling the next generation')
+        traj.results.generation_params.f_add_result(generation_name + '.best_fitness_in_run', self.best_fitness_in_run,
+                                                    comment='The highest fitness among the individuals in the '
+                                                            'evaluated generation')
+        traj.results.generation_params.f_add_result(generation_name + '.pop_size', self.pop_size,
+                                                    comment='Population size')
 
         # new distribution fit
         individuals_to_be_fitted = elite_individuals
         
         # Fitting New distribution parameters.
         self.distribution_results = self.current_distribution.fit(individuals_to_be_fitted, smoothing)
+        
+        #Add the results of the distribution fitting to the trajectory
+        for parameter_key, parameter_value in self.distribution_results.items():
+            traj.results.generation_params.f_add_result(generation_name + '.' + parameter_key, parameter_value)
         
         #**************************************************************************************************************
         # Create the next generation by sampling the inferred distribution
@@ -253,6 +255,7 @@ class ClonCEOptimizer(Optimizer):
                 
         self.eval_pop = [list_to_dict(ind_asarray, self.optimizee_individual_dict_spec)
                          for ind_asarray in sampled_population]
+        self.eval_pop_asarray = np.array([dict_to_list(x) for x in self.eval_pop])
         self.g += 1  # Update generation counter
         self._expand_trajectory(traj)
 
@@ -261,7 +264,9 @@ class ClonCEOptimizer(Optimizer):
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
         # ------------ Finished all runs and print result --------------- #
-        logger.info("-- End of (successful) CE optimization --")
+        logger.info("-- End of (successful) CLONCE optimization --")
         logger.info("-- Final distribution parameters --")
         for parameter_key, parameter_value in self.distribution_results.items():
             logger.info('  {}: {}'.format(parameter_key, parameter_value))
+        logger.info("-- Best Individual --")
+        logger.info(str(self.best_indv) + " with a fitness of: " + str(self.best_fitness_in_run))
