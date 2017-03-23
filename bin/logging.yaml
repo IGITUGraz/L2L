@@ -28,6 +28,10 @@ loggers:
     level: DEBUG
     handlers: [file]
     propagate: no
+  ltl-clonce:
+    level: DEBUG
+    handlers: [file]
+    propagate: no
   ltl-face:
     level: DEBUG
     handlers: [file]
