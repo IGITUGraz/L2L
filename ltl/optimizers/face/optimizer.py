@@ -89,15 +89,15 @@ class FACEOptimizer(Optimizer):
         self.optimizee_bounding_func = optimizee_bounding_func
 
         if parameters.min_pop_size < 1:
-            raise ValueError("min_pop_size needs to be greater than 0")
+            raise Exception("min_pop_size needs to be greater than 0")
         if parameters.max_pop_size < parameters.min_pop_size:
-            raise ValueError("max_pop_size needs to be greater or equal to min_pop_size")
+            raise Exception("max_pop_size needs to be greater or equal to min_pop_size")
         if parameters.n_elite > parameters.min_pop_size:
-            raise ValueError("n_elite exceeds min_pop_size")
+            raise Exception("n_elite exceeds min_pop_size")
         if parameters.temp_decay < 0 or parameters.temp_decay > 1:
-            raise ValueError("temp_decay not in range")
+            raise Exception("temp_decay not in range")
         if parameters.smoothing >= 1 or parameters.smoothing < 0:
-            raise ValueError("smoothing has to be in interval [0, 1)")
+            raise Exception("smoothing has to be in interval [0, 1)")
         
         # The following parameters are recorded
         traj.f_add_parameter('min_pop_size', parameters.min_pop_size,

@@ -1,11 +1,16 @@
-import numpy as np
 import logging
+import abc
+from abc import ABCMeta
+import numpy as np
+
 logger = logging.getLogger('ltl-distribution')
 
 
-class Distribution():
+class Distribution(metaclass=ABCMeta):
     """Generic base for a distribution. Needs to implement the functions fit and sample.
     """
+    
+    @abc.abstractmethod
     def fit(self, individuals):
         """This function fits the distributions parameters to the given samples
         in maximum likelihood fashion.
@@ -15,6 +20,7 @@ class Distribution():
         """
         pass
 
+    @abc.abstractmethod
     def sample(self, n_individuals):
         """Samples n_individuals from the current parametrized distribution.
 
@@ -28,6 +34,7 @@ class Distribution():
 class Gaussian(Distribution):
     """Gaussian distribution.
     """
+    
     def __init__(self):
         """Initializes the distributions members
         """
@@ -61,9 +68,9 @@ class Gaussian(Distribution):
         
     def sample(self, n_individuals):
         """Sample n_individuals individuals under the current parametrization
-
+ 
         :param n_individuals: number of individuals to sample.
-
+ 
         :returns numpy array with n_individual rows of individuals
         """
         return np.random.multivariate_normal(self.mean, self.cov, n_individuals)

@@ -85,9 +85,9 @@ class CrossEntropyOptimizer(Optimizer):
         self.optimizee_bounding_func = optimizee_bounding_func
 
         if parameters.pop_size < 1:
-            raise ValueError("pop_size needs to be greater than 0")
+            raise Exception("pop_size needs to be greater than 0")
         if parameters.smoothing >= 1 or parameters.smoothing < 0:
-            raise ValueError("smoothing has to be in interval [0, 1)")
+            raise Exception("smoothing has to be in interval [0, 1)")
         
         # The following parameters are recorded
         traj.f_add_parameter('pop_size', parameters.pop_size,
