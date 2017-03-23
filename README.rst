@@ -12,7 +12,7 @@ Each optimizees and optimizers may have their own dependencies specified in the 
 respective package.
 
 To Install The LTL Package
--------------------------
+--------------------------
 
 From the Top-Level directory of the directory, run the following command:
 

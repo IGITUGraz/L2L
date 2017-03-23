@@ -1,6 +1,7 @@
 import numpy as np
 import pylab
 from pylab import find
+from ltl.matplotlib_ import plt
 
 
 def get_spike_times(spike_rec):
@@ -288,3 +289,26 @@ def test_readout(w, states, targets):
     y[yr >= 0.5] = 1
     err = (1. * sum(y != targets)) / len(targets)
     return err
+
+
+def plot_spiketrains(spike_times_s_E, spike_times_s_I, time_slice_s, figure_filename, sample_neuron_fraction=1.):
+    plt.figure()
+    _plot_spiketrains(spike_times_s_E, 0, sample_neuron_fraction, color='blue')
+    _plot_spiketrains(spike_times_s_I, len(spike_times_s_E), sample_neuron_fraction, color='red')
+    plt.ylabel("Neurons")
+    plt.xlim(*time_slice_s)
+    plt.savefig(figure_filename)
+    plt.close()
+
+
+def _plot_spiketrains(spike_times_s, neuron_offset, sample_neuron_fraction, color):
+    all_spiketrains = list(spike_times_s)
+    n_neurons = len(all_spiketrains)
+
+    random_numbers = np.random.rand(n_neurons)
+    should_plot = (random_numbers < sample_neuron_fraction).tolist()
+
+    for neuron, (spiketrain, sp) in enumerate(zip(all_spiketrains, should_plot)):
+        if sp:
+            y = np.ones_like(spiketrain) * (neuron + neuron_offset)
+            plt.plot(spiketrain, y, '.', color=color, ms=2., mew=2.)
