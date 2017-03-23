@@ -7,7 +7,7 @@ from pypet import pypetconstants
 from ltl.optimizees.functions.optimizee import FunctionOptimizee
 from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
-from ltl.optimizers.crossentropy.distribution import Gaussian
+from ltl.optimizers.crossentropy.distribution import NoisyGaussian
 
 warnings.filterwarnings("ignore")
 
