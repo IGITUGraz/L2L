@@ -24,8 +24,10 @@ class FunctionGenerator:
         self.noise = noise
         self.mu = mu
         self.sigma = sigma
-        name_list = ['gaussian', 'permutation', 'easom', 'langermann', 'michalewicz', 'shekel']
-        function_list = [Gaussian, Permutation, Easom, Langermann, Michalewicz, Shekel]
+        name_list = ['gaussian', 'permutation', 'easom', 'langermann', 'michalewicz', 'shekel', 'rastrigin',
+                     'rosenbrock', 'ackley', 'chasm']
+        function_list = [Gaussian, Permutation, Easom, Langermann, Michalewicz, Shekel, Rastrigin, Rosenbrock, Ackley,
+                         Chasm]
 
         # Create a dictionary which associate the function and state bound to a cost name
         for n, f in zip(name_list, function_list):
@@ -313,3 +315,86 @@ class Gaussian(TestFunction):
         value = 1 / np.sqrt((2 * np.pi)**self.dims * np.linalg.det(self.sigma))
         value = value * np.exp(-0.5 * (np.transpose(x - self.mean).dot(np.linalg.inv(self.sigma))).dot((x - self.mean)))
         return -value
+
+
+class Rastrigin(TestFunction):
+    """
+    Rastrigin function is a multimodal function with a large number of local minima.
+
+
+    :param dims: dimensionality of the function
+    """
+    def __init__(self, params, dims):
+        if params is not None:
+            raise Exception("Function does not take parameters.")
+        self.dims = dims
+        self.bound = [-5, 5]
+
+    def call(self, x):
+        x = np.array(x)
+        return np.sum(x ** 2 + 10 - 10 * np.cos(2 * np.pi * x))
+
+
+class Rosenbrock(TestFunction):
+    """
+    Rosenbrock function is a unimodal function.
+    reference: https://www.sfu.ca/~ssurjano/rosen.html
+
+    :param dims: dimensionality of the function
+    """
+    def __init__(self, params, dims):
+        if params is not None:
+            raise Exception("Function does not take parameters.")
+        self.dims = dims
+        self.bound = [-2, 2]
+
+    def call(self, x):
+        x = np.array(x)
+        x_1 = x[1:self.dims]
+        x_0 = x[0:self.dims-1]
+        value = (x_1 - x_0 ** 2)**2 + (x_0 - 1)
+        # add the same term as in the original framework functions
+        value = sum(value) / 2 + 2 * np.sum(np.abs(x - 1.5))
+        return value
+
+
+class Ackley(TestFunction):
+    """
+    Ackley function has a large hole in at the centre surrounded by small hill like regions. Algorithms can get
+    trapped in one of its many local minima.
+    reference: https://www.sfu.ca/~ssurjano/ackley.html
+
+    :param dims: dimensionality of the function
+    """
+    def __init__(self, params, dims):
+        if params is not None:
+            raise Exception("Function does not take parameters.")
+        self.dims = dims
+        self.bound = [-2, 2]
+
+    def call(self, x):
+        x = np.array(x)
+        return np.exp(1) + 20 - 20 * np.exp(-0.2 * np.sqrt(1 / 2 * np.sum(x ** 2))) - np.exp(
+            0.5 * np.sum(np.cos(2 * np.pi * x)))
+
+
+class Chasm(TestFunction):
+    """
+    Chasm is characterized by a large flat area with a very large slope that halves the two parts of the
+    function.
+
+    :param dims: dimensionality of the function
+    """
+    def __init__(self, params, dims):
+        if params is not None:
+            raise Exception("Function does not take parameters.")
+
+        if dims != 2:
+            raise Exception("Dimensionality of the function must equal 2.")
+
+        self.dims = dims
+        self.bound = [-2, 2]
+
+    def call(self, x):
+        x = np.array(x)
+        return 1e3 * np.abs(x[0]) / (1e3 * np.abs(x[0]) + 1) + 1e-2 * np.abs(x[1])
