@@ -16,8 +16,7 @@ logger = logging.getLogger('ltl-clonce')
 
 def main():
     name = 'LTL-CLONCE'
-    root_dir_path = 'results'  # CHANGE THIS to the directory where your simulation results are contained
-    os.chdir('/home/thomas/workspace/LTL/src/')
+    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
 
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
