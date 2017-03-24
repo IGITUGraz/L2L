@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections import namedtuple
 import numpy as np
 
 
@@ -24,8 +25,9 @@ class FunctionGenerator:
         self.noise = noise
         self.mu = mu
         self.sigma = sigma
-        name_list = ['gaussian', 'permutation', 'easom', 'langermann', 'michalewicz', 'shekel', 'rastrigin',
-                     'rosenbrock', 'ackley', 'chasm']
+        name_list = ['GaussianParameters', 'PermutationParameters', 'EasomParameters', 'LangermannParameters',
+                     'MichalewiczParameters', 'ShekelParameters', 'RastriginParameters', 'RosenbrockParameters',
+                     'AckleyParameters', 'ChasmParameters']
         function_list = [Gaussian, Permutation, Easom, Langermann, Michalewicz, Shekel, Rastrigin, Rosenbrock, Ackley,
                          Chasm]
 
@@ -35,8 +37,7 @@ class FunctionGenerator:
 
         self.gen_functions = []
         for param in fg_params:
-            f_name = param["name"]
-            function_class = cost_functions[f_name](param["params"], dims)
+            function_class = cost_functions[param.__class__.__name__](param, dims)
             self.gen_functions.append(function_class)
 
         if bound is not None:
@@ -114,6 +115,13 @@ class Function(ABC):
         pass
 
 
+ShekelParameters = namedtuple('ShekelParameters', ['A', 'c'])
+ShekelParameters.__doc__ = """
+:param A: matrix m*n of coordinates of all minima (m equals length of c, and n equals dims)
+:param c: list of inverse intensities of minima
+"""
+
+
 class Shekel(Function):
     """
     The Shekels (foxholes) function has variable number of local minima (length of c or A).
@@ -121,13 +129,11 @@ class Shekel(Function):
     and inverse of their intensities in c.
     reference: https://www.sfu.ca/~ssurjano/shekel.html
 
-    :param params: a dictionary containing:
-        :key "A": matrix m*n of coordinates of all minima (m equals length of c, and n equals dims)
-        :key "c": list of inverse intensities of minima
+    :param params: Instance of :func:`~collections.namedtuple` :class:`ShekelParameters`
     :param dims: dimensionality of the function
     """
     def __init__(self, params, dims):
-        if params is None and dims == 2:
+        if params.A == 'default' and params.c == 'default' and dims == 2:
             self.c = (1. / 10.) * np.array([1, 2, 5, 2, 3, 1, 1])
             self.A = np.array([[3, 5],
                                [5, 2],
@@ -136,15 +142,13 @@ class Shekel(Function):
                                [2, 7],
                                [1, 4],
                                [7, 9]])
-        elif params is not None:
-            self.c = np.array(params["c"])
-            self.A = np.array(params["A"])
+        else:
+            self.c = np.array(params.c)
+            self.A = np.array(params.A)
             if self.c.size != self.A.shape[0]:
                 raise Exception("Parameters A and c do not match.")
             if self.A.shape[1] != dims:
                 raise Exception("Shape of parameter A does not match the dimensionality.")
-        else:
-            raise Exception("Parameters not defined.")
 
         self.dims = dims
         self.bound = [0, 10]
@@ -158,6 +162,12 @@ class Shekel(Function):
         return -value
 
 
+MichalewiczParameters = namedtuple('MichalewiczParameters', ['m'])
+MichalewiczParameters.__doc__ = """
+:param m: steepness factor
+"""
+
+
 class Michalewicz(Function):
     """
     The Michalewicz function is multimodal with number of local minima equal to factoriel of the number of dimensions.
@@ -165,15 +175,14 @@ class Michalewicz(Function):
     difficult function to minimize. The recommended value for m is 10 which is defined if no parameters are given.
     reference: https://www.sfu.ca/~ssurjano/michal.html
 
-    :param params: a dictionary containing:
-        :key "m": steepness factor
+    :param params: Instance of :func:`~collections.namedtuple` :class:`MichalewiczParameters`
     :param dims: dimensionality of the function
     """
     def __init__(self, params, dims):
-        if params is None:
+        if params.m == 'default':
             self.m = 10
         else:
-            self.m = params["m"]
+            self.m = params.m
 
         self.dims = dims
         self.bound = [0, np.pi]
@@ -187,6 +196,13 @@ class Michalewicz(Function):
         return value
 
 
+LangermannParameters = namedtuple('LangermannParameters', ['A', 'c'])
+LangermannParameters.__doc__ = """
+:param A: matrix m*n of coordinates of all minima, (m equals length of c, and n equals dims)
+:param c: list of intensities of minima
+"""
+
+
 class Langermann(Function):
     """
     The Langermann function is multimodal, with many unevenly distributed local minima.
@@ -194,28 +210,24 @@ class Langermann(Function):
     and their intensities in c.
     reference: https://www.sfu.ca/~ssurjano/langer.html
 
-    :param params: a dictionary containing:
-        :key "A": matrix m*n of coordinates of all minima, (m equals length of c, and n equals dims)
-        :key "c": list of intensities of minima
+    :param params: Instance of :func:`~collections.namedtuple` :class:`LangermannParameters`
     :param dims: dimensionality of the function
     """
     def __init__(self, params, dims):
-        if params is None and dims == 2:
+        if params.A == 'default' and params.c == 'default' and dims == 2:
             self.c = np.array([1, 2, 5, 2, 3])
             self.A = np.array([[3, 5],
                                [5, 2],
                                [2, 1],
                                [1, 4],
                                [7, 9]])
-        elif params is not None:
-            self.c = np.array(params["c"])
-            self.A = np.array(params["A"])
+        else:
+            self.c = np.array(params.c)
+            self.A = np.array(params.A)
             if self.c.size != self.A.shape[0]:
                 raise Exception("Parameters A and c do not match.")
             if self.A.shape[1] != dims:
                 raise Exception("Shape of parameter A does not match the dimensionality.")
-        else:
-            raise Exception("Parameters not defined.")
 
         self.dims = dims
         self.bound = [0, 10]
@@ -229,6 +241,9 @@ class Langermann(Function):
         return value
 
 
+EasomParameters = namedtuple('EasomParameters', [])
+
+
 class Easom(Function):
     """
     The Easom function has several local minima. It is unimodal,
@@ -238,9 +253,6 @@ class Easom(Function):
     :param dims: dimensionality of the function
     """
     def __init__(self, params, dims):
-        if params is not None:
-            raise Exception("Function does not take parameters.")
-
         self.dims = dims
         self.bound = [-10, 10]
 
@@ -252,6 +264,12 @@ class Easom(Function):
         return value
 
 
+PermutationParameters = namedtuple('PermutationParameters', ['beta'])
+PermutationParameters.__doc__ = """
+:param beta: non-negative, difference between global and local minima (smaller means harder)
+"""
+
+
 class Permutation(Function):
     """
     beta is a non-negative parameter. The smaller beta, the more difficult problem becomes since the global minimum
@@ -261,14 +279,13 @@ class Permutation(Function):
     minimum successfully and to discriminate it from other local minima.
     reference: http://solon.cma.univie.ac.at/glopt/my_problems.html
 
-    :param params: a dictionary containing:
-        :key "beta": non-negative, difference between global and local minima (smaller means harder)
+    :param params: Instance of :func:`~collections.namedtuple` :class:`PermutationParameters`
     :param dims: dimensionality of the function
     """
     def __init__(self, params, dims):
         if not len(params) == 1:
             raise Exception("Number of parameters does not equal 1.")
-        beta = np.array(params["beta"])
+        beta = np.array(params.beta)
 
         if np.isscalar(beta):
             raise Exception("Beta paramater must always be a scalar value.")
@@ -285,20 +302,25 @@ class Permutation(Function):
         return value
 
 
+GaussianParameters = namedtuple('GaussianParameters', ['sigma', 'mean'])
+GaussianParameters.__doc__ = """
+:param sigma: variance matrix
+:param mean: list containing coordinates of the peak (mean, median, mode)
+"""
+
+
 class Gaussian(Function):
     """
     The multi-dimensional Gaussian (normal) distribution function.
 
-    :param params: a dictionary containing:
-        :key "sigma": variance matrix
-        :key "mean": list containing coordinates of the peak (mean, median, mode)
+    :param params: Instance of :func:`~collections.namedtuple` :class:`GaussianParameters`
     :param dims: dimensionality of the function
     """
     def __init__(self, params, dims):
         if not len(params) == 2:
             raise Exception("Number of parameters does not equal 2.")
-        sigma = np.array(params["sigma"])
-        mean = np.array(params["mean"])
+        sigma = np.array(params.sigma)
+        mean = np.array(params.mean)
 
         if (dims > 1 and (not sigma.shape[0] == sigma.shape[1] == mean.shape[0] == dims)) or \
                 (dims == 1 and (not sigma.shape == mean.shape == tuple())):
@@ -315,6 +337,9 @@ class Gaussian(Function):
         return -value
 
 
+RastriginParameters = namedtuple('RastriginParameters', [])
+
+
 class Rastrigin(Function):
     """
     Rastrigin function is a multimodal function with a large number of local minima.
@@ -323,14 +348,15 @@ class Rastrigin(Function):
     :param dims: dimensionality of the function
     """
     def __init__(self, params, dims):
-        if params is not None:
-            raise Exception("Function does not take parameters.")
         self.dims = dims
         self.bound = [-5, 5]
 
     def __call__(self, x):
         x = np.array(x)
         return np.sum(x ** 2 + 10 - 10 * np.cos(2 * np.pi * x))
+
+
+RosenbrockParameters = namedtuple('RosenbrockParameters', [])
 
 
 class Rosenbrock(Function):
@@ -341,19 +367,20 @@ class Rosenbrock(Function):
     :param dims: dimensionality of the function
     """
     def __init__(self, params, dims):
-        if params is not None:
-            raise Exception("Function does not take parameters.")
         self.dims = dims
         self.bound = [-2, 2]
 
     def __call__(self, x):
         x = np.array(x)
         x_1 = x[1:self.dims]
-        x_0 = x[0:self.dims-1]
+        x_0 = x[0:self.dims - 1]
         value = (x_1 - x_0 ** 2)**2 + (x_0 - 1)
         # add the same term as in the original framework functions
         value = sum(value) / 2 + 2 * np.sum(np.abs(x - 1.5))
         return value
+
+
+AckleyParameters = namedtuple('AckleyParameters', [])
 
 
 class Ackley(Function):
@@ -365,8 +392,6 @@ class Ackley(Function):
     :param dims: dimensionality of the function
     """
     def __init__(self, params, dims):
-        if params is not None:
-            raise Exception("Function does not take parameters.")
         self.dims = dims
         self.bound = [-2, 2]
 
@@ -374,6 +399,9 @@ class Ackley(Function):
         x = np.array(x)
         return np.exp(1) + 20 - 20 * np.exp(-0.2 * np.sqrt(1 / 2 * np.sum(x ** 2))) - np.exp(
             0.5 * np.sum(np.cos(2 * np.pi * x)))
+
+
+ChasmParameters = namedtuple('ChasmParameters', [])
 
 
 class Chasm(Function):
@@ -384,9 +412,6 @@ class Chasm(Function):
     :param dims: dimensionality of the function
     """
     def __init__(self, params, dims):
-        if params is not None:
-            raise Exception("Function does not take parameters.")
-
         if dims != 2:
             raise Exception("Dimensionality of the function must equal 2.")
 
