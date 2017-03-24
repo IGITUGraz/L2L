@@ -60,33 +60,20 @@ class FunctionGenerator:
         return res
 
     def plot(self):
-        from mpl_toolkits.mplot3d import Axes3D  # NOQA
+        from mpl_toolkits.mplot3d import Axes3D
         import matplotlib.pyplot as plt
         from matplotlib import cm
         from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
         fig = plt.figure()
-        ax = fig.gca(projection='3d')
+        ax = fig.gca(projection=Axes3D.name)
 
         # Make data.
         X = np.arange(self.bound[0], self.bound[1], 0.05)
         Y = np.arange(self.bound[0], self.bound[1], 0.05)
         X, Y = np.meshgrid(X, Y)
         Z = [self.cost_function([x, y]) for x, y in zip(X.ravel(), Y.ravel())]
-        # Z = []
-        # i = 0
-        # # print(self.cost_function([1., 2., 3.]))
-        # print("computing cost function [", sep='', end='')
-        # for x, y in zip(X.ravel(), Y.ravel()):
-        #     Z.append(self.cost_function([x, y]))
-        #     i += 1
-        #     if i % (X.size / 100) == 0:
-        #         perc = (i / X.size) * 100
-        #         # print("%d%%" % (perc,))
-        #         print(".", sep='', end='', flush=True)
-        # print("]")
         Z = np.array(Z).reshape(X.shape)
-        # print(Z)
 
         # Plot the surface.
         surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm, linewidth=0, antialiased=False)
