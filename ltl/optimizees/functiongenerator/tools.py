@@ -34,18 +34,16 @@ class FunctionGenerator:
             cost_functions[n] = f
 
         self.gen_functions = []
-        gen_functions_classes = []
         for param in fg_params:
             f_name = param["name"]
             function_class = cost_functions[f_name](param["params"], dims)
-            self.gen_functions.append(function_class.call)
-            gen_functions_classes.append(function_class)
+            self.gen_functions.append(function_class)
 
         if bound is not None:
             self.bound = bound
         else:
-            bounds_min = [function_class.bound[0] for function_class in gen_functions_classes]
-            bounds_max = [function_class.bound[1] for function_class in gen_functions_classes]
+            bounds_min = [function_class.bound[0] for function_class in self.gen_functions]
+            bounds_max = [function_class.bound[1] for function_class in self.gen_functions]
             bound_min = np.min(bounds_min)
             bound_max = np.max(bounds_max)
             self.bound = [bound_min, bound_max]
@@ -103,12 +101,12 @@ class FunctionGenerator:
         plt.show()
 
 
-class TestFunction(ABC):
+class Function(ABC):
     """
     Base class for all test functions.
     """
     @abstractmethod
-    def call(self, x):
+    def __call__(self, x):
         """
         :param x: input data vector with length equal to the function dimensionality
         :return: the resulting scalar output of the function
@@ -116,7 +114,7 @@ class TestFunction(ABC):
         pass
 
 
-class Shekel(TestFunction):
+class Shekel(Function):
     """
     The Shekels (foxholes) function has variable number of local minima (length of c or A).
     It can be customized by defining the coordinates of minima in matrix A,
@@ -151,7 +149,7 @@ class Shekel(TestFunction):
         self.dims = dims
         self.bound = [0, 10]
 
-    def call(self, x):
+    def __call__(self, x):
         x = np.array(x)
         value = 0
         for i in range(self.A.shape[0]):
@@ -160,7 +158,7 @@ class Shekel(TestFunction):
         return -value
 
 
-class Michalewicz(TestFunction):
+class Michalewicz(Function):
     """
     The Michalewicz function is multimodal with number of local minima equal to factoriel of the number of dimensions.
     It accepts only a parameter m which defines the steepness of the valleys and ridges. Larger m leads to a more
@@ -180,7 +178,7 @@ class Michalewicz(TestFunction):
         self.dims = dims
         self.bound = [0, np.pi]
 
-    def call(self, x):
+    def __call__(self, x):
         x = np.array(x)
         i = np.arange(1, self.dims + 1)
         a = (i * x**2) / np.pi
@@ -189,7 +187,7 @@ class Michalewicz(TestFunction):
         return value
 
 
-class Langermann(TestFunction):
+class Langermann(Function):
     """
     The Langermann function is multimodal, with many unevenly distributed local minima.
     It can be customized by defining the coordinates of centers of sub-functions in matrix A,
@@ -222,7 +220,7 @@ class Langermann(TestFunction):
         self.dims = dims
         self.bound = [0, 10]
 
-    def call(self, x):
+    def __call__(self, x):
         x = np.array(x)
         value = 0
         for i in range(self.A.shape[0]):
@@ -231,7 +229,7 @@ class Langermann(TestFunction):
         return value
 
 
-class Easom(TestFunction):
+class Easom(Function):
     """
     The Easom function has several local minima. It is unimodal,
     and the global minimum has a small area relative to the search space.
@@ -246,7 +244,7 @@ class Easom(TestFunction):
         self.dims = dims
         self.bound = [-10, 10]
 
-    def call(self, x):
+    def __call__(self, x):
         x = np.array(x)
         cos_x = np.cos(x)
         x_min_pi = (x - np.pi)**2
@@ -254,7 +252,7 @@ class Easom(TestFunction):
         return value
 
 
-class Permutation(TestFunction):
+class Permutation(Function):
     """
     beta is a non-negative parameter. The smaller beta, the more difficult problem becomes since the global minimum
     is difficult to distinguish from local minima near permuted solutions. For beta=0, every permuted solution is a
@@ -278,7 +276,7 @@ class Permutation(TestFunction):
         self.beta = beta
         self.bound = [-dims, dims]
 
-    def call(self, x):
+    def __call__(self, x):
         x = np.array(x)
         ks = np.array(range(1, self.dims + 1))
         i = np.array(range(1, self.dims + 1))
@@ -287,7 +285,7 @@ class Permutation(TestFunction):
         return value
 
 
-class Gaussian(TestFunction):
+class Gaussian(Function):
     """
     The multi-dimensional Gaussian (normal) distribution function.
 
@@ -310,14 +308,14 @@ class Gaussian(TestFunction):
         self.mean = mean
         self.bound = [-5, 5]
 
-    def call(self, x):
+    def __call__(self, x):
         x = np.array(x)
         value = 1 / np.sqrt((2 * np.pi)**self.dims * np.linalg.det(self.sigma))
         value = value * np.exp(-0.5 * (np.transpose(x - self.mean).dot(np.linalg.inv(self.sigma))).dot((x - self.mean)))
         return -value
 
 
-class Rastrigin(TestFunction):
+class Rastrigin(Function):
     """
     Rastrigin function is a multimodal function with a large number of local minima.
 
@@ -330,12 +328,12 @@ class Rastrigin(TestFunction):
         self.dims = dims
         self.bound = [-5, 5]
 
-    def call(self, x):
+    def __call__(self, x):
         x = np.array(x)
         return np.sum(x ** 2 + 10 - 10 * np.cos(2 * np.pi * x))
 
 
-class Rosenbrock(TestFunction):
+class Rosenbrock(Function):
     """
     Rosenbrock function is a unimodal function.
     reference: https://www.sfu.ca/~ssurjano/rosen.html
@@ -348,7 +346,7 @@ class Rosenbrock(TestFunction):
         self.dims = dims
         self.bound = [-2, 2]
 
-    def call(self, x):
+    def __call__(self, x):
         x = np.array(x)
         x_1 = x[1:self.dims]
         x_0 = x[0:self.dims-1]
@@ -358,7 +356,7 @@ class Rosenbrock(TestFunction):
         return value
 
 
-class Ackley(TestFunction):
+class Ackley(Function):
     """
     Ackley function has a large hole in at the centre surrounded by small hill like regions. Algorithms can get
     trapped in one of its many local minima.
@@ -372,13 +370,13 @@ class Ackley(TestFunction):
         self.dims = dims
         self.bound = [-2, 2]
 
-    def call(self, x):
+    def __call__(self, x):
         x = np.array(x)
         return np.exp(1) + 20 - 20 * np.exp(-0.2 * np.sqrt(1 / 2 * np.sum(x ** 2))) - np.exp(
             0.5 * np.sum(np.cos(2 * np.pi * x)))
 
 
-class Chasm(TestFunction):
+class Chasm(Function):
     """
     Chasm is characterized by a large flat area with a very large slope that halves the two parts of the
     function.
@@ -395,6 +393,6 @@ class Chasm(TestFunction):
         self.dims = dims
         self.bound = [-2, 2]
 
-    def call(self, x):
+    def __call__(self, x):
         x = np.array(x)
         return 1e3 * np.abs(x[0]) / (1e3 * np.abs(x[0]) + 1) + 1e-2 * np.abs(x[1])

@@ -32,42 +32,45 @@ def main():
     print("Change the values in logging.yaml to control log level and destination")
     print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
 
-    # fg_params = [{'name': 'gaussian', 'params': {"sigma": [[1.5, .1],
-    #                                                        [.1, .3]],
-    #                                              "mean": [-1., -1.]}},
-    #              {'name': 'gaussian', 'params': {"sigma": [[.25, .3],
-    #                                                        [.3, 1.]],
-    #                                              "mean": [1., 1.]}},
-    #              {'name': 'gaussian', 'params': {"sigma": [[.5, .25],
-    #                                                        [.25, 1.3]],
-    #                                              "mean": [2., -2.]}}]
-    # FunctionGenerator(fg_params, dims=2, noise=True).plot()
-    #
-    # fg_params = [{'name': 'permutation', 'params': {"beta": 0.005}}]
-    # FunctionGenerator(fg_params, dims=2).plot()
-    #
-    # fg_params = [{'name': 'easom', 'params': None}]
-    # FunctionGenerator(fg_params, dims=3).plot()
-    #
-    # fg_params = [{'name': 'langermann', 'params': None}]
-    # FunctionGenerator(fg_params, dims=2).plot()
-    #
-    # fg_params = [{'name': 'michalewicz', 'params': None}]
-    # FunctionGenerator(fg_params, dims=2).plot()
-    #
-    # fg_params = [{'name': 'shekel', 'params': None}]
-    # FunctionGenerator(fg_params, dims=2).plot()
-    #
-    # fg_params = [{'name': 'shekel', 'params': {'A': [[8, 5]],
-    #                                            'c': [0.08]}},
-    #              {'name': 'langermann', 'params': None}]
-    # FunctionGenerator(fg_params, dims=2).plot()
-    # fg_params = [{'name': 'rastrigin', 'params': None}]
-    # FunctionGenerator(fg_params, dims=2).plot()
-    # fg_params = [{'name': 'rosenbrock', 'params': None}]
-    # FunctionGenerator(fg_params, dims=2).plot()
-    # fg_params = [{'name': 'chasm', 'params': None}]
-    # FunctionGenerator(fg_params, dims=2).plot()
+    fg_params = [{'name': 'gaussian', 'params': {"sigma": [[1.5, .1],
+                                                           [.1, .3]],
+                                                 "mean": [-1., -1.]}},
+                 {'name': 'gaussian', 'params': {"sigma": [[.25, .3],
+                                                           [.3, 1.]],
+                                                 "mean": [1., 1.]}},
+                 {'name': 'gaussian', 'params': {"sigma": [[.5, .25],
+                                                           [.25, 1.3]],
+                                                 "mean": [2., -2.]}}]
+    FunctionGenerator(fg_params, dims=2, noise=True).plot()
+
+    fg_params = [{'name': 'permutation', 'params': {"beta": 0.005}}]
+    FunctionGenerator(fg_params, dims=2).plot()
+
+    fg_params = [{'name': 'easom', 'params': None}]
+    FunctionGenerator(fg_params, dims=3).plot()
+
+    fg_params = [{'name': 'langermann', 'params': None}]
+    FunctionGenerator(fg_params, dims=2).plot()
+
+    fg_params = [{'name': 'michalewicz', 'params': None}]
+    FunctionGenerator(fg_params, dims=2).plot()
+
+    fg_params = [{'name': 'shekel', 'params': None}]
+    FunctionGenerator(fg_params, dims=2).plot()
+
+    fg_params = [{'name': 'shekel', 'params': {'A': [[8, 5]],
+                                               'c': [0.08]}},
+                 {'name': 'langermann', 'params': None}]
+    FunctionGenerator(fg_params, dims=2).plot()
+
+    fg_params = [{'name': 'rastrigin', 'params': None}]
+    FunctionGenerator(fg_params, dims=2).plot()
+
+    fg_params = [{'name': 'rosenbrock', 'params': None}]
+    FunctionGenerator(fg_params, dims=2).plot()
+
+    fg_params = [{'name': 'chasm', 'params': None}]
+    FunctionGenerator(fg_params, dims=2).plot()
 
 if __name__ == '__main__':
     main()
