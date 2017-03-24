@@ -9,7 +9,7 @@ import yaml
 from pypet import Environment
 
 from ltl.optimizees.functiongenerator.optimizee import FunctionGeneratorOptimizee
-from ltl.optimizees.functiongenerator.tools import GaussianParameters
+from ltl.optimizees.functiongenerator.function_generator import GaussianParameters
 from ltl.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParameters, SimulatedAnnealingOptimizer
 from ltl.paths import Paths
 
@@ -57,7 +57,7 @@ def main():
     traj = env.trajectory
 
     # NOTE: Innerloop simulator
-    from ltl.optimizees.functiongenerator.tools import FunctionGenerator
+    from ltl.optimizees.functiongenerator.function_generator import FunctionGenerator
     fg_instance = FunctionGenerator([GaussianParameters(sigma=[[1., 0.], [0., 1.]], mean=[1., 1.])],
                                     dims=2, bound=[0, 2])
     fg_instance.plot()
