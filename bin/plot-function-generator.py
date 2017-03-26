@@ -7,7 +7,7 @@ import yaml
 
 from ltl.optimizees.functiongenerator.function_generator import FunctionGenerator, GaussianParameters, PermutationParameters, \
     EasomParameters, LangermannParameters, MichalewiczParameters, ShekelParameters, RastriginParameters, \
-    RosenbrockParameters, ChasmParameters
+    RosenbrockParameters, ChasmParameters, AckleyParameters
 from ltl.paths import Paths
 
 warnings.filterwarnings("ignore")
@@ -58,6 +58,8 @@ def main():
     FunctionGenerator([RosenbrockParameters()], dims=2).plot()
 
     FunctionGenerator([ChasmParameters()], dims=2).plot()
+
+    FunctionGenerator([AckleyParameters()], dims=2).plot()
 
 
 if __name__ == '__main__':
