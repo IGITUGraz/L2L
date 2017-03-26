@@ -291,7 +291,7 @@ class Permutation(Function):
 
 GaussianParameters = namedtuple('GaussianParameters', ['sigma', 'mean'])
 GaussianParameters.__doc__ = """
-:param sigma: variance matrix
+:param sigma: covariance matrix
 :param mean: list containing coordinates of the peak (mean, median, mode)
 """
 
