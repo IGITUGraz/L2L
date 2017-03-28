@@ -85,7 +85,7 @@ class AdamOptimizer(Optimizer):
 
         # Initialize parameters for ADAM.
         # delta is used for numerical stabilization, s stores first order momentum, r stores second order momentum
-        self.delta = 10^(-8)
+        self.delta = 10**(-8)
         self.s = np.zeros(len(self.current_individual))
         self.r = np.zeros(len(self.current_individual)) 
 
@@ -93,20 +93,21 @@ class AdamOptimizer(Optimizer):
 
         # Explore the neighbourhood in the parameter space of current individual
         new_individual_list = [
-            list_to_dict(self.current_individual + np.random.normal(0.0, parameters.exploration_rate, current_individual.size),
+            list_to_dict(self.current_individual + np.random.normal(0.0, parameters.exploration_rate, self.current_individual.size),
                          self.optimizee_individual_dict_spec)
-            for i in traj.n_random_steps
+            for i in range(traj.n_random_steps)
         ]
 
         # Also add the current individual to determine it's fitness
-        new_individual_list.append(self.current_individual)
+        new_individual_list.append(list_to_dict(self.current_individual, self.optimizee_individual_dict_spec))
 
-        if optimizee_bounding_func is not None:
+        if self.optimizee_bounding_func is not None:
             new_individual_list = [self.optimizee_bounding_func(ind) for ind in new_individual_list]
 
         # Storing the fitness of the current individual
         self.current_fitness = -np.Inf
 
+        self.g = 0
         self.eval_pop = new_individual_list
         self._expand_trajectory(traj)
 
@@ -115,7 +116,7 @@ class AdamOptimizer(Optimizer):
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
         learning_rate, exploration_rate, first_order_decay, second_order_decay,  n_random_steps, n_iteration, stop_criterion = \
-            traj.learning_rate, traj.exploration_rate, first_order_decay, second_order_decay, traj.n_random_steps, traj.n_iteration, traj.stop_criterion
+            traj.learning_rate, traj.exploration_rate, traj.first_order_decay, traj.second_order_decay, traj.n_random_steps, traj.n_iteration, traj.stop_criterion
         old_eval_pop = self.eval_pop.copy()
         self.eval_pop.clear()
 
@@ -124,17 +125,17 @@ class AdamOptimizer(Optimizer):
         assert len(fitnesses_results) - 1 == traj.n_random_steps
 
         # We need to collect the directions of the random steps along with the fitness evaluated there
-        dx = np.zeros((n_random_steps, len(self.current_individual))
-        weighted_fitness = np.zeros(n_random_steps)
+        dx = np.zeros((n_random_steps, len(self.current_individual)))
+        fitnesses = np.zeros(n_random_steps)
 
         for i, (run_index, fitness) in enumerate(fitnesses_results):
-            weighted_fitness = sum(f * w for f, w in zip(fitness, self.optimizee_fitness_weights))
+            ind_fitness = sum(f * w for f, w in zip(fitness, self.optimizee_fitness_weights))
 
             # The last element of the list is the evaluation of the individual obtained via gradient descent
             if i == len(fitnesses_results) - 1:
-                self.current_fitness = weighted_fitness
+                self.current_fitness = ind_fitness
             else:
-                weighted_fitness[i] = weighted_fitness
+                fitnesses[i] = ind_fitness
 
                 # We need to convert the current run index into an ind_idx
                 # (index of individual within one generation
@@ -142,7 +143,7 @@ class AdamOptimizer(Optimizer):
                 ind_index = traj.par.ind_idx
                 individual = old_eval_pop[ind_index]
                 
-                dx[i] = individual - self.current_individual
+                dx[i] = np.array(dict_to_list(individual)) - self.current_individual
             
         logger.debug("Current fitness is %.2f", self.current_fitness) 
 
@@ -151,26 +152,25 @@ class AdamOptimizer(Optimizer):
 
         if self.g < n_iteration - 1 and stop_criterion > self.current_fitness:
             # Update momentum estimates and calculate gradient 
-            gradient = np.dot(np.linalg.pinv(dx), weighted_fitness - self.current_fitness)
-            self.s = first_order_decay * self.s + (1 - first_order_decay) * gradient
-            self.r = second_order_decay * self.r + (1 - second_order_decay) * np.multiply(gradient, gradient)
-            s_corrected = self.s / (1 - first_order_decay ^ g)
-            r_corrected = self.r/ (1 - second_order_decay ^ g)
+            gradient = np.dot(np.linalg.pinv(dx), fitnesses - self.current_fitness)
+            self.s = traj.first_order_decay * self.s + (1 - traj.first_order_decay) * gradient
+            self.r = traj.second_order_decay * self.r + (1 - traj.second_order_decay) * np.multiply(gradient, gradient)
+            s_corrected = self.s / (1 - traj.first_order_decay ** self.g)
+            r_corrected = self.r/ (1 - traj.second_order_decay ** self.g)
 
-            current_individual += np.multiply(traj.learning_rate * s_corrected / (np.sqrt(r_corrected) + self.delta), gradient)
-            if optimizee_bounding_func is not None:
-                current_individual = self.optimizee_bounding_func(current_individual)
+            self.current_individual += np.multiply(traj.learning_rate * s_corrected / (np.sqrt(r_corrected) + self.delta), gradient)
 
             # Explore neighbourhood of the new current individual
             new_individual_list = [
-                list_to_dict(self.current_individual + np.random.normal(0.0, parameters.exploration_rate, current_individual.size),
+                list_to_dict(self.current_individual + np.random.normal(0.0, traj.exploration_rate, self.current_individual.size),
                              self.optimizee_individual_dict_spec)
-                for i in traj.n_random_steps
+                for i in range(traj.n_random_steps)
             ]
-            new_individual_list.append(current_individual)
-            if optimizee_bounding_func is not None:
+            
+            new_individual_list.append(list_to_dict(self.current_individual, self.optimizee_individual_dict_spec))
+            if self.optimizee_bounding_func is not None:
                 new_individual_list = [self.optimizee_bounding_func(ind) for ind in new_individual_list]
-
+            fitnesses_results.clear()
             self.eval_pop = new_individual_list
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)

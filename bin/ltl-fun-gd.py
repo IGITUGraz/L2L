@@ -20,7 +20,7 @@ logger = logging.getLogger('ltl-lsm-gd')
 
 def main():
     name = 'LTL-FUN-GD'
-    root_dir_path = '~/LTL/sim_results.txt'  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = '../sim_results'  # CHANGE THIS to the directory where your simulation results are contained
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
            " Set it manually in the code (by setting the variable 'root_dir_path')" \

@@ -7,14 +7,14 @@ import numpy as np
 from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list
 from ltl import list_to_dict
-logger = logging.getLogger("ltl-stoch_gd")
+logger = logging.getLogger("ltl-gd")
 
 StochGradientDescentParameters = namedtuple('StochGradientDescentParameters',
                                           ['learning_rate', 'stoch_deviation', 'stoch_decay', 'exploration_rate', 'n_random_steps', 'n_iteration', 'stop_criterion'])
 StochGradientDescentParameters.__doc__ = """
 :param learning_rate: The rate of learning per step of gradient descent
-:param stoch_deviation: The standard deviation of the random vector added to the gradient
-:param stoch_decay: The decay of the influence of the random vector that is added to the gradient
+:param stoch_deviation: The standard deviation of the random vector used to perturbate the gradient
+:param stoch_decay: The decay of the influence of the random vector that is added to the gradient (set to 0 to disable stochastic perturbation)
 :param exploration_rate: The standard deviation of random steps used for finite difference gradient
 :param n_random_steps: The amount of random steps used to estimate gradient
 :param n_iteration: number of iteration to perform
@@ -31,7 +31,7 @@ class StochGradientDescentOptimizer(Optimizer):
         - Explore the fitness of individuals in the close vicinity of the current one
         - Calculate the hyperplane that best fits the fitness values of those individuals in the parameter space
         - Create the new 'current individual' by taking a step in the parameters space along the direction
-            of the largest ascent of the plane and adding a random vector
+            of the largest ascent of the plane. This direction is perturbated by a random vector. 
 
     NOTE: This expects all parameters of the system to be of floating point
 
@@ -86,19 +86,20 @@ class StochGradientDescentOptimizer(Optimizer):
 
         # Explore the neighbourhood in the parameter space of current individual
         new_individual_list = [
-            list_to_dict(self.current_individual + np.random.normal(0.0, parameters.exploration_rate, current_individual.size),
+            list_to_dict(self.current_individual + np.random.normal(0.0, parameters.exploration_rate, self.current_individual.size),
                          self.optimizee_individual_dict_spec)
-            for i in traj.n_random_steps
+            for i in range(traj.n_random_steps)
         ]
 
         # Also add the current individual to determine it's fitness
-        new_individual_list.append(self.current_individual)
+        new_individual_list.append(list_to_dict(self.current_individual, self.optimizee_individual_dict_spec))
 
         if optimizee_bounding_func is not None:
             new_individual_list = [self.optimizee_bounding_func(ind) for ind in new_individual_list]
 
         # Storing the fitness of the current individual
         self.current_fitness = -np.Inf
+        self.g = 0
 
         self.eval_pop = new_individual_list
         self._expand_trajectory(traj)
@@ -107,8 +108,8 @@ class StochGradientDescentOptimizer(Optimizer):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
-        learning_rate, exploration_rate, n_random_steps, n_iteration, stop_criterion = \
-            traj.learning_rate, traj.exploration_rate, traj.n_random_steps, traj.n_iteration, traj.stop_criterion
+        learning_rate, stoch_deviation, stoch_decay, exploration_rate, n_random_steps, n_iteration, stop_criterion = \
+            traj.learning_rate, traj.stoch_deviation, traj.stoch_decay, traj.exploration_rate, traj.n_random_steps, traj.n_iteration, traj.stop_criterion
         old_eval_pop = self.eval_pop.copy()
         self.eval_pop.clear()
 
@@ -117,17 +118,17 @@ class StochGradientDescentOptimizer(Optimizer):
         assert len(fitnesses_results) - 1 == traj.n_random_steps
 
         # We need to collect the directions of the random steps along with the fitness evaluated there
-        dx = np.zeros((n_random_steps, len(self.current_individual))
-        weighted_fitness = np.zeros(n_random_steps)
+        dx = np.zeros((n_random_steps, len(self.current_individual)))
+        fitnesses = np.zeros((n_random_steps))
 
         for i, (run_index, fitness) in enumerate(fitnesses_results):
-            weighted_fitness = sum(f * w for f, w in zip(fitness, self.optimizee_fitness_weights))
+            ind_fitness = sum(f * w for f, w in zip(fitness, self.optimizee_fitness_weights))
 
             # The last element of the list is the evaluation of the individual obtained via gradient descent
             if i == len(fitnesses_results) - 1:
-                self.current_fitness = weighted_fitness
+                self.current_fitness = ind_fitness
             else:
-                weighted_fitness[i] = weighted_fitness
+                fitnesses[i] = ind_fitness
 
                 # We need to convert the current run index into an ind_idx
                 # (index of individual within one generation
@@ -135,7 +136,7 @@ class StochGradientDescentOptimizer(Optimizer):
                 ind_index = traj.par.ind_idx
                 individual = old_eval_pop[ind_index]
                 
-                dx[i] = individual - self.current_individual
+                dx[i] = np.array(dict_to_list(individual)) - self.current_individual
             
         logger.debug("Current fitness is %.2f", self.current_fitness) 
 
@@ -144,22 +145,21 @@ class StochGradientDescentOptimizer(Optimizer):
 
         if self.g < n_iteration - 1 and stop_criterion > self.current_fitness:
             # Create new individual using gradient descent
-            gradient = np.dot(np.linalg.pinv(dx), weighted_fitness - self.current_fitness)
-            gradient = gradient + np.random.normal(0.0, traj.stoch_deviation, current_individual.size) * traj.stoch_decay^g
-            current_individual += traj.learning_rate * gradient
-            if optimizee_bounding_func is not None:
-                current_individual = self.optimizee_bounding_func(current_individual)
+            gradient = np.dot(np.linalg.pinv(dx), fitnesses - self.current_fitness)
+            gradient += np.random.normal(0.0, stoch_deviation, self.current_individual.size) * stoch_decay**self.g
+            self.current_individual += traj.learning_rate * gradient
         
             # Explore the neighbourhood in the parameter space of the current individual
             new_individual_list = [
-                list_to_dict(self.current_individual + np.random.normal(0.0, parameters.exploration_rate, current_individual.size),
+                list_to_dict(self.current_individual + np.random.normal(0.0, traj.exploration_rate, self.current_individual.size),
                              self.optimizee_individual_dict_spec)
-                for i in traj.n_random_steps
+                for i in range(traj.n_random_steps)
             ]
-            new_individual_list.append(current_individual)
-            if optimizee_bounding_func is not None:
+            new_individual_list.append(list_to_dict(self.current_individual, self.optimizee_individual_dict_spec))
+            if self.optimizee_bounding_func is not None:
                 new_individual_list = [self.optimizee_bounding_func(ind) for ind in new_individual_list]
-
+                
+            fitnesses_results.clear()
             self.eval_pop = new_individual_list
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
