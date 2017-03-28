@@ -3,6 +3,7 @@ import logging
 from collections import namedtuple
 
 import numpy as np
+from enum import Enum
 
 from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list
@@ -102,6 +103,52 @@ class SimulatedAnnealingOptimizer(Optimizer):
 
         self.eval_pop = new_individual_list
         self._expand_trajectory(traj)
+        
+        # enum for cooling schedules: 
+        # DEF ... default
+        # LOG ... logartihmic
+        # EXP ... exponential
+        # LINMULT .. linear multiplicative cooling. 
+        # QUADMULT .. quadratic multiplicative cooling
+        # LINADD ... linear additive cooling
+        # QUADADD ... quadratic additive cooling
+        # EXPADD ... exponential additive cooling
+        # TRIGADD ...trigonometric additive cooling
+        self.available_cooling_schedules = Enum('Schedule', 'DEF LOG EXP LINMULT QUADMULT LINADD QUADADD EXPADD TRIGADD')
+
+    def cooling(self,temperature, cooling_schedule, temperature_decay, temperature_end, steps_total):        
+        # assumes, that the temperature always starts at 1
+        T0 = 1
+        k = self.g + 1        
+        
+        if cooling_schedule == self.available_cooling_schedules.DEF:
+            return temperature * temperature_decay
+          
+        # Simulated Annealing and Boltzmann Machines: 
+        # A Stochastic Approach to Combinatorial Optimization and Neural Computing (1989)
+        if cooling_schedule == self.available_cooling_schedules.LOG:
+            return T0 / (1 + np.log(1 + k))
+            
+        # Kirkpatrick, Gelatt and Vecchi (1983)
+        if cooling_schedule == self.available_cooling_schedules.EXP:
+            alpha = 0.85 
+            return T0 * alpha ^ (k)
+        if cooling_schedule == self.available_cooling_schedules.LINMULT:
+            alpha = 1
+            return T0 / (1 + alpha * k)
+        if cooling_schedule == self.available_cooling_schedules.QUADMULT:
+            alpha = 1
+            return T0 / (1 + alpha * np.square(k))
+            
+        # Additive monotonic cooling B. T. Luke (2005) 
+        if cooling_schedule == self.available_cooling_schedules.LINADD:
+            return temperature_end + (T0 - temperature) * ((steps_total - k) / steps_total)
+        if cooling_schedule == self.available_cooling_schedules.QUADADD:
+            return temperature_end + (T0 - temperature) * np.square((steps_total - k) / steps_total)
+        if cooling_schedule == self.available_cooling_schedules.EXPADD:            
+            return temperature_end + (T0 - temperature) * (1 / (1 + np.exp(2 * np.log(T0 - temperature_end) / steps_total)(k - steps_total / 2)))
+        if cooling_schedule == self.available_cooling_schedules.TRIGADD:
+            return temperature_end + (T0 - temperature_end) * (1 + np.cos(k * 3.1415 / steps_total)) / 2
 
     def post_process(self, traj, fitnesses_results):
         """
@@ -111,7 +158,10 @@ class SimulatedAnnealingOptimizer(Optimizer):
             traj.noisy_step, traj.temp_decay, traj.n_iteration, traj.stop_criterion
         old_eval_pop = self.eval_pop.copy()
         self.eval_pop.clear()
-        self.T *= temp_decay
+        cooling_schedule = self.available_cooling_schedules.QUADMULT
+        temperature_end = 0
+        temperature = self.T
+        self.T = self.cooling(temperature, cooling_schedule, temp_decay, temperature_end,0)
 
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
         # NOTE: Currently works with only one individual at a time.
@@ -167,6 +217,15 @@ class SimulatedAnnealingOptimizer(Optimizer):
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 
+    # get tthe transistion probability between two simulated annealing systems with
+    # tempereatures T and energies E
+    #def metropolis_hasting(E1,E2,T1,T2):
+    #       p = np.exp(-np.abs((E1-E2)*(1/(k*T1)-1/(k*T2))))
+    #        if p < 1:
+    #            return p
+    #        
+    #        return 1
+            
     def end(self):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
