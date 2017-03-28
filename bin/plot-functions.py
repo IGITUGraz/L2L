@@ -5,7 +5,7 @@ import logging.config
 
 import yaml
 
-from ltl.optimizees.functiongenerator.function_generator import FunctionGenerator, GaussianParameters, PermutationParameters, \
+from ltl.optimizees.functions.function_generator import FunctionGenerator, GaussianParameters, PermutationParameters, \
     EasomParameters, LangermannParameters, MichalewiczParameters, ShekelParameters, RastriginParameters, \
     RosenbrockParameters, ChasmParameters
 from ltl.paths import Paths
