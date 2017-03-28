@@ -291,7 +291,7 @@ class Permutation(Function):
 
 GaussianParameters = namedtuple('GaussianParameters', ['sigma', 'mean'])
 GaussianParameters.__doc__ = """
-:param sigma: variance matrix
+:param sigma: covariance matrix
 :param mean: list containing coordinates of the peak (mean, median, mode)
 """
 
@@ -330,7 +330,7 @@ RastriginParameters = namedtuple('RastriginParameters', [])
 class Rastrigin(Function):
     """
     Rastrigin function is a multimodal function with a large number of local minima.
-
+    reference: https://www.sfu.ca/%7Essurjano/rastr.html
 
     :param dims: dimensionality of the function
     """
@@ -348,7 +348,7 @@ RosenbrockParameters = namedtuple('RosenbrockParameters', [])
 
 class Rosenbrock(Function):
     """
-    Rosenbrock function is a unimodal function.
+    Rosenbrock function is a unimodal valley-shaped function.
     reference: https://www.sfu.ca/~ssurjano/rosen.html
 
     :param dims: dimensionality of the function
