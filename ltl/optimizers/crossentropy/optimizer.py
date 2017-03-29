@@ -196,19 +196,29 @@ class CrossEntropyOptimizer(Optimizer):
         #**************************************************************************************************************
         # These entries correspond to the generation that has been simulated prior to this post-processing run
 
-        traj.results.generation_params.f_add_result(generation_name + '.g', self.g,
-                                                    comment='The index of the evaluated generation')
-        traj.results.generation_params.f_add_result(generation_name + '.gamma', self.gamma,
-                                                    comment='The fitness threshold inferred from the evaluated '
-                                                            'generation (This is used in sampling the next generation')
-        traj.results.generation_params.f_add_result(generation_name + '.T', self.T,
-                                                    comment='Temperature used to select non-elite elements among the'
-                                                            'individuals of the evaluated generation')
-        traj.results.generation_params.f_add_result(generation_name + '.best_fitness_in_run', self.best_fitness_in_run,
-                                                    comment='The highest fitness among the individuals in the '
-                                                            'evaluated generation')
-        traj.results.generation_params.f_add_result(generation_name + '.pop_size', self.pop_size,
-                                                    comment='Population size')
+        # Documentation of generation parameters
+        # 
+        # generation          - The index of the evaluated generation
+        # gamma               - The fitness threshold inferred from the evaluated  generation
+        #                       (This is used in sampling the next generation)
+        # T                   - Temperature used to select non-elite elements among the individuals
+        #                       of the evaluated generation
+        # best_fitness_in_run - The highest fitness among the individuals in the
+        #                       evaluated generation
+        # pop_size            - Population size
+        generation_result_dict = {
+            'generation': self.g,
+            'gamma': self.gamma,
+            'T': self.T,
+            'best_fitness_in_run': self.best_fitness_in_run,
+            'pop_size': self.pop_size
+        }
+        traj.results.generation_params.f_add_result_group(generation_name)
+        traj.results.generation_params.f_add_result(generation_name + '.algorithm_params',
+            generation_result_dict,
+            comment="These are the parameters that correspond to the algorithm, look at the source code"
+                    " for `CrossEntropyOptimizer::post_process()` for comments documenting these"
+                    " parameters")
 
         # new distribution fit
         individuals_to_be_fitted = elite_individuals
@@ -225,8 +235,10 @@ class CrossEntropyOptimizer(Optimizer):
         self.distribution_results = self.current_distribution.fit(individuals_to_be_fitted, smoothing)
 
         #Add the results of the distribution fitting to the trajectory
-        for parameter_key, parameter_value in self.distribution_results.items():
-            traj.results.generation_params.f_add_result(generation_name + '.' + parameter_key, parameter_value)
+        traj.results.generation_params.f_add_result(generation_name + '.distribution_params',
+            self.distribution_results,
+            comment="These are the parameters of the distribution inferred from the currently evaluated"
+                    " generation")
 
         #**************************************************************************************************************
         # Create the next generation by sampling the inferred distribution
