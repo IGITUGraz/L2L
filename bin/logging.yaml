@@ -24,11 +24,31 @@ loggers:
     level: DEBUG
     handlers: [file]
     propagate: no
+  ltl-ce:
+    level: DEBUG
+    handlers: [file]
+    propagate: no
+  ltl-face:
+    level: DEBUG
+    handlers: [file]
+    propagate: no
+  ltl-noisy-ce:
+    level: DEBUG
+    handlers: [file]
+    propagate: no
+  ltl-distribution:
+    level: DEBUG
+    handlers: [file]
+    propagate: no
   ltl-lsm-ga:
     level: INFO
     handlers: [file]
     propagate: no
   ltl-lsm-sa:
+    level: INFO
+    handlers: [file]
+    propagate: no
+  ltl-fun-ce:
     level: INFO
     handlers: [file]
     propagate: no
