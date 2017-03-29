@@ -91,17 +91,17 @@ class CrossEntropyOptimizer(Optimizer):
         
         # The following parameters are recorded
         traj.f_add_parameter('pop_size', parameters.pop_size,
-                                    comment='Number of minimal individuals simulated in each run')
+                             comment='Number of minimal individuals simulated in each run')
         traj.f_add_parameter('rho', parameters.rho,
-                                    comment='Fraction of individuals considered elite in each generation')
+                             comment='Fraction of individuals considered elite in each generation')
         traj.f_add_parameter('n_iteration', parameters.n_iteration,
-                                    comment='Number of iterations to run')
+                             comment='Number of iterations to run')
         traj.f_add_parameter('stop_criterion', parameters.stop_criterion,
-                                    comment='Stop if best individual reaches this fitness')
+                             comment='Stop if best individual reaches this fitness')
         traj.f_add_parameter('smoothing', parameters.smoothing,
-                                    comment='Weight of old parameters in smoothing')
+                             comment='Weight of old parameters in smoothing')
         traj.f_add_parameter('temp_decay', parameters.temp_decay,
-                                    comment='Decay factor for temperature')        
+                             comment='Decay factor for temperature')        
 
         temp_indiv, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(),
                                                                        get_dict_spec=True)
@@ -214,8 +214,8 @@ class CrossEntropyOptimizer(Optimizer):
             'pop_size': self.pop_size
         }
         traj.results.generation_params.f_add_result_group(generation_name)
-        traj.results.generation_params.f_add_result(generation_name + '.algorithm_params',
-            generation_result_dict,
+        traj.results.generation_params.f_add_result(
+            generation_name + '.algorithm_params', generation_result_dict,
             comment="These are the parameters that correspond to the algorithm, look at the source code"
                     " for `CrossEntropyOptimizer::post_process()` for comments documenting these"
                     " parameters")
@@ -235,8 +235,8 @@ class CrossEntropyOptimizer(Optimizer):
         self.distribution_results = self.current_distribution.fit(individuals_to_be_fitted, smoothing)
 
         #Add the results of the distribution fitting to the trajectory
-        traj.results.generation_params.f_add_result(generation_name + '.distribution_params',
-            self.distribution_results,
+        traj.results.generation_params.f_add_result(
+            generation_name + '.distribution_params', self.distribution_results,
             comment="These are the parameters of the distribution inferred from the currently evaluated"
                     " generation")
 
