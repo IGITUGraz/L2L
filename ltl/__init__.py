@@ -1,8 +1,10 @@
+import functools
+
+import time
 from collections import OrderedDict
+from contextlib import contextmanager
 from warnings import warn
 from enum import Enum
-
-import functools
 from collections import Iterable
 
 __author__ = 'anand'
@@ -14,10 +16,12 @@ def static_vars(**kwargs):
     :param kwargs:
     :return:
     """
+
     def decorate(func):
         for k in kwargs:
             setattr(func, k, kwargs[k])
         return func
+
     return decorate
 
 
@@ -62,7 +66,7 @@ class sdictm(object):
         return self.__getattr__(key)
 
     def __set__(self, key, value):
-            self._data[key] = value
+        self._data[key] = value
 
     def __setitem__(self, key, value):
         self.__set__(key, value)
@@ -152,6 +156,7 @@ class sdict(sdictm):
     """
     Immutable version of :class:`~ltl.sdictm`
     """
+
     def __set__(self, attr, value):
         raise RuntimeError("Immutable dictionary")
 
@@ -245,7 +250,7 @@ def list_to_dict(input_list, dict_spec):
         cursor += value_len
     assert cursor == len(input_list), "Incorrect Parameter List length, Somethings not right"
     return return_dict
-    
+
 
 def get_grouped_dict(dict_iter):
     """
@@ -282,6 +287,7 @@ def static_var(varname, value):
     def decorate(func):
         setattr(func, varname, value)
         return func
+
     return decorate
 
 
@@ -293,4 +299,21 @@ def get(obj, key, default_value):
 
 
 class DummyTrajectory:
-    pass
+    def __init__(self):
+        self.individual = lambda: None
+
+        def f_add_parameter(*args, **kwargs):
+            pass
+
+        self.individual.f_add_parameter = f_add_parameter
+
+    def f_add_parameter_group(self, *args, **kwargs):
+        pass
+
+
+@contextmanager
+def timed(logger):
+    start = time.time()
+    yield
+    end = time.time()
+    logger.info("Run took {:.2f} seconds".format(end - start))
