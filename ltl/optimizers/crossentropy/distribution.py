@@ -61,8 +61,8 @@ class Gaussian(Distribution):
         self.mean = smooth_update * self.mean + (1 - smooth_update) * mean
         self.cov = smooth_update * self.cov + (1 - smooth_update) * cov_mat
 
-        logger.info('Gaussian center\n{}'.format(self.mean))
-        logger.info('Gaussian cov\n{}'.format(self.cov))
+        logger.debug('Gaussian center\n%s', self.mean)
+        logger.debug('Gaussian cov\n%s', self.cov)
         
         return {'mean': self.mean, 'covariance_matrix': self.cov}
         
@@ -119,7 +119,7 @@ class NoisyGaussian(Gaussian):
         diagonalized_covariance = np.diag(eigenvalues + self.noise)
         self.noisy_cov = eigenvectors.dot(diagonalized_covariance.dot(eigenvectors.T))
 
-        logger.info('Noisy cov\n{}'.format(self.noisy_cov))
+        logger.debug('Noisy cov\n%s', self.noisy_cov)
         return {'mean': self.mean, 'covariance_matrix': self.noisy_cov}
 
     def sample(self, n_individuals):

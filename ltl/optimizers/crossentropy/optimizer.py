@@ -173,8 +173,6 @@ class CrossEntropyOptimizer(Optimizer):
         # Performs descending arg-sort of weighted fitness
         fitness_sorting_indices = list(reversed(np.argsort(weighted_fitness_list)))
 
-        generation_name = 'generation_{}'.format(self.g)
-
         # Sorting the data according to fitness
         sorted_population = self.eval_pop_asarray[fitness_sorting_indices]
         sorted_fitess = np.asarray(weighted_fitness_list)[fitness_sorting_indices]
@@ -186,17 +184,17 @@ class CrossEntropyOptimizer(Optimizer):
         self.best_fitness_in_run = sorted_fitess[0]
         self.gamma = sorted_fitess[n_elite - 1]
 
-        logger.info("-- End of generation {} --".format(self.g))
-        logger.info("  Evaluated %i individuals" % len(fitnesses_results))
-        logger.info('  Best Fitness: {}'.format(self.best_fitness_in_run))
-        logger.debug('  Calculated gamma: {}'.format(self.gamma))
+        logger.info("-- End of generation %d --", self.g)
+        logger.info("  Evaluated %d individuals", len(fitnesses_results))
+        logger.info('  Best Fitness: %.4f', self.best_fitness_in_run)
+        logger.debug('  Calculated gamma: %.4f', self.gamma)
 
         #**************************************************************************************************************
         # Storing Generation Parameters / Results in the trajectory
         #**************************************************************************************************************
         # These entries correspond to the generation that has been simulated prior to this post-processing run
 
-        # Documentation of generation parameters
+        # Documentation of algorithm parameters for the current generation
         # 
         # generation          - The index of the evaluated generation
         # gamma               - The fitness threshold inferred from the evaluated  generation
@@ -213,6 +211,8 @@ class CrossEntropyOptimizer(Optimizer):
             'best_fitness_in_run': self.best_fitness_in_run,
             'pop_size': self.pop_size
         }
+
+        generation_name = 'generation_{}'.format(self.g)
         traj.results.generation_params.f_add_result_group(generation_name)
         traj.results.generation_params.f_add_result(
             generation_name + '.algorithm_params', generation_result_dict,
@@ -265,4 +265,4 @@ class CrossEntropyOptimizer(Optimizer):
         logger.info("-- End of (successful) CE optimization --")
         logger.info("-- Final distribution parameters --")
         for parameter_key, parameter_value in self.distribution_results.items():
-            logger.info('  {}: {}'.format(parameter_key, parameter_value))
+            logger.info('  %s: %s', parameter_key, parameter_value)

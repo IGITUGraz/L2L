@@ -200,10 +200,10 @@ class FACEOptimizer(Optimizer):
         previous_gamma = self.gamma
         self.gamma = sorted_fitess[n_elite - 1]
 
-        logger.info("-- End of generation {} --".format(self.g))
-        logger.info("  Evaluated %i individuals" % len(fitnesses_results))
-        logger.info('  Best Fitness: {}'.format(self.best_fitness_in_run))
-        logger.debug('  Calculated gamma: {}'.format(self.gamma))
+        logger.info("-- End of generation %d --", self.g)
+        logger.info("  Evaluated %d individuals", len(fitnesses_results))
+        logger.info('  Best Fitness: %.4f', self.best_fitness_in_run)
+        logger.debug('  Calculated gamma: %.4f', self.gamma)
 
         #**************************************************************************************************************
         # Storing Generation Parameters / Results in the trajectory
@@ -247,7 +247,7 @@ class FACEOptimizer(Optimizer):
             self.distribution_results = self.current_distribution.fit(individuals_to_be_fitted, smoothing)
         elif self.pop_size + n_expand <= max_pop_size:
             # Increase pop size by one, resample, FACE part
-            logger.info('  FACE increase population size by {}'.format(n_expand))
+            logger.info('  FACE increase population size by %d', n_expand)
             self.pop_size += n_expand
         else:
             # Stop algorithm
@@ -281,4 +281,4 @@ class FACEOptimizer(Optimizer):
         logger.info("-- End of (successful) FACE optimization --")
         logger.info("-- Final distribution parameters --")
         for parameter_key, parameter_value in self.distribution_results.items():
-            logger.info('  {}: {}'.format(parameter_key, parameter_value))
+            logger.info('  %s: %s', parameter_key, parameter_value)
