@@ -9,9 +9,7 @@ class FunctionGenerator:
     Given the list of function descriptions in the constructor, the cost_function represents the sum of all those
     functions.
 
-    :param fg_params: List of parameters. Each parameter is a dictionary that describes a single test function.
-                       Each dictionary contains two keys ("name" and "params"), first expecting the name of the
-                       function, and the second the list of function specific parameters.
+    :param fg_params: List of function parameters. Each parameter is a namedtuple that describes a single test function.
     :param dims: Dimensionality of the functions.
     :param bound: Two element list containing minimum and maximum value of function input. If None, the bound is
                   computed from default bounds of given functions.
@@ -20,22 +18,24 @@ class FunctionGenerator:
     :param sigma: Scalar indicating the standard deviation of the Gaussian noise.
     """
     def __init__(self, fg_params, dims=2, bound=None, noise=False, mu=0., sigma=0.01):
-        cost_functions = {}
         self.dims = dims
         self.noise = noise
         self.mu = mu
         self.sigma = sigma
-        name_list = ['GaussianParameters', 'PermutationParameters', 'EasomParameters', 'LangermannParameters',
-                     'MichalewiczParameters', 'ShekelParameters', 'RastriginParameters', 'RosenbrockParameters',
-                     'AckleyParameters', 'ChasmParameters']
-        function_list = [Gaussian, Permutation, Easom, Langermann, Michalewicz, Shekel, Rastrigin, Rosenbrock, Ackley,
-                         Chasm]
-
-        # Create a dictionary which associate the function and state bound to a cost name
-        for n, f in zip(name_list, function_list):
-            cost_functions[n] = f
+        cost_functions = dict(GaussianParameters=Gaussian,
+                              PermutationParameters=Permutation,
+                              EasomParameters=Easom,
+                              LangermannParameters=Langermann,
+                              MichalewiczParameters=Michalewicz,
+                              ShekelParameters=Shekel,
+                              RastriginParameters=Rastrigin,
+                              RosenbrockParameters=Rosenbrock,
+                              AckleyParameters=Ackley,
+                              ChasmParameters=Chasm)
 
         self.gen_functions = []
+        # The class name of the parameter named tuple indexes the actual function class,
+        # which is initialized using the given param and dims
         for param in fg_params:
             function_class = cost_functions[param.__class__.__name__](param, dims)
             self.gen_functions.append(function_class)
@@ -58,35 +58,6 @@ class FunctionGenerator:
             res += np.random.normal(self.mu, self.sigma)
 
         return res
-
-    def plot(self):
-        from mpl_toolkits.mplot3d import Axes3D
-        import matplotlib.pyplot as plt
-        from matplotlib import cm
-        from matplotlib.ticker import LinearLocator, FormatStrFormatter
-
-        fig = plt.figure()
-        ax = fig.gca(projection=Axes3D.name)
-
-        # Make data.
-        X = np.arange(self.bound[0], self.bound[1], 0.05)
-        Y = np.arange(self.bound[0], self.bound[1], 0.05)
-        X, Y = np.meshgrid(X, Y)
-        Z = [self.cost_function([x, y]) for x, y in zip(X.ravel(), Y.ravel())]
-        Z = np.array(Z).reshape(X.shape)
-
-        # Plot the surface.
-        surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm, linewidth=0, antialiased=False)
-
-        # Customize the z axis.
-        # ax.set_zlim(-1.01, 1.01)
-        ax.zaxis.set_major_locator(LinearLocator(10))
-        ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-
-        # Add a color bar which maps values to colors.
-        fig.colorbar(surf, shrink=0.5, aspect=5)
-
-        plt.show()
 
 
 class Function(ABC):
