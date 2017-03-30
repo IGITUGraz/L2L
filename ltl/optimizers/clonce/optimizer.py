@@ -1,8 +1,6 @@
 import logging
 from collections import namedtuple
-import random
 import numpy as np
-from ltl.optimizers.clonce.distribution import Gaussian
 from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list, list_to_dict
 logger = logging.getLogger("ltl-ce")
@@ -10,7 +8,7 @@ logger = logging.getLogger("ltl-ce")
 ClonceParameters = namedtuple('CloneceParameters',
                                     ['pop_size', 'rho', 'smoothing', 'burn_in', 'distribution', 
                                      'parameterDistribution', 'stop_criterion', 'n_iteration'])
-ClonceParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0.1, None, None, 0.0, 30)
+ClonceParameters.__new__.__defaults__ = (30, 0.2, 0, 1, None, None, 0.0, 30)
 
 ClonceParameters.__doc__ = """
 :param pop_size: Minimal number of individuals per simulation.
@@ -22,10 +20,11 @@ ClonceParameters.__doc__ = """
     
     new_params = smoothing*old_params + (1-smoothing)*optimal_new_params
 
-:param burn_in: 
+:param burn_in: This is the number how many burn in steps should be performed 
 :param distribution: Distribution object to use. Has to implement a fit and sample function.
 :param parameterDistribution: Distribution object to use for parameter distribution. Has to implement a fit and sample function.
-:param stop_criterion: (Optional) Stop if this fitness is reached.
+:param stop_criterion: Stop if this fitness is reached.
+:param n_iteration: This is the maximum amount of iterations to perform
 """
 
 
@@ -38,13 +37,12 @@ class ClonCEOptimizer(Optimizer):
       - Sample individuals from distribution
       - evaluate individuals and get fitness
       - pick rho * pop_size number of elite individuals
-      - Out of the remaining non-elite individuals, select them using a simulated-annealing style
-        selection based on the difference between their fitness and the `1-rho` quantile (*gamma*)
-        fitness, and the current temperature
       - Fit the distribution family to the new elite individuals by minimizing cross entropy.
         The distribution fitting is smoothed to prevent premature convergence to local minima.
         A weight equal to the `smoothing` parameter is assigned to the previous parameters when
         smoothing.
+      - Perform cloning step on the generated population
+      - Perform Gibbs sampling for each parameter   
 
     return final distribution parameters.
     (The final distribution parameters contain information regarding the location of the maxima)
@@ -170,8 +168,6 @@ class ClonCEOptimizer(Optimizer):
         # Performs descending arg-sort of weighted fitness
         fitness_sorting_indices = list(reversed(np.argsort(weighted_fitness_list)))
 
-        generation_name = 'generation_{}'.format(self.g)
-
         # Sorting the data according to fitness
         sorted_population = self.eval_pop_asarray[fitness_sorting_indices]
         sorted_fitess = np.asarray(weighted_fitness_list)[fitness_sorting_indices]
@@ -186,9 +182,7 @@ class ClonCEOptimizer(Optimizer):
         
         #Check for stopping criterion
         if self.g > n_iteration or self.best_fitness_in_run > stop_criterion:
-            return
-        
-        print('Gamma: ' + str(self.gamma) + ' n_elite: ' + str(n_elite))      
+            return  
 
         logger.info("-- End of generation {} --".format(self.g))
         logger.info("  Evaluated %i individuals" % len(fitnesses_results))
@@ -199,17 +193,29 @@ class ClonCEOptimizer(Optimizer):
         # Storing Generation Parameters / Results in the trajectory
         #**************************************************************************************************************
         # These entries correspond to the generation that has been simulated prior to this post-processing run
+        
+        # Documentation of algorithm parameters for the current generation
+        # 
+        # generation          - The index of the evaluated generation
+        # gamma               - The fitness threshold inferred from the evaluated  generation
+        #                       (This is used in sampling the next generation)
+        # best_fitness_in_run - The highest fitness among the individuals in the
+        #                       evaluated generation
+        # pop_size            - Population size
+        generation_result_dict = {
+            'generation': self.g,
+            'gamma': self.gamma,
+            'best_fitness_in_run': self.best_fitness_in_run,
+            'pop_size': self.pop_size
+        }
 
-        traj.results.generation_params.f_add_result(generation_name + '.g', self.g,
-                                                    comment='The index of the evaluated generation')
-        traj.results.generation_params.f_add_result(generation_name + '.gamma', self.gamma,
-                                                    comment='The fitness threshold inferred from the evaluated '
-                                                            'generation (This is used in sampling the next generation')
-        traj.results.generation_params.f_add_result(generation_name + '.best_fitness_in_run', self.best_fitness_in_run,
-                                                    comment='The highest fitness among the individuals in the '
-                                                            'evaluated generation')
-        traj.results.generation_params.f_add_result(generation_name + '.pop_size', self.pop_size,
-                                                    comment='Population size')
+        generation_name = 'generation_{}'.format(self.g)
+        traj.results.generation_params.f_add_result_group(generation_name)
+        traj.results.generation_params.f_add_result(
+            generation_name + '.algorithm_params', generation_result_dict,
+            comment="These are the parameters that correspond to the algorithm, look at the source code"
+                    " for `CrossEntropyOptimizer::post_process()` for comments documenting these"
+                    " parameters")
 
         # new distribution fit
         individuals_to_be_fitted = elite_individuals
@@ -225,8 +231,6 @@ class ClonCEOptimizer(Optimizer):
         # Create the next generation by sampling the inferred distribution
         #**************************************************************************************************************
         # Note that this is only done in case the evaluated run is not the last run
-        fitnesses_results.clear()
-        self.eval_pop.clear()
 
         #Sample from the constructed distribution
         self.eval_pop_asarray = self.current_distribution.sample(self.pop_size)
@@ -234,6 +238,11 @@ class ClonCEOptimizer(Optimizer):
         #Cloning
         #Perform the cloning step
         cloning_parameter = int(pop_size / (burn_in * n_elite) - 1)
+        
+        print('Used: ' + str(len(fitnesses_results)) + 'individuals with ' + str(cloning_parameter) + ' best: ' + str(self.best_fitness_in_run))
+        
+        fitnesses_results.clear()
+        self.eval_pop.clear()
         
         #Generate the new cloned population
         cloned_population = self.eval_pop_asarray.copy()
@@ -243,7 +252,7 @@ class ClonCEOptimizer(Optimizer):
          
         sampled_population = cloned_population.copy()
         
-        #Apply gibbs sampling for the entire cloned population
+        #Apply Gibbs sampling by fitting a distribution over the parameters for the entire cloned population
         for i in range(len(cloned_population)):
             condSamples = cloned_population[:i]
             condSamples = np.concatenate((condSamples, cloned_population[i+1:]), axis=0)
@@ -252,6 +261,9 @@ class ClonCEOptimizer(Optimizer):
                 cloned_population[i] = self.parameterDistribution.sample(1)
 
         sampled_population = self.parameterDistribution.sample(len(sampled_population))
+        self.current_distribution.fit(cloned_population, smoothing)
+        sampled_population = self.current_distribution.sample(len(cloned_population))
+        
                 
         self.eval_pop = [list_to_dict(ind_asarray, self.optimizee_individual_dict_spec)
                          for ind_asarray in sampled_population]

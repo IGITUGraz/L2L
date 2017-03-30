@@ -55,8 +55,8 @@ class Gaussian(Distribution):
         self.mean = smooth_update * self.mean + (1 - smooth_update) * mean
         self.cov = smooth_update * self.cov + (1 - smooth_update) * cov_mat
 
-        logger.info('Gaussian center\n{}'.format(self.mean))
-        logger.info('Gaussian cov\n{}'.format(self.cov))
+        logger.debug('Gaussian center\n{}'.format(self.mean))
+        logger.debug('Gaussian cov\n{}'.format(self.cov))
         
         return {'mean': self.mean, 'covariance_matrix': self.cov}
         
