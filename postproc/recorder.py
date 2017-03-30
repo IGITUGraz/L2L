@@ -19,7 +19,8 @@ class Recorder:
             raise Exception("Not a git repository (or any of the parent directories): .git")
         if repo.is_dirty():
             raise Exception('Commit your changes first.(use "git add" and then "git commit")')
-
+        self.git_commit_id = repo.active_branch.commit
+        print(self.git_commit_id)
 
     def end(self):
         pass
