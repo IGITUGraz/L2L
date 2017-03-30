@@ -53,5 +53,8 @@ _build/
 # Style Report Directory
 /style-reports
 
+# Package egg-info directory
+/learntolearn.egg-info
+
 # unison temp files
 **/.unison*
