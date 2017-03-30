@@ -50,5 +50,8 @@ _build/
 
 **/.nfs*
 
+# Style Report Directory
+/style-reports
+
 # unison temp files
 **/.unison*
