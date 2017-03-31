@@ -78,7 +78,6 @@ def main():
 
     recorder = Recorder(optimizee_name, None, optimizer_name, parameters)
     recorder.start()
-    exit(1)
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
