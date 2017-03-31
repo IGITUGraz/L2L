@@ -22,11 +22,8 @@ logger = logging.getLogger('ltl-lsm-ga')
 
 
 def main():
-    recorder = Recorder()
-    recorder.start()
-    exit(1)
     name = 'LTL-RECFUN-SA'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = "/home/sinisa/Uni/Project_CI/results"  # CHANGE THIS to the directory where your simulation results are contained
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
            " Set it manually in the code (by setting the variable 'root_dir_path')" \
@@ -63,10 +60,12 @@ def main():
     traj = env.trajectory
 
     # NOTE: Innerloop simulator
-    optimizee = FunctionOptimizee(traj, 'rastrigin')
+    optimizee_name = "rastrigin"
+    optimizee = FunctionOptimizee(traj, optimizee_name)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
+    optimizer_name = "SimulatedAnnealing"
     parameters = SimulatedAnnealingParameters(noisy_step=.3, temp_decay=.998, n_iteration=1000, stop_criterion=np.Inf,
                                               seed=np.random.randint(1e5))
     optimizer = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
@@ -77,6 +76,9 @@ def main():
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
 
+    recorder = Recorder(optimizee_name, None, optimizer_name, parameters)
+    recorder.start()
+    exit(1)
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
