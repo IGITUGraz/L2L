@@ -7,7 +7,7 @@ from pypet import pypetconstants
 from ltl.optimizees.functions.optimizee import FunctionOptimizee
 from ltl.optimizers.clonce.optimizer import ClonCEOptimizer, ClonceParameters
 from ltl.paths import Paths
-from ltl.optimizers.clonce.distribution import Gaussian
+from ltl.optimizers.clonce.distribution import Gaussian, NoisyGaussian
 
 warnings.filterwarnings("ignore")
 
@@ -16,7 +16,8 @@ logger = logging.getLogger('ltl-clonce')
 
 def main():
     name = 'LTL-CLONCE'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = 'results'  # CHANGE THIS to the directory where your simulation results are contained
+    os.chdir(r'C:\Users\BohnstiT\Desktop\Eclipse_work\LTL\src')
 
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
@@ -54,11 +55,11 @@ def main():
     traj = env.trajectory
 
     # NOTE: Innerloop simulator
-    optimizee = FunctionOptimizee(traj, 'rastrigin')
+    optimizee = FunctionOptimizee(traj, 'chasm')
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = ClonceParameters(pop_size=50, rho=0.2, smoothing=0.0, burn_in=1, distribution=Gaussian(), parameterDistribution=Gaussian())
+    parameters = ClonceParameters(pop_size=50, rho=0.3, smoothing=0.0, burn_in=2, distribution=Gaussian(), parameterDistribution=NoisyGaussian())
     optimizer = ClonCEOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                             optimizee_fitness_weights=(-0.1,),
                                             parameters=parameters,
