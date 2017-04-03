@@ -15,6 +15,7 @@ from ltl.paths import Paths
 from ltl.optimizees.optimizee import Optimizee
 from ltl.optimizers.optimizer import Optimizer
 from postproc.recorder import Recorder
+from collections import namedtuple
 
 warnings.filterwarnings("ignore")
 
@@ -41,6 +42,7 @@ def main():
     print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
 
     traj_file = os.path.join(paths.output_dir_path, 'data.h5')
+    print(traj_file)
 
     # Create an environment that handles running our simulation
     # This initializes a PyPet environment
@@ -66,7 +68,7 @@ def main():
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
     optimizer_name = "SimulatedAnnealing"
-    parameters = SimulatedAnnealingParameters(noisy_step=.3, temp_decay=.998, n_iteration=1000, stop_criterion=np.Inf,
+    parameters = SimulatedAnnealingParameters(noisy_step=.3, temp_decay=.998, n_iteration=10, stop_criterion=np.Inf,
                                               seed=np.random.randint(1e5))
     optimizer = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                                   optimizee_fitness_weights=(-0.1,),
@@ -76,11 +78,15 @@ def main():
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
 
-    recorder = Recorder(optimizee_name, None, optimizer_name, parameters)
+    optimizee_params = None
+    recorder = Recorder(description='description', environment=env,
+                        optimizee_name=optimizee_name, optimizee_parameters=optimizee_params,
+                        optimizer_name=optimizer_name, optimizer_parameters=parameters)
+    # recorder.parse_md()
+    # exit()
     recorder.start()
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
-
     # NOTE: Innerloop optimizee end
     optimizee.end()
     # NOTE: Outerloop optimizer end
@@ -88,6 +94,7 @@ def main():
 
     # Finally disable logging and close all log-files
     env.disable_logging()
+    recorder.end()
 
 
 if __name__ == '__main__':
