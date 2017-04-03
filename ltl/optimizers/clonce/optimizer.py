@@ -249,24 +249,24 @@ class ClonCEOptimizer(Optimizer):
         for i in range(len(self.eval_pop_asarray)):
             for j in range(cloning_parameter):
                 cloned_population = np.concatenate((cloned_population, [self.eval_pop_asarray[i]]), axis=0)
-         
+        
+#         np.random.shuffle(cloned_population)
         sampled_population = cloned_population.copy()
         
         #Apply Gibbs sampling by fitting a distribution over the parameters for the entire cloned population
         for i in range(len(cloned_population)):
-            condSamples = cloned_population[:i]
-            condSamples = np.concatenate((condSamples, cloned_population[i+1:]), axis=0)
-            self.parameterDistribution.fit(condSamples)
             for j in range(burn_in):
+                condSamples = cloned_population[:i]
+                condSamples = np.concatenate((condSamples, sampled_population[i+1:]), axis=0)
+                self.parameterDistribution.fit(condSamples)
+#                 for j in range(burn_in):
                 cloned_population[i] = self.parameterDistribution.sample(1)
 
         sampled_population = self.parameterDistribution.sample(len(sampled_population))
-        self.current_distribution.fit(cloned_population, smoothing)
-        sampled_population = self.current_distribution.sample(len(cloned_population))
         
                 
         self.eval_pop = [list_to_dict(ind_asarray, self.optimizee_individual_dict_spec)
-                         for ind_asarray in sampled_population]
+                         for ind_asarray in cloned_population]
         self.eval_pop_asarray = np.array([dict_to_list(x) for x in self.eval_pop])
         self.g += 1  # Update generation counter
         self._expand_trajectory(traj)
