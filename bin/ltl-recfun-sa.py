@@ -15,7 +15,6 @@ from ltl.paths import Paths
 from ltl.optimizees.optimizee import Optimizee
 from ltl.optimizers.optimizer import Optimizer
 from postproc.recorder import Recorder
-from collections import namedtuple
 
 warnings.filterwarnings("ignore")
 
