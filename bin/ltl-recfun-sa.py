@@ -78,7 +78,7 @@ def main():
     env.add_postprocessing(optimizer.post_process)
 
     optimizee_params = None
-    recorder = Recorder(description='description', environment=env,
+    recorder = Recorder(environment=env,
                         optimizee_name=optimizee_name, optimizee_parameters=optimizee_params,
                         optimizer_name=optimizer_name, optimizer_parameters=parameters)
     recorder.start()

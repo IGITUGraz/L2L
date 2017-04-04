@@ -28,11 +28,10 @@ class Recorder:
     :param optimizer_parameters:
       Optimizer parameters as named tuple.
     """
-    def __init__(self, description,
+    def __init__(self,
                  environment, optimizee_name, optimizee_parameters, optimizer_name, optimizer_parameters):
         self.record_flag, self.username, self.description = self.__process_args__()
         self.environment = environment
-        self.description = description
         self.optimizee_name = optimizee_name
         if optimizee_parameters is None:
             self.optimizee_parameters = {}
