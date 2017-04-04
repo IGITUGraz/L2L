@@ -49,8 +49,6 @@ class Recorder:
         """
         Starts the recording session by checking that repository is not dirty.
         """
-        if self.optimizee_parameters is not dict:
-            raise Exception("Optimizee_parameters cannot")
         repo = Repo()
         if repo.bare:
             raise Exception("Not a git repository (or any of the parent directories): .git")
