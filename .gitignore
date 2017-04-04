@@ -54,7 +54,10 @@ _build/
 /style-reports
 
 # Package egg-info directory
-/learntolearn.egg-info
+/Learning_to_Learn.egg-info
 
 # unison temp files
 **/.unison*
+
+# Mac OS X
+**/.DS_Store
