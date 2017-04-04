@@ -1,15 +1,13 @@
 .. image:: https://circleci.com/gh/IGITUGraz/LTL.svg?style=svg&circle-token=227d26445f67e74ecc1c8904688859b1c49c292f
     :target: https://circleci.com/gh/IGITUGraz/LTL
+    
+If you are developing a new Optimizee or want to try out a new Optimizee with the Optimizers in the LTL package, install LTL as a python package. See section `To Install The LTL Package`_ for more details (this automatically installs all requirements). See the `wiki <https://github.com/IGITUGraz/LTL/wiki/Writing-new-Optimizees>`_ for more details.
+
+If you want to add a new Optimizer or want to modify the function Optimizees in the LTL package, install the 
+requirements according to `Installing Requirements`_.
+
+In both cases, you should build the documentation according to`To build documentation`_ and read it.
    
-Installing Requirements
------------------------
-
-If one wishes to install LTL as a python package, then one may ignore this section and continue from the section `To Install The LTL Package`_. If you however, wish to use it as-is, without installing, then the relevant requirements must be installed. This can be done by running the following from the root directory of the repository:
-
-    pip3 install --user -r requirements.text
-
-Each optimizees and optimizers may have their own dependencies specified in the requirements.txt file within their
-respective package.
 
 To Install The LTL Package
 --------------------------
@@ -37,8 +35,18 @@ which contains all the relevant modules relevant for using the ltl package.
 This should also install the `sphinx` package which should now enable you to build
 the documentation as specified below.
 
-To build documentation:
+Installing Requirements
 -----------------------
+
+If you wish to install LTL as a python package, then you may ignore this section and continue from the section `To Install The LTL Package`_. If you however, wish to use it as-is, without installing, then the relevant requirements must be installed. This can be done by running the following from the root directory of the repository:
+
+    pip3 install --user -r requirements.text
+
+Each optimizees and optimizers may have their own dependencies specified in the requirements.txt file within their
+respective package.
+
+To build documentation
+----------------------
 Run the following command from the `doc` directory
 
     make html 
