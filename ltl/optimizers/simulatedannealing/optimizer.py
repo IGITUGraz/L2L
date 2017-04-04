@@ -176,5 +176,9 @@ class SimulatedAnnealingOptimizer(Optimizer):
         best_last_indiv = self.current_individual_list[best_last_indiv_index]
         best_last_fitness = self.current_fitness_value_list[best_last_indiv_index]
 
+        traj.f_add_result('final_individual', self.current_individual)
+        traj.f_add_result('final_fitness', self.current_fitness_value)
+        traj.f_add_result('n_iteration', self.g + 1)
+
         logger.info("The best last individual was %s with fitness %s", best_last_indiv, best_last_fitness)
         logger.info("-- End of (successful) annealing --")
