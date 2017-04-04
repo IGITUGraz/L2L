@@ -37,15 +37,13 @@ class Recorder:
             self.optimizee_parameters = optimizee_parameters._asdict()
         self.optimizer_name = optimizer_name
         self.optimizer_parameters = optimizer_parameters._asdict()
-        self.n_iteration = optimizer_parameters.n_iteration
+        self.n_iteration = None
         self.optima_found = None
         self.actual_optima = None
         self.runtime = None
         self.git_commit_id = None
         self.start_time = None
         self.end_time = None
-        # Initialize fitness_list with -np.inf and remove later for easier implementation
-        self.fitness_list = [-np.inf]
 
     def start(self):
         """
@@ -63,26 +61,16 @@ class Recorder:
 
     def end(self):
         """
-        Ends the recording session by creating .md table with simulation details
-        and a plot representing the fitness progress. Table and plot are then saved
-        to the current directory.
+        Ends the recording session by creating .md table with simulation details.
+        Table is then saved to the current directory.
         """
         traj = self.environment.trajectory
-        run_set = traj.res.run_set_00000
-        for i in reversed(range(self.n_iteration)):
-            individual = run_set[i]
-            if individual['individual'].accepted and self.optima_found is None:
-                self.optima_found = individual['fitness']
-            if individual['individual'].accepted:
-                self.fitness_list.append(individual['fitness'])
-            else:
-                self.fitness_list.append(self.fitness_list[-1])
-        self.fitness_list = self.fitness_list[1:]
+        self.optima_found = traj.res.final_fitness
+        self.n_iteration = traj.res.n_iteration
 
         self.end_time = datetime.datetime.now()
         self.runtime = self.end_time - self.start_time
         self.__parse_md__()
-        self.__plot_fitness__()
 
     def __parse_md__(self):
         fname = "result_details.md"
@@ -104,9 +92,3 @@ class Recorder:
         with open(fname, 'w') as f:
             rendered_data = template.render(context)
             f.write(rendered_data)
-
-    def __plot_fitness__(self):
-        plt.plot(self.fitness_list)
-        plt.ylabel('Fitness')
-        plt.xlabel('Iteration')
-        plt.savefig('fitness_progress.png', format='png')
