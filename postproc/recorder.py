@@ -4,6 +4,8 @@ from pypet import Environment
 import numpy as np
 from jinja2 import Environment, FileSystemLoader
 import matplotlib.pyplot as plt
+import argparse
+
 
 
 class Recorder:
@@ -28,6 +30,7 @@ class Recorder:
     """
     def __init__(self, description,
                  environment, optimizee_name, optimizee_parameters, optimizer_name, optimizer_parameters):
+        self.record_flag, self.username, self.description = self.__process_args__()
         self.environment = environment
         self.description = description
         self.optimizee_name = optimizee_name
@@ -76,6 +79,7 @@ class Recorder:
              loader=FileSystemLoader('postproc/templates'))
 
         context = {'cur_date_': self.end_time,
+                   'username_': self.username,
                    'description_': self.description,
                    'optimizee_name_': self.optimizee_name,
                    'optimizee_params_': self.optimizee_parameters,
@@ -90,3 +94,18 @@ class Recorder:
         with open(fname, 'w') as f:
             rendered_data = template.render(context)
             f.write(rendered_data)
+    def __process_args__(self):
+        record_flag = False
+        name = False
+        description = ""
+        parser = argparse.ArgumentParser(description="Main parser.")
+        parser.add_argument('--record_experiment', dest='record_flag', action='store_true')
+        parser.add_argument('--username', dest="username", type=str, required=False)
+        parser.add_argument('--description', dest="description", type=str, required=False)
+        args = parser.parse_args()
+
+        if args.record_flag and (args.username is None or args.description is None):
+            raise Exception("--record_experiment requires --name and --description")
+        name = args.username
+        description = args.description
+        return record_flag, name, description

@@ -81,8 +81,6 @@ def main():
     recorder = Recorder(description='description', environment=env,
                         optimizee_name=optimizee_name, optimizee_parameters=optimizee_params,
                         optimizer_name=optimizer_name, optimizer_parameters=parameters)
-    # recorder.parse_md()
-    # exit()
     recorder.start()
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
