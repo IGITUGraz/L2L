@@ -1,15 +1,21 @@
 .. image:: https://circleci.com/gh/IGITUGraz/LTL.svg?style=svg&circle-token=227d26445f67e74ecc1c8904688859b1c49c292f
     :target: https://circleci.com/gh/IGITUGraz/LTL
-    
-If you are developing a new Optimizee or want to try out a new Optimizee with the Optimizers in the LTL package, install LTL as a python package. See section `To Install The LTL Package`_ for more details (this automatically installs all requirements). See the `wiki <https://github.com/IGITUGraz/LTL/wiki/Writing-new-Optimizees>`_ for more details.
 
-If you want to add a new Optimizer or want to modify the function Optimizees in the LTL package, install the 
-requirements according to `Installing Requirements`_.
+Learning To Learn (LTL)
++++++++++++++++++++++++
 
-In both cases, you should build the documentation according to`To build documentation`_ and read it.
+Getting Started
+---------------
+
+Choose one of the following options to get started:
+
+* If you are developing a new Optimizee or want to try out a new Optimizee with the Optimizers in the LTL package, install LTL as a python package. See section `Installing the LTL Package`_ for more details (this automatically installs all requirements). See the `wiki <https://github.com/IGITUGraz/LTL/wiki/Writing-new-Optimizees>`_ for more details.
+* If you want to add a new Optimizer or want to modify the function Optimizees in the LTL package, install the requirements according to `Installing Requirements`_.
+
+In both cases, you should build the documentation according to `Building Documentation`_ and read it.
    
 
-To Install The LTL Package
+Installing the LTL Package
 --------------------------
 
 From the Top-Level directory of the directory, run the following command:
@@ -45,7 +51,7 @@ If you wish to install LTL as a python package, then you may ignore this section
 Each optimizees and optimizers may have their own dependencies specified in the requirements.txt file within their
 respective package.
 
-To build documentation
+Building Documentation
 ----------------------
 Run the following command from the `doc` directory
 
