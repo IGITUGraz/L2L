@@ -89,7 +89,7 @@ def main():
     # NOTE: Innerloop optimizee end
     optimizee.end()
     # NOTE: Outerloop optimizer end
-    optimizer.end()
+    optimizer.end(traj)
 
     # Finally disable logging and close all log-files
     env.disable_logging()
