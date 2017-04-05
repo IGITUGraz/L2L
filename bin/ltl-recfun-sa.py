@@ -11,6 +11,7 @@ from pypet import Environment
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizees.functions.function_generator import GaussianParameters
 from ltl.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParameters, SimulatedAnnealingOptimizer
+from ltl.optimizees.functions import tools as function_tools
 from ltl.paths import Paths
 from postproc.recorder import Recorder
 
@@ -22,7 +23,7 @@ logger = logging.getLogger('ltl-fg-sa')
 
 def main():
     name = 'LTL-FunctionGenerator-SA'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = "/home/sinisa/Uni/Project_CI/results"  # CHANGE THIS to the directory where your simulation results are contained
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
            " Set it manually in the code (by setting the variable 'root_dir_path')" \
@@ -62,7 +63,7 @@ def main():
     from ltl.optimizees.functions.function_generator import FunctionGenerator
     fg_instance = FunctionGenerator([GaussianParameters(sigma=[[1., 0.], [0., 1.]], mean=[1., 1.])],
                                     dims=2, bound=[0, 2])
-    fg_instance.plot()
+    function_tools.plot(fg_instance)
     optimizee = FunctionGeneratorOptimizee(traj, fg_instance)
 
     # NOTE: Outerloop optimizer initialization
