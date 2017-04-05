@@ -83,7 +83,6 @@ class SimulatedAnnealingOptimizer(Optimizer):
         self.current_individual_list = [np.array(dict_to_list(self.optimizee_create_individual()))
                                         for _ in range(parameters.n_parallel_runs)]
 
-        traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
 
         # The following parameters are NOT recorded
         self.T = 1.  # Initialize temperature
@@ -137,7 +136,9 @@ class SimulatedAnnealingOptimizer(Optimizer):
             p = np.exp((weighted_fitness - current_fitness_value_i) / self.T)
 
             # Accept
+            accepted_flag = False
             if r < p or weighted_fitness >= current_fitness_value_i:
+                accepted_flag = True
                 self.current_fitness_value_list[i] = weighted_fitness
                 self.current_individual_list[i] = np.array(dict_to_list(individual))
 
@@ -167,7 +168,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 
-    def end(self):
+    def end(self, traj):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """

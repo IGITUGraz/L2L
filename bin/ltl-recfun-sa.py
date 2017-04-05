@@ -8,19 +8,21 @@ import yaml
 
 from pypet import Environment
 
-from ltl.optimizees.functions.optimizee import FunctionOptimizee
+from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
+from ltl.optimizees.functions.function_generator import GaussianParameters
 from ltl.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParameters, SimulatedAnnealingOptimizer
 from ltl.paths import Paths
 from postproc.recorder import Recorder
 
+
 warnings.filterwarnings("ignore")
 
-logger = logging.getLogger('ltl-lsm-ga')
+logger = logging.getLogger('ltl-fg-sa')
 
 
 def main():
-    name = 'LTL-RECFUN-SA'
-    root_dir_path = "/home/sinisa/Uni/Project_CI/results"  # CHANGE THIS to the directory where your simulation results are contained
+    name = 'LTL-FunctionGenerator-SA'
+    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
            " Set it manually in the code (by setting the variable 'root_dir_path')" \
@@ -38,7 +40,6 @@ def main():
     print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
 
     traj_file = os.path.join(paths.output_dir_path, 'data.h5')
-    print(traj_file)
 
     # Create an environment that handles running our simulation
     # This initializes a PyPet environment
@@ -58,34 +59,39 @@ def main():
     traj = env.trajectory
 
     # NOTE: Innerloop simulator
-    optimizee_name = "rastrigin"
-    optimizee = FunctionOptimizee(traj, optimizee_name)
+    from ltl.optimizees.functions.function_generator import FunctionGenerator
+    fg_instance = FunctionGenerator([GaussianParameters(sigma=[[1., 0.], [0., 1.]], mean=[1., 1.])],
+                                    dims=2, bound=[0, 2])
+    fg_instance.plot()
+    optimizee = FunctionGeneratorOptimizee(traj, fg_instance)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    optimizer_name = "SimulatedAnnealing"
-    parameters = SimulatedAnnealingParameters(noisy_step=.3, temp_decay=.998, n_iteration=10, stop_criterion=np.Inf,
-                                              seed=np.random.randint(1e5))
+    parameters = SimulatedAnnealingParameters(n_parallel_runs=1, noisy_step=.03, temp_decay=.99, n_iteration=1000,
+                                              stop_criterion=np.Inf, seed=np.random.randint(1e5))
     optimizer = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                                  optimizee_fitness_weights=(-0.1,),
+                                                  optimizee_fitness_weights=(-1,),
                                                   parameters=parameters,
                                                   optimizee_bounding_func=optimizee.bounding_func)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
 
+    optimizee_name = "Gaussian"
+    optimizer_name = "SimulatedAnnealingOptimizer"
     optimizee_params = None
     recorder = Recorder(environment=env,
                         optimizee_name=optimizee_name, optimizee_parameters=optimizee_params,
                         optimizer_name=optimizer_name, optimizer_parameters=parameters)
     recorder.start()
+
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
+
     # NOTE: Innerloop optimizee end
     optimizee.end()
     # NOTE: Outerloop optimizer end
     optimizer.end(traj)
-    recorder.end()
 
     # Finally disable logging and close all log-files
     env.disable_logging()
