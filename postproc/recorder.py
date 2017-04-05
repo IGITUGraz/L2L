@@ -64,6 +64,7 @@ class Recorder:
         """
         if not self.record_flag:
             return
+
         traj = self.environment.trajectory
         self.optima_found = traj.res.final_fitness
         self.n_iteration = traj.res.n_iteration
@@ -94,9 +95,6 @@ class Recorder:
             f.write(rendered_data)
 
     def __process_args__(self):
-        record_flag = False
-        name = False
-        description = ""
         parser = argparse.ArgumentParser(description="Main parser.")
         parser.add_argument('--record_experiment', dest='record_flag', action='store_true')
         parser.add_argument('--username', dest="username", type=str, required=False)
@@ -107,4 +105,5 @@ class Recorder:
             raise Exception("--record_experiment requires --name and --description")
         name = args.username
         description = args.description
+        record_flag = args.record_flag
         return record_flag, name, description
