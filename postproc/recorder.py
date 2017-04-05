@@ -1,11 +1,7 @@
 from git import Repo
 import datetime
-from pypet import Environment
-import numpy as np
 from jinja2 import Environment, FileSystemLoader
-import matplotlib.pyplot as plt
 import argparse
-
 
 
 class Recorder:
@@ -74,8 +70,7 @@ class Recorder:
 
     def __parse_md__(self):
         fname = "result_details.md"
-        env = Environment(
-             loader=FileSystemLoader('postproc/templates'))
+        env = Environment(loader=FileSystemLoader('postproc/templates'))
 
         context = {'cur_date_': self.end_time,
                    'username_': self.username,
@@ -93,6 +88,7 @@ class Recorder:
         with open(fname, 'w') as f:
             rendered_data = template.render(context)
             f.write(rendered_data)
+
     def __process_args__(self):
         record_flag = False
         name = False
