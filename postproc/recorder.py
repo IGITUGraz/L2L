@@ -47,6 +47,8 @@ class Recorder:
         """
         Starts the recording session by checking that repository is not dirty.
         """
+        if not self.record_flag:
+            return
         repo = Repo()
         if repo.bare:
             raise Exception("Not a git repository (or any of the parent directories): .git")
@@ -60,6 +62,8 @@ class Recorder:
         Ends the recording session by creating .md table with simulation details.
         Table is then saved to the current directory.
         """
+        if not self.record_flag:
+            return
         traj = self.environment.trajectory
         self.optima_found = traj.res.final_fitness
         self.n_iteration = traj.res.n_iteration
