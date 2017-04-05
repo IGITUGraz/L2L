@@ -93,6 +93,7 @@ def main():
     optimizee.end()
     # NOTE: Outerloop optimizer end
     optimizer.end(traj)
+    recorder.end()
 
     # Finally disable logging and close all log-files
     env.disable_logging()
