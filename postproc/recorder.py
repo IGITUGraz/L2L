@@ -17,8 +17,8 @@ class Recorder:
       Environment that was used for recording data during the simulation
     :param optimizee_name:
       Optimizee name
-    :param optimizee_parameters:
-      Optimizee parameters as named tuple. Set None, if no parameters are required
+    :param optimizee_description:
+      Optimizee description
     :param optimizer_name:
       Optimizer name
     :param optimizer_parameters:
