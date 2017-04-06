@@ -2,6 +2,7 @@ import logging
 import abc
 from abc import ABCMeta
 import numpy as np
+from sklearn.mixture import BayesianGaussianMixture
 
 logger = logging.getLogger('ltl-distribution')
 
@@ -74,6 +75,49 @@ class Gaussian(Distribution):
         :returns numpy array with n_individual rows of individuals
         """
         return np.random.multivariate_normal(self.mean, self.cov, n_individuals)
+
+
+class GaussianMixture():
+    """Gaussian Mixture Model
+    """
+    def __init__(self, n_components=2):
+        """
+        
+        :param n_components: components of the mixture model
+        """
+        self.bayesian_mixture = BayesianGaussianMixture(n_components)
+        self.fitted = False
+        self.parametrization = ('covariance_prior_', 'covariances_', 'mean_precision_prior_', 'mean_prior_',
+                                'means_', 'weight_concentration_prior_', 'weight_concentration_', 'weights_')
+
+    def fit(self, data_list, smooth_update=0):
+        """Fits data_list on the parametrized model
+        
+        :param data_list: 
+        :param smooth_update: 
+        :return: 
+        """
+        old = self.bayesian_mixture
+        self.bayesian_mixture.fit(data_list)
+        for p in self.parametrization:
+            orig = old.__getattribute__(p)
+            new = self.bayesian_mixture.__getattribute__(p)
+            if isinstance(orig, tuple):
+                mix = tuple(smooth_update * a + (1 - smooth_update) * b for a, b in zip(orig, new))
+            else:
+                mix = smooth_update * orig + (1 - smooth_update) * new
+            self.bayesian_mixture.__setattr__(p, mix)
+        return {'mean': self.bayesian_mixture.means_, 'covariance_matrix': self.bayesian_mixture.covariances_,
+                'weights': self.bayesian_mixture.weights_}
+
+    def sample(self, n_individuals):
+        """
+        
+        :param n_individuals: 
+        :return: 
+        """
+        individuals, _ = self.bayesian_mixture.sample(n_individuals)
+        return individuals
 
 
 class NoisyGaussian(Gaussian):
