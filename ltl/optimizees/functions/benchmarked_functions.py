@@ -1,6 +1,6 @@
-from ltl.optimizees.functions.function_generator import FunctionGenerator, GaussianParameters, PermutationParameters, \
-    EasomParameters, LangermannParameters, MichalewiczParameters, ShekelParameters, RastriginParameters, \
-    RosenbrockParameters, ChasmParameters, AckleyParameters
+from ltl.optimizees.functions.function_generator import FunctionGenerator, GaussianParameters, \
+    MichalewiczParameters, ShekelParameters, \
+    RosenbrockParameters, ChasmParameters
 
 
 class BenchmarkedFunctions:
@@ -13,7 +13,6 @@ class BenchmarkedFunctions:
         function = self.functions[ind]()
         function_name = self.function_names[ind]
         return function, function_name
-
 
     def __create_rastrigin__(self):
         return FunctionGenerator([RosenbrockParameters()], dims=2)
@@ -32,4 +31,3 @@ class BenchmarkedFunctions:
                      GaussianParameters(sigma=[[.25, .3], [.3, 1.]], mean=[1., 1.]),
                      GaussianParameters(sigma=[[.5, .25], [.25, 1.3]], mean=[2., -2.])]
         return FunctionGenerator(fg_params, dims=2, noise=True)
-

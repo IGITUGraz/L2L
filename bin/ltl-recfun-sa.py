@@ -12,7 +12,6 @@ from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParameters, SimulatedAnnealingOptimizer
 from ltl.optimizees.functions import tools as function_tools
-from ltl.optimizees.functions.function_generator import FunctionGenerator
 from ltl.paths import Paths
 from postproc.recorder import Recorder
 
