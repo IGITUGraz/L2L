@@ -24,15 +24,13 @@ class Recorder:
     :param optimizer_parameters:
       Optimizer parameters as named tuple.
     """
-    def __init__(self,
-                 environment, optimizee_name, optimizee_parameters, optimizer_name, optimizer_parameters):
+    def __init__(self, environment,
+                 optimizee_id, optimizee_name, optimizee_description, optimizer_name, optimizer_parameters):
         self.record_flag, self.username, self.description = self.__process_args__()
         self.environment = environment
+        self.optimizee_id = optimizee_id
         self.optimizee_name = optimizee_name
-        if optimizee_parameters is None:
-            self.optimizee_parameters = {}
-        else:
-            self.optimizee_parameters = optimizee_parameters._asdict()
+        self.optimizee_description = optimizee_description
         self.optimizer_name = optimizer_name
         self.optimizer_parameters = optimizer_parameters._asdict()
         self.n_iteration = None
@@ -81,7 +79,8 @@ class Recorder:
                    'username_': self.username,
                    'description_': self.description,
                    'optimizee_name_': self.optimizee_name,
-                   'optimizee_params_': self.optimizee_parameters,
+                   'optimizee_id_': self.optimizee_id,
+                   'optimizee_description_': self.optimizee_description.replace("\n","<br>"),
                    'optimizer_name_': self.optimizer_name,
                    'optimizer_params_': self.optimizer_parameters,
                    'n_iteration_': self.n_iteration,

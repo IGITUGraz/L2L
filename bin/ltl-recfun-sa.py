@@ -9,9 +9,10 @@ import yaml
 from pypet import Environment
 
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
-from ltl.optimizees.functions.function_generator import GaussianParameters
+from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParameters, SimulatedAnnealingOptimizer
 from ltl.optimizees.functions import tools as function_tools
+from ltl.optimizees.functions.function_generator import FunctionGenerator
 from ltl.paths import Paths
 from postproc.recorder import Recorder
 
@@ -23,7 +24,7 @@ logger = logging.getLogger('ltl-fg-sa')
 
 def main():
     name = 'LTL-FunctionGenerator-SA'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = "/home/sinisa/ltlresults"  # CHANGE THIS to the directory where your simulation results are contained
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
            " Set it manually in the code (by setting the variable 'root_dir_path')" \
@@ -59,10 +60,12 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    # NOTE: Innerloop simulator
-    from ltl.optimizees.functions.function_generator import FunctionGenerator
-    fg_instance = FunctionGenerator([GaussianParameters(sigma=[[1., 0.], [0., 1.]], mean=[1., 1.])],
-                                    dims=2, bound=[0, 2])
+    # fg_instance = FunctionGenerator([GaussianParameters(sigma=[[1., 0.], [0., 1.]], mean=[1., 1.])],
+    #                                 dims=2, bound=[0, 2])
+    function_id = 4
+    bench_functs = BenchmarkedFunctions()
+    fg_instance, fg_name = bench_functs.get_function_by_index(4)
+
     function_tools.plot(fg_instance)
     optimizee = FunctionGeneratorOptimizee(traj, fg_instance)
 
@@ -77,13 +80,9 @@ def main():
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
-
-    optimizee_name = "Gaussian"
-    optimizer_name = "SimulatedAnnealingOptimizer"
-    optimizee_params = None
-    recorder = Recorder(environment=env,
-                        optimizee_name=optimizee_name, optimizee_parameters=optimizee_params,
-                        optimizer_name=optimizer_name, optimizer_parameters=parameters)
+    recorder = Recorder(environment=env, optimizee_id=function_id,
+                        optimizee_name=fg_name, optimizee_description=fg_instance.description,
+                        optimizer_name=parameters.__class__.__name__, optimizer_parameters=parameters)
     recorder.start()
 
     # Run the simulation with all parameter combinations
