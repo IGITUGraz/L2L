@@ -10,7 +10,11 @@ from pypet import Environment
 from pypet import pypetconstants
 
 from ltl.optimizees.functions.optimizee import FunctionOptimizee
-from ltl.optimizers.gd.optimizer import ClassicGDParameters, StochGDParameters, RMSPropParameters, AdamParameters, GradientDescentOptimizer
+from ltl.optimizers.gd.optimizer import GradientDescentOptimizer
+from ltl.optimizers.gd.optimizer import ClassicGDParameters
+#from ltl.optimizers.gd.optimizer import StochasticGDParameters
+#from ltl.optimizers.gd.optimizer import AdamParameters
+#from ltl.optimizers.gd.optimizer import RMSPropParameters
 from ltl.paths import Paths
 
 warnings.filterwarnings("ignore")
@@ -64,7 +68,7 @@ def main():
 
     parameters = ClassicGDParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, n_iteration=100, stop_criterion=np.Inf)
     # parameters = AdamParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, first_order_decay=0.8, second_order_decay=0.8, n_iteration=100, stop_criterion=np.Inf)
-    # parameters = StochGDParameters(learning_rate=0.01, stoch_deviation=1, stoch_decay=0.99, exploration_rate=0.01, n_random_steps=5, n_iteration=100, stop_criterion=np.Inf)
+    # parameters = StochasticGDParameters(learning_rate=0.01, stochastic_deviation=1, stochastic_decay=0.99, exploration_rate=0.01, n_random_steps=5, n_iteration=100, stop_criterion=np.Inf)
     # parameters = RMSPropParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, momentum_decay=0.5, n_iteration=100, stop_criterion=np.Inf)
 
     optimizer = GradientDescentOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
