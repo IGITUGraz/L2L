@@ -123,7 +123,7 @@ def dict_product(dicts):
 
 
 class PathsMap:
-    def __init__(self, param_lists, args_name, n_networks, suffix):
+    def __init__(self, param_lists, args_name, n_networks, suffix, root_dir_path='./results'):
         """
         This class manages groups of paths for larger simulations of different parameter combinations since each
         :class:`~ltl.paths.Path` above only manages one parameter combination.
@@ -133,6 +133,7 @@ class PathsMap:
         :param suffix:
         """
         self._root_dir_name = args_name
+        self._root_dir_path = root_dir_path
         self._suffix = suffix
 
         param_lists.update(dict(network_num=range(n_networks)))
@@ -169,7 +170,7 @@ class PathsMap:
     # Aggregate reults paths
     @property
     def root_dir_path(self):
-        return os.path.join(Paths._HOME_DIR_PATH, self._root_dir_name)
+        return os.path.join(self._root_dir_path, self._root_dir_name)
 
     @property
     def agg_results_path(self):

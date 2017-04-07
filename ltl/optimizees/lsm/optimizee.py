@@ -1,27 +1,35 @@
 import logging
+from enum import Enum
 
 import numpy as np
 
 import nest
 import nest.raster_plot
+from ltl import sdict
 
 from ltl.optimizees.lsm.tools import get_spike_times, get_liquid_states, train_readout, \
-    test_readout, divide_train_test, generate_stimuls_xor
+    test_readout, divide_train_test, generate_stimuls_xor, plot_spiketrains, generate_stimuls_mem
 from ltl.optimizees.optimizee import Optimizee
-from ltl.matplotlib_ import plt
 
 logger = logging.getLogger("ltl-lsm")
 
-_DEBUG = False
+
+class Tasks(Enum):
+    XOR = 1
+    FADING_MEMORY = 2
 
 
 class LSMOptimizee(Optimizee):
-    def __init__(self, traj, *, n_NEST_threads=1):
+    def __init__(self, traj, task, n_NEST_threads=1):
         super().__init__(traj)
+
+        assert task in Tasks
+        self.task = task
+
         self.n_NEST_threads = n_NEST_threads
         self._initialize()
 
-        # create_individual can be called because __init__ is complete except for traj initializtion
+        # create_individual can be called because __init__ is complete except for traj initialization
         indiv_dict = self.create_individual()
         for key, val in indiv_dict.items():
             traj.individual.f_add_parameter(key, val)
@@ -83,16 +91,13 @@ class LSMOptimizee(Optimizee):
 
     def create_individual(self):
         jee, jei, jie, jii = np.random.randint(1, 20, 4).astype(np.float64)
-        return {'jee':jee,
-                'jei':jei,
-                'jie':jie,
-                'jii':jii}
+        return dict(jee=jee, jei=jei, jie=jie, jii=jii)
 
     def bounding_func(self, individual):
-        individual = {key:np.float64(value if value > 0.01 else 0.01) for key, value in individual.items()}
+        individual = {key: np.float64(value if value > 0.01 else 0.01) for key, value in individual.items()}
         return individual
-        
-    def simulate(self, traj):
+
+    def simulate(self, traj, should_plot=False, debug=False):
 
         jee = traj.individual.jee
         jei = traj.individual.jei
@@ -104,9 +109,9 @@ class LSMOptimizee(Optimizee):
 
         logger.info("Running for %.2f, %.2f, %.2f, %.2f", jee, jei, jie, jii)
 
-        simtime = 200000.  # how long shall we simulate [ms]
-        if _DEBUG:
-            simtime = 20000.
+        simtime_ms = 200000.  # how long shall we simulate [ms]
+        if debug:
+            simtime_ms = 20000.
 
         N_rec = 500  # Number of neurons to record from
 
@@ -149,9 +154,6 @@ class LSMOptimizee(Optimizee):
         nodes_E = nodes[:N_E]
         nodes_I = nodes[N_E:]
 
-        # Create noise input
-        noise = nest.Create('poisson_generator', 1, {'rate': p_rate})
-
         # create spike detectors from excitatory and inhibitory populations
         spikes = nest.Create('spike_detector', 2,
                              [{'label': 'ex_spd'},
@@ -160,11 +162,18 @@ class LSMOptimizee(Optimizee):
         spikes_I = spikes[1:]
 
         # create input generators
-        dt_stim = 300.  #[ms]
-        stim_len = 50.  #[ms]
+        dt_stim_ms = 300.  #[ms]
+        stim_len_ms = 50.  #[ms]
         Rs = 200.  #[Hz]
-        inp_spikes, targets = generate_stimuls_xor(dt_stim, stim_len, Rs, simtime)
-        # inp_spikes, targets = generate_stimuls_mem(dt_stim, stim_len, Rs, simtime)
+
+        if self.task == Tasks.XOR:
+            inp_spikes, targets = generate_stimuls_xor(dt_stim_ms, stim_len_ms, Rs, simtime_ms)
+            readout_delay = 0.030  # [sec]
+        elif self.task == Tasks.FADING_MEMORY:
+            inp_spikes, targets = generate_stimuls_mem(dt_stim_ms, stim_len_ms, Rs, simtime_ms)
+            readout_delay = (dt_stim_ms - stim_len_ms - 1) * 1e-3  # [sec]
+        else:
+            raise RuntimeError("Unknown task {}".format(self.task.name))
 
         # create two spike generators,
         # set their spike_times of i-th generator to inp_spikes[i]
@@ -211,6 +220,8 @@ class LSMOptimizee(Optimizee):
                       })
 
         # connect one noise generator to all neurons
+        # Create noise input
+        noise = nest.Create('poisson_generator', 1, {'rate': p_rate})
         nest.Connect(noise, nodes, syn_spec={'model': 'excitatory_noise', 'delay': delay_dict})
 
         # connect input neurons to E-pool
@@ -233,49 +244,42 @@ class LSMOptimizee(Optimizee):
         nest.Connect(nodes_I[:N_rec], spikes_I)
 
         # SIMULATE!! -----------------------------------------------------
-        nest.Simulate(simtime)
+        nest.Simulate(simtime_ms)
 
         #compute excitatory rate
         events = nest.GetStatus(spikes, 'n_events')
-        rate_ex = events[0] / simtime * 1000.0 / N_rec
+        rate_ex = events[0] / simtime_ms * 1000.0 / N_rec
         logger.debug('Excitatory rate   : %.2f Hz', rate_ex)
 
         #compute inhibitory rate
-        rate_in = events[1] / simtime * 1000.0 / N_rec
+        rate_in = events[1] / simtime_ms * 1000.0 / N_rec
         logger.debug('Inhibitory rate   : %.2f Hz', rate_in)
 
-        if _DEBUG:
-            import pylab
-            nest.raster_plot.from_device(spikes, hist=True)
-            # pylab.show()
-            plt.xlim(19000, 20000)
-            pylab.savefig('raster.png')
-            logger.debug("Plotted spike raster")
-            return (0,)
+        spike_times_s = spike_times_s_E = get_spike_times(spikes_E)  # returns spike times in seconds
+        spike_times_s_I = get_spike_times(spikes_I)  # returns spike times in seconds
+        if debug or should_plot:
+            num_stims_to_plot = 2
+            plot_spiketrains(spike_times_s_E, spike_times_s_I, [0, num_stims_to_plot * dt_stim_ms * 1e-3],
+                             'raster-start.png')
+            plot_spiketrains(spike_times_s_E, spike_times_s_I,
+                             [(simtime_ms - num_stims_to_plot * dt_stim_ms) * 1e-3, simtime_ms * 1e-3],
+                             'raster-end.png')
 
-            # else:
-            # nest.raster_plot.from_device(spikes, hist=True)
-            # pylab.show()
-            # pylab.savefig('raster.png')
-            # logger.debug("Plotted spike raster")
-
-        # To plot network activity
-        #nest.raster_plot.from_device(spikes_E, hist=False, title='')
-        #pylab.show()
+            if debug:
+                return (0,)
 
         # train the readout on 20 randomly chosen training sets
         NUM_TRAIN = 30
 
         tau_lsm = 0.020  #[sec]
-        readout_delay = 0.030  # [sec]
-        spike_times = get_spike_times(spikes_E)  # returns spike times in seconds
-        rec_time_start = (dt_stim / 1000 + stim_len / 1000 + readout_delay)  # time of first liquid state [sec]
-        times = np.arange(rec_time_start, simtime / 1000,
-                          dt_stim / 1000)  # times when liquid states are extracted [sec]
+
+        rec_time_start = (dt_stim_ms / 1000 + stim_len_ms / 1000 + readout_delay)  # time of first liquid state [sec]
+        # times when liquid states are extracted [sec]
+        times = np.arange(rec_time_start, simtime_ms / 1000, dt_stim_ms / 1000)
         logger.debug("Extract Liquid States...")
-        states = get_liquid_states(spike_times, times, tau_lsm)
+        states = get_liquid_states(spike_times_s, times, tau_lsm)
         states = states[5:, :]  # disregard first 5 stimuli
-        targets_cap = targets[5:]
+        targets = targets[5:]
         Nstates = np.size(states, 0)
         # add constant component to states for bias
         states = np.hstack([states, np.ones((Nstates, 1))])
@@ -285,16 +289,11 @@ class LSMOptimizee(Optimizee):
         logger.debug("Computing Least Squares...")
         reg_const = 5.0
         for trial in range(NUM_TRAIN):
-            states_train, states_test, targets_train, targets_test = divide_train_test(states, targets_cap,
-                                                                                       train_frac)
-            # Ntrain = len(targets_train)
-            # Ntest = len(targets_test)
+            states_train, states_test, targets_train, targets_test = divide_train_test(states, targets, train_frac)
             # compute least squares solution
             w = train_readout(states_train, targets_train, reg_fact=reg_const)
             err_train[trial] = test_readout(w, states_train, targets_train)
             err_test[trial] = test_readout(w, states_test, targets_test)
-            # logger.debug("N training examples: %d", Ntrain)
-            # logger.debug("N test examples: %d", Ntest)
         training_error_mean, training_error_std = np.mean(err_train) * 100, np.std(err_train * 100)
         testing_error_mean, testing_error_std = np.mean(err_test) * 100, np.std(err_test * 100)
 
@@ -309,21 +308,30 @@ class LSMOptimizee(Optimizee):
 
 
 def main():
-    """
-    Contains code to run simulation independently
-    :return:
-    """
+    import yaml
+    import os
+    import logging.config
+
     from ltl import DummyTrajectory
-    global _DEBUG
-    _DEBUG = True
-    optimizee = LSMOptimizee()
+    from ltl.paths import Paths
+    from ltl import timed
+
+    # TODO: Set root_dir_path here
+    paths = Paths('ltl-lc-fading-memory', dict(run_num='test'), root_dir_path=None)
+    with open("bin/logging.yaml") as f:
+        l_dict = yaml.load(f)
+        log_output_file = os.path.join(paths.results_path, l_dict['handlers']['file']['filename'])
+        l_dict['handlers']['file']['filename'] = log_output_file
+        logging.config.dictConfig(l_dict)
+
     fake_traj = DummyTrajectory()
-    fake_traj.individual = optimizee.create_individual()
-    testing_error = optimizee.simulate(fake_traj)
-    print("Testing error is ", testing_error)
-    print("Simulating again!")
-    testing_error = optimizee.simulate(fake_traj)
-    print("Testing error is ", testing_error)
+    optimizee = LSMOptimizee(fake_traj, task=Tasks.XOR, n_NEST_threads=15)
+
+    fake_traj.individual = sdict(optimizee.create_individual())
+
+    with timed(logger):
+        testing_error = optimizee.simulate(fake_traj)
+    logger.info("Testing error is %s", testing_error)
 
 
 if __name__ == "__main__":
