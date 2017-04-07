@@ -24,7 +24,7 @@ logger = logging.getLogger('ltl-lsm-gd')
 
 def main():
     name = 'LTL-FUN-GD'
-    root_dir_path = '../sim_results'  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
            " Set it manually in the code (by setting the variable 'root_dir_path')" \
@@ -66,10 +66,15 @@ def main():
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
 
-    parameters = ClassicGDParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, n_iteration=100, stop_criterion=np.Inf)
-    # parameters = AdamParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, first_order_decay=0.8, second_order_decay=0.8, n_iteration=100, stop_criterion=np.Inf)
-    # parameters = StochasticGDParameters(learning_rate=0.01, stochastic_deviation=1, stochastic_decay=0.99, exploration_rate=0.01, n_random_steps=5, n_iteration=100, stop_criterion=np.Inf)
-    # parameters = RMSPropParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, momentum_decay=0.5, n_iteration=100, stop_criterion=np.Inf)
+    parameters = ClassicGDParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, n_iteration=100, 
+                                     stop_criterion=np.Inf)
+    #parameters = AdamParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, first_order_decay=0.8,
+    #                             second_order_decay=0.8, n_iteration=100, stop_criterion=np.Inf)
+    #parameters = StochasticGDParameters(learning_rate=0.01, stochastic_deviation=1, stochastic_decay=0.99,
+    #                                    exploration_rate=0.01, n_random_steps=5, n_iteration=100,
+    #                                    stop_criterion=np.Inf)
+    #parameters = RMSPropParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, momentum_decay=0.5,
+    #                               n_iteration=100, stop_criterion=np.Inf)
 
     optimizer = GradientDescentOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                                   optimizee_fitness_weights=(0.1,),
