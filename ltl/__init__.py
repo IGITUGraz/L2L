@@ -1,5 +1,8 @@
+from __future__ import print_function
+
 import functools
 
+import copy
 import time
 from collections import OrderedDict
 from contextlib import contextmanager
@@ -134,7 +137,7 @@ class sdictm(object):
         :param fn:
         :return:
         """
-        for key, value in self._data.copy().items():
+        for key, value in copy.copy(self._data).items():
             if isinstance(value, sdictm):
                 value.apply(fn)
             elif isinstance(value, list):

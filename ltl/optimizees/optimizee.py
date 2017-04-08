@@ -1,4 +1,4 @@
-class Optimizee:
+class Optimizee(object):
     """
     This is the base class for the Optimizees, i.e. the inner loop algorithms. Often, these are the implementations
     that interact with the environment. Given a set of parameters, it runs the simulation and returns the fitness

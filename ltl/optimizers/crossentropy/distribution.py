@@ -1,3 +1,5 @@
+from six import with_metaclass
+
 import logging
 import abc
 from abc import ABCMeta
@@ -6,7 +8,7 @@ import numpy as np
 logger = logging.getLogger('ltl-distribution')
 
 
-class Distribution(metaclass=ABCMeta):
+class Distribution(with_metaclass(ABCMeta, object)):
     """Generic base for a distribution. Needs to implement the functions fit and sample.
     """
     

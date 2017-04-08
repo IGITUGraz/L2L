@@ -1,4 +1,5 @@
 import os
+import copy
 from collections import OrderedDict
 
 import re
@@ -6,6 +7,19 @@ import re
 import itertools
 
 __author__ = 'anand'
+
+
+def create_if_not_exists(path):
+    """
+    Creates a directory if it not exists yet (Python2 compatible)
+
+    :param path: The path to create
+    """
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != os.errno.EEXIST:
+            raise
 
 
 class Paths:
@@ -50,7 +64,7 @@ class Paths:
         :return:
         """
         path = os.path.join(self.output_dir_path, "results")
-        os.makedirs(path, exist_ok=True)
+        create_if_not_exists(path)
         return path
 
     @property
@@ -60,7 +74,7 @@ class Paths:
         :return:
         """
         path = os.path.join(self.output_dir_path, "simulation")
-        os.makedirs(path, exist_ok=True)
+        create_if_not_exists(path)
         return path
 
     @property
@@ -70,7 +84,7 @@ class Paths:
         :return:
         """
         path = os.path.join(self.output_dir_path, "data")
-        os.makedirs(path, exist_ok=True)
+        create_if_not_exists(path)
         return path
 
     # General function to generate paths
@@ -79,7 +93,7 @@ class Paths:
         Get the path of an arbitrary file of the form /root_dir_path/root_dir_name/param1name-param1val-param2name-param2val/results/{name}-{param-paramval*}-{kwarg-kwargval*}.ext
         :return:
         """
-        d = self._param_combo.copy()
+        d = copy.copy(self._param_combo)
         d.update(kwargs)
         return os.path.join(self.results_path, "{}-{}{}.{}".format(name, make_param_string(**d), self._suffix, ext))
 
@@ -175,11 +189,11 @@ class PathsMap:
     @property
     def agg_results_path(self):
         path = os.path.join(self.root_dir_path, "results")
-        os.makedirs(path, exist_ok=True)
+        create_if_not_exists(path)
         return path
 
     def get_agg_fpath(self, name, param_combo, ext, **kwargs):
-        d = param_combo.copy()
+        d = copy.copy(param_combo)
         d.update(kwargs)
         return os.path.join(self.agg_results_path, "{}-{}{}.{}"
                             .format(name, make_param_string(**d), self._suffix, ext))

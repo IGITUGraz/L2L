@@ -10,19 +10,21 @@ from ltl import dict_to_list, list_to_dict
 
 logger = logging.getLogger("ltl-ga")
 
-GeneticAlgorithmParameters = namedtuple('GeneticAlgorithmParameters',
-                                        ['seed', 'popsize', 'CXPB', 'MUTPB', 'NGEN', 'indpb', 'tournsize', 'matepar',
-                                         'mutpar'])
-GeneticAlgorithmParameters.__doc__ = """
-:param seed: Random seed
-:param popsize: Size of the population
-:param CXPB: Crossover probability
-:param MUTPB: Mutation probability
-:param NGEN: Number of generations simulation should run for
-:param indpb: Probability of mutation of each element in individual
-:param tournsize: Size of the tournamaent used for fitness evaluation and selection
-:param matepar: Paramter used for blending two values during mating
-"""
+
+class GeneticAlgorithmParameters(namedtuple('GeneticAlgorithmParameters',
+                                            ['seed', 'popsize', 'CXPB', 'MUTPB', 'NGEN', 'indpb',
+                                             'tournsize', 'matepar', 'mutpar'])):
+    """
+    :param seed: Random seed
+    :param popsize: Size of the population
+    :param CXPB: Crossover probability
+    :param MUTPB: Mutation probability
+    :param NGEN: Number of generations simulation should run for
+    :param indpb: Probability of mutation of each element in individual
+    :param tournsize: Size of the tournamaent used for fitness evaluation and selection
+    :param matepar: Paramter used for blending two values during mating
+    """
+    pass
 
 
 class GeneticAlgorithmOptimizer(Optimizer):
@@ -41,7 +43,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
                  parameters,
                  optimizee_bounding_func=None):
 
-        super().__init__(traj,
+        super(GeneticAlgorithmOptimizer, self).__init__(traj,
                          optimizee_create_individual=optimizee_create_individual,
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters)

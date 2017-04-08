@@ -7,7 +7,7 @@ from ltl import get_grouped_dict
 OptimizerParameters = namedtuple('OptimizerParamters', [])
 
 
-class Optimizer:
+class Optimizer(object):
     """
     This is the base class for the Optimizers i.e. the outer loop algorithms. These algorithms generate parameters, \
     give them to the inner loop to be evaluated, and with the resulting fitness modify the parameters in some way.
