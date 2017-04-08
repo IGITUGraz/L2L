@@ -82,12 +82,12 @@ class BayesianGaussianMixtureModel():
     Unlike normal Gaussian mixture, the algorithm has tendency to set the weights of non present modes close to zero.
     Meaning that it effectively inferences the number of active modes present in the given data.
     """
-    def __init__(self, n_components=2):
+    def __init__(self, n_components=2, **kwargs):
         """ Initialize the distribution
 
         :param n_components: components of the mixture model
         """
-        self.bayesian_mixture = BayesianGaussianMixture(n_components, weight_concentration_prior_type='dirichlet_distribution')
+        self.bayesian_mixture = BayesianGaussianMixture(n_components, weight_concentration_prior_type='dirichlet_distribution', **kwargs)
         self.fitted = False
         self.parametrization = ('covariances_', 'means_', 'weight_concentration_', 'weights_')
 
