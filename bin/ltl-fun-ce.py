@@ -7,7 +7,7 @@ from pypet import pypetconstants
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
-from ltl.optimizers.crossentropy.distribution import NoisyGaussian, GaussianMixture, Gaussian
+from ltl.optimizers.crossentropy.distribution import NoisyGaussian, BayesianGaussianMixtureModel, Gaussian
 
 warnings.filterwarnings("ignore")
 
@@ -16,7 +16,7 @@ logger = logging.getLogger('ltl-fun-ce')
 
 def main():
     name = 'LTL-FUN-CE'
-    root_dir_path = '/home/scherr/simulations'  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
     
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
@@ -64,9 +64,9 @@ def main():
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
     parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=30, 
-                                        distribution=GaussianMixture(5))
+                                        distribution=BayesianGaussianMixtureModel(2))
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                            optimizee_fitness_weights=(-0.1,),
+                                            optimizee_fitness_weights=(.1,),
                                             parameters=parameters,
                                             optimizee_bounding_func=optimizee.bounding_func)
 

@@ -77,44 +77,56 @@ class Gaussian(Distribution):
         return np.random.multivariate_normal(self.mean, self.cov, n_individuals)
 
 
-class GaussianMixture():
-    """Gaussian Mixture Model
+class BayesianGaussianMixtureModel():
+    """BayesianGaussianMixtureModel from sklearn
+    Unlike normal Gaussian mixture, the algorithm has tendency to set the weights of non present modes close to zero.
+    Meaning that it effectively inferences the number of active modes present in the given data.
     """
     def __init__(self, n_components=2):
-        """
-        
+        """ Initialize the distribution
+
         :param n_components: components of the mixture model
         """
-        self.bayesian_mixture = BayesianGaussianMixture(n_components)
+        self.bayesian_mixture = BayesianGaussianMixture(n_components, weight_concentration_prior_type='dirichlet_distribution')
         self.fitted = False
-        self.parametrization = ('covariance_prior_', 'covariances_', 'mean_precision_prior_', 'mean_prior_',
-                                'means_', 'weight_concentration_prior_', 'weight_concentration_', 'weights_')
+        self.parametrization = ('covariances_', 'means_', 'weight_concentration_', 'weights_')
 
     def fit(self, data_list, smooth_update=0):
         """Fits data_list on the parametrized model
         
-        :param data_list: 
-        :param smooth_update: 
-        :return: 
+        :param data_list: list or numpy array with individuals as rows
+        :param smooth_update: determines to which extent the new samples
+        account for the new distribution.
+        :return: dict specifiying current parametrization
         """
         old = self.bayesian_mixture
         self.bayesian_mixture.fit(data_list)
+        distribution_parameters = dict()
+
+        # smooth update and fill out distribution parameters dict to return
+        # distribution parameters can also be tuples of ndarray
         for p in self.parametrization:
             orig = old.__getattribute__(p)
             new = self.bayesian_mixture.__getattribute__(p)
             if isinstance(orig, tuple):
                 mix = tuple(smooth_update * a + (1 - smooth_update) * b for a, b in zip(orig, new))
+                for index in range(len(mix)):
+                    distribution_parameters[p + '_' + str(index)] = mix[index]
             else:
                 mix = smooth_update * orig + (1 - smooth_update) * new
+                distribution_parameters[p] = mix
             self.bayesian_mixture.__setattr__(p, mix)
-        return {'mean': self.bayesian_mixture.means_, 'covariance_matrix': self.bayesian_mixture.covariances_,
-                'weights': self.bayesian_mixture.weights_}
+            if p == 'covariances_':
+                logger.info('New covariances:\n' + str(mix))
+            elif p == 'means_':
+                logger.info('New means:\n' + str(mix))
+        return distribution_parameters
 
     def sample(self, n_individuals):
-        """
+        """Sample n_individuals individuals under the current parametrization
         
-        :param n_individuals: 
-        :return: 
+        :param n_individuals: number of individuals to sample
+        :return: numpy array with n_individuals rows of individuals
         """
         individuals, _ = self.bayesian_mixture.sample(n_individuals)
         return individuals
