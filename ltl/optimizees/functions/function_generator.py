@@ -1,5 +1,6 @@
-from abc import ABC, abstractmethod
 from collections import namedtuple
+from six import with_metaclass
+from abc import ABCMeta, abstractmethod
 import numpy as np
 
 
@@ -60,7 +61,7 @@ class FunctionGenerator:
         return res
 
 
-class Function(ABC):
+class Function(with_metaclass(ABCMeta, object)):
     """
     Base class for all test functions.
     """
