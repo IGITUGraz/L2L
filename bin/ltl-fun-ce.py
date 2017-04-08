@@ -7,7 +7,8 @@ from pypet import pypetconstants
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
-from ltl.optimizers.crossentropy.distribution import NoisyGaussian, BayesianGaussianMixtureModel, Gaussian
+from ltl.optimizers.crossentropy.distribution import NoisyGaussian, BayesianGaussianMixture, Gaussian,\
+    NoisyBayesianGaussianMixture
 
 warnings.filterwarnings("ignore")
 
@@ -64,9 +65,10 @@ def main():
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
     parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=30, 
-                                        distribution=BayesianGaussianMixtureModel(2))
+                                        distribution=NoisyBayesianGaussianMixture(2, additive_noise=[1, 1],
+                                                                                  noise_decay=0.99))
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                            optimizee_fitness_weights=(.1,),
+                                            optimizee_fitness_weights=(1,),
                                             parameters=parameters,
                                             optimizee_bounding_func=optimizee.bounding_func)
 

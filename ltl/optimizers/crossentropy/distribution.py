@@ -2,7 +2,7 @@ import logging
 import abc
 from abc import ABCMeta
 import numpy as np
-from sklearn.mixture import BayesianGaussianMixture
+import sklearn.mixture
 
 logger = logging.getLogger('ltl-distribution')
 
@@ -77,8 +77,8 @@ class Gaussian(Distribution):
         return np.random.multivariate_normal(self.mean, self.cov, n_individuals)
 
 
-class BayesianGaussianMixtureModel():
-    """BayesianGaussianMixtureModel from sklearn
+class BayesianGaussianMixture():
+    """BayesianGaussianMixture from sklearn
     Unlike normal Gaussian mixture, the algorithm has tendency to set the weights of non present modes close to zero.
     Meaning that it effectively inferences the number of active modes present in the given data.
     """
@@ -87,9 +87,13 @@ class BayesianGaussianMixtureModel():
 
         :param n_components: components of the mixture model
         """
-        self.bayesian_mixture = BayesianGaussianMixture(n_components, weight_concentration_prior_type='dirichlet_distribution', **kwargs)
-        self.fitted = False
+        self.bayesian_mixture = sklearn.mixture.BayesianGaussianMixture(n_components, weight_concentration_prior_type='dirichlet_distribution', **kwargs)
         self.parametrization = ('covariances_', 'means_', 'weight_concentration_', 'weights_')
+
+    def _postprocess_fitted(self, model):
+        """postprocesses the fitted model, adding the possibility to add noise or something
+        """
+        pass
 
     def fit(self, data_list, smooth_update=0):
         """Fits data_list on the parametrized model
@@ -101,6 +105,7 @@ class BayesianGaussianMixtureModel():
         """
         old = self.bayesian_mixture
         self.bayesian_mixture.fit(data_list)
+        self._postprocess_fitted(self.bayesian_mixture)
         distribution_parameters = dict()
 
         # smooth update and fill out distribution parameters dict to return
@@ -130,6 +135,36 @@ class BayesianGaussianMixtureModel():
         """
         individuals, _ = self.bayesian_mixture.sample(n_individuals)
         return individuals
+
+
+class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
+    """NoisyBayesianGaussianMixture is basically the same as BayesianGaussianMixture but superimposed with noise
+    """
+    def __init__(self, n_components, additive_noise=None, noise_decay=0.95, **kwargs):
+        """
+        Initializes the Noisy Bayesian Gaussian Mixture Model with noise components
+        :param n_components: number of components in the mixture model
+        :param additive_noise: vector representing the diagonal covariances that get added to the 
+        diagonalized covariance matrix. If None it will get to np.ones
+        :param noise_decay: factor that will decay the additive noise
+        :param kwargs: additional arguments that get passed to the underlying scikit learn model
+        """
+        BayesianGaussianMixture.__init__(self, n_components, **kwargs)
+        self.noise_decay = noise_decay
+        if additive_noise is not None:
+            self.additive_noise = np.array(additive_noise, dtype=np.float)
+
+    def _postprocess_fitted(self, model):
+        """adds noise components
+        """
+        if hasattr(model, 'covariances_'):
+            for cov in model.covariances_:
+                _, eigenvectors = np.linalg.eig(cov)
+                if self.additive_noise is None:
+                    self.additive_noise = np.ones(eigenvectors.shape[-1])
+                noise = np.diag(self.additive_noise)
+                self.additive_noise *= self.noise_decay
+                cov += eigenvectors.dot(noise.dot(eigenvectors.T))
 
 
 class NoisyGaussian(Gaussian):
