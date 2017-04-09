@@ -87,11 +87,22 @@ class BayesianGaussianMixture():
 
         :param n_components: components of the mixture model
         """
-        self.bayesian_mixture = sklearn.mixture.BayesianGaussianMixture(n_components, weight_concentration_prior_type='dirichlet_distribution', **kwargs)
-        self.parametrization = ('covariances_', 'means_', 'weight_concentration_', 'weights_')
+        self.bayesian_mixture = sklearn.mixture.BayesianGaussianMixture(
+            n_components, weight_concentration_prior_type='dirichlet_distribution', **kwargs)
+        # taken from check_fitted function of BaysianGaussianMixture in the sklearn repository
+        self.parametrization = ('covariances_', 'means_', 'weight_concentration_', 'weights_',
+                                'mean_precision_', 'degrees_of_freedom_', 'precisions_', 'precisions_cholesky_')
 
     def _postprocess_fitted(self, model):
         """postprocesses the fitted model, adding the possibility to add noise or something
+        """
+        pass
+
+    def _append_additional_parameters(self, distribution_parameters):
+        """
+        appends additional parametrization
+        
+        :param distribution_parameters: the dictionary that contains the distributions parametrization
         """
         pass
 
@@ -125,6 +136,7 @@ class BayesianGaussianMixture():
                 logger.info('New covariances:\n' + str(mix))
             elif p == 'means_':
                 logger.info('New means:\n' + str(mix))
+        self._append_additional_parameters(distribution_parameters)
         return distribution_parameters
 
     def sample(self, n_individuals):
@@ -155,7 +167,10 @@ class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
             self.additive_noise = np.array(additive_noise, dtype=np.float)
 
     def _postprocess_fitted(self, model):
-        """adds noise components
+        """
+        adds noise to the diagonalized components
+        
+        :param model: the considered model
         """
         if hasattr(model, 'covariances_'):
             for cov in model.covariances_:
@@ -165,6 +180,14 @@ class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
                 noise = np.diag(self.additive_noise)
                 self.additive_noise *= self.noise_decay
                 cov += eigenvectors.dot(noise.dot(eigenvectors.T))
+
+    def _append_additional_parameters(self, distribution_parameters):
+        """
+        appends noise parameters
+        
+        :param distribution_parameters: the dictionary that contains the distributions parametrization
+        """
+        distribution_parameters['additive_noise'] = self.additive_noise
 
 
 class NoisyGaussian(Gaussian):
@@ -204,14 +227,13 @@ class NoisyGaussian(Gaussian):
         # determine noise variance
         if self.noise is None:
             self.noise = self.noise_bias * eigenvalues
-            self.noise /= self.noise_decay
 
-        self.noise *= self.noise_decay
+        self.noise_bias *= self.noise_decay
         diagonalized_covariance = np.diag(eigenvalues + self.noise)
         self.noisy_cov = eigenvectors.dot(diagonalized_covariance.dot(eigenvectors.T))
 
         logger.debug('Noisy cov\n%s', self.noisy_cov)
-        return {'mean': self.mean, 'covariance_matrix': self.noisy_cov}
+        return {'mean': self.mean, 'covariance_matrix': self.noisy_cov, 'noise_bias': self.noise_bias}
 
     def sample(self, n_individuals):
         """Samples from current parametrization
