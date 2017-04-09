@@ -12,8 +12,8 @@ logger = logging.getLogger("ltl-sa")
 
 
 class SimulatedAnnealingParameters(namedtuple('SimulatedAnnealingParameters',
-                                          ['n_parallel_runs', 'noisy_step', 'temp_decay',
-                                           'n_iteration', 'stop_criterion', 'seed'])):
+                                              ['n_parallel_runs', 'noisy_step', 'temp_decay',
+                                               'n_iteration', 'stop_criterion', 'seed'])):
     """SimulatedAnnealingParameters
     
     :param n_parallel_runs: Number of individuals per simulation / Number of parallel Simulated Annealing runs
@@ -64,10 +64,10 @@ class SimulatedAnnealingOptimizer(Optimizer):
                  optimizee_fitness_weights,
                  parameters,
                  optimizee_bounding_func=None):
-        super(SimulatedAnnealingOptimizer, self).__init__(traj,
-                         optimizee_create_individual=optimizee_create_individual,
-                         optimizee_fitness_weights=optimizee_fitness_weights,
-                         parameters=parameters)
+        super(SimulatedAnnealingOptimizer, 
+                self).__init__(traj, optimizee_create_individual=optimizee_create_individual,
+                                optimizee_fitness_weights=optimizee_fitness_weights,
+                                parameters=parameters)
         self.optimizee_bounding_func = optimizee_bounding_func
         
         # The following parameters are recorded

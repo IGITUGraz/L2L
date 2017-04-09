@@ -43,10 +43,10 @@ class GeneticAlgorithmOptimizer(Optimizer):
                  parameters,
                  optimizee_bounding_func=None):
 
-        super(GeneticAlgorithmOptimizer, self).__init__(traj,
-                         optimizee_create_individual=optimizee_create_individual,
-                         optimizee_fitness_weights=optimizee_fitness_weights,
-                         parameters=parameters)
+        super(GeneticAlgorithmOptimizer, 
+                self).__init__(traj, optimizee_create_individual=optimizee_create_individual,
+                                optimizee_fitness_weights=optimizee_fitness_weights,
+                                parameters=parameters)
         self.optimizee_bounding_func = optimizee_bounding_func
         __, self.optimizee_individual_dict_spec = dict_to_list(optimizee_create_individual(), get_dict_spec=True)
 

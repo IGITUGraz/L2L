@@ -31,6 +31,7 @@ class FACEParameters(namedtuple('FACEParameters',
     """
     pass
 
+
 FACEParameters.__new__.__defaults__ = (30, 50, 10, 0.2, 0, 10, None, np.inf, 5)
 
 
@@ -86,8 +87,10 @@ class FACEOptimizer(Optimizer):
     def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters, 
                  optimizee_bounding_func=None):
         
-        super(FACEOptimizer, self).__init__(traj, optimizee_create_individual=optimizee_create_individual,
-                         optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters)
+        super(FACEOptimizer, 
+                self).__init__(traj, optimizee_create_individual=optimizee_create_individual,
+                                 optimizee_fitness_weights=optimizee_fitness_weights,
+                                 parameters=parameters)
         
         self.optimizee_bounding_func = optimizee_bounding_func
 

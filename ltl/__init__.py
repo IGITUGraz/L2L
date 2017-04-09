@@ -18,6 +18,7 @@ __author__ = 'anand'
 if sys.version_info[0] == 2:
     import copy_reg
     import types
+
     def _pickle_method(m):
         if m.im_self is None:
             return getattr, (m.im_class, m.im_func.func_name)

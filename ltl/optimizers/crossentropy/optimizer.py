@@ -31,6 +31,7 @@ class CrossEntropyParameters(namedtuple('CrossEntropyParameters',
     """
     pass
 
+
 CrossEntropyParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0, 10, None, np.inf)
 
 
@@ -83,8 +84,10 @@ class CrossEntropyOptimizer(Optimizer):
     def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters, 
                  optimizee_bounding_func=None):
         
-        super(CrossEntropyOptimizer, self).__init__(traj, optimizee_create_individual=optimizee_create_individual,
-                         optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters)
+        super(CrossEntropyOptimizer, 
+                self).__init__(traj, optimizee_create_individual=optimizee_create_individual,
+                                 optimizee_fitness_weights=optimizee_fitness_weights,
+                                 parameters=parameters)
         
         self.optimizee_bounding_func = optimizee_bounding_func
 
