@@ -7,8 +7,7 @@ from pypet import pypetconstants
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
-from ltl.optimizers.crossentropy.distribution import NoisyGaussian, BayesianGaussianMixture, Gaussian,\
-    NoisyBayesianGaussianMixture
+from ltl.optimizers.crossentropy.distribution import NoisyBayesianGaussianMixture
 
 warnings.filterwarnings("ignore")
 
@@ -55,7 +54,7 @@ def main():
     traj = env.trajectory
 
     # NOTE: Innerloop simulator
-    from ltl.optimizees.functions.function_generator import FunctionGenerator, GaussianParameters, LangermannParameters
+    from ltl.optimizees.functions.function_generator import FunctionGenerator, LangermannParameters
     fg_instance = FunctionGenerator([LangermannParameters('default', 'default')],
                                     dims=2, bound=[0, 2])
 
