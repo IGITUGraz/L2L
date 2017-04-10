@@ -7,19 +7,19 @@ import numpy as np
 import yaml
 
 from pypet import Environment
-from pypet import pypetconstants
 
-from ltl.optimizees.functions.optimizee import FunctionOptimizee
+from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
+from ltl.optimizees.functions.function_generator import GaussianParameters
 from ltl.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParameters, SimulatedAnnealingOptimizer
 from ltl.paths import Paths
 
 warnings.filterwarnings("ignore")
 
-logger = logging.getLogger('ltl-lsm-ga')
+logger = logging.getLogger('ltl-fg-sa')
 
 
 def main():
-    name = 'LTL-FUN-SA'
+    name = 'LTL-FunctionGenerator-SA'
     root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
@@ -44,10 +44,10 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      freeze_input=True,
-                      multiproc=True,
-                      use_scoop=True,
-                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                      # freeze_input=True,
+                      # multiproc=True,
+                      # use_scoop=True,
+                      # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=True,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
@@ -57,14 +57,18 @@ def main():
     traj = env.trajectory
 
     # NOTE: Innerloop simulator
-    optimizee = FunctionOptimizee(traj, 'rastrigin')
+    from ltl.optimizees.functions.function_generator import FunctionGenerator
+    fg_instance = FunctionGenerator([GaussianParameters(sigma=[[1., 0.], [0., 1.]], mean=[1., 1.])],
+                                    dims=2, bound=[0, 2])
+    fg_instance.plot()
+    optimizee = FunctionGeneratorOptimizee(traj, fg_instance)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = SimulatedAnnealingParameters(n_parallel_runs=12, noisy_step=.3, temp_decay=.98, n_iteration=100, stop_criterion=np.Inf,
-                                              seed=np.random.randint(1e5))
+    parameters = SimulatedAnnealingParameters(n_parallel_runs=1, noisy_step=.03, temp_decay=.99, n_iteration=1000,
+                                              stop_criterion=np.Inf, seed=np.random.randint(1e5))
     optimizer = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                                  optimizee_fitness_weights=(-0.1,),
+                                                  optimizee_fitness_weights=(-1,),
                                                   parameters=parameters,
                                                   optimizee_bounding_func=optimizee.bounding_func)
 

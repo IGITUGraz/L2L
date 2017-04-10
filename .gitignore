@@ -44,7 +44,6 @@
 **/scratchpad.py
 
 **/ipython-log.py
-dpca/.ipynb_checkpoints/dPCA_demo-checkpoint.ipynb
 
 _build/
 
@@ -54,7 +53,10 @@ _build/
 /style-reports
 
 # Package egg-info directory
-/learntolearn.egg-info
+/Learning_to_Learn.egg-info
 
 # unison temp files
 **/.unison*
+
+# Mac OS X
+**/.DS_Store
