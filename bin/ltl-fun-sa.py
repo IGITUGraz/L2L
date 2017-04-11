@@ -23,7 +23,7 @@ logger = logging.getLogger('ltl-fg-sa')
 
 def main():
     name = 'LTL-FunctionGenerator-SA'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = "/home/sinisa/ltlresults/"  # CHANGE THIS to the directory where your simulation results are contained
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
            " Set it manually in the code (by setting the variable 'root_dir_path')" \
@@ -62,12 +62,12 @@ def main():
     # NOTE: Benchmark function
     function_id = 4
     bench_functs = BenchmarkedFunctions(noise=True)
-    fg_name, fg_instance = bench_functs.get_function_by_index(4)
+    fg_name, fg_params = bench_functs.get_function_by_index(4)
 
-    function_tools.plot(fg_instance)
+    function_tools.plot(fg_params)
 
     # NOTE: Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, fg_instance)
+    optimizee = FunctionGeneratorOptimizee(traj, fg_params)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
@@ -83,8 +83,8 @@ def main():
 
     # Add Recorder
     recorder = Recorder(trajectory=traj, optimizee_id=function_id,
-                        optimizee_name=fg_name, optimizee_parameters=fg_instance,
-                        optimizer_name=parameters.__class__.__name__, optimizer_parameters=parameters)
+                        optimizee_name=fg_name, optimizee_parameters=fg_params,
+                        optimizer_name=optimizer.__class__.__name__, optimizer_parameters=parameters)
     recorder.start()
 
     # Run the simulation with all parameter combinations

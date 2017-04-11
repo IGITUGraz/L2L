@@ -57,7 +57,7 @@ class BenchmarkedFunctions:
         return FunctionGenerator([ChasmParameters()], dims=2, noise=noise, mu=mu, sigma=sigma)
 
     def _create_gauss2d(self, noise, mu, sigma):
-        return FunctionGenerator(GaussianParameters(sigma=[[1.5, .1], [.1, .3]], mean=[-1., -1.]), dims=2,
+        return FunctionGenerator([GaussianParameters(sigma=[[1.5, .1], [.1, .3]], mean=[-1., -1.])], dims=2,
                                                     noise=noise, mu=mu, sigma=sigma)
 
     def _create_shekel2d(self, noise, mu, sigma):
@@ -77,7 +77,7 @@ class BenchmarkedFunctions:
         return FunctionGenerator([EasomParameters()], dims=10, noise=noise, mu=mu, sigma=sigma)
 
     def _create_langermann(self, noise, mu, sigma):
-        return FunctionGenerator([LangermannParameters()], dims=10, noise=noise, mu=mu, sigma=sigma)
+        return FunctionGenerator([LangermannParameters(A='default', c='default')], dims=2, noise=noise, mu=mu, sigma=sigma)
 
     def _create_3gaussians2d(self, noise, mu, sigma):
         fg_params = [GaussianParameters(sigma=[[1.5, .1], [.1, .3]], mean=[-1., -1.]),
