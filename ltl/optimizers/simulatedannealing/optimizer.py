@@ -1,6 +1,7 @@
 
 import logging
 from collections import namedtuple
+import copy
 
 import numpy as np
 
@@ -9,16 +10,20 @@ from ltl import dict_to_list
 from ltl import list_to_dict
 logger = logging.getLogger("ltl-sa")
 
-SimulatedAnnealingParameters = namedtuple('SimulatedAnnealingParameters',
-                                          ['n_parallel_runs', 'noisy_step', 'temp_decay', 'n_iteration', 'stop_criterion', 'seed'])
-SimulatedAnnealingParameters.__doc__ = """
-:param n_parallel_runs: Number of individuals per simulation / Number of parallel Simulated Annealing runs
-:param noisy_step: Size of the random step
-:param temp_decay: A function of the form f(t) = temperature at time t
-:param n_iteration: number of iteration to perform
-:param stop_criterion: Stop if change in fitness is below this value
-:param seed: Random seed
-"""
+
+class SimulatedAnnealingParameters(namedtuple('SimulatedAnnealingParameters',
+                                              ['n_parallel_runs', 'noisy_step', 'temp_decay',
+                                               'n_iteration', 'stop_criterion', 'seed'])):
+    """SimulatedAnnealingParameters
+    
+    :param n_parallel_runs: Number of individuals per simulation / Number of parallel Simulated Annealing runs
+    :param noisy_step: Size of the random step
+    :param temp_decay: A function of the form f(t) = temperature at time t
+    :param n_iteration: number of iteration to perform
+    :param stop_criterion: Stop if change in fitness is below this value
+    :param seed: Random seed
+    """
+    pass
 
 
 class SimulatedAnnealingOptimizer(Optimizer):
@@ -59,10 +64,10 @@ class SimulatedAnnealingOptimizer(Optimizer):
                  optimizee_fitness_weights,
                  parameters,
                  optimizee_bounding_func=None):
-        super().__init__(traj,
-                         optimizee_create_individual=optimizee_create_individual,
-                         optimizee_fitness_weights=optimizee_fitness_weights,
-                         parameters=parameters)
+        super(SimulatedAnnealingOptimizer, 
+                self).__init__(traj, optimizee_create_individual=optimizee_create_individual,
+                                optimizee_fitness_weights=optimizee_fitness_weights,
+                                parameters=parameters)
         self.optimizee_bounding_func = optimizee_bounding_func
         
         # The following parameters are recorded
@@ -109,8 +114,8 @@ class SimulatedAnnealingOptimizer(Optimizer):
         """
         noisy_step, temp_decay, n_iteration, stop_criterion = \
             traj.noisy_step, traj.temp_decay, traj.n_iteration, traj.stop_criterion
-        old_eval_pop = self.eval_pop.copy()
-        self.eval_pop.clear()
+        old_eval_pop = copy.copy(self.eval_pop)
+        self.eval_pop[:] = []
         self.T *= temp_decay
 
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
@@ -163,7 +168,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         # ------- Create the next generation by crossover and mutation -------- #
         # not necessary for the last generation
         if self.g < n_iteration - 1 and stop_criterion > max(self.current_fitness_value_list):
-            fitnesses_results.clear()
+            fitnesses_results[:] = []
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 

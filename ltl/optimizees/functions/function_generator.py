@@ -1,5 +1,6 @@
-from abc import ABC, abstractmethod
 from collections import namedtuple
+from six import with_metaclass
+from abc import ABCMeta, abstractmethod
 import numpy as np
 
 
@@ -60,7 +61,7 @@ class FunctionGenerator:
         return res
 
 
-class Function(ABC):
+class Function(with_metaclass(ABCMeta, object)):
     """
     Base class for all test functions.
     """
@@ -73,11 +74,12 @@ class Function(ABC):
         pass
 
 
-ShekelParameters = namedtuple('ShekelParameters', ['A', 'c'])
-ShekelParameters.__doc__ = """
-:param A: matrix m*n of coordinates of all minima (m equals length of c, and n equals dims)
-:param c: list of inverse intensities of minima
-"""
+class ShekelParameters(namedtuple('ShekelParameters', ['A', 'c'])):
+    """
+    :param A: matrix m*n of coordinates of all minima (m equals length of c, and n equals dims)
+    :param c: list of inverse intensities of minima
+    """
+    pass
 
 
 class Shekel(Function):
@@ -120,10 +122,11 @@ class Shekel(Function):
         return -value
 
 
-MichalewiczParameters = namedtuple('MichalewiczParameters', ['m'])
-MichalewiczParameters.__doc__ = """
-:param m: steepness factor
-"""
+class MichalewiczParameters(namedtuple('MichalewiczParameters', ['m'])):
+    """
+    :param m: steepness factor
+    """
+    pass
 
 
 class Michalewicz(Function):
@@ -154,11 +157,12 @@ class Michalewicz(Function):
         return value
 
 
-LangermannParameters = namedtuple('LangermannParameters', ['A', 'c'])
-LangermannParameters.__doc__ = """
-:param A: matrix m*n of coordinates of all minima, (m equals length of c, and n equals dims)
-:param c: list of intensities of minima
-"""
+class LangermannParameters(namedtuple('LangermannParameters', ['A', 'c'])):
+    """
+    :param A: matrix m*n of coordinates of all minima, (m equals length of c, and n equals dims)
+    :param c: list of intensities of minima
+    """
+    pass
 
 
 class Langermann(Function):
@@ -222,10 +226,11 @@ class Easom(Function):
         return value
 
 
-PermutationParameters = namedtuple('PermutationParameters', ['beta'])
-PermutationParameters.__doc__ = """
-:param beta: non-negative, difference between global and local minima (smaller means harder)
-"""
+class PermutationParameters(namedtuple('PermutationParameters', ['beta'])):
+    """
+    :param beta: non-negative, difference between global and local minima (smaller means harder)
+    """
+    pass
 
 
 class Permutation(Function):
@@ -260,11 +265,12 @@ class Permutation(Function):
         return value
 
 
-GaussianParameters = namedtuple('GaussianParameters', ['sigma', 'mean'])
-GaussianParameters.__doc__ = """
-:param sigma: covariance matrix
-:param mean: list containing coordinates of the peak (mean, median, mode)
-"""
+class GaussianParameters(namedtuple('GaussianParameters', ['sigma', 'mean'])):
+    """
+    :param sigma: covariance matrix
+    :param mean: list containing coordinates of the peak (mean, median, mode)
+    """
+    pass
 
 
 class Gaussian(Function):

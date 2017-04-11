@@ -12,7 +12,7 @@ class FunctionGeneratorOptimizee(Optimizee):
     """
 
     def __init__(self, traj, fg_instance):
-        super().__init__(traj)
+        super(FunctionGeneratorOptimizee, self).__init__(traj)
         self.dims = fg_instance.dims
         self.cost_fn = fg_instance.cost_function
         self.bound = fg_instance.bound

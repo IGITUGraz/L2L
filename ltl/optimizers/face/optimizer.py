@@ -5,30 +5,34 @@ from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list, list_to_dict
 logger = logging.getLogger("ltl-face")
 
-FACEParameters = namedtuple('FACEParameters',
-                                    ['min_pop_size', 'max_pop_size', 'n_elite', 'smoothing', 'temp_decay', 'n_iteration', 'distribution',
-                                     'stop_criterion', 'n_expand'])
-FACEParameters.__new__.__defaults__ = (30, 50, 10, 0.2, 0, 10, None, np.inf, 5)
 
-FACEParameters.__doc__ = """
-:param min_pop_size: Minimal number of individuals per simulation.
-:param max_pop_size: This is the minimum amount of samples taken into account for the FACE algorithm
-:param n_elite: Number of individuals to be considered as elite
-
-:param smoothing: This is a factor between 0 and 1 that determines the weight assigned to the previous distribution
-  parameters while calculating the new distribution parameters. The smoothing is done as a linear combination of the 
-  optimal parameters for the current data, and the previous distribution as follows:
+class FACEParameters(namedtuple('FACEParameters',
+                                ['min_pop_size', 'max_pop_size', 'n_elite', 'smoothing', 'temp_decay',
+                                 'n_iteration', 'distribution', 'stop_criterion', 'n_expand'])):
+    """FACEParameters
     
-    new_params = smoothing*old_params + (1-smoothing)*optimal_new_params
+    :param min_pop_size: Minimal number of individuals per simulation.
+    :param max_pop_size: This is the minimum amount of samples taken into account for the FACE algorithm
+    :param n_elite: Number of individuals to be considered as elite
 
-:param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
-  generation. To see the use of temperature, look at the documentation of :class:`FACEOptimizer`
+    :param smoothing: This is a factor between 0 and 1 that determines the weight assigned to the previous distribution
+    parameters while calculating the new distribution parameters. The smoothing is done as a linear combination of the
+    optimal parameters for the current data, and the previous distribution as follows:
 
-:param n_iteration: Number of iterations to perform
-:param distribution: Distribution class to use. Has to implement a fit and sample function.
-:param stop_criterion: (Optional) Stop if this fitness is reached.
-:param n_expand: (Optional) This is the amount by which the sample size is increased if FACE becomes active
-"""
+        new_params = smoothing*old_params + (1-smoothing)*optimal_new_params
+
+    :param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
+    generation. To see the use of temperature, look at the documentation of :class:`FACEOptimizer`
+
+    :param n_iteration: Number of iterations to perform
+    :param distribution: Distribution class to use. Has to implement a fit and sample function.
+    :param stop_criterion: (Optional) Stop if this fitness is reached.
+    :param n_expand: (Optional) This is the amount by which the sample size is increased if FACE becomes active
+    """
+    pass
+
+
+FACEParameters.__new__.__defaults__ = (30, 50, 10, 0.2, 0, 10, None, np.inf, 5)
 
 
 class FACEOptimizer(Optimizer):
@@ -83,8 +87,10 @@ class FACEOptimizer(Optimizer):
     def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters, 
                  optimizee_bounding_func=None):
         
-        super().__init__(traj, optimizee_create_individual=optimizee_create_individual,
-                         optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters)
+        super(FACEOptimizer, 
+                self).__init__(traj, optimizee_create_individual=optimizee_create_individual,
+                                 optimizee_fitness_weights=optimizee_fitness_weights,
+                                 parameters=parameters)
         
         self.optimizee_bounding_func = optimizee_bounding_func
 

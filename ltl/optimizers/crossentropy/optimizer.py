@@ -7,27 +7,32 @@ from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list, list_to_dict
 logger = logging.getLogger("ltl-ce")
 
-CrossEntropyParameters = namedtuple('CrossEntropyParameters',
-                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distribution', 'stop_criterion'])
-CrossEntropyParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0, 10, None, np.inf)
 
-CrossEntropyParameters.__doc__ = """
-:param pop_size: Minimal number of individuals per simulation.
-:param rho: Fraction of solutions to be considered elite in each iteration.
-
-:param smoothing: This is a factor between 0 and 1 that determines the weight assigned to the previous distribution
-  parameters while calculating the new distribution parameters. The smoothing is done as a linear combination of the 
-  optimal parameters for the current data, and the previous distribution as follows:
+class CrossEntropyParameters(namedtuple('CrossEntropyParameters',
+                                        ['pop_size', 'rho', 'smoothing', 'temp_decay',
+                                         'n_iteration', 'distribution', 'stop_criterion'])):
+    """CrossEntropyParameters
     
-    new_params = smoothing*old_params + (1-smoothing)*optimal_new_params
+    :param pop_size: Minimal number of individuals per simulation.
+    :param rho: Fraction of solutions to be considered elite in each iteration.
 
-:param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
-  generation. To see the use of temperature, look at the documentation of :class:`CrossEntropyOptimizer`
+    :param smoothing: This is a factor between 0 and 1 that determines the weight assigned to the previous distribution
+      parameters while calculating the new distribution parameters. The smoothing is done as a linear combination of the 
+      optimal parameters for the current data, and the previous distribution as follows:
+        
+        new_params = smoothing*old_params + (1-smoothing)*optimal_new_params
 
-:param n_iteration: Number of iterations to perform
-:param distribution: Distribution object to use. Has to implement a fit and sample function.
-:param stop_criterion: (Optional) Stop if this fitness is reached.
-"""
+    :param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
+      generation. To see the use of temperature, look at the documentation of :class:`CrossEntropyOptimizer`
+
+    :param n_iteration: Number of iterations to perform
+    :param distribution: Distribution object to use. Has to implement a fit and sample function.
+    :param stop_criterion: (Optional) Stop if this fitness is reached.
+    """
+    pass
+
+
+CrossEntropyParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0, 10, None, np.inf)
 
 
 class CrossEntropyOptimizer(Optimizer):
@@ -79,8 +84,10 @@ class CrossEntropyOptimizer(Optimizer):
     def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters, 
                  optimizee_bounding_func=None):
         
-        super().__init__(traj, optimizee_create_individual=optimizee_create_individual,
-                         optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters)
+        super(CrossEntropyOptimizer, 
+                self).__init__(traj, optimizee_create_individual=optimizee_create_individual,
+                                 optimizee_fitness_weights=optimizee_fitness_weights,
+                                 parameters=parameters)
         
         self.optimizee_bounding_func = optimizee_bounding_func
 
