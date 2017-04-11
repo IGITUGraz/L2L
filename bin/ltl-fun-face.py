@@ -67,8 +67,6 @@ def main():
     # NOTE: Innerloop simulator
     optimizee = FunctionGeneratorOptimizee(traj, fg_instance)
 
-
-
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
     parameters = FACEParameters(min_pop_size=20, max_pop_size=50, n_elite=10, smoothing=0.2, temp_decay=0, n_iteration=30, 

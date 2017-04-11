@@ -26,7 +26,7 @@ class Recorder:
     """
     def __init__(self, trajectory,
                  optimizee_id, optimizee_name, optimizee_parameters, optimizer_name, optimizer_parameters):
-        self.record_flag, self.username, self.description = self.__process_args__()
+        self.record_flag, self.username, self.description = self._process_args()
         self.trajectory = trajectory
         self.optimizee_id = optimizee_id
         self.optimizee_name = optimizee_name
@@ -93,7 +93,7 @@ class Recorder:
             rendered_data = template.render(context)
             f.write(rendered_data)
 
-    def __process_args__(self):
+    def _process_args(self):
         parser = argparse.ArgumentParser(description="Main parser.")
         parser.add_argument('--record_experiment', dest='record_flag', action='store_true')
         parser.add_argument('--username', dest="username", type=str, required=False)
