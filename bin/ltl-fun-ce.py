@@ -19,7 +19,7 @@ logger = logging.getLogger('ltl-fun-ce')
 
 def main():
     name = 'LTL-FUN-CE'
-    root_dir_path = "/home/sinisa/ltlresults"  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
     
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
@@ -60,7 +60,7 @@ def main():
     bench_functs = BenchmarkedFunctions(noise=True)
     fg_name, fg_instance = bench_functs.get_function_by_index(4)
 
-    # function_tools.plot(fg_instance)
+    function_tools.plot(fg_instance)
 
     # NOTE: Innerloop simulator
     optimizee = FunctionGeneratorOptimizee(traj, fg_instance)

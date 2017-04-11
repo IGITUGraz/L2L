@@ -4,6 +4,7 @@ from jinja2 import Environment, FileSystemLoader
 import argparse
 import os
 
+
 class Recorder:
     """
     Implements a recorder that records simulation of one run of some optimization process.

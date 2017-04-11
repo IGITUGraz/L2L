@@ -1,6 +1,6 @@
 from ltl.optimizees.functions.function_generator import FunctionGenerator, GaussianParameters, \
     MichalewiczParameters, ShekelParameters, \
-    RastriginParameters, ChasmParameters
+    RastriginParameters, ChasmParameters, RosenbrockParameters, AckleyParameters
 
 
 class BenchmarkedFunctions:
@@ -13,6 +13,7 @@ class BenchmarkedFunctions:
     """
     def __init__(self, noise=False, mu=0., sigma=0.01):
         self.function_name_map = [("Rastrigin2d", self._create_rastrigin2d(noise, mu, sigma)),
+                                  ("Rastrigin10d", self._create_rastrigin10d(noise, mu, sigma)),
                                   ("Chasm", self._create_chasm(noise, mu, sigma)),
                                   ("Shekel2d", self._create_shekel2d(noise, mu, sigma)),
                                   ("Michalewicz2d", self._create_michalewicz2d(noise, mu, sigma)),
@@ -27,6 +28,24 @@ class BenchmarkedFunctions:
 
     def _create_rastrigin2d(self, noise, mu, sigma):
         return FunctionGenerator([RastriginParameters()], dims=2, noise=noise, mu=mu, sigma=sigma)
+
+    def _create_rastrigin10d(self, noise, mu, sigma):
+        return FunctionGenerator([RastriginParameters()], dims=10, noise=noise, mu=mu, sigma=sigma)
+
+    def _create_rosenbrock2d(self, noise, mu, sigma):
+        return FunctionGenerator([RosenbrockParameters()], dims=2, noise=noise, mu=mu, sigma=sigma)
+
+    def _create_rosenbrock10d(self, noise, mu, sigma):
+        return FunctionGenerator([RosenbrockParameters()], dims=10, noise=noise, mu=mu, sigma=sigma)
+
+    def _create_ackley2d(self, noise, mu, sigma):
+        return FunctionGenerator([AckleyParameters()], dims=2, noise=noise, mu=mu, sigma=sigma)
+
+    def _create_ackley10d(self, noise, mu, sigma):
+        return FunctionGenerator([AckleyParameters()], dims=10, noise=noise, mu=mu, sigma=sigma)
+
+    def _create_gauss2d(self, noise, mu, sigma):
+        return FunctionGenerator([GaussianParameters()], dims=2, noise=noise, mu=mu, sigma=sigma)
 
     def _create_chasm(self, noise, mu, sigma):
         return FunctionGenerator([ChasmParameters()], dims=2, noise=noise, mu=mu, sigma=sigma)
