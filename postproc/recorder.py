@@ -24,15 +24,15 @@ class Recorder:
     :param optimizer_parameters:
       Optimizer parameters as named tuple.
     """
-    def __init__(self, environment,
-                 optimizee_id, optimizee_name, optimizee_description, optimizer_name, optimizer_parameters):
+    def __init__(self, trajectory,
+                 optimizee_id, optimizee_name, optimizee_parameters, optimizer_name, optimizer_parameters):
         self.record_flag, self.username, self.description = self.__process_args__()
-        self.environment = environment
+        self.trajectory = trajectory
         self.optimizee_id = optimizee_id
         self.optimizee_name = optimizee_name
-        self.optimizee_description = optimizee_description
+        self.optimizee_parameters = optimizee_parameters
         self.optimizer_name = optimizer_name
-        self.optimizer_parameters = optimizer_parameters._asdict()
+        self.optimizer_parameters = optimizer_parameters
         self.n_iteration = None
         self.optima_found = None
         self.actual_optima = None
@@ -63,15 +63,15 @@ class Recorder:
         if not self.record_flag:
             return
 
-        traj = self.environment.trajectory
+        traj = self.trajectory
         self.optima_found = traj.res.final_fitness
         self.n_iteration = traj.res.n_iteration
 
         self.end_time = datetime.datetime.now()
         self.runtime = self.end_time - self.start_time
-        self.__parse_md__()
+        self._parse_md()
 
-    def __parse_md__(self):
+    def _parse_md(self):
         fname = "result_details.md"
         env = Environment(loader=FileSystemLoader('postproc/templates'))
 
@@ -80,7 +80,7 @@ class Recorder:
                    'description_': self.description,
                    'optimizee_name_': self.optimizee_name,
                    'optimizee_id_': self.optimizee_id,
-                   'optimizee_description_': self.optimizee_description.replace("\n","<br>"),
+                   'optimizee_parameters_': self.optimizee_parameters,
                    'optimizer_name_': self.optimizer_name,
                    'optimizer_params_': self.optimizer_parameters,
                    'n_iteration_': self.n_iteration,

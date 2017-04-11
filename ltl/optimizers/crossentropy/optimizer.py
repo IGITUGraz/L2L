@@ -257,10 +257,15 @@ class CrossEntropyOptimizer(Optimizer):
             self.T *= temp_decay
             self._expand_trajectory(traj)
 
-    def end(self):
+    def end(self, traj):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
+        # TODO best individual should be tracked somehow?(not needed for recorder)
+        # traj.f_add_result('final_individual', best_individual)
+        traj.f_add_result('final_fitness', self.best_fitness_in_run)
+        traj.f_add_result('n_iteration', self.g + 1)
+
         # ------------ Finished all runs and print result --------------- #
         logger.info("-- End of (successful) CE optimization --")
         logger.info("-- Final distribution parameters --")

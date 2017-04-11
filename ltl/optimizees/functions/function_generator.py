@@ -34,17 +34,12 @@ class FunctionGenerator:
                               ChasmParameters=Chasm)
 
         self.gen_functions = []
+        self.function_parameters = fg_params
         # The class name of the parameter named tuple indexes the actual function class,
         # which is initialized using the given param and dims
-        self.description = ""
-        self.description += "Dimensions: " + str(self.dims) + "\n"
-        self.description += "Noise: " + str(self.noise) + " ,Mean: " + \
-                            str(self.mu) + " " + " ,Sigma:" + str(self.sigma) + "\n"
         for param in fg_params:
             function_class = cost_functions[param.__class__.__name__](param, dims)
             self.gen_functions.append(function_class)
-            self.description += param.__class__.__name__ + ":\n"
-            self.description += str(dict(param._asdict())) + "\n"
 
         if bound is not None:
             self.bound = bound

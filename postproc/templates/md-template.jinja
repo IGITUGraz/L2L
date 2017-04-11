@@ -6,9 +6,14 @@
 | Optimizee name | {{optimizee_name_}} |
 | Optimizee id | {{optimizee_id_}} |
 | Optimizee Description: | |
-| {{optimizee_description_}} |  |
+| --Number of dimensions: | {{optimizee_parameters_.dims}} |
+| --Noise: | {% if optimizee_parameters_.noise
+%} Mean: {{optimizee_parameters_.mu}}, Sigma: {{optimizee_parameters_.sigma}} |{% else %} None |{% endif %}
+| --Function description: |  | {% for param in optimizee_parameters_.function_parameters%}
+| ---{{param.__class__.__name__}} | {% for key, value in param._asdict().items()
+%} {{key}} {{value}} <br> {% endfor %}{% endfor %}|
 | Optimizer name | {{optimizer_name_}} |
-| Optimizer params: | | {% for key, value in optimizer_params_.items() %}
+| Optimizer params: | | {% for key, value in optimizer_params_._asdict().items() %}
 | --{{key}} | {{value}} | {% endfor %}
 | Number of iterations | {{n_iteration_}} |
 | Optima found | {{optima_found_}} |

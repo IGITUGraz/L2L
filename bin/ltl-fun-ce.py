@@ -4,9 +4,12 @@ import logging.config
 import yaml
 from pypet import Environment
 from pypet import pypetconstants
-from ltl.optimizees.functions.optimizee import FunctionOptimizee
+from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
+from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
+from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
+from postproc.recorder import Recorder
 from ltl.optimizers.crossentropy.distribution import NoisyGaussian
 
 warnings.filterwarnings("ignore")
@@ -16,7 +19,7 @@ logger = logging.getLogger('ltl-fun-ce')
 
 def main():
     name = 'LTL-FUN-CE'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = "/home/sinisa/ltlresults"  # CHANGE THIS to the directory where your simulation results are contained
     
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
@@ -53,12 +56,18 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
+    function_id = 4
+    bench_functs = BenchmarkedFunctions(noise=True)
+    fg_name, fg_instance = bench_functs.get_function_by_index(4)
+
+    # function_tools.plot(fg_instance)
+
     # NOTE: Innerloop simulator
-    optimizee = FunctionOptimizee(traj, 'rastrigin')
+    optimizee = FunctionGeneratorOptimizee(traj, fg_instance)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=30, 
+    parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=5,
                                         distribution=NoisyGaussian(noise_decay=0.95, noise_bias=0.05))
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                             optimizee_fitness_weights=(-0.1,),
@@ -68,13 +77,20 @@ def main():
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
 
+    # Add Recorder
+    recorder = Recorder(trajectory=traj, optimizee_id=function_id,
+                        optimizee_name=fg_name, optimizee_parameters=fg_instance,
+                        optimizer_name=parameters.__class__.__name__, optimizer_parameters=parameters)
+    recorder.start()
+
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
     # NOTE: Innerloop optimizee end
     optimizee.end()
     # NOTE: Outerloop optimizer end
-    optimizer.end()
+    optimizer.end(traj)
+    recorder.end()
 
     # Finally disable logging and close all log-files
     env.disable_logging()

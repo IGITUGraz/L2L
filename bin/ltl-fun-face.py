@@ -4,10 +4,14 @@ import logging.config
 import yaml
 from pypet import Environment
 from pypet import pypetconstants
-from ltl.optimizees.functions.optimizee import FunctionOptimizee
+from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
+from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
+from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizers.face.optimizer import FACEOptimizer, FACEParameters
 from ltl.paths import Paths
 from ltl.optimizers.crossentropy.distribution import Gaussian
+from postproc.recorder import Recorder
+
 
 warnings.filterwarnings("ignore")
 
@@ -16,7 +20,7 @@ logger = logging.getLogger('ltl-fun-face')
 
 def main():
     name = 'LTL-FUN-FACE'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = "/home/sinisa/ltlresults"  # CHANGE THIS to the directory where your simulation results are contained
 
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
@@ -53,8 +57,17 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
+    # NOTE: Benchmark function
+    function_id = 4
+    bench_functs = BenchmarkedFunctions(noise=True)
+    fg_name, fg_instance = bench_functs.get_function_by_index(4)
+
+    # function_tools.plot(fg_instance)
+
     # NOTE: Innerloop simulator
-    optimizee = FunctionOptimizee(traj, 'rastrigin')
+    optimizee = FunctionGeneratorOptimizee(traj, fg_instance)
+
+
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
@@ -68,13 +81,20 @@ def main():
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
 
+    # Add Recorder
+    recorder = Recorder(trajectory=traj, optimizee_id=function_id,
+                        optimizee_name=fg_name, optimizee_parameters=fg_instance,
+                        optimizer_name=parameters.__class__.__name__, optimizer_parameters=parameters)
+    recorder.start()
+
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
     # NOTE: Innerloop optimizee end
     optimizee.end()
     # NOTE: Outerloop optimizer end
-    optimizer.end()
+    optimizer.end(traj)
+    recorder.end()
 
     # Finally disable logging and close all log-files
     env.disable_logging()
