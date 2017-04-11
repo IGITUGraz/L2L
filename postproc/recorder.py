@@ -2,7 +2,7 @@ from git import Repo
 import datetime
 from jinja2 import Environment, FileSystemLoader
 import argparse
-
+import os
 
 class Recorder:
     """
@@ -92,6 +92,7 @@ class Recorder:
         with open(fname, 'w') as f:
             rendered_data = template.render(context)
             f.write(rendered_data)
+            print("Recorder details have been written to " + os.curdir + "/" + f.name)
 
     def _process_args(self):
         parser = argparse.ArgumentParser(description="Main parser.")
