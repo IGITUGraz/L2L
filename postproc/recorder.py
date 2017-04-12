@@ -49,10 +49,10 @@ class Recorder:
         if not self.record_flag:
             return
         repo = Repo()
-        if repo.bare:
-            raise Exception("Not a git repository (or any of the parent directories): .git")
-        if repo.is_dirty():
-            raise Exception('Commit your changes first.(use "git add" and then "git commit")')
+        # if repo.bare:
+        #     raise Exception("Not a git repository (or any of the parent directories): .git")
+        # if repo.is_dirty():
+        #     raise Exception('Commit your changes first.(use "git add" and then "git commit")')
         self.start_time = datetime.datetime.now()
         self.git_commit_id = repo.head.commit.hexsha
 
@@ -88,12 +88,14 @@ class Recorder:
                    'optima_found_': self.optima_found,
                    'actual_optima_': self.actual_optima,
                    'runtime_': self.runtime,
-                   'git_commit_id': self.git_commit_id}
+                   'git_commit_id': self.git_commit_id,
+                   'hasattr' : hasattr,
+                   'str' : str}
         template = env.get_template("md-template.jinja")
         with open(fname, 'w') as f:
             rendered_data = template.render(context)
             f.write(rendered_data)
-            print("Recorder details have been written to " + os.curdir + "/" + f.name)
+        print("Recorder details have been written to " + os.curdir + "/" + f.name)
 
     def _process_args(self):
         parser = argparse.ArgumentParser(description="Main parser.")

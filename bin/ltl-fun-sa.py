@@ -23,7 +23,7 @@ logger = logging.getLogger('ltl-fg-sa')
 
 def main():
     name = 'LTL-FunctionGenerator-SA'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = "/home/sinisa/ltlresults"  # CHANGE THIS to the directory where your simulation results are contained
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
            " Set it manually in the code (by setting the variable 'root_dir_path')" \
@@ -62,7 +62,7 @@ def main():
     # NOTE: Benchmark function
     function_id = 4
     bench_functs = BenchmarkedFunctions(noise=True)
-    fg_name, fg_params = bench_functs.get_function_by_index(4)
+    fg_name, fg_params = bench_functs.get_function_by_index(function_id)
 
     function_tools.plot(fg_params)
 

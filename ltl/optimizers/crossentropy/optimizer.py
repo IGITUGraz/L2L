@@ -248,7 +248,7 @@ class CrossEntropyOptimizer(Optimizer):
         self.eval_pop.clear()
 
         # check if to stop
-        if self.g < n_iteration and self.best_fitness_in_run < stop_criterion:
+        if self.g < n_iteration - 1 and self.best_fitness_in_run < stop_criterion:
             #Sample from the constructed distribution
             self.eval_pop_asarray = self.current_distribution.sample(self.pop_size)
             self.eval_pop = [list_to_dict(ind_asarray, self.optimizee_individual_dict_spec)
