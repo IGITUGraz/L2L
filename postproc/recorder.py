@@ -89,8 +89,8 @@ class Recorder:
                    'actual_optima_': self.actual_optima,
                    'runtime_': self.runtime,
                    'git_commit_id': self.git_commit_id,
-                   'hasattr' : hasattr,
-                   'str' : str}
+                   'hasattr': hasattr,
+                   'str': str}
         template = env.get_template("md-template.jinja")
         with open(fname, 'w') as f:
             rendered_data = template.render(context)
