@@ -250,8 +250,8 @@ class GradientDescentOptimizer(Optimizer):
         traj.f_add_parameter('momentum_decay', parameters.momentum_decay, 
                              comment='Decay of the historic momentum at each gradient descent step')
 
-        self.delta = 10**(-6)
-        self.r = np.zeros(len(self.current_individual))
+        self.delta = 10**(-6) # used to for numerical stabilization
+        self.so_moment = np.zeros(len(self.current_individual)) # second order moment
 
     def init_adam(self, parameters, traj):
         """
@@ -269,9 +269,9 @@ class GradientDescentOptimizer(Optimizer):
         traj.f_add_parameter('second_order_decay', parameters.second_order_decay, 
                              comment='Decay of the second order momentum')
 
-        self.delta = 10**(-8)
-        self.s = np.zeros(len(self.current_individual))
-        self.r = np.zeros(len(self.current_individual)) 
+        self.delta = 10**(-8) # used for numerical stablization
+        self.fo_moment = np.zeros(len(self.current_individual)) # first order moment
+        self.so_moment = np.zeros(len(self.current_individual)) # second order moment
 
     def init_stochastic_gd(self, parameters, traj):
         """
@@ -313,8 +313,10 @@ class GradientDescentOptimizer(Optimizer):
         :return:
         """
 
-        self.r = traj.momentum_decay * self.r + (1 - traj.momentum_decay) * np.multiply(gradient, gradient)
-        self.current_individual += np.multiply(traj.learning_rate / (np.sqrt(self.r + self.delta)), gradient)
+        self.so_moment = (traj.momentum_decay * self.so_moment + 
+                          (1 - traj.momentum_decay) * np.multiply(gradient, gradient))
+        self.current_individual += np.multiply(traj.learning_rate / (np.sqrt(self.so_moment + self.delta)),
+                                               gradient)
 
     def adam_update(self, traj, gradient):
         """
@@ -328,13 +330,15 @@ class GradientDescentOptimizer(Optimizer):
         :return:
         """
 
-        self.s = traj.first_order_decay * self.s + (1 - traj.first_order_decay) * gradient
-        self.r = traj.second_order_decay * self.r + (1 - traj.second_order_decay) * np.multiply(gradient, gradient)
-        s_corrected = self.s / (1 - traj.first_order_decay ** (self.g + 1))
-        r_corrected = self.r / (1 - traj.second_order_decay ** (self.g + 1))
+        self.fo_moment = (traj.first_order_decay * self.fo_moment +
+                          (1 - traj.first_order_decay) * gradient)
+        self.so_moment = (traj.second_order_decay * self.so_moment +
+                          (1 - traj.second_order_decay) * np.multiply(gradient, gradient))
+        fo_moment_corrected = self.fo_moment / (1 - traj.first_order_decay ** (self.g + 1))
+        so_moment_corrected = self.so_moment / (1 - traj.second_order_decay ** (self.g + 1))
 
-        self.current_individual += np.multiply(traj.learning_rate * s_corrected / (np.sqrt(r_corrected) + self.delta), 
-                                               gradient)
+        self.current_individual += np.multiply(traj.learning_rate * fo_moment_corrected / 
+                                               (np.sqrt(so_moment_corrected) + self.delta), gradient)
 
     def stochastic_gd_update(self, traj, gradient):
         """
