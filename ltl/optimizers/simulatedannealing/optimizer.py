@@ -83,8 +83,6 @@ class SimulatedAnnealingOptimizer(Optimizer):
         self.current_individual_list = [np.array(dict_to_list(self.optimizee_create_individual()))
                                         for _ in range(parameters.n_parallel_runs)]
 
-        traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
-
         # The following parameters are NOT recorded
         self.T = 1.  # Initialize temperature
         self.g = 0  # the current generation
@@ -167,7 +165,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 
-    def end(self):
+    def end(self, traj):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
@@ -175,6 +173,10 @@ class SimulatedAnnealingOptimizer(Optimizer):
         best_last_indiv_index = np.argmax(self.current_fitness_value_list)
         best_last_indiv = self.current_individual_list[best_last_indiv_index]
         best_last_fitness = self.current_fitness_value_list[best_last_indiv_index]
+
+        traj.f_add_result('final_individual', self.current_fitness_value_list[-1])
+        traj.f_add_result('final_fitness', self.current_fitness_value_list[-1])
+        traj.f_add_result('n_iteration', self.g + 1)
 
         logger.info("The best last individual was %s with fitness %s", best_last_indiv, best_last_fitness)
         logger.info("-- End of (successful) annealing --")
