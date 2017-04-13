@@ -20,7 +20,7 @@ logger = logging.getLogger('ltl-fun-face')
 
 def main():
     name = 'LTL-FUN-FACE'
-    root_dir_path = "/home/sinisa/ltlresults"  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
 
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
