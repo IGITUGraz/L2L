@@ -4,7 +4,10 @@ import logging.config
 import yaml
 from pypet import Environment
 from pypet import pypetconstants
-from ltl.optimizees.functions.optimizee import FunctionOptimizee
+from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
+from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
+from ltl.optimizees.functions import tools as function_tools
+
 from ltl.optimizers.gridsearch import GridSearchOptimizer, GridSearchParameters
 from ltl.paths import Paths
 
@@ -52,8 +55,14 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
+    function_id = 0
+    bench_functs = BenchmarkedFunctions(noise=True)
+    fg_name, fg_params = bench_functs.get_function_by_index(function_id)
+
+    function_tools.plot(fg_params)
+
     # NOTE: Innerloop simulator
-    optimizee = FunctionOptimizee(traj, 'rastrigin')
+    optimizee = FunctionGeneratorOptimizee(traj, fg_params)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
