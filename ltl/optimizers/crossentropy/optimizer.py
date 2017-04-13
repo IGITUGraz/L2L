@@ -260,6 +260,10 @@ class CrossEntropyOptimizer(Optimizer):
             self.eval_pop_asarray = self.current_distribution.sample(self.pop_size)
             self.eval_pop = [list_to_dict(ind_asarray, self.optimizee_individual_dict_spec)
                              for ind_asarray in self.eval_pop_asarray]
+            # Clip to boundaries
+            if self.optimizee_bounding_func is not None:
+                self.eval_pop = [self.optimizee_bounding_func(individual) for individual in self.eval_pop]
+                self.eval_pop_asarray = np.array([dict_to_list(x) for x in self.eval_pop])
             self.g += 1  # Update generation counter
             self.T *= temp_decay
             self._expand_trajectory(traj)

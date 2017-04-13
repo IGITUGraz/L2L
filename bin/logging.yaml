@@ -28,6 +28,10 @@ loggers:
     level: DEBUG
     handlers: [file]
     propagate: no
+  ltl-gs:
+    level: DEBUG
+    handlers: [file]
+    propagate: no
   ltl-face:
     level: DEBUG
     handlers: [file]
@@ -49,6 +53,10 @@ loggers:
     handlers: [file]
     propagate: no
   ltl-fun-ce:
+    level: INFO
+    handlers: [file]
+    propagate: no
+  ltl-fun-gs:
     level: INFO
     handlers: [file]
     propagate: no
