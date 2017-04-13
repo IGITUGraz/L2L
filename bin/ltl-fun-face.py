@@ -4,10 +4,14 @@ import logging.config
 import yaml
 from pypet import Environment
 from pypet import pypetconstants
-from ltl.optimizees.functions.optimizee import FunctionOptimizee
+from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
+from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
+from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizers.face.optimizer import FACEOptimizer, FACEParameters
 from ltl.paths import Paths
 from ltl.optimizers.crossentropy.distribution import Gaussian
+from postproc.recorder import Recorder
+
 
 warnings.filterwarnings("ignore")
 
@@ -53,8 +57,15 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
+    # NOTE: Benchmark function
+    function_id = 4
+    bench_functs = BenchmarkedFunctions(noise=True)
+    fg_name, fg_params = bench_functs.get_function_by_index(function_id)
+
+    function_tools.plot(fg_params)
+
     # NOTE: Innerloop simulator
-    optimizee = FunctionOptimizee(traj, 'rastrigin')
+    optimizee = FunctionGeneratorOptimizee(traj, fg_params)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
@@ -68,13 +79,20 @@ def main():
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
 
+    # Add Recorder
+    recorder = Recorder(trajectory=traj, optimizee_id=function_id,
+                        optimizee_name=fg_name, optimizee_parameters=fg_params,
+                        optimizer_name=optimizer.__class__.__name__, optimizer_parameters=parameters)
+    recorder.start()
+
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
     # NOTE: Innerloop optimizee end
     optimizee.end()
     # NOTE: Outerloop optimizer end
-    optimizer.end()
+    optimizer.end(traj)
+    recorder.end()
 
     # Finally disable logging and close all log-files
     env.disable_logging()

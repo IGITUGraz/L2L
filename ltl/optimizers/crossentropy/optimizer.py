@@ -248,7 +248,7 @@ class CrossEntropyOptimizer(Optimizer):
         self.eval_pop.clear()
 
         # check if to stop
-        if self.g < n_iteration and self.best_fitness_in_run < stop_criterion:
+        if self.g < n_iteration - 1 and self.best_fitness_in_run < stop_criterion:
             #Sample from the constructed distribution
             self.eval_pop_asarray = self.current_distribution.sample(self.pop_size)
             self.eval_pop = [list_to_dict(ind_asarray, self.optimizee_individual_dict_spec)
@@ -261,10 +261,15 @@ class CrossEntropyOptimizer(Optimizer):
             self.T *= temp_decay
             self._expand_trajectory(traj)
 
-    def end(self):
+    def end(self, traj):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
+        # TODO best individual should be tracked somehow?(not needed for recorder)
+        # traj.f_add_result('final_individual', best_individual)
+        traj.f_add_result('final_fitness', self.best_fitness_in_run)
+        traj.f_add_result('n_iteration', self.g + 1)
+
         # ------------ Finished all runs and print result --------------- #
         logger.info("-- End of (successful) CE optimization --")
         logger.info("-- Final distribution parameters --")
