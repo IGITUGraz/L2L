@@ -62,19 +62,19 @@ class GridSearchOptimizer(Optimizer):
                  optimizee_fitness_weights,
                  parameters,
                  optimizee_param_grid):
-        super().__init__(traj, optimizee_create_individual, optimizee_fitness_weights,
-                         parameters)
-        
+        super(GridSearchOptimizer, self).__init__(traj, optimizee_create_individual, optimizee_fitness_weights,
+                                                  parameters)
+
         # Initializing basic variables
         self.optimizee_create_individual = optimizee_create_individual
         self.optimizee_fitness_weights = optimizee_fitness_weights
-        
+
         sample_individual = self.optimizee_create_individual()
 
         # Assert validity of optimizee_param_grid
         assert set(sample_individual.keys()) == set(optimizee_param_grid.keys()), \
             "The Parameters of optimizee_param_grid don't match those of the optimizee individual"
-        
+
         # Generate parameter dictionary based on optimizee_param_grid
         self.param_list = {}
         _, optimizee_individual_param_spec = dict_to_list(sample_individual, get_dict_spec=True)
@@ -93,14 +93,14 @@ class GridSearchOptimizer(Optimizer):
                 self.param_list[param_name] = curr_param_list
 
         self.param_list = cartesian_product(self.param_list, tuple(sorted(optimizee_param_grid.keys())))
-        
+
         # Adding the bounds information to the trajectory
         traj.par.f_add_parameter_group('grid_spec')
         for param_name, param_grid_spec in optimizee_param_grid.items():
             traj.par.grid_spec.f_add_parameter(param_name + '.lower_bound', )
-        
+
         # Expanding the trajectory
-        self.param_list = {('individual.' + key):value for key, value in self.param_list.items()}
+        self.param_list = {('individual.' + key): value for key, value in self.param_list.items()}
         traj.f_expand(self.param_list)
         #: The current generation number
         self.g = None
@@ -138,7 +138,7 @@ class GridSearchOptimizer(Optimizer):
         individual = traj.par.individual
         for param_node in individual.f_iter_leaves():
             logger.info('  %s: %s', param_node.v_name, param_node.f_get())
-        
+
         logger.info('  with fitness: %s', fitness_array[max_fitness_indiv_index])
         logger.info('  with weighted fitness: %s', weighted_fitness_array[max_fitness_indiv_index])
 
