@@ -250,8 +250,8 @@ class GradientDescentOptimizer(Optimizer):
         traj.f_add_parameter('momentum_decay', parameters.momentum_decay, 
                              comment='Decay of the historic momentum at each gradient descent step')
 
-        self.delta = 10**(-6) # used to for numerical stabilization
-        self.so_moment = np.zeros(len(self.current_individual)) # second order moment
+        self.delta = 10**(-6)  # used to for numerical stabilization
+        self.so_moment = np.zeros(len(self.current_individual))  # second order moment
 
     def init_adam(self, parameters, traj):
         """
@@ -269,9 +269,9 @@ class GradientDescentOptimizer(Optimizer):
         traj.f_add_parameter('second_order_decay', parameters.second_order_decay, 
                              comment='Decay of the second order momentum')
 
-        self.delta = 10**(-8) # used for numerical stablization
-        self.fo_moment = np.zeros(len(self.current_individual)) # first order moment
-        self.so_moment = np.zeros(len(self.current_individual)) # second order moment
+        self.delta = 10**(-8)  # used for numerical stablization
+        self.fo_moment = np.zeros(len(self.current_individual))  # first order moment
+        self.so_moment = np.zeros(len(self.current_individual))  # second order moment
 
     def init_stochastic_gd(self, parameters, traj):
         """
