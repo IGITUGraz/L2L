@@ -35,6 +35,7 @@ class FunctionGenerator:
                               ChasmParameters=Chasm)
 
         self.gen_functions = []
+        self.function_parameters = fg_params
         # The class name of the parameter named tuple indexes the actual function class,
         # which is initialized using the given param and dims
         for param in fg_params:

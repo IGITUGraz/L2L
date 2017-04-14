@@ -379,6 +379,23 @@ file.
 
 See the `Python logging tutorial <https://docs.python.org/3/howto/logging.html>`_ for more details.
 
+Recording an LTL simulation
+~~~~~~~~~~~~~~~~~~~~~~~~~
+Recorder enables user to record the results of the simulation in form of .md file which is then
+ready to publish.
+
+To implement the ability for recording the results, user creates an instance of
+:class:`~postproc.recorder.Recorder` and calls :meth:`~postproc.recorder.Recorder.start`.
+At the end of the simulation the user calls :meth:`~postproc.recorder.Recorder.end`
+method which is responsible for generating the details of the simulated session.
+
+To enable the recorder functionality the simulation is run as following( for some arbitrary
+bin/ltl-example simulation):
+
+python3 bin/ltl-example.py --record_experiment --username <username> --description <one_line_description>
+
+If the bin/ltl-example.py provides the recording functionality, you should be able to find a result_details.md
+file in the current directory.
 
 Other packages used
 *******************

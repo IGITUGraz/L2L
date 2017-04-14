@@ -1,0 +1,24 @@
+| | |
+| --- | --- |
+| Date | {{cur_date_}} |
+| Username | {{username_}} |
+| Description | {{description_}} |
+| Optimizee name | {{optimizee_name_}} |
+| Optimizee id | {{optimizee_id_}} |
+| Optimizee Description: | |
+| --Number of dimensions: | {{optimizee_parameters_.dims}} |
+| --Noise: | {% if optimizee_parameters_.noise
+%} Mean: {{optimizee_parameters_.mu}}, Sigma: {{optimizee_parameters_.sigma}} |{% else %} None |{% endif %}
+| --Function description: |  | {% for param in optimizee_parameters_.function_parameters%}
+| ----{{param.__class__.__name__}} | {% for key, value in param._asdict().items()
+%} {% if hasattr(value, '__dict__') %} {{value.__class__.__name__}} <br> {% for key1, value1 in value.__dict__.items()
+%} {{key1}} : {{str(value1).replace('\n', ',')}} <br> {% endfor %}  {% else %} {{value}} {% endif %} {% endfor %}{% endfor %}|
+| Optimizer name | {{optimizer_name_}} |
+| Optimizer params: | | {% for key, value in optimizer_params_._asdict().items() %}
+| --{{key}} | {% if hasattr(value, '__dict__') %} {{value.__class__.__name__}} <br> {% for key1, value1 in value.__dict__.items()
+%} {{key1}} : {{str(value1).replace('\n', ',')}} <br> {% endfor %}  {% else %} {{value}} {% endif %}| {% endfor %}
+| Number of iterations | {{n_iteration_}} |
+| Optima found | {{optima_found_}} |
+| Actual optima | {{actual_optima_}} |
+| runtime | {{runtime_}} |
+| git commit id | {{git_commit_id}} |
