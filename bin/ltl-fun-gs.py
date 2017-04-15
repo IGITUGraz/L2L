@@ -2,13 +2,12 @@ import os
 import warnings
 import logging.config
 import yaml
-
 from pypet import Environment
 from pypet import pypetconstants
-
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions import tools as function_tools
+
 from ltl.optimizers.gridsearch import GridSearchOptimizer, GridSearchParameters
 from ltl.paths import Paths
 
@@ -19,8 +18,7 @@ logger = logging.getLogger('ltl-fun-gs')
 
 def main():
     name = 'LTL-FUN-GS'
-    with open('bin/path.conf') as f:
-        root_dir_path = f.read().strip()  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
     
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
@@ -57,7 +55,7 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    function_id = 7
+    function_id = 0
     bench_functs = BenchmarkedFunctions(noise=True)
     fg_name, fg_params = bench_functs.get_function_by_index(function_id)
 
