@@ -90,6 +90,8 @@ class CrossEntropyOptimizer(Optimizer):
             raise Exception("smoothing has to be in interval [0, 1)")
         
         # The following parameters are recorded
+        traj.f_add_parameter('distribution', str(parameters.distribution.__class__),
+                             comment='Used distribution family')
         traj.f_add_parameter('pop_size', parameters.pop_size,
                              comment='Number of minimal individuals simulated in each run')
         traj.f_add_parameter('rho', parameters.rho,
@@ -163,11 +165,11 @@ class CrossEntropyOptimizer(Optimizer):
             # (index of individual within one generation)
             traj.v_idx = run_index
             ind_index = traj.par.ind_idx
-            
-            traj.f_add_result('$set.$.individual', self.eval_pop[ind_index])
-            traj.f_add_result('$set.$.fitness', fitness)
 
-            weighted_fitness_list.append(np.dot(fitness, self.optimizee_fitness_weights))
+            weighted_fitness = np.dot(fitness, self.optimizee_fitness_weights)
+            weighted_fitness_list.append(weighted_fitness)
+            
+            traj.f_add_result('$set.$', fitness=fitness, weighted_fitness=weighted_fitness)
         traj.v_idx = -1  # set trajectory back to default
 
         # Performs descending arg-sort of weighted fitness

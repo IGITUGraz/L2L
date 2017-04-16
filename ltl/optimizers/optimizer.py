@@ -34,6 +34,7 @@ class Optimizer:
         # Creating Placeholders for individuals and results that are about to be explored
         traj.f_add_parameter('generation', 0, comment='Current generation')
         traj.f_add_parameter('ind_idx', 0, comment='Index of individual')
+        traj.f_add_parameter('fitness_weights', optimizee_fitness_weights, comment='Fitness weights')
         
         # Initializing basic variables
         self.optimizee_create_individual = optimizee_create_individual
