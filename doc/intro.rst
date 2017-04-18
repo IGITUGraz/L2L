@@ -329,7 +329,7 @@ method which is responsible for generating the details of the simulated session.
 To enable the recorder functionality the simulation is run as following (for some arbitrary
 bin/ltl-example simulation)::
 
-  `python3 bin/ltl-example.py --record_experiment --username <username> --description <one_line_description>`
+  `python3 bin/ltl-example.py --record-experiment --username <username> --description <one_line_description>`
 
 If the `bin/ltl-example.py` provides the recording functionality, you should be able to find a `result_details.md`
 file in the current directory.

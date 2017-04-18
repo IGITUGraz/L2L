@@ -99,13 +99,13 @@ class Recorder:
 
     def _process_args(self):
         parser = argparse.ArgumentParser(description="Main parser.")
-        parser.add_argument('--record_experiment', dest='record_flag', action='store_true')
+        parser.add_argument('--record-experiment', dest='record_flag', action='store_true')
         parser.add_argument('--username', dest="username", type=str, required=False)
         parser.add_argument('--description', dest="description", type=str, required=False)
         args = parser.parse_args()
 
         if args.record_flag and (args.username is None or args.description is None):
-            raise Exception("--record_experiment requires --name and --description")
+            raise Exception("--record-experiment requires --name and --description")
         name = args.username
         description = args.description
         record_flag = args.record_flag
