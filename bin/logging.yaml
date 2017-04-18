@@ -14,51 +14,51 @@ handlers:
 loggers:
   ltl-lsm:
     level: INFO
-    handlers: [file]
+    handlers: [console]
     propagate: no
   ltl-ga:
     level: INFO
-    handlers: [file]
+    handlers: [console]
     propagate: no
   ltl-sa:
-    level: DEBUG
-    handlers: [file]
+    level: INFO
+    handlers: [console]
     propagate: no
   ltl-ce:
-    level: DEBUG
-    handlers: [file]
+    level: INFO
+    handlers: [console]
     propagate: no
   ltl-gs:
-    level: DEBUG
-    handlers: [file]
+    level: INFO
+    handlers: [console]
     propagate: no
   ltl-face:
-    level: DEBUG
-    handlers: [file]
+    level: INFO
+    handlers: [console]
     propagate: no
   ltl-noisy-ce:
-    level: DEBUG
-    handlers: [file]
+    level: INFO
+    handlers: [console]
     propagate: no
   ltl-distribution:
-    level: DEBUG
-    handlers: [file]
+    level: INFO
+    handlers: [console]
     propagate: no
   ltl-lsm-ga:
     level: INFO
-    handlers: [file]
+    handlers: [console]
     propagate: no
   ltl-lsm-sa:
     level: INFO
-    handlers: [file]
+    handlers: [console]
     propagate: no
   ltl-fun-ce:
     level: INFO
-    handlers: [file]
+    handlers: [console]
     propagate: no
   ltl-fun-gs:
     level: INFO
-    handlers: [file]
+    handlers: [console]
     propagate: no
   pypet:
     level: ERROR

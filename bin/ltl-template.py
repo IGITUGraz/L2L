@@ -3,20 +3,20 @@ This file is a typical example of a script used to run a LTL experiment. Read th
 explanations
 """
 
+import logging.config
 import os
 
-import logging.config
 import yaml
-
 from pypet import Environment
 from pypet import pypetconstants
 
-from ltl.paths import Paths
 from ltl.optimizees.optimizee import Optimizee
 from ltl.optimizers.optimizer import Optimizer, OptimizerParameters
-
+from ltl.paths import Paths
 # We first setup the logger and read the logging config which controls the verbosity and destination of the logs from
 # various parts of the code.
+from ltl.recorder import Recorder
+
 logger = logging.getLogger('ltl-optimizee-optimizer')
 
 
@@ -27,9 +27,9 @@ def main():
     # TODO when using the template: Change the `root_dir_path` here
     root_dir_path = None
     assert root_dir_path is not None, \
-           "You have not set the root path to store your results." \
-           " Set it manually in the code (by setting the variable 'root_dir_path')" \
-           " before running the simulation"
+        "You have not set the root path to store your results." \
+        " Set it manually in the code (by setting the variable 'root_dir_path')" \
+        " before running the simulation"
     paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
 
     # Load the logging config which tells us where and what to log (loglevel, destination)
@@ -78,6 +78,13 @@ def main():
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
 
+    # Add Recorder
+    # TODO: Change the names, ids and parameters passed in
+    recorder = Recorder(trajectory=traj, optimizee_id='optimizee_id',
+                        optimizee_name='optimizee', optimizee_parameters=dict(),
+                        optimizer_name=optimizer.__class__.__name__, optimizer_parameters=dict())
+    recorder.start()
+
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
@@ -85,6 +92,8 @@ def main():
     optimizee.end()
     # NOTE: Outerloop optimizer end
     optimizer.end()
+
+    recorder.end()
 
     # Finally disable logging and close all log-files
     env.disable_logging()

@@ -1,13 +1,14 @@
+import logging.config
 import os
 import warnings
-import logging.config
+
 import yaml
 from pypet import Environment
 from pypet import pypetconstants
-from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
-from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
-from ltl.optimizees.functions import tools as function_tools
 
+from ltl.optimizees.functions import tools as function_tools
+from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
+from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizers.gridsearch import GridSearchOptimizer, GridSearchParameters
 from ltl.paths import Paths
 
@@ -19,11 +20,11 @@ logger = logging.getLogger('ltl-fun-gs')
 def main():
     name = 'LTL-FUN-GS'
     root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
-    
+
     assert root_dir_path is not None, \
-           "You have not set the root path to store your results." \
-           " Set it manually in the code (by setting the variable 'root_dir_path')" \
-           " before running the simulation"
+        "You have not set the root path to store your results." \
+        " Set it manually in the code (by setting the variable 'root_dir_path')" \
+        " before running the simulation"
     paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
 
     with open("bin/logging.yaml") as f:
@@ -69,11 +70,11 @@ def main():
     n_grid_divs_per_axis = 30
     parameters = GridSearchParameters()
     optimizer = GridSearchOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                          optimizee_fitness_weights=(-0.1,),
-                                          parameters=parameters,
-                                          optimizee_param_grid={
-                                              'coords': (optimizee.bound[0], optimizee.bound[1], n_grid_divs_per_axis)
-                                          })
+                                    optimizee_fitness_weights=(-0.1,),
+                                    parameters=parameters,
+                                    optimizee_param_grid={
+                                        'coords': (optimizee.bound[0], optimizee.bound[1], n_grid_divs_per_axis)
+                                    })
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)

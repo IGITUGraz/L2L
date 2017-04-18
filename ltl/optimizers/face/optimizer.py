@@ -1,8 +1,11 @@
 import logging
 from collections import namedtuple
+
 import numpy as np
-from ltl.optimizers.optimizer import Optimizer
+
 from ltl import dict_to_list, list_to_dict
+from ltl.optimizers.optimizer import Optimizer
+
 logger = logging.getLogger("ltl-face")
 
 FACEParameters = namedtuple('FACEParameters',

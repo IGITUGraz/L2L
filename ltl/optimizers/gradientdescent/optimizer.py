@@ -2,13 +2,13 @@
 import logging
 from collections import namedtuple
 
-
 import numpy as np
 
-from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list
 from ltl import list_to_dict
-logger = logging.getLogger("ltl-gd")
+from ltl.optimizers.optimizer import Optimizer
+
+logger = logging.getLogger("ltl-gradientdescent")
 
 ClassicGDParameters = namedtuple(
     'ClassicGDParameters',

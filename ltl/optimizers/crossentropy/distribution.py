@@ -1,6 +1,7 @@
-import logging
 import abc
+import logging
 from abc import ABCMeta
+
 import numpy as np
 
 logger = logging.getLogger('ltl-distribution')

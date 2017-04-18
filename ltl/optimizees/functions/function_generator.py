@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple
+
 import numpy as np
 
 
@@ -17,6 +18,7 @@ class FunctionGenerator:
     :param mu: Scalar indicating the mean of the Gaussian noise.
     :param sigma: Scalar indicating the standard deviation of the Gaussian noise.
     """
+
     def __init__(self, fg_params, dims=2, bound=None, noise=False, mu=0., sigma=0.01):
         self.dims = dims
         self.noise = noise
@@ -65,6 +67,7 @@ class Function(ABC):
     """
     Base class for all test functions.
     """
+
     @abstractmethod
     def __call__(self, x):
         """
@@ -91,6 +94,7 @@ class Shekel(Function):
     :param params: Instance of :func:`~collections.namedtuple` :class:`ShekelParameters`
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         if params.A == 'default' and params.c == 'default' and dims == 2:
             self.c = (1. / 10.) * np.array([1, 2, 5, 2, 3, 1, 1])
@@ -116,7 +120,7 @@ class Shekel(Function):
         x = np.array(x)
         value = 0
         for i in range(self.A.shape[0]):
-            sum_diff_sq = np.sum((x - self.A[i])**2 + self.c[i]) ** -1
+            sum_diff_sq = np.sum((x - self.A[i]) ** 2 + self.c[i]) ** -1
             value += sum_diff_sq
         return -value
 
@@ -137,6 +141,7 @@ class Michalewicz(Function):
     :param params: Instance of :func:`~collections.namedtuple` :class:`MichalewiczParameters`
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         if params.m == 'default':
             self.m = 10
@@ -149,8 +154,8 @@ class Michalewicz(Function):
     def __call__(self, x):
         x = np.array(x)
         i = np.arange(1, self.dims + 1)
-        a = (i * x**2) / np.pi
-        b = np.sin(a)**(2 * self.m)
+        a = (i * x ** 2) / np.pi
+        b = np.sin(a) ** (2 * self.m)
         value = -np.sum(np.sin(x) * b)
         return value
 
@@ -172,6 +177,7 @@ class Langermann(Function):
     :param params: Instance of :func:`~collections.namedtuple` :class:`LangermannParameters`
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         if params.A == 'default' and params.c == 'default' and dims == 2:
             self.c = np.array([1, 2, 5, 2, 3])
@@ -195,7 +201,7 @@ class Langermann(Function):
         x = np.array(x)
         value = 0
         for i in range(self.A.shape[0]):
-            sum_diff_sq = np.sum((x - self.A[i])**2)
+            sum_diff_sq = np.sum((x - self.A[i]) ** 2)
             value += self.c[i] * np.exp((-1 / np.pi) * sum_diff_sq) * np.cos(np.pi * sum_diff_sq)
         return value
 
@@ -211,6 +217,7 @@ class Easom(Function):
 
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         self.dims = dims
         self.bound = [-10, 10]
@@ -218,7 +225,7 @@ class Easom(Function):
     def __call__(self, x):
         x = np.array(x)
         cos_x = np.cos(x)
-        x_min_pi = (x - np.pi)**2
+        x_min_pi = (x - np.pi) ** 2
         value = -cos_x.prod() * np.exp(-np.sum(x_min_pi))
         return value
 
@@ -241,6 +248,7 @@ class Permutation(Function):
     :param params: Instance of :func:`~collections.namedtuple` :class:`PermutationParameters`
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         if not len(params) == 1:
             raise Exception("Number of parameters does not equal 1.")
@@ -256,8 +264,8 @@ class Permutation(Function):
         x = np.array(x)
         ks = np.array(range(1, self.dims + 1))
         i = np.array(range(1, self.dims + 1))
-        value = np.array([np.sum((i**k + self.beta) * ((x / i)**k - 1), axis=0) for k in ks])
-        value = np.sum(value**2)
+        value = np.array([np.sum((i ** k + self.beta) * ((x / i) ** k - 1), axis=0) for k in ks])
+        value = np.sum(value ** 2)
         return value
 
 
@@ -275,6 +283,7 @@ class Gaussian(Function):
     :param params: Instance of :func:`~collections.namedtuple` :class:`GaussianParameters`
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         if not len(params) == 2:
             raise Exception("Number of parameters does not equal 2.")
@@ -291,7 +300,7 @@ class Gaussian(Function):
 
     def __call__(self, x):
         x = np.array(x)
-        value = 1 / np.sqrt((2 * np.pi)**self.dims * np.linalg.det(self.sigma))
+        value = 1 / np.sqrt((2 * np.pi) ** self.dims * np.linalg.det(self.sigma))
         value = value * np.exp(-0.5 * (np.transpose(x - self.mean).dot(np.linalg.inv(self.sigma))).dot((x - self.mean)))
         return -value
 
@@ -306,6 +315,7 @@ class Rastrigin(Function):
 
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         self.dims = dims
         self.bound = [-5, 5]
@@ -325,6 +335,7 @@ class Rosenbrock(Function):
 
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         self.dims = dims
         self.bound = [-2, 2]
@@ -333,7 +344,7 @@ class Rosenbrock(Function):
         x = np.array(x)
         x_1 = x[1:self.dims]
         x_0 = x[0:self.dims - 1]
-        value = (x_1 - x_0 ** 2)**2 + (x_0 - 1)
+        value = (x_1 - x_0 ** 2) ** 2 + (x_0 - 1)
         # add the same term as in the original framework functions
         value = sum(value) / 2 + 2 * np.sum(np.abs(x - 1.5))
         return value
@@ -350,6 +361,7 @@ class Ackley(Function):
 
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         self.dims = dims
         self.bound = [-2, 2]
@@ -370,6 +382,7 @@ class Chasm(Function):
 
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         if dims != 2:
             raise Exception("Dimensionality of the function must equal 2.")

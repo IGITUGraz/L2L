@@ -5,8 +5,8 @@ from collections import namedtuple
 from deap import base, creator, tools
 from deap.tools import HallOfFame
 
-from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list, list_to_dict
+from ltl.optimizers.optimizer import Optimizer
 
 logger = logging.getLogger("ltl-ga")
 

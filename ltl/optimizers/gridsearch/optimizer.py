@@ -4,9 +4,9 @@ from collections import namedtuple
 import numpy as np
 from pypet.utils.explore import cartesian_product
 
-from ltl.optimizers.optimizer import Optimizer
-from ltl import dict_to_list
 from ltl import DictEntryType
+from ltl import dict_to_list
+from ltl.optimizers.optimizer import Optimizer
 
 logger = logging.getLogger("ltl-gs")
 

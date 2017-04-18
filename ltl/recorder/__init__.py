@@ -1,8 +1,9 @@
-from git import Repo
-import datetime
-from jinja2 import Environment, FileSystemLoader
 import argparse
+import datetime
 import os
+
+from git import Repo
+from jinja2 import Environment, FileSystemLoader
 
 
 class Recorder:
@@ -12,17 +13,16 @@ class Recorder:
     need to be made. end() ends the recording session and produces an .md table and a plot of
     the fitness progress.
 
-    :param description:
-      One-line description of the run
-    :param ~pypet.environment.Environment:
-      Environment that was used for recording data during the simulation
-    :param optimizee_name:
-      Optimizee name
-    :param optimizee_description:
-      Optimizee description
+    :param  ~pypet.trajectory.Trajectory trajectory: PyPet trajectory
+    :param optimizee_id:
+      One of the ids given to the Optimizee. Currently applies only to the benchmark functions
+    :param str optimizee_name:
+      Name of the optimizee
+    :param optimizee_parameters:
+      Optimizee parameters (:obj:`dict` or :obj:`namedtuple`)
     :param optimizer_name:
-      Optimizer name
-    :param optimizer_parameters:
+      Name of the Optimizer 
+    :param ~collections.namedtuple optimizer_parameters:
       Optimizer parameters as named tuple.
     """
     def __init__(self, trajectory,
@@ -74,7 +74,7 @@ class Recorder:
 
     def _parse_md(self):
         fname = "result_details.md"
-        env = Environment(loader=FileSystemLoader('postproc/templates'))
+        env = Environment(loader=FileSystemLoader('ltl/recorder/templates'))
 
         context = {'cur_date_': self.end_time,
                    'username_': self.username,
