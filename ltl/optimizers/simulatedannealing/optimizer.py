@@ -1,4 +1,3 @@
-
 import logging
 from collections import namedtuple
 
@@ -11,7 +10,8 @@ from ltl.optimizers.optimizer import Optimizer
 logger = logging.getLogger("ltl-sa")
 
 SimulatedAnnealingParameters = namedtuple('SimulatedAnnealingParameters',
-                                          ['n_parallel_runs', 'noisy_step', 'temp_decay', 'n_iteration', 'stop_criterion', 'seed'])
+                                          ['n_parallel_runs', 'noisy_step', 'temp_decay', 'n_iteration',
+                                           'stop_criterion', 'seed'])
 SimulatedAnnealingParameters.__doc__ = """
 :param n_parallel_runs: Number of individuals per simulation / Number of parallel Simulated Annealing runs
 :param noisy_step: Size of the random step
@@ -56,7 +56,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters)
         self.optimizee_bounding_func = optimizee_bounding_func
-        
+
         # The following parameters are recorded
         traj.f_add_parameter('n_parallel_runs', parameters.n_parallel_runs,
                              comment='Number of parallel simulated annealing runs / Size of Population')
@@ -83,8 +83,9 @@ class SimulatedAnnealingOptimizer(Optimizer):
         self.current_fitness_value_list = [-np.Inf] * parameters.n_parallel_runs
 
         new_individual_list = [
-            list_to_dict(ind_as_list + np.random.normal(0.0, parameters.noisy_step, ind_as_list.size) * traj.noisy_step * self.T,
-                         self.optimizee_individual_dict_spec)
+            list_to_dict(
+                ind_as_list + np.random.normal(0.0, parameters.noisy_step, ind_as_list.size) * traj.noisy_step * self.T,
+                self.optimizee_individual_dict_spec)
             for ind_as_list in self.current_individual_list
         ]
         if optimizee_bounding_func is not None:
@@ -109,7 +110,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         assert len(fitnesses_results) == traj.n_parallel_runs
         weighted_fitness_list = []
         for i, (run_index, fitness) in enumerate(fitnesses_results):
-            
+
             # Update fitnesses
             # NOTE: The fitness here is a tuple! For now, we'll only support fitnesses with one element
             weighted_fitness = sum(f * w for f, w in zip(fitness, self.optimizee_fitness_weights))
@@ -136,12 +137,13 @@ class SimulatedAnnealingOptimizer(Optimizer):
             traj.f_add_result('$set.$.fitness', weighted_fitness)
 
             current_individual = self.current_individual_list[i]
-            new_individual = list_to_dict(current_individual + np.random.randn(current_individual.size) * noisy_step * self.T,
-                                          self.optimizee_individual_dict_spec)
+            new_individual = list_to_dict(
+                current_individual + np.random.randn(current_individual.size) * noisy_step * self.T,
+                self.optimizee_individual_dict_spec)
             if self.optimizee_bounding_func is not None:
                 new_individual = self.optimizee_bounding_func(new_individual)
 
-            logger.debug("Current best fitness for individual %d is %.2f. New individual is %s", 
+            logger.debug("Current best fitness for individual %d is %.2f. New individual is %s",
                          i, self.current_fitness_value_list[i], new_individual)
             self.eval_pop.append(new_individual)
 
