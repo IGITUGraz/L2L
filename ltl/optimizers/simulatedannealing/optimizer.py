@@ -28,29 +28,20 @@ class SimulatedAnnealingOptimizer(Optimizer):
     In the pseudo code the algorithm does:
 
     For n iterations do:
-        - Take a step of size noisy step in a random direction
-        - If it reduces the cost, keep the solution
-        - Otherwise keep with probability exp(- (f_new - f) / T)
+        1. Take a step of size noisy step in a random direction
+        2. If it reduces the cost, keep the solution
+        3. Otherwise keep with probability exp(- (f_new - f) / T)
 
     NOTE: This expects all parameters of the system to be of floating point
 
-    :param  ~pypet.trajectory.Trajectory traj:
-      Use this pypet trajectory to store the parameters of the specific runs. The parameters should be
+    :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs. The parameters should be
       initialized based on the values in `parameters`
-    
-    :param optimizee_create_individual:
-      Function that creates a new individual
-    
-    :param optimizee_fitness_weights: 
-      Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each
+    :param optimizee_create_individual: Function that creates a new individual
+    :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each
       element of the fitness vector)
-    
-    :param parameters: 
-      Instance of :func:`~collections.namedtuple` :class:`SimulatedAnnealingParameters` containing the
+    :param parameters: Instance of :func:`~collections.namedtuple` :class:`SimulatedAnnealingParameters` containing the
       parameters needed by the Optimizer
-    
-    :param optimizee_bounding_func:
-      This is a function that takes an individual as argument and returns another individual that is
+    :param optimizee_bounding_func: This is a function that takes an individual as argument and returns another individual that is
       within bounds (The bounds are defined by the function itself). If not provided, the individuals
       are not bounded.
     """

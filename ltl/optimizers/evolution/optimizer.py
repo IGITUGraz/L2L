@@ -29,10 +29,13 @@ class GeneticAlgorithmOptimizer(Optimizer):
     """
     Implements evolutionary algorithm
 
-    :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs.  The parameters should be initialized based on the values in `parameters`
+    :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs.
+      The parameters should be initialized based on the values in `parameters`
     :param optimizee_create_individual: Function that creates a new individual
-    :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each element of the fitness vector)
-    :param parameters: Instance of :class:`namedtuple` :class:`GeneticAlgorithmParameters` containing the parameters needed by the Optimizer
+    :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these
+      values (one for each element of the fitness vector)
+    :param parameters: Instance of :class:`namedtuple` :class:`GeneticAlgorithmParameters` containing the parameters
+      needed by the Optimizer
     """
 
     def __init__(self, traj,

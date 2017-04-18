@@ -40,19 +40,20 @@ class FACEOptimizer(Optimizer):
     In the pseudo code the algorithm does:
 
     For n iterations do:
-      1 Sample individuals from distribution
-      2 evaluate individuals and get fitness
-      3 check if gamma or best individuals fitness increased
-      4 if not increase population size by n_expand (if not yet max_pop_size else stop) and sample again (1)
-        else set pop_size = min_pop_size and proceed
-      5 pick n_elite individuals with highest fitness
-      6 Out of the remaining non-elite individuals, select them using a simulated-annealing style
-        selection based on the difference between their fitness and the `1-rho` quantile (*gamma*)
-        fitness, and the current temperature
-      7 Fit the distribution family to the new elite individuals by minimizing cross entropy.
-        The distribution fitting is smoothed to prevent premature convergence to local minima.
-        A weight equal to the `smoothing` parameter is assigned to the previous parameters when
-        smoothing.
+    
+      1. Sample individuals from distribution
+      2. evaluate individuals and get fitness
+      3. check if gamma or best individuals fitness increased
+      4. if not increase population size by n_expand (if not yet max_pop_size else stop) and sample again (1)
+         else set pop_size = min_pop_size and proceed
+      5. pick n_elite individuals with highest fitness
+      6. Out of the remaining non-elite individuals, select them using a simulated-annealing style
+         selection based on the difference between their fitness and the `1-rho` quantile (*gamma*)
+         fitness, and the current temperature
+      7. Fit the distribution family to the new elite individuals by minimizing cross entropy.
+         The distribution fitting is smoothed to prevent premature convergence to local minima.
+         A weight equal to the `smoothing` parameter is assigned to the previous parameters when
+         smoothing.
 
     return final distribution parameters.
     (The final distribution parameters contain information regarding the location of the maxima)
@@ -61,34 +62,24 @@ class FACEOptimizer(Optimizer):
     restriction on the kind of floating point type rewired is put in place due to PyPet's crankiness
     regarding types.
 
-    :param  ~pypet.trajectory.Trajectory traj:
-      Use this pypet trajectory to store the parameters of the specific runs. The parameters should be
-      initialized based on the values in `parameters`
-    
-    :param optimizee_create_individual:
-      Function that creates a new individual. All parameters of the Individual-Dict returned should be
-      of numpy.float64 type
-    
-    :param optimizee_fitness_weights: 
-      Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each
-      element of the fitness vector)
-    
-    :param parameters: 
-      Instance of :func:`~collections.namedtuple` :class:`CrossEntropyParameters` containing the
+    :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs.
+      The parameters should be initialized based on the values in `parameters`
+    :param optimizee_create_individual: Function that creates a new individual. All parameters of the Individual-Dict
+      returned should be of numpy.float64 type
+    :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these
+      values (one for each element of the fitness vector)
+    :param parameters: Instance of :func:`~collections.namedtuple` :class:`CrossEntropyParameters` containing the
       parameters needed by the Optimizer
-    
-    :param optimizee_bounding_func:
-      This is a function that takes an individual as argument and returns another individual that is
-      within bounds (The bounds are defined by the function itself). If not provided, the individuals
-      are not bounded.
+    :param optimizee_bounding_func: This is a function that takes an individual as argument and returns another 
+      individual that is within bounds (The bounds are defined by the function itself). If not provided, the individuals are not bounded.
     """
 
-    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters, 
+    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters,
                  optimizee_bounding_func=None):
-        
+
         super().__init__(traj, optimizee_create_individual=optimizee_create_individual,
                          optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters)
-        
+
         self.optimizee_bounding_func = optimizee_bounding_func
 
         if parameters.min_pop_size < 1:
