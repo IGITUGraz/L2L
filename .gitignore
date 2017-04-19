@@ -62,4 +62,4 @@ _build/
 **/.DS_Store
 
 # local rood dir config
-root_dir_path.py
+bin/root_dir_path.py
