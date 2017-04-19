@@ -161,6 +161,8 @@ class CrossEntropyOptimizer(Optimizer):
         n_iteration, smoothing, temp_decay = \
             traj.n_iteration, traj.smoothing, traj.temp_decay
         stop_criterion, n_elite = traj.stop_criterion, traj.n_elite
+        
+        fitnesses_results = fitnesses_results[-self.pop_size:]
             
         weighted_fitness_list = []
         #**************************************************************************************************************

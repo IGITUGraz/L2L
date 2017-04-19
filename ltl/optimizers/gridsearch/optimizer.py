@@ -62,7 +62,7 @@ class GridSearchOptimizer(Optimizer):
                  optimizee_fitness_weights,
                  parameters,
                  optimizee_param_grid):
-        super().__init__(traj, optimizee_create_individual, optimizee_fitness_weights,
+        super(GridSearchOptimizer, self).__init__(traj, optimizee_create_individual, optimizee_fitness_weights,
                          parameters)
         
         # Initializing basic variables

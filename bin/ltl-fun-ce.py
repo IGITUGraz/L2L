@@ -9,8 +9,7 @@ from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
-from postproc.recorder import Recorder
-from ltl.optimizers.crossentropy.distribution import NoisyGaussian
+from ltl.optimizers.crossentropy.distribution import NoisyGaussian, Gaussian
 
 warnings.filterwarnings("ignore")
 
@@ -19,7 +18,7 @@ logger = logging.getLogger('ltl-fun-ce')
 
 def main():
     name = 'LTL-FUN-CE'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = '/wang/users/s2ext_scherr/cluster_home/simulations'  # CHANGE THIS to the directory where your simulation results are contained
     
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
@@ -44,10 +43,10 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      freeze_input=True,
-                      multiproc=True,
-                      use_scoop=True,
-                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                      #freeze_input=True,
+                      #multiproc=True,
+                      #use_scoop=True,
+                      wrap_mode=pypetconstants.WRAP_MODE_LOCK,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
@@ -60,15 +59,15 @@ def main():
     bench_functs = BenchmarkedFunctions(noise=True)
     fg_name, fg_params = bench_functs.get_function_by_index(function_id)
 
-    function_tools.plot(fg_params)
+    #function_tools.plot(fg_params)
 
     # NOTE: Innerloop simulator
     optimizee = FunctionGeneratorOptimizee(traj, fg_params)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=5,
-                                        distribution=NoisyGaussian(noise_decay=0.95, noise_bias=0.05))
+    parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=30,
+                                        distribution=Gaussian())#NoisyGaussian(noise_decay=0.95, noise_bias=0.05))
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                             optimizee_fitness_weights=(-0.1,),
                                             parameters=parameters,
@@ -77,12 +76,6 @@ def main():
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
 
-    # Add Recorder
-    recorder = Recorder(trajectory=traj, optimizee_id=function_id,
-                        optimizee_name=fg_name, optimizee_parameters=fg_params,
-                        optimizer_name=optimizer.__class__.__name__, optimizer_parameters=parameters)
-    recorder.start()
-
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
@@ -90,7 +83,6 @@ def main():
     optimizee.end()
     # NOTE: Outerloop optimizer end
     optimizer.end(traj)
-    recorder.end()
 
     # Finally disable logging and close all log-files
     env.disable_logging()
