@@ -24,12 +24,16 @@ def main():
     # TODO when using the template: Give some *meaningful* name here
     name = 'LTL'
 
-    # TODO when using the template: Change the `root_dir_path` here
-    root_dir_path = None
-    assert root_dir_path is not None, \
-        "You have not set the root path to store your results." \
-        " Set it manually in the code (by setting the variable 'root_dir_path')" \
-        " before running the simulation"
+    # TODO when using the template: make a path.conf file and write the root path there
+    try:
+        with open('bin/path.conf') as f:
+            root_dir_path = f.read().strip()
+    except FileNotFoundError:
+        raise FileNotFoundError(
+            "You have not set the root path to store your results."
+            " Write the path to a path.conf text file in the bin directory"
+            " before running the simulation"
+        )
     paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
 
     # Load the logging config which tells us where and what to log (loglevel, destination)
