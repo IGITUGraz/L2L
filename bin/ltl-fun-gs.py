@@ -11,6 +11,7 @@ from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizers.gridsearch import GridSearchOptimizer, GridSearchParameters
 from ltl.paths import Paths
+from bin.root_dir_path import root_dir_path
 
 warnings.filterwarnings("ignore")
 
@@ -19,7 +20,6 @@ logger = logging.getLogger('ltl-fun-gs')
 
 def main():
     name = 'LTL-FUN-GS'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
 
     assert root_dir_path is not None, \
         "You have not set the root path to store your results." \

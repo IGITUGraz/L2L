@@ -8,6 +8,7 @@ from ltl.optimizees.functions.function_generator import FunctionGenerator, Gauss
     EasomParameters, LangermannParameters, MichalewiczParameters, ShekelParameters, RastriginParameters, \
     RosenbrockParameters, ChasmParameters, AckleyParameters
 from ltl.paths import Paths
+from bin.root_dir_path import root_dir_path
 
 warnings.filterwarnings("ignore")
 
@@ -16,7 +17,7 @@ logger = logging.getLogger('plot-function-generator')
 
 def main():
     name = 'plot-function-generator'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+
     assert root_dir_path is not None, \
         "You have not set the root path to store your results." \
         " Set it manually in the code (by setting the variable 'root_dir_path')" \

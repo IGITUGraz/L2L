@@ -12,6 +12,7 @@ from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParameters, SimulatedAnnealingOptimizer
 from ltl.paths import Paths
 from ltl.recorder import Recorder
+from bin.root_dir_path import root_dir_path
 
 warnings.filterwarnings("ignore")
 
@@ -20,7 +21,7 @@ logger = logging.getLogger('ltl-fg-sa')
 
 def main():
     name = 'LTL-FunctionGenerator-SA'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
+
     assert root_dir_path is not None, \
         "You have not set the root path to store your results." \
         " Set it manually in the code (by setting the variable 'root_dir_path')" \

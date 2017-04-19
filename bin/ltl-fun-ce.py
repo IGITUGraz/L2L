@@ -12,6 +12,7 @@ from ltl.optimizers.crossentropy.distribution import NoisyGaussian
 from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
 from ltl.recorder import Recorder
+from bin.root_dir_path import root_dir_path
 
 warnings.filterwarnings("ignore")
 
@@ -20,7 +21,6 @@ logger = logging.getLogger('ltl-fun-ce')
 
 def main():
     name = 'LTL-FUN-CE'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
 
     assert root_dir_path is not None, \
         "You have not set the root path to store your results." \

@@ -16,6 +16,7 @@ from ltl.paths import Paths
 # We first setup the logger and read the logging config which controls the verbosity and destination of the logs from
 # various parts of the code.
 from ltl.recorder import Recorder
+from bin.root_dir_path import root_dir_path
 
 logger = logging.getLogger('ltl-optimizee-optimizer')
 
@@ -24,8 +25,6 @@ def main():
     # TODO when using the template: Give some *meaningful* name here
     name = 'LTL'
 
-    # TODO when using the template: Change the `root_dir_path` here
-    root_dir_path = None
     assert root_dir_path is not None, \
         "You have not set the root path to store your results." \
         " Set it manually in the code (by setting the variable 'root_dir_path')" \

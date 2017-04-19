@@ -1,0 +1,1 @@
+root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
