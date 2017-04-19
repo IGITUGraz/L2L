@@ -60,3 +60,6 @@ _build/
 
 # Mac OS X
 **/.DS_Store
+
+# local rood dir config
+bin/root_dir_path.py
