@@ -24,6 +24,7 @@ class FunctionGenerator:
         self.noise = noise
         self.mu = mu
         self.sigma = sigma
+        self.actual_optima = None
         cost_functions = dict(GaussianParameters=Gaussian,
                               PermutationParameters=Permutation,
                               EasomParameters=Easom,

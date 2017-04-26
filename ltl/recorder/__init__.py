@@ -26,10 +26,9 @@ class Recorder:
       Optimizer parameters as named tuple.
     """
     def __init__(self, trajectory,
-                 optimizee_id, optimizee_name, optimizee_parameters, optimizer_name, optimizer_parameters):
+                 optimizee_name, optimizee_parameters, optimizer_name, optimizer_parameters):
         self.record_flag, self.username, self.description = self._process_args()
         self.trajectory = trajectory
-        self.optimizee_id = optimizee_id
         self.optimizee_name = optimizee_name
         self.optimizee_parameters = optimizee_parameters
         self.optimizer_name = optimizer_name
@@ -66,6 +65,7 @@ class Recorder:
 
         traj = self.trajectory
         self.optima_found = traj.res.final_fitness
+        self.individual_found = traj.res.final_individual
         self.n_iteration = traj.res.n_iteration
 
         self.end_time = datetime.datetime.now()
@@ -80,12 +80,12 @@ class Recorder:
                    'username_': self.username,
                    'description_': self.description,
                    'optimizee_name_': self.optimizee_name,
-                   'optimizee_id_': self.optimizee_id,
                    'optimizee_parameters_': self.optimizee_parameters,
                    'optimizer_name_': self.optimizer_name,
                    'optimizer_params_': self.optimizer_parameters,
                    'n_iteration_': self.n_iteration,
                    'optima_found_': self.optima_found,
+                   'individual_found_': self.individual_found,
                    'actual_optima_': self.actual_optima,
                    'runtime_': self.runtime,
                    'git_commit_id': self.git_commit_id,

@@ -56,6 +56,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters)
         self.optimizee_bounding_func = optimizee_bounding_func
+        self.recorder_parameters = parameters
 
         # The following parameters are recorded
         traj.f_add_parameter('n_parallel_runs', parameters.n_parallel_runs,
@@ -93,6 +94,13 @@ class SimulatedAnnealingOptimizer(Optimizer):
 
         self.eval_pop = new_individual_list
         self._expand_trajectory(traj)
+
+    def get_recorder_parameters(self):
+        """
+        Get parameters used for recorder
+        :return: Dictionary containing recorder parameters
+        """
+        return self.recorder_parameters._asdict()
 
     def post_process(self, traj, fitnesses_results):
         """
