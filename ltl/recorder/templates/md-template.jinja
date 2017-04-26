@@ -5,10 +5,10 @@
 | Description | {{description_}} |
 | Optimizee name | {{optimizee_name_}} |
 | Optimizee params | {% for key, value in optimizee_parameters_.items()
-%} {{key}} : {{value}}|
+%} {{key}} : {{value}} </br> {% endfor %}|
 | Optimizer name | {{optimizer_name_}} |
 | Optimizer params: | {% for key, value in optimizer_params_.items()
-%} {{key}} : {{value}} |
+%} {{key}} : {{value}} </br> {% endfor %} |
 | Number of iterations | {{n_iteration_}} |
 | Optima found | {{optima_found_}} |
 | Individual found | {{individual_found_}} |
