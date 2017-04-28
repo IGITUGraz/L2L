@@ -54,7 +54,9 @@ class BenchmarkedFunctions:
         # else:
         #     params_dict_items = [("benchmark_id", id)]
         params_dict_items = [("benchmark_id", id)]
-        params_dict_items += [("functions", self.function_name_map[id][1].get_params())]
+        # params_dict = OrderedDict(params_dict_items)
+        function_params_items = self.function_name_map[id][1].get_params().items()
+        params_dict_items += function_params_items
         return OrderedDict(params_dict_items)
 
     def _create_rastrigin2d(self):

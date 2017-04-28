@@ -86,16 +86,17 @@ class Recorder:
             os.makedirs(dir_name)
 
         with open(dir_name + 'optimizee_parameters.yml', 'w') as ofile:
-            yaml.dump(dict(self.optimizee_parameters), ofile, default_flow_style=False)
-            self.optimizee_parameters = 'optimizee_parameters.yml'
+            yaml.dump(dict(self.optimizee_parameters), ofile, default_flow_style=None)
+        self.optimizee_parameters = 'optimizee_parameters.yml'
+
         if (len(self.optimizer_parameters) > 5):
             with open(dir_name + 'optimizer_parameters.yml', 'w') as ofile:
-                yaml.dump(dict(self.optimizer_parameters), ofile, default_flow_style=False)
-                self.optimizer_parameters = 'optimizer_parameters.yml'
+                yaml.dump(dict(self.optimizer_parameters), ofile, default_flow_style=None)
+            self.optimizer_parameters = 'optimizer_parameters.yml'
         if (len(self.individual_found) > 5):
             with open(dir_name + 'optima_coordinates.yml', 'w') as ofile:
-                yaml.dump(dict(self.optimizer_parameters), ofile, default_flow_style=False)
-                self.optimizer_parameters = 'optima_coordinates.yml'
+                yaml.dump(dict(self.optimizer_parameters), ofile, default_flow_style=None)
+            self.optimizer_parameters = 'optima_coordinates.yml'
 
         context = {'cur_date_': self.end_time.strftime("%Y-%m-%d %H:%M:%S"),
                    'username_': self.username,

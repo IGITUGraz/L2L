@@ -152,6 +152,7 @@ class CrossEntropyOptimizer(Optimizer):
         Get parameters used for recorder
         :return: Dictionary containing recorder parameters
         """
+
         param_dict = self.recorder_parameters._asdict()
         param_dict['distribution'] = self.recorder_parameters.distribution.get_params()
         return param_dict

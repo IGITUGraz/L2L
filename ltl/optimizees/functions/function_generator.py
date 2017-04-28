@@ -64,7 +64,9 @@ class FunctionGenerator:
         return res
 
     def get_params(self):
-        fg_params = self.function_parameters
+        fg_params = []
+        for param in self.function_parameters:
+            fg_params.append({type(param).__name__: dict(param._asdict())})
 
         if self.noise:
             params_dict_items = [("dims", self.dims),

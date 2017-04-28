@@ -101,7 +101,8 @@ class SimulatedAnnealingOptimizer(Optimizer):
         Get parameters used for recorder
         :return: Dictionary containing recorder parameters
         """
-        return self.recorder_parameters._asdict()
+        param_dict = self.recorder_parameters._asdict()
+        return param_dict
 
     def post_process(self, traj, fitnesses_results):
         """
