@@ -49,10 +49,10 @@ class Recorder:
         if not self.record_flag:
             return
         repo = Repo()
-        if repo.bare:
-            raise Exception("Not a git repository (or any of the parent directories): .git")
-        if repo.is_dirty():
-            raise Exception('Commit your changes first.(use "git add" and then "git commit")')
+        # if repo.bare:
+        #     raise Exception("Not a git repository (or any of the parent directories): .git")
+        # if repo.is_dirty():
+        #     raise Exception('Commit your changes first.(use "git add" and then "git commit")')
         self.start_time = datetime.datetime.now()
         self.git_commit_id = repo.head.commit.hexsha
 
@@ -85,14 +85,17 @@ class Recorder:
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
 
-        if(len(self.optimizee_parameters) > 5):
-            with open(dir_name + 'optimizee_parameters.yml', 'w') as ofile:
-                yaml.dump(dict(self.optimizee_parameters), ofile, default_flow_style=False)
-                self.optimizee_parameters = 'optimizee_parameters.yml'
+        with open(dir_name + 'optimizee_parameters.yml', 'w') as ofile:
+            yaml.dump(dict(self.optimizee_parameters), ofile, default_flow_style=False)
+            self.optimizee_parameters = 'optimizee_parameters.yml'
         if (len(self.optimizer_parameters) > 5):
             with open(dir_name + 'optimizer_parameters.yml', 'w') as ofile:
                 yaml.dump(dict(self.optimizer_parameters), ofile, default_flow_style=False)
                 self.optimizer_parameters = 'optimizer_parameters.yml'
+        if (len(self.individual_found) > 5):
+            with open(dir_name + 'optima_coordinates.yml', 'w') as ofile:
+                yaml.dump(dict(self.optimizer_parameters), ofile, default_flow_style=False)
+                self.optimizer_parameters = 'optima_coordinates.yml'
 
         context = {'cur_date_': self.end_time.strftime("%Y-%m-%d %H:%M:%S"),
                    'username_': self.username,

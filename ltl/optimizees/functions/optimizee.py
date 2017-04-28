@@ -22,6 +22,15 @@ class FunctionGeneratorOptimizee(Optimizee):
         for key, val in indiv_dict.items():
             traj.individual.f_add_parameter(key, val)
 
+    def get_params(self):
+        """
+        Get the important parameters of the optimizee. This is used by :class:`ltl.recorder`
+        for recording the optimizee parameters.
+
+        :return: a :class:`dict
+        """
+
+
     def create_individual(self):
         """
         Creates a random value of parameter within given bounds

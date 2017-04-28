@@ -147,13 +147,13 @@ class CrossEntropyOptimizer(Optimizer):
         
         self._expand_trajectory(traj)
 
-    def get_recorder_parameters(self):
+    def get_params(self):
         """
         Get parameters used for recorder
         :return: Dictionary containing recorder parameters
         """
         param_dict = self.recorder_parameters._asdict()
-        param_dict['distribution'] = self.recorder_parameters.distribution.get_parameters()
+        param_dict['distribution'] = self.recorder_parameters.distribution.get_params()
         return param_dict
 
     def post_process(self, traj, fitnesses_results):

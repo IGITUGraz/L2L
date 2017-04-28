@@ -110,7 +110,7 @@ class GridSearchOptimizer(Optimizer):
         #: The population (i.e. list of individuals) to be evaluated at the next iteration
         self.eval_pop = None
 
-    def get_recorder_parameters(self):
+    def get_params(self):
         """
         Get parameters used for recorder
         :return: Dictionary containing recorder parameters

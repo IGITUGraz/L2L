@@ -44,15 +44,17 @@ class BenchmarkedFunctions:
         self.function_name_map[id][1].mu = mu
         self.function_name_map[id][1].sigma = sigma
 
-        return self.function_name_map[id], self._parse_parameters(id, noise, mu, sigma)
+        return self.function_name_map[id], self.get_params(id, noise, mu, sigma)
 
-    def _parse_parameters(self, id, noise, mu, sigma):
-        if noise:
-            params_dict_items = [("benchmark_id", id),
-                                 ("mu", mu),
-                                 ("sigma", sigma)]
-        else:
-            params_dict_items = [("benchmark_id", id)]
+    def get_params(self, id, noise, mu, sigma):
+        # if noise:
+        #     params_dict_items = [("benchmark_id", id),
+        #                          ("mu", mu),
+        #                          ("sigma", sigma)]
+        # else:
+        #     params_dict_items = [("benchmark_id", id)]
+        params_dict_items = [("benchmark_id", id)]
+        params_dict_items += [("functions", self.function_name_map[id][1].get_params())]
         return OrderedDict(params_dict_items)
 
     def _create_rastrigin2d(self):

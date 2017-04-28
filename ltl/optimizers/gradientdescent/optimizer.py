@@ -164,7 +164,7 @@ class GradientDescentOptimizer(Optimizer):
         self.eval_pop = new_individual_list
         self._expand_trajectory(traj)
 
-    def get_recorder_parameters(self):
+    def get_params(self):
         """
         Get parameters used for recorder
         :return: Dictionary containing recorder parameters

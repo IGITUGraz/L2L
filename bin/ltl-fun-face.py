@@ -90,7 +90,7 @@ def main():
     recorder = Recorder(trajectory=traj,
                         optimizee_name=benchmark_name, optimizee_parameters=benchmark_parameters,
                         optimizer_name=optimizer.__class__.__name__,
-                        optimizer_parameters=optimizer.get_recorder_parameters())
+                        optimizer_parameters=optimizer.get_params())
     recorder.start()
 
     # Run the simulation with all parameter combinations
