@@ -83,6 +83,7 @@ class CrossEntropyOptimizer(Optimizer):
         super().__init__(traj, optimizee_create_individual=optimizee_create_individual,
                          optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters)
         
+        self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func
 
         if parameters.pop_size < 1:
@@ -124,6 +125,7 @@ class CrossEntropyOptimizer(Optimizer):
         self.T = 1  # This is the temperature used to filter evaluated samples in this run
         self.pop_size = parameters.pop_size  # Population size is dynamic in FACE
         self.best_fitness_in_run = -np.inf
+        self.best_individual_in_run = None
 
         # The first iteration does not pick the values out of the Gaussian distribution. It picks randomly
         # (or at-least as randomly as optimizee_create_individual creates individuals)
@@ -144,6 +146,15 @@ class CrossEntropyOptimizer(Optimizer):
         self.current_distribution.fit(self.eval_pop_asarray)
         
         self._expand_trajectory(traj)
+
+    def get_recorder_parameters(self):
+        """
+        Get parameters used for recorder
+        :return: Dictionary containing recorder parameters
+        """
+        param_dict = self.recorder_parameters._asdict()
+        param_dict['distribution'] = self.recorder_parameters.distribution.get_parameters()
+        return param_dict
 
     def post_process(self, traj, fitnesses_results):
         """
@@ -182,6 +193,7 @@ class CrossEntropyOptimizer(Optimizer):
         # See original describtion of cross entropy for optimization
         elite_individuals = sorted_population[:n_elite]
 
+        self.best_individual_in_run = sorted_population[0]
         self.best_fitness_in_run = sorted_fitess[0]
         self.gamma = sorted_fitess[n_elite - 1]
 
@@ -266,8 +278,7 @@ class CrossEntropyOptimizer(Optimizer):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
-        # TODO best individual should be tracked somehow?(not needed for recorder)
-        # traj.f_add_result('final_individual', best_individual)
+        traj.f_add_result('final_individual', self.best_individual_in_run)
         traj.f_add_result('final_fitness', self.best_fitness_in_run)
         traj.f_add_result('n_iteration', self.g + 1)
 

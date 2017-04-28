@@ -55,8 +55,9 @@ class SimulatedAnnealingOptimizer(Optimizer):
                          optimizee_create_individual=optimizee_create_individual,
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters)
-        self.optimizee_bounding_func = optimizee_bounding_func
+
         self.recorder_parameters = parameters
+        self.optimizee_bounding_func = optimizee_bounding_func
 
         # The following parameters are recorded
         traj.f_add_parameter('n_parallel_runs', parameters.n_parallel_runs,
@@ -176,7 +177,9 @@ class SimulatedAnnealingOptimizer(Optimizer):
         best_last_indiv = self.current_individual_list[best_last_indiv_index]
         best_last_fitness = self.current_fitness_value_list[best_last_indiv_index]
 
-        traj.f_add_result('final_individual', self.current_fitness_value_list[-1])
+
+        best_last_indiv_dict = list_to_dict(self.current_individual_list[-1], self.optimizee_individual_dict_spec)
+        traj.f_add_result('final_individual', best_last_indiv_dict)
         traj.f_add_result('final_fitness', self.current_fitness_value_list[-1])
         traj.f_add_result('n_iteration', self.g + 1)
 

@@ -63,13 +63,15 @@ def main():
 
     # NOTE: Benchmark function
     function_id = 4
-    bench_functs = BenchmarkedFunctions(noise=True)
-    fg_name, fg_params = bench_functs.get_function_by_index(function_id)
+    bench_functs = BenchmarkedFunctions()
+    benchmark, benchmark_parameters = bench_functs.get_function_by_index(function_id, noise=True)
+    benchmark_name = benchmark[0]
+    benchmark_function = benchmark[1]
 
-    function_tools.plot(fg_params)
+    function_tools.plot(benchmark_function)
 
     # NOTE: Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, fg_params)
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
@@ -85,9 +87,10 @@ def main():
     env.add_postprocessing(optimizer.post_process)
 
     # Add Recorder
-    recorder = Recorder(trajectory=traj, optimizee_id=function_id,
-                        optimizee_name=fg_name, optimizee_parameters=fg_params,
-                        optimizer_name=optimizer.__class__.__name__, optimizer_parameters=parameters)
+    recorder = Recorder(trajectory=traj,
+                        optimizee_name=benchmark_name, optimizee_parameters=benchmark_parameters,
+                        optimizer_name=optimizer.__class__.__name__,
+                        optimizer_parameters=optimizer.get_recorder_parameters())
     recorder.start()
 
     # Run the simulation with all parameter combinations

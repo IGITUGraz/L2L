@@ -110,6 +110,7 @@ class GradientDescentOptimizer(Optimizer):
                          optimizee_create_individual=optimizee_create_individual,
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters)
+        self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func
         
         traj.f_add_parameter('learning_rate', parameters.learning_rate, comment='Value of learning rate')
@@ -162,6 +163,13 @@ class GradientDescentOptimizer(Optimizer):
         
         self.eval_pop = new_individual_list
         self._expand_trajectory(traj)
+
+    def get_recorder_parameters(self):
+        """
+        Get parameters used for recorder
+        :return: Dictionary containing recorder parameters
+        """
+        return self.recorder_parameters._asdict()
 
     def post_process(self, traj, fitnesses_results):
         """
@@ -219,10 +227,14 @@ class GradientDescentOptimizer(Optimizer):
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 
-    def end(self):
+    def end(self, traj):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
+        traj.f_add_result('final_individual', self.current_individual)
+        traj.f_add_result('final_fitness', self.current_fitness)
+        traj.f_add_result('n_iteration', self.g + 1)
+
         logger.info("The last individual was %s with fitness %s", self.current_individual, self.current_fitness)
         logger.info("-- End of (successful) gradient descent --")
 

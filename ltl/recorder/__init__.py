@@ -1,6 +1,7 @@
 import argparse
 import datetime
 import os
+import yaml
 
 from git import Repo
 from jinja2 import Environment, FileSystemLoader
@@ -48,10 +49,10 @@ class Recorder:
         if not self.record_flag:
             return
         repo = Repo()
-        if repo.bare:
-            raise Exception("Not a git repository (or any of the parent directories): .git")
-        if repo.is_dirty():
-            raise Exception('Commit your changes first.(use "git add" and then "git commit")')
+        # if repo.bare:
+        #     raise Exception("Not a git repository (or any of the parent directories): .git")
+        # if repo.is_dirty():
+        #     raise Exception('Commit your changes first.(use "git add" and then "git commit")')
         self.start_time = datetime.datetime.now()
         self.git_commit_id = repo.head.commit.hexsha
 
@@ -75,14 +76,31 @@ class Recorder:
     def _parse_md(self):
         fname = "result_details.md"
         env = Environment(loader=FileSystemLoader('ltl/recorder/templates'))
+        dir_name = "results/"
+        dir_name += self.optimizer_name + "-"
+        dir_name += self.optimizee_name + "-"
+        end_time_parsed = str(self.end_time.strftime("%Y-%m-%d %H:%M:%S")).replace(":","-")
+        end_time_parsed = end_time_parsed.replace(" ","-")
+        dir_name += end_time_parsed + "/"
+        if not os.path.exists(dir_name):
+            os.makedirs(dir_name)
 
-        context = {'cur_date_': self.end_time,
+        if(len(self.optimizee_parameters) > 5):
+            with open(dir_name + 'optimizee_parameters.yml', 'w') as ofile:
+                yaml.dump(dict(self.optimizee_parameters), ofile, default_flow_style=False)
+                self.optimizee_parameters = 'optimizee_parameters.yml'
+        if (len(self.optimizer_parameters) > 5):
+            with open(dir_name + 'optimizer_parameters.yml', 'w') as ofile:
+                yaml.dump(dict(self.optimizer_parameters), ofile, default_flow_style=False)
+                self.optimizer_parameters = 'optimizer_parameters.yml'
+
+        context = {'cur_date_': self.end_time.strftime("%Y-%m-%d %H:%M:%S"),
                    'username_': self.username,
                    'description_': self.description,
                    'optimizee_name_': self.optimizee_name,
                    'optimizee_parameters_': self.optimizee_parameters,
                    'optimizer_name_': self.optimizer_name,
-                   'optimizer_params_': self.optimizer_parameters,
+                   'optimizer_parameters_': self.optimizer_parameters,
                    'n_iteration_': self.n_iteration,
                    'optima_found_': self.optima_found,
                    'individual_found_': self.individual_found,
@@ -90,12 +108,13 @@ class Recorder:
                    'runtime_': self.runtime,
                    'git_commit_id': self.git_commit_id,
                    'hasattr': hasattr,
+                   'isinstance': isinstance,
                    'str': str}
         template = env.get_template("md-template.jinja")
-        with open(fname, 'w') as f:
+        with open(dir_name + fname, 'w') as f:
             rendered_data = template.render(context)
             f.write(rendered_data)
-        print("Recorder details have been written to " + os.curdir + "/" + f.name)
+        print("Recorder details have been written to " + f.name)
 
     def _process_args(self):
         parser = argparse.ArgumentParser(description="Main parser.")

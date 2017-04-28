@@ -78,6 +78,7 @@ class FACEOptimizer(Optimizer):
         super().__init__(traj, optimizee_create_individual=optimizee_create_individual,
                          optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters)
 
+        self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func
 
         if parameters.min_pop_size < 1:
@@ -148,6 +149,15 @@ class FACEOptimizer(Optimizer):
 
         self._expand_trajectory(traj)
 
+    def get_recorder_parameters(self):
+        """
+        Get parameters used for recorder
+        :return: Dictionary containing recorder parameters
+        """
+        param_dict = self.recorder_parameters._asdict()
+        param_dict['distribution'] = self.recorder_parameters.distribution.get_parameters()
+        return param_dict
+
     def post_process(self, traj, fitnesses_results):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
@@ -188,6 +198,7 @@ class FACEOptimizer(Optimizer):
         elite_individuals = sorted_population[:n_elite]
 
         previous_best_fitness = self.best_fitness_in_run
+        self.best_individual_in_run = sorted_population[0]
         self.best_fitness_in_run = sorted_fitess[0]
         previous_gamma = self.gamma
         self.gamma = sorted_fitess[n_elite - 1]
@@ -275,10 +286,9 @@ class FACEOptimizer(Optimizer):
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
 
-        # TODO best individual should be tracked somehow?(not needed for recorder)
-        # traj.f_add_result('final_individual', best_individual)
+        traj.f_add_result('final_individual', self.best_individual_in_run)
         traj.f_add_result('final_fitness', self.best_fitness_in_run)
-        traj.f_add_result('n_iteration', self.g + 1)
+        traj.f_add_result('n_iteration', self.g)
 
         # ------------ Finished all runs and print result --------------- #
         logger.info("-- End of (successful) FACE optimization --")

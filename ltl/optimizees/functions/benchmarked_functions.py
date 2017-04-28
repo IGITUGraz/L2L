@@ -1,7 +1,7 @@
 from ltl.optimizees.functions.function_generator import FunctionGenerator, GaussianParameters, \
     MichalewiczParameters, ShekelParameters, EasomParameters, LangermannParameters, \
     RastriginParameters, ChasmParameters, RosenbrockParameters, AckleyParameters, PermutationParameters
-
+from collections import OrderedDict
 
 class BenchmarkedFunctions:
     """
@@ -48,12 +48,12 @@ class BenchmarkedFunctions:
 
     def _parse_parameters(self, id, noise, mu, sigma):
         if noise:
-            params_dict = {"benchmark_id": id,
-                           "mu": mu,
-                           "sigma": sigma}
+            params_dict_items = [("benchmark_id", id),
+                                 ("mu", mu),
+                                 ("sigma", sigma)]
         else:
-            params_dict = {"id": id}
-        return params_dict
+            params_dict_items = [("benchmark_id", id)]
+        return OrderedDict(params_dict_items)
 
     def _create_rastrigin2d(self):
         return FunctionGenerator([RastriginParameters()], dims=2)

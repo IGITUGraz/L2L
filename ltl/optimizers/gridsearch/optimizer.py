@@ -64,7 +64,10 @@ class GridSearchOptimizer(Optimizer):
                  optimizee_param_grid):
         super().__init__(traj, optimizee_create_individual, optimizee_fitness_weights,
                          parameters)
-        
+
+        self.recorder_parameters = parameters
+        self.best_individual = None
+        self.best_fitness = None
         # Initializing basic variables
         self.optimizee_create_individual = optimizee_create_individual
         self.optimizee_fitness_weights = optimizee_fitness_weights
@@ -103,9 +106,16 @@ class GridSearchOptimizer(Optimizer):
         self.param_list = {('individual.' + key):value for key, value in self.param_list.items()}
         traj.f_expand(self.param_list)
         #: The current generation number
-        self.g = None
+        self.g = 0
         #: The population (i.e. list of individuals) to be evaluated at the next iteration
         self.eval_pop = None
+
+    def get_recorder_parameters(self):
+        """
+        Get parameters used for recorder
+        :return: Dictionary containing recorder parameters
+        """
+        return self.recorder_parameters._asdict()
 
     def post_process(self, traj, fitnesses_results):
         """
@@ -138,16 +148,22 @@ class GridSearchOptimizer(Optimizer):
         individual = traj.par.individual
         for param_node in individual.f_iter_leaves():
             logger.info('  %s: %s', param_node.v_name, param_node.f_get())
-        
+            self.best_individual = param_node.f_get()
+
+        self.best_fitness = fitness_array[max_fitness_indiv_index]
         logger.info('  with fitness: %s', fitness_array[max_fitness_indiv_index])
         logger.info('  with weighted fitness: %s', weighted_fitness_array[max_fitness_indiv_index])
 
+        self.g += 1
         traj.v_idx = -1
 
-    def end(self):
+    def end(self, traj):
         """
         Run any code required to clean-up, print final individuals etc.
         """
+        traj.f_add_result('final_individual', self.best_individual)
+        traj.f_add_result('final_fitness', self.best_fitness)
+        traj.f_add_result('n_iteration', self.g)
 
         logger.info('x -------------------------------- x')
         logger.info('  Completed SUCCESSFUL Grid Search  ')
