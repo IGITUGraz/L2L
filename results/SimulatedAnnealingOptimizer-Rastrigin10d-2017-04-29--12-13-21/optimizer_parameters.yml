@@ -1,0 +1,2 @@
+{n_iteration: 10, n_parallel_runs: 1, noisy_step: 0.03, seed: 34021, stop_criterion: .inf,
+  temp_decay: 0.99}

@@ -82,6 +82,7 @@ class GridSearchOptimizer(Optimizer):
         # Generate parameter dictionary based on optimizee_param_grid
         self.param_list = {}
         _, optimizee_individual_param_spec = dict_to_list(sample_individual, get_dict_spec=True)
+        self.optimizee_individual_dict_spec = optimizee_individual_param_spec
 
         for param_name, param_type, param_length in optimizee_individual_param_spec:
             param_lower_bound = optimizee_param_grid[param_name][0]
