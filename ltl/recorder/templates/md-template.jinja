@@ -15,7 +15,10 @@
 %} {{key}} : {{value}} </br> {% endfor %} {% endif %} |
 | Number of iterations | {{n_iteration_}} |
 | Fitness at optima | {{optima_found_}} |
-| Coordinates of optima | {{individual_found_}} |
+| Coordinates of optima | {% if isinstance(individual_found_, str)
+%} <a href="{{ individual_found_ }}">{{ individual_found_ }}</a> {% else
+%} {% for key, value in individual_found_.items()
+%} {{key}} : {{value}} </br> {% endfor %} {% endif %} |
 | Actual optima | {% if actual_optima_ == None %} Unknown {% else %} {{actual_optima_}} {% endif %} |
 | runtime | {{runtime_}} |
 | git commit id | {{git_commit_id}} |

@@ -100,7 +100,7 @@ class Recorder:
         with open(dir_name + 'optima_coordinates.yml', 'w') as ofile:
             print(self.individual_found)
             yaml.dump(self.individual_found, ofile, default_flow_style=None)
-        self.optimizer_parameters = 'optima_coordinates.yml'
+        self.individual_found = 'optima_coordinates.yml'
 
         context = {'cur_date_': self.end_time.strftime("%Y-%m-%d %H:%M:%S"),
                    'username_': self.username,
