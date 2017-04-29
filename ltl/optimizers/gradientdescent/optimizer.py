@@ -231,7 +231,10 @@ class GradientDescentOptimizer(Optimizer):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
-        traj.f_add_result('final_individual', self.current_individual)
+        best_last_indiv_dict = list_to_dict(self.current_individual.tolist(),
+                                            self.optimizee_individual_dict_spec)
+
+        traj.f_add_result('final_individual', best_last_indiv_dict)
         traj.f_add_result('final_fitness', self.current_fitness)
         traj.f_add_result('n_iteration', self.g + 1)
 

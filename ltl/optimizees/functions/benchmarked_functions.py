@@ -3,6 +3,7 @@ from ltl.optimizees.functions.function_generator import FunctionGenerator, Gauss
     RastriginParameters, ChasmParameters, RosenbrockParameters, AckleyParameters, PermutationParameters
 from collections import OrderedDict
 
+
 class BenchmarkedFunctions:
     """
     Implements benchmarked functions class for an easier call of the benchmarked functions

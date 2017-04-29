@@ -279,7 +279,10 @@ class CrossEntropyOptimizer(Optimizer):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
-        traj.f_add_result('final_individual', self.best_individual_in_run)
+        best_last_indiv_dict = list_to_dict(self.best_individual_in_run.tolist(),
+                                            self.optimizee_individual_dict_spec)
+
+        traj.f_add_result('final_individual', best_last_indiv_dict)
         traj.f_add_result('final_fitness', self.best_fitness_in_run)
         traj.f_add_result('n_iteration', self.g + 1)
 

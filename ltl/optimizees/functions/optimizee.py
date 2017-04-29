@@ -30,7 +30,6 @@ class FunctionGeneratorOptimizee(Optimizee):
         :return: a :class:`dict
         """
 
-
     def create_individual(self):
         """
         Creates a random value of parameter within given bounds

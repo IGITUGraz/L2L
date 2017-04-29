@@ -3,7 +3,6 @@ import logging
 from abc import ABCMeta
 
 import numpy as np
-from collections import OrderedDict
 
 logger = logging.getLogger('ltl-distribution')
 

@@ -2,6 +2,7 @@ import argparse
 import datetime
 import os
 import yaml
+import warnings
 
 from git import Repo
 from jinja2 import Environment, FileSystemLoader
@@ -28,6 +29,10 @@ class Recorder:
     """
     def __init__(self, trajectory,
                  optimizee_name, optimizee_parameters, optimizer_name, optimizer_parameters):
+        if optimizee_parameters is None:
+            warnings.warn("optimizee_parameters is set to None.")
+        if optimizer_parameters is None:
+            warnings.warn("optimizer_parameters is set to None.")
         self.record_flag, self.username, self.description = self._process_args()
         self.trajectory = trajectory
         self.optimizee_name = optimizee_name
@@ -89,14 +94,13 @@ class Recorder:
             yaml.dump(dict(self.optimizee_parameters), ofile, default_flow_style=None)
         self.optimizee_parameters = 'optimizee_parameters.yml'
 
-        if (len(self.optimizer_parameters) > 5):
-            with open(dir_name + 'optimizer_parameters.yml', 'w') as ofile:
-                yaml.dump(dict(self.optimizer_parameters), ofile, default_flow_style=None)
-            self.optimizer_parameters = 'optimizer_parameters.yml'
-        if (len(self.individual_found) > 5):
-            with open(dir_name + 'optima_coordinates.yml', 'w') as ofile:
-                yaml.dump(dict(self.optimizer_parameters), ofile, default_flow_style=None)
-            self.optimizer_parameters = 'optima_coordinates.yml'
+        with open(dir_name + 'optimizer_parameters.yml', 'w') as ofile:
+            yaml.dump(dict(self.optimizer_parameters), ofile, default_flow_style=None)
+        self.optimizer_parameters = 'optimizer_parameters.yml'
+        with open(dir_name + 'optima_coordinates.yml', 'w') as ofile:
+            print(self.individual_found)
+            yaml.dump(self.individual_found, ofile, default_flow_style=None)
+        self.optimizer_parameters = 'optima_coordinates.yml'
 
         context = {'cur_date_': self.end_time.strftime("%Y-%m-%d %H:%M:%S"),
                    'username_': self.username,
