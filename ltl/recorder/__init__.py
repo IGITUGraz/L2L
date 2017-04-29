@@ -54,10 +54,10 @@ class Recorder:
         if not self.record_flag:
             return
         repo = Repo()
-        # if repo.bare:
-        #     raise Exception("Not a git repository (or any of the parent directories): .git")
-        # if repo.is_dirty():
-        #     raise Exception('Commit your changes first.(use "git add" and then "git commit")')
+        if repo.bare:
+            raise Exception("Not a git repository (or any of the parent directories): .git")
+        if repo.is_dirty():
+            raise Exception('Commit your changes first.(use "git add" and then "git commit")')
         self.start_time = datetime.datetime.now()
         self.git_commit_id = repo.head.commit.hexsha
 
