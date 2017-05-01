@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 
 import numpy as np
 
@@ -24,6 +24,7 @@ class FunctionGenerator:
         self.noise = noise
         self.mu = mu
         self.sigma = sigma
+        self.actual_optima = None
         cost_functions = dict(GaussianParameters=Gaussian,
                               PermutationParameters=Permutation,
                               EasomParameters=Easom,
@@ -61,6 +62,20 @@ class FunctionGenerator:
             res += np.random.normal(self.mu, self.sigma)
 
         return res
+
+    def get_params(self):
+        fg_params = []
+        for param in self.function_parameters:
+            fg_params.append({type(param).__name__: dict(param._asdict())})
+
+        if self.noise:
+            params_dict_items = [("dims", self.dims),
+                                 ("mu", self.mu),
+                                 ("sigma", self.sigma)]
+        else:
+            params_dict_items = [("dims", self.dims)]
+        params_dict_items += [("functions", fg_params)]
+        return OrderedDict(params_dict_items)
 
 
 class Function(ABC):

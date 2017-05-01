@@ -42,6 +42,10 @@ class Gaussian(Distribution):
         self.mean = None
         self.cov = None
 
+    def get_params(self):
+        params_dict_items = [("distribution_name", self.__class__.__name__)]
+        return dict(params_dict_items)
+
     def fit(self, data_list, smooth_update=0):
         """Fit a gaussian distribution to the given data
 
@@ -96,6 +100,12 @@ class NoisyGaussian(Gaussian):
         self.noise_bias = noise_bias
         self.noisy_cov = None
         self.noise = None
+
+    def get_params(self):
+        params_dict_items = [("distribution_name", self.__class__.__name__),
+                             ("noise_bias", self.noise_bias),
+                             ("noise_decay", self.noise_decay)]
+        return dict(params_dict_items)
 
     def fit(self, data_list, smooth_update=0):
         """Fits the parameters to the given data (see .Gaussian) and additionally

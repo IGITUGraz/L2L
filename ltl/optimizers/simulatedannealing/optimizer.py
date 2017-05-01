@@ -55,6 +55,8 @@ class SimulatedAnnealingOptimizer(Optimizer):
                          optimizee_create_individual=optimizee_create_individual,
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters)
+
+        self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func
 
         # The following parameters are recorded
@@ -93,6 +95,14 @@ class SimulatedAnnealingOptimizer(Optimizer):
 
         self.eval_pop = new_individual_list
         self._expand_trajectory(traj)
+
+    def get_params(self):
+        """
+        Get parameters used for recorder
+        :return: Dictionary containing recorder parameters
+        """
+        param_dict = self.recorder_parameters._asdict()
+        return param_dict
 
     def post_process(self, traj, fitnesses_results):
         """
@@ -168,8 +178,9 @@ class SimulatedAnnealingOptimizer(Optimizer):
         best_last_indiv = self.current_individual_list[best_last_indiv_index]
         best_last_fitness = self.current_fitness_value_list[best_last_indiv_index]
 
-        traj.f_add_result('final_individual', self.current_fitness_value_list[-1])
-        traj.f_add_result('final_fitness', self.current_fitness_value_list[-1])
+        best_last_indiv_dict = list_to_dict(best_last_indiv, self.optimizee_individual_dict_spec)
+        traj.f_add_result('final_individual', best_last_indiv_dict)
+        traj.f_add_result('final_fitness', best_last_fitness)
         traj.f_add_result('n_iteration', self.g + 1)
 
         logger.info("The best last individual was %s with fitness %s", best_last_indiv, best_last_fitness)

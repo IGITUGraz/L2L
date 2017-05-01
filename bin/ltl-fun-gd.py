@@ -1,22 +1,21 @@
 import logging.config
 import os
-import warnings
 
 import numpy as np
 import yaml
 from pypet import Environment
 from pypet import pypetconstants
 
-from ltl.optimizees.functions.function_generator import GaussianParameters, FunctionGenerator
+from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
+from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizers.gradientdescent.optimizer import GradientDescentOptimizer
 # from ltl.optimizers.gradientdescent.optimizer import ClassicGDParameters
 # from ltl.optimizers.gradientdescent.optimizer import StochasticGDParameters
 # from ltl.optimizers.gradientdescent.optimizer import AdamParameters
 from ltl.optimizers.gradientdescent.optimizer import RMSPropParameters
 from ltl.paths import Paths
-
-warnings.filterwarnings("ignore")
+from ltl.recorder import Recorder
 
 logger = logging.getLogger('ltl-lsm-gradientdescent')
 
@@ -63,10 +62,16 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
+    # NOTE: Benchmark function
+    function_id = 4
+    bench_functs = BenchmarkedFunctions()
+    (benchmark_name, benchmark_function), benchmark_parameters = \
+        bench_functs.get_function_by_index(function_id, noise=True)
+
+    function_tools.plot(benchmark_function)
+
     # NOTE: Innerloop simulator
-    fg_instance = FunctionGenerator([GaussianParameters(sigma=[[1., 0.], [0., 1.]], mean=[1., 1.])],
-                                    dims=2, bound=[0, 2])
-    optimizee = FunctionGeneratorOptimizee(traj, fg_instance)
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
@@ -89,13 +94,21 @@ def main():
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
 
+    # Add Recorder
+    recorder = Recorder(trajectory=traj,
+                        optimizee_name=benchmark_name, optimizee_parameters=benchmark_parameters,
+                        optimizer_name=optimizer.__class__.__name__,
+                        optimizer_parameters=optimizer.get_params())
+    recorder.start()
+
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
     # NOTE: Innerloop optimizee end
     optimizee.end()
     # NOTE: Outerloop optimizer end
-    optimizer.end()
+    optimizer.end(traj)
+    recorder.end()
 
     # Finally disable logging and close all log-files
     env.disable_logging()

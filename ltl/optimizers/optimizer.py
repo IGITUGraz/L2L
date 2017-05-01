@@ -44,6 +44,15 @@ class Optimizer:
         #: The population (i.e. list of individuals) to be evaluated at the next iteration
         self.eval_pop = None
 
+    def get_params(self):
+        """
+        Get the important parameters of the optimizer. This is used by :class:`ltl.recorder`
+        for recording the optimizee parameters.
+
+        :return: a :class:`dict`
+        """
+        pass
+
     def post_process(self, traj, fitnesses_results):
         """
         This is the key function of this class. Given a set of :obj:`fitnesses_results`,  and the :obj:`traj`, it uses
