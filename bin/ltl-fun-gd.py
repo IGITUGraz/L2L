@@ -1,6 +1,5 @@
 import logging.config
 import os
-import warnings
 
 import numpy as np
 import yaml

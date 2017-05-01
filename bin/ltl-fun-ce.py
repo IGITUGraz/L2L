@@ -1,6 +1,5 @@
 import logging.config
 import os
-import warnings
 
 import yaml
 from pypet import Environment
