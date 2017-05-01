@@ -7,11 +7,7 @@ from pypet import pypetconstants
 
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
-from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizers.gradientdescent.optimizer import GradientDescentOptimizer
-# from ltl.optimizers.gradientdescent.optimizer import ClassicGDParameters
-# from ltl.optimizers.gradientdescent.optimizer import StochasticGDParameters
-# from ltl.optimizers.gradientdescent.optimizer import AdamParameters
 from ltl.optimizers.gradientdescent.optimizer import RMSPropParameters
 from ltl.paths import Paths
 from ltl.recorder import Recorder

@@ -36,8 +36,6 @@ def main():
     print("Change the values in logging.yaml to control log level and destination")
     print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
 
-
-
     # NOTE: Benchmark function
     bench_functs = BenchmarkedFunctions()
 

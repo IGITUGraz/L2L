@@ -4,7 +4,6 @@ import yaml
 from pypet import Environment
 from pypet import pypetconstants
 
-from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizers.crossentropy.distribution import Gaussian
