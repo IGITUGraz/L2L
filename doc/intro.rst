@@ -337,7 +337,7 @@ bin/ltl-example simulation)::
 
 If the `bin/ltl-example.py` provides the recording functionality, you should be able to find a `result_details.md`
 file in the "results/<optimizer_name>-<benchmark_name>-<dd-mm-yyyy--hh-MM-ss>" together with .yaml files representing
-additional experiment info.
+additional experiment info. The results should then be checked in to the master-branch.
 
 
 Additional Utilities and Protocols

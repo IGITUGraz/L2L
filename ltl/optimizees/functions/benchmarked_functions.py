@@ -29,10 +29,10 @@ class BenchmarkedFunctions:
                                   ("Easom10d", self._create_easom10d()),
                                   ("3Gaussians2d", self._create_3gaussians2d())]
 
-    def get_function_by_index(self, id, noise=False, mu=0., sigma=0.01):
+    def get_function_by_index(self, id_, noise=False, mu=0., sigma=0.01):
         """
         Get the benchmarked function with given id
-        :param id: Function id
+        :param id_: Function id
         :param noise: Indicates whether the function should provide noisy values
         :param mu: mean of the noise
         :param sigma: convariance of the noise
@@ -41,11 +41,11 @@ class BenchmarkedFunctions:
         """
 
         #first update the noise for the given function
-        self.function_name_map[id][1].noise = noise
-        self.function_name_map[id][1].mu = mu
-        self.function_name_map[id][1].sigma = sigma
+        self.function_name_map[id_][1].noise = noise
+        self.function_name_map[id_][1].mu = mu
+        self.function_name_map[id_][1].sigma = sigma
 
-        return self.function_name_map[id], self.get_params(id, noise, mu, sigma)
+        return self.function_name_map[id_], self.get_params(id_, noise, mu, sigma)
 
     def get_params(self, id, noise, mu, sigma):
         # if noise:

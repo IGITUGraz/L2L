@@ -13,8 +13,6 @@ from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEn
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
-warnings.filterwarnings("ignore")
-
 logger = logging.getLogger('ltl-fun-ce')
 
 
@@ -63,9 +61,8 @@ def main():
     # NOTE: Benchmark function
     function_id = 4
     bench_functs = BenchmarkedFunctions()
-    benchmark, benchmark_parameters = bench_functs.get_function_by_index(function_id, noise=True)
-    benchmark_name = benchmark[0]
-    benchmark_function = benchmark[1]
+    (benchmark_name, benchmark_function), benchmark_parameters = \
+        bench_functs.get_function_by_index(function_id, noise=True)
 
     function_tools.plot(benchmark_function)
 

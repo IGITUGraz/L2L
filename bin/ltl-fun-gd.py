@@ -18,9 +18,6 @@ from ltl.optimizers.gradientdescent.optimizer import RMSPropParameters
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
-
-warnings.filterwarnings("ignore")
-
 logger = logging.getLogger('ltl-lsm-gradientdescent')
 
 
@@ -69,9 +66,8 @@ def main():
     # NOTE: Benchmark function
     function_id = 4
     bench_functs = BenchmarkedFunctions()
-    benchmark, benchmark_parameters = bench_functs.get_function_by_index(function_id, noise=True)
-    benchmark_name = benchmark[0]
-    benchmark_function = benchmark[1]
+    (benchmark_name, benchmark_function), benchmark_parameters = \
+        bench_functs.get_function_by_index(function_id, noise=True)
 
     function_tools.plot(benchmark_function)
 
