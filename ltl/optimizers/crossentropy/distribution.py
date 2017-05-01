@@ -225,7 +225,6 @@ class NoisyGaussian(Gaussian):
 
         # determine noise variance
         if self.additive_noise is None:
-            # have to compensate first decay
             self.additive_noise = np.ones(eigenvectors.shape[-1])
 
         noise = np.diag(eigenvalues + self.additive_noise)
