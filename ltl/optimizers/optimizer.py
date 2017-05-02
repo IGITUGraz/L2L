@@ -29,20 +29,29 @@ class Optimizer:
     def __init__(self, traj,
                  optimizee_create_individual,
                  optimizee_fitness_weights,
+                 optimizee_bounding_func,
                  parameters):
-
         # Creating Placeholders for individuals and results that are about to be explored
         traj.f_add_parameter('generation', 0, comment='Current generation')
         traj.f_add_parameter('ind_idx', 0, comment='Index of individual')
-        
+
         # Initializing basic variables
         self.optimizee_create_individual = optimizee_create_individual
         self.optimizee_fitness_weights = optimizee_fitness_weights
-        
+
         #: The current generation number
         self.g = None
         #: The population (i.e. list of individuals) to be evaluated at the next iteration
         self.eval_pop = None
+
+    def get_params(self):
+        """
+        Get the important parameters of the optimizer. This is used by :class:`ltl.recorder`
+        for recording the optimizee parameters.
+
+        :return: a :class:`dict`
+        """
+        pass
 
     def post_process(self, traj, fitnesses_results):
         """
@@ -65,10 +74,16 @@ class Optimizer:
         self.g += 1
         self._expand_trajectory(traj)
 
-    def end(self):
+    def end(self, traj):
         """
         Run any code required to clean-up, print final individuals etc.
+        
+        :param  ~pypet.trajectory.Trajectory traj: The :mod:`pypet` trajectory that contains the parameters and the
+            individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.
+            param1 is accessible using `traj.param1`
+            
         """
+        pass
 
     def _expand_trajectory(self, traj):
         """

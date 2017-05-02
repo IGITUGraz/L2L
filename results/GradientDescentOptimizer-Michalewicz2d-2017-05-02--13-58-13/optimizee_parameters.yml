@@ -1,0 +1,6 @@
+benchmark_id: 10
+dims: 2
+functions:
+- MichalewiczParameters: {m: default}
+mu: 0.0
+sigma: 0.01
