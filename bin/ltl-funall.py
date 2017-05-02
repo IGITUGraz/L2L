@@ -4,7 +4,7 @@ import itertools
 
 import numpy as np
 import yaml
-from pypet import Environment, pypetconstants
+from pypet import Environment
 
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
