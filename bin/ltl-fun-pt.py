@@ -27,7 +27,7 @@ def main():
            " before running the simulation"
     paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
 
-    with open("/home/daniel/Schreibtisch/LTL-master/bin/logging.yaml") as f:
+    with open("bin/logging.yaml") as f:
         l_dict = yaml.load(f)
         log_output_file = os.path.join(paths.results_path, l_dict['handlers']['file']['filename'])
         l_dict['handlers']['file']['filename'] = log_output_file
