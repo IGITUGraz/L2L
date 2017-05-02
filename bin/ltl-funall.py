@@ -44,36 +44,48 @@ def main():
     print("Change the values in logging.yaml to control log level and destination")
     print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
 
+    traj_file = os.path.join(paths.output_dir_path, 'data.h5')
+
     n_iterations = 100
+
+    # NOTE: Need to use lambdas here since we want the distributions within CE, FACE etc. optimizers to be reinitialized
+    #  afresh each time since it seems like they are stateful.
     optimizers = [
-        (CrossEntropyOptimizer, CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0,
-                                                       n_iteration=n_iterations,
-                                                       distribution=NoisyGaussian(noise_decay=0.95, noise_bias=0.05))),
-        (FACEOptimizer, FACEParameters(min_pop_size=20, max_pop_size=50, n_elite=10, smoothing=0.2, temp_decay=0,
-                                       n_iteration=n_iterations, distribution=Gaussian(), n_expand=5)),
-        (GradientDescentOptimizer, RMSPropParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5,
-                                                     momentum_decay=0.5, n_iteration=n_iterations, stop_criterion=np.Inf)),
-        (GradientDescentOptimizer, ClassicGDParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5,
-                                                       n_iteration=n_iterations, stop_criterion=np.Inf)),
-        (GradientDescentOptimizer, AdamParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5,
-                                                  first_order_decay=0.8, second_order_decay=0.8, n_iteration=n_iterations,
-                                                  stop_criterion=np.Inf)),
-        (GradientDescentOptimizer, StochasticGDParameters(learning_rate=0.01, stochastic_deviation=1,
-                                                          stochastic_decay=0.99, exploration_rate=0.01,
-                                                          n_random_steps=5, n_iteration=n_iterations, stop_criterion=np.Inf)),
-        (GridSearchOptimizer, GridSearchParameters(param_grid=None)),  # param_grid will be replaced below
-        (SimulatedAnnealingOptimizer, SimulatedAnnealingParameters(n_parallel_runs=1, noisy_step=.03, temp_decay=.99,
-                                                                   n_iteration=n_iterations, stop_criterion=np.Inf,
-                                                                   seed=np.random.randint(1e5)))
+        (CrossEntropyOptimizer,
+         lambda: CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0,
+                                        n_iteration=n_iterations,
+                                        distribution=NoisyGaussian(noise_decay=0.95, noise_bias=0.05))),
+        (FACEOptimizer,
+         lambda: FACEParameters(min_pop_size=20, max_pop_size=50, n_elite=10, smoothing=0.2, temp_decay=0,
+                                n_iteration=n_iterations, distribution=Gaussian(), n_expand=5)),
+        (GradientDescentOptimizer,
+         lambda: RMSPropParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, momentum_decay=0.5,
+                                   n_iteration=n_iterations, stop_criterion=np.Inf)),
+        (GradientDescentOptimizer,
+         lambda: ClassicGDParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5,
+                                     n_iteration=n_iterations, stop_criterion=np.Inf)),
+        (GradientDescentOptimizer,
+         lambda: AdamParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, first_order_decay=0.8,
+                                second_order_decay=0.8, n_iteration=n_iterations, stop_criterion=np.Inf)),
+        (GradientDescentOptimizer,
+         lambda: StochasticGDParameters(learning_rate=0.01, stochastic_deviation=1, stochastic_decay=0.99,
+                                        exploration_rate=0.01, n_random_steps=5, n_iteration=n_iterations,
+                                        stop_criterion=np.Inf)),
+        (GridSearchOptimizer,
+         lambda: GridSearchParameters(param_grid=None)),  # param_grid will be replaced below
+        (SimulatedAnnealingOptimizer,
+         lambda: SimulatedAnnealingParameters(n_parallel_runs=1, noisy_step=.03, temp_decay=.99,
+                                              n_iteration=n_iterations, stop_criterion=np.Inf,
+                                              seed=np.random.randint(1e5)))
     ]
 
     # NOTE: Benchmark functions
     bench_functs = BenchmarkedFunctions()
     function_ids = range(len(bench_functs.function_name_map))
 
-    for function_id, (optimizer_class, optimizer_parameters) in itertools.product(function_ids, optimizers):
+    for function_id, (optimizer_class, optimizer_parameters_fn) in itertools.product(function_ids, optimizers):
         logger.info("Running benchmark for %s optimizer and function id %d", optimizer_class, function_id)
-        traj_file = os.path.join(paths.output_dir_path, 'data.h5')
+        optimizer_parameters = optimizer_parameters_fn()
 
         # Create an environment that handles running our simulation
         # This initializes a PyPet environment
