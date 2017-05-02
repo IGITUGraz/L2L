@@ -32,6 +32,11 @@ class Distribution(metaclass=ABCMeta):
         """
         pass
 
+    @abc.abstractmethod
+    def get_params(self):
+        """Returns the parametrization of the distribution as a dict"""
+        pass
+
 
 class Gaussian(Distribution):
     """Gaussian distribution.
@@ -97,6 +102,7 @@ class BayesianGaussianMixture():
         # taken from check_fitted function of BaysianGaussianMixture in the sklearn repository
         self.parametrization = ('covariances_', 'means_', 'weight_concentration_', 'weights_',
                                 'mean_precision_', 'degrees_of_freedom_', 'precisions_', 'precisions_cholesky_')
+        self.n_components = n_components
 
     def _postprocess_fitted(self, model):
         """postprocesses the fitted model, adding the possibility to add noise or something
@@ -110,6 +116,11 @@ class BayesianGaussianMixture():
         :param distribution_parameters: the dictionary that contains the distributions parametrization
         """
         pass
+
+    def get_params(self):
+        params_dict_items = [("distribution_name", self.__class__.__name__),
+                             ("n_components", self.n_components)]
+        return dict(params_dict_items)
 
     def fit(self, data_list, smooth_update=0):
         """Fits data_list on the parametrized model
@@ -194,6 +205,12 @@ class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
         """
         distribution_parameters['additive_noise'] = self.additive_noise
 
+    def get_params(self):
+        params_dict_items = BayesianGaussianMixture.get_params(self)
+        params_dict_items['additive_noise'] = self.additive_noise
+        params_dict_items['noise_decay'] = self.noise_decay
+        return dict(params_dict_items)
+
 
 class NoisyGaussian(Gaussian):
     """Additive Noisy Gaussian distribution. The initialization of its noise components
@@ -216,7 +233,7 @@ class NoisyGaussian(Gaussian):
 
     def get_params(self):
         params_dict_items = [("distribution_name", self.__class__.__name__),
-                             ("noise_bias", self.noise_bias),
+                             ("additive_noise", self.additive_noise),
                              ("noise_decay", self.noise_decay)]
         return dict(params_dict_items)
 

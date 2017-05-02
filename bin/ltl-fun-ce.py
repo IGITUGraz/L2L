@@ -3,6 +3,7 @@ import os
 
 import yaml
 from pypet import Environment
+from pypet import pypetconstants
 
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
@@ -45,10 +46,10 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      # freeze_input=True,
-                      # multiproc=True,
-                      # use_scoop=True,
-                      # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                      freeze_input=True,
+                      multiproc=True,
+                      use_scoop=True,
+                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
@@ -72,7 +73,7 @@ def main():
     # TODO: Change the optimizer to the appropriate Optimizer class
     parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=5,
                                         distribution=NoisyGaussian(additive_noise=[1., 1.],
-                                                                    noise_decay=0.95))
+                                                                   noise_decay=0.95))
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                       optimizee_fitness_weights=(-0.1,),
                                       parameters=parameters,
