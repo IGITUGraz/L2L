@@ -309,7 +309,7 @@ def convert_dict_to_numpy(input_dict):
             new_value = np.array(value)
         elif isinstance(value, Integral) and not isinstance(value, bool):
             new_value = np.int64(value)
-        elif isinstance(value, Real):
+        elif isinstance(value, Real) and not isinstance(value, bool):
             new_value = np.float64(value)
         elif isinstance(value, Mapping):
             new_value = convert_dict_to_numpy(value)
