@@ -70,13 +70,7 @@ def main():
         (GradientDescentOptimizer,
          lambda: StochasticGDParameters(learning_rate=0.01, stochastic_deviation=1, stochastic_decay=0.99,
                                         exploration_rate=0.01, n_random_steps=5, n_iteration=n_iterations,
-                                        stop_criterion=np.Inf)),
-        (GridSearchOptimizer,
-         lambda: GridSearchParameters(param_grid=None)),  # param_grid will be replaced below
-        (SimulatedAnnealingOptimizer,
-         lambda: SimulatedAnnealingParameters(n_parallel_runs=1, noisy_step=.03, temp_decay=.99,
-                                              n_iteration=n_iterations, stop_criterion=np.Inf,
-                                              seed=np.random.randint(1e5)))
+                                        stop_criterion=np.Inf))
     ]
 
     # NOTE: Benchmark functions
