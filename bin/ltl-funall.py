@@ -14,7 +14,6 @@ from ltl.optimizers.face.optimizer import FACEOptimizer, FACEParameters
 from ltl.optimizers.gradientdescent.optimizer import GradientDescentOptimizer, RMSPropParameters, ClassicGDParameters, \
     AdamParameters, StochasticGDParameters
 from ltl.optimizers.gridsearch import GridSearchOptimizer, GridSearchParameters
-from ltl.optimizers.simulatedannealing.optimizer import SimulatedAnnealingOptimizer, SimulatedAnnealingParameters
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
