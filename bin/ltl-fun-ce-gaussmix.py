@@ -5,9 +5,12 @@ import yaml
 from pypet import Environment
 from pypet import pypetconstants
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
+from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
+from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
-from ltl.optimizers.crossentropy.distribution import BayesianGaussianMixture
+from postproc.recorder import Recorder
+from ltl.optimizers.crossentropy.distribution import NoisyBayesianGaussianMixture
 
 warnings.filterwarnings("ignore")
 
@@ -53,25 +56,34 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    # NOTE: Innerloop simulator
-    from ltl.optimizees.functions.function_generator import FunctionGenerator, LangermannParameters
-    fg_instance = FunctionGenerator([LangermannParameters('default', 'default')],
-                                    dims=2, bound=[0, 2])
+    function_id = 7
+    bench_functs = BenchmarkedFunctions(noise=True)
+    fg_name, fg_params = bench_functs.get_function_by_index(function_id)
+
+    function_tools.plot(fg_params)
 
     # NOTE: Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, fg_instance)
+    optimizee = FunctionGeneratorOptimizee(traj, fg_params)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=30, 
-                                        distribution=BayesianGaussianMixture(2))
+    parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=5,
+                                        distribution=NoisyBayesianGaussianMixture(2,
+                                                                                  additive_noise=[1., 1.],
+                                                                                  noise_decay=0.9))
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                            optimizee_fitness_weights=(1,),
+                                            optimizee_fitness_weights=(-.1,),
                                             parameters=parameters,
                                             optimizee_bounding_func=optimizee.bounding_func)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
+
+    # Add Recorder
+    recorder = Recorder(trajectory=traj, optimizee_id=function_id,
+                        optimizee_name=fg_name, optimizee_parameters=fg_params,
+                        optimizer_name=optimizer.__class__.__name__, optimizer_parameters=parameters)
+    recorder.start()
 
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
@@ -79,13 +91,12 @@ def main():
     # NOTE: Innerloop optimizee end
     optimizee.end()
     # NOTE: Outerloop optimizer end
-    optimizer.end()
+    optimizer.end(traj)
+    recorder.end()
 
     # Finally disable logging and close all log-files
     env.disable_logging()
 
 
 if __name__ == '__main__':
-    import ipdb
-    with ipdb.launch_ipdb_on_exception():
-        main()
+    main()
