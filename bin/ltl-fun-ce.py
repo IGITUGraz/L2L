@@ -1,30 +1,31 @@
-import os
-import warnings
 import logging.config
+import os
+
 import yaml
 from pypet import Environment
-from pypet import pypetconstants
-from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
-from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
+
 from ltl.optimizees.functions import tools as function_tools
+from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
+from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
+from ltl.optimizers.crossentropy.distribution import NoisyGaussian
 from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
-from postproc.recorder import Recorder
-from ltl.optimizers.crossentropy.distribution import NoisyGaussian
-
-warnings.filterwarnings("ignore")
+from ltl.recorder import Recorder
 
 logger = logging.getLogger('ltl-fun-ce')
 
 
 def main():
     name = 'LTL-FUN-CE'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
-    
-    assert root_dir_path is not None, \
-           "You have not set the root path to store your results." \
-           " Set it manually in the code (by setting the variable 'root_dir_path')" \
-           " before running the simulation"
+    try:
+        with open('bin/path.conf') as f:
+            root_dir_path = f.read().strip()
+    except FileNotFoundError:
+        raise FileNotFoundError(
+            "You have not set the root path to store your results."
+            " Write the path to a path.conf text file in the bin directory"
+            " before running the simulation"
+        )
     paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
 
     with open("bin/logging.yaml") as f:
@@ -44,10 +45,10 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      freeze_input=True,
-                      multiproc=True,
-                      use_scoop=True,
-                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                      # freeze_input=True,
+                      # multiproc=True,
+                      # use_scoop=True,
+                      # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
@@ -56,14 +57,16 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    function_id = 7
-    bench_functs = BenchmarkedFunctions(noise=True)
-    fg_name, fg_params = bench_functs.get_function_by_index(function_id)
+    # NOTE: Benchmark function
+    function_id = 4
+    bench_functs = BenchmarkedFunctions()
+    (benchmark_name, benchmark_function), benchmark_parameters = \
+        bench_functs.get_function_by_index(function_id, noise=True)
 
-    function_tools.plot(fg_params)
+    function_tools.plot(benchmark_function)
 
     # NOTE: Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, fg_params)
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
@@ -71,17 +74,18 @@ def main():
                                         distribution=NoisyGaussian(additive_noise=[1., 1.],
                                                                     noise_decay=0.95))
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                            optimizee_fitness_weights=(-0.1,),
-                                            parameters=parameters,
-                                            optimizee_bounding_func=optimizee.bounding_func)
+                                      optimizee_fitness_weights=(-0.1,),
+                                      parameters=parameters,
+                                      optimizee_bounding_func=optimizee.bounding_func)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
 
     # Add Recorder
-    recorder = Recorder(trajectory=traj, optimizee_id=function_id,
-                        optimizee_name=fg_name, optimizee_parameters=fg_params,
-                        optimizer_name=optimizer.__class__.__name__, optimizer_parameters=parameters)
+    recorder = Recorder(trajectory=traj,
+                        optimizee_name=benchmark_name, optimizee_parameters=benchmark_parameters,
+                        optimizer_name=optimizer.__class__.__name__,
+                        optimizer_parameters=optimizer.get_params())
     recorder.start()
 
     # Run the simulation with all parameter combinations

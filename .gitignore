@@ -60,3 +60,6 @@ _build/
 
 # Mac OS X
 **/.DS_Store
+
+# root path config file
+bin/path.conf

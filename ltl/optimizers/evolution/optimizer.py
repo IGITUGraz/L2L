@@ -5,8 +5,8 @@ from collections import namedtuple
 from deap import base, creator, tools
 from deap.tools import HallOfFame
 
-from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list, list_to_dict
+from ltl.optimizers.optimizer import Optimizer
 
 logger = logging.getLogger("ltl-ga")
 
@@ -29,10 +29,13 @@ class GeneticAlgorithmOptimizer(Optimizer):
     """
     Implements evolutionary algorithm
 
-    :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs.  The parameters should be initialized based on the values in `parameters`
+    :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs.
+      The parameters should be initialized based on the values in `parameters`
     :param optimizee_create_individual: Function that creates a new individual
-    :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each element of the fitness vector)
-    :param parameters: Instance of :class:`namedtuple` :class:`GeneticAlgorithmParameters` containing the parameters needed by the Optimizer
+    :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these
+      values (one for each element of the fitness vector)
+    :param parameters: Instance of :class:`namedtuple` :class:`GeneticAlgorithmParameters` containing the parameters
+      needed by the Optimizer
     """
 
     def __init__(self, traj,
@@ -100,7 +103,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness.valid]
         self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec)
                          for ind in self.eval_pop_inds]
-        
+
         self.g = 0  # the current generation
         self.toolbox = toolbox  # the DEAP toolbox
         self.hall_of_fame = HallOfFame(20)
@@ -135,7 +138,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         logger.info("-- End of generation {} --".format(self.g))
         best_inds = tools.selBest(self.eval_pop_inds, 2)
         for best_ind in best_inds:
-            print("Best individual is %s, %s" % (list_to_dict(best_ind, self.optimizee_individual_dict_spec), 
+            print("Best individual is %s, %s" % (list_to_dict(best_ind, self.optimizee_individual_dict_spec),
                                                  best_ind.fitness.values))
 
         self.hall_of_fame.update(self.eval_pop_inds)
@@ -178,7 +181,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
             self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness.valid]
             self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec)
                              for ind in self.eval_pop_inds]
-            
+
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 

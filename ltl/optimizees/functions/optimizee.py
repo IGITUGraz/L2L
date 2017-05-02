@@ -16,11 +16,21 @@ class FunctionGeneratorOptimizee(Optimizee):
         self.dims = fg_instance.dims
         self.cost_fn = fg_instance.cost_function
         self.bound = fg_instance.bound
+        self.fg_instance = fg_instance
 
         # create_individual can be called because __init__ is complete except for traj initializtion
         indiv_dict = self.create_individual()
         for key, val in indiv_dict.items():
             traj.individual.f_add_parameter(key, val)
+
+    def get_params(self):
+        """
+        Get the important parameters of the optimizee. This is used by :class:`ltl.recorder`
+        for recording the optimizee parameters.
+
+        :return: a :class:`dict
+        """
+        return self.fg_instance.get_params()
 
     def create_individual(self):
         """
