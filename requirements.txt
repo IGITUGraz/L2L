@@ -3,7 +3,7 @@ scipy
 pyyaml
 matplotlib
 pypet==0.4.0
-scoop==0.7.1.1
+git+https://github.com/soravux/scoop.git@b700f5c#egg=scoop-0.7.2.0
 sphinx
 sklearn
 jinja2
