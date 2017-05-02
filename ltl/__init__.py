@@ -1,11 +1,16 @@
 import functools
 
+import os
+import sys
 import time
 from collections import OrderedDict
 from contextlib import contextmanager
 from warnings import warn
 from enum import Enum
-from collections import Iterable
+from collections import Iterable, Mapping
+from numbers import Integral, Real
+
+import numpy as np
 
 __author__ = 'anand'
 
@@ -278,6 +283,43 @@ def get_grouped_dict(dict_iter):
     return return_dict
 
 
+def convert_dict_to_numpy(input_dict):
+    """
+    This function takes a dictionary as input and converts the arguments to
+    numpy data types. This is useful when importing parameters from config
+    files.
+
+    NOTE: Only the following data types are converted:
+
+    1.  Scalars integer or float. They are converted to `np.int64` and
+        `numpy.float64` respectively
+
+    2.  Iterables. All elements of the iterable are converted to a numpy array
+        via ``np.array(...)``
+
+    3.  Dictionaries. Dictionaries are recursively converted
+
+    :param input_dict: This is the dictionary to convert
+
+    :returns: The converted output dictionary
+    """
+    output_dict = {}
+    for key, value in input_dict.items():
+        if isinstance(value, Iterable) and not isinstance(value, str):
+            new_value = np.array(value)
+        elif isinstance(value, Integral) and not isinstance(value, bool):
+            new_value = np.int64(value)
+        elif isinstance(value, Real) and not isinstance(value, bool):
+            new_value = np.float64(value)
+        elif isinstance(value, Mapping):
+            new_value = convert_dict_to_numpy(value)
+        else:
+            new_value = value
+        output_dict[key] = new_value
+
+    return output_dict
+
+
 def printq(s, quiet):
     if not quiet:
         print(s)
@@ -294,8 +336,73 @@ def static_var(varname, value):
 def get(obj, key, default_value):
     try:
         return obj[key]
-    except:
+    except Exception:
         return default_value
+
+
+@contextmanager
+def stdout_redirected(filename):
+    """
+    This context manager causes all writes to stdout (whether within python or its
+    subprocesses) to be redirected to the filename specified. For usage, look at
+    example below::
+
+        import os
+
+        with stdout_redirected(filename):
+            print("from Python")
+            os.system("echo non-Python applications are also supported")
+
+    inspired from the article
+    http://eli.thegreenplace.net/2015/redirecting-all-kinds-of-stdout-in-python/
+    
+    :param filename: The filename (NOT file stream object, this is to ensure that
+        the stream is always a valid file object) to which the stdout is to be
+        redirected
+    """
+
+    os_stdout_fd = sys.stdout.fileno()
+    assert os_stdout_fd == 1, "Doesn't work if stdout is not the actual __stdout__"
+
+    sys.stdout.flush()
+    old_stdout = sys.stdout
+    old_stdout_fd_dup = os.dup(sys.__stdout__.fileno())
+
+    # # assert that Python and C stdio write using the same file descriptor
+    # assert libc.fileno(ctypes.c_void_p.in_dll(libc, "stdout")) == os_stdout_fd == 1
+
+    def _redirect_stdout(filestream):
+        os.dup2(filestream.fileno(), os_stdout_fd)  # os_stdout_fd writes to 'to' file
+        sys.stdout = os.fdopen(os_stdout_fd, 'w')  # Python writes to os_stdout_fd
+
+    def _revert_stdout():
+        sys.stdout.close()
+        os.dup2(old_stdout_fd_dup, os_stdout_fd)
+        sys.stdout = old_stdout
+
+    with open(filename, 'w') as file:
+        _redirect_stdout(filestream=file)
+        try:
+            yield  # allow code to be run with the redirected stdout
+        finally:
+            _revert_stdout()
+
+
+@contextmanager
+def stdout_discarded():
+    """
+    This context manager causes all writes to stdout (whether within python or its
+    subprocesses) to be redirected to `os.devnull`, thereby effectively discarding the
+    output. For usage look at example below::
+
+        import os
+
+        with stdout_discarded():
+            print("from Python")
+            os.system("echo non-Python applications are also supported")
+    """
+    with stdout_redirected(os.devnull):
+        yield
 
 
 class DummyTrajectory:
