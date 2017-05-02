@@ -1,0 +1,10 @@
+benchmark_id: 7
+dims: 2
+functions:
+- GaussianParameters:
+    mean: [-1.0, -1.0]
+    sigma:
+    - [1.5, 0.1]
+    - [0.1, 0.3]
+mu: 0.0
+sigma: 0.01

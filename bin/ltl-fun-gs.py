@@ -1,18 +1,15 @@
 import logging.config
 import os
-import warnings
 
 import yaml
 from pypet import Environment
-from pypet import pypetconstants
 
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizers.gridsearch import GridSearchOptimizer, GridSearchParameters
 from ltl.paths import Paths
-
-warnings.filterwarnings("ignore")
+from ltl.recorder import Recorder
 
 logger = logging.getLogger('ltl-fun-gs')
 
@@ -47,10 +44,6 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      freeze_input=True,
-                      multiproc=True,
-                      use_scoop=True,
-                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
@@ -59,28 +52,35 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    function_id = 0
-    bench_functs = BenchmarkedFunctions(noise=True)
-    fg_name, fg_params = bench_functs.get_function_by_index(function_id)
+    # NOTE: Benchmark function
+    function_id = 4
+    bench_functs = BenchmarkedFunctions()
+    (benchmark_name, benchmark_function), benchmark_parameters = \
+        bench_functs.get_function_by_index(function_id, noise=True)
 
-    function_tools.plot(fg_params)
+    function_tools.plot(benchmark_function)
 
     # NOTE: Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, fg_params)
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function)
 
     # NOTE: Outerloop optimizer initialization
-    # TODO: Change the optimizer to the appropriate Optimizer class
     n_grid_divs_per_axis = 30
-    parameters = GridSearchParameters()
+    parameters = GridSearchParameters(param_grid={
+        'coords': (optimizee.bound[0], optimizee.bound[1], n_grid_divs_per_axis)
+    })
     optimizer = GridSearchOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                     optimizee_fitness_weights=(-0.1,),
-                                    parameters=parameters,
-                                    optimizee_param_grid={
-                                        'coords': (optimizee.bound[0], optimizee.bound[1], n_grid_divs_per_axis)
-                                    })
+                                    parameters=parameters)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
+
+    # Add Recorder
+    recorder = Recorder(trajectory=traj,
+                        optimizee_name=benchmark_name, optimizee_parameters=benchmark_parameters,
+                        optimizer_name=optimizer.__class__.__name__,
+                        optimizer_parameters=optimizer.get_params())
+    recorder.start()
 
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
@@ -88,7 +88,8 @@ def main():
     # NOTE: Innerloop optimizee end
     optimizee.end()
     # NOTE: Outerloop optimizer end
-    optimizer.end()
+    optimizer.end(traj)
+    recorder.end()
 
     # Finally disable logging and close all log-files
     env.disable_logging()
