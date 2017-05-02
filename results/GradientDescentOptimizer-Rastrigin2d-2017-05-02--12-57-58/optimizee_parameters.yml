@@ -1,0 +1,6 @@
+benchmark_id: 0
+dims: 2
+functions:
+- RastriginParameters: {}
+mu: 0.0
+sigma: 0.01

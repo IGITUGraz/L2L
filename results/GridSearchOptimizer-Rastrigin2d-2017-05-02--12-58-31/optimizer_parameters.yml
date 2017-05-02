@@ -1,0 +1,13 @@
+param_grid:
+  coords: !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - &id001 !!python/object/apply:numpy.dtype
+      args: [i8, 0, 1]
+      state: !!python/tuple [3, <, null, null, null, -1, -1, 0]
+    - !!binary |
+      +/////////8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      BQAAAAAAAAA=
+  - 30
