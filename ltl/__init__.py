@@ -342,7 +342,7 @@ def get(obj, key, default_value):
 
 @contextmanager
 def stdout_redirected(filename):
-    '''
+    """
     This context manager causes all writes to stdout (whether within python or its
     subprocesses) to be redirected to the filename specified. For usage, look at
     example below::
@@ -359,7 +359,7 @@ def stdout_redirected(filename):
     :param filename: The filename (NOT file stream object, this is to ensure that
         the stream is always a valid file object) to which the stdout is to be
         redirected
-    '''
+    """
 
     os_stdout_fd = sys.stdout.fileno()
     assert os_stdout_fd == 1, "Doesn't work if stdout is not the actual __stdout__"
@@ -390,7 +390,7 @@ def stdout_redirected(filename):
 
 @contextmanager
 def stdout_discarded():
-    '''
+    """
     This context manager causes all writes to stdout (whether within python or its
     subprocesses) to be redirected to `os.devnull`, thereby effectively discarding the
     output. For usage look at example below::
@@ -400,7 +400,7 @@ def stdout_discarded():
         with stdout_discarded():
             print("from Python")
             os.system("echo non-Python applications are also supported")
-    '''
+    """
     with stdout_redirected(os.devnull):
         yield
 
