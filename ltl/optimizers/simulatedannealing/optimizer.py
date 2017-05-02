@@ -11,7 +11,7 @@ from ltl import list_to_dict
 logger = logging.getLogger("ltl-sa")
 
 SimulatedAnnealingParameters = namedtuple('SimulatedAnnealingParameters',
-                                          ['n_parallel_runs', 'noisy_step', 'temp_decay', 'n_iteration', 'stop_criterion', 'seed'])
+                                          ['n_parallel_runs', 'noisy_step', 'temp_decay', 'n_iteration', 'stop_criterion', 'seed', 'cooling_schedule'])
 SimulatedAnnealingParameters.__doc__ = """
 :param n_parallel_runs: Number of individuals per simulation / Number of parallel Simulated Annealing runs
 :param noisy_step: Size of the random step
@@ -20,6 +20,18 @@ SimulatedAnnealingParameters.__doc__ = """
 :param stop_criterion: Stop if change in fitness is below this value
 :param seed: Random seed
 """
+
+# enum for cooling schedules: 
+# DEF ... default
+# LOG ... logartihmic
+# EXP ... exponential
+# LINMULT .. linear multiplicative cooling. 
+# QUADMULT .. quadratic multiplicative cooling
+# LINADD ... linear additive cooling
+# QUADADD ... quadratic additive cooling
+# EXPADD ... exponential additive cooling
+# TRIGADD ...trigonometric additive cooling
+AvailableCoolingSchedules = Enum('Schedule', 'DEF LOG EXP LINMULT QUADMULT LINADD QUADADD EXPADD TRIGADD')
 
 
 class SimulatedAnnealingOptimizer(Optimizer):
@@ -104,24 +116,14 @@ class SimulatedAnnealingOptimizer(Optimizer):
         self.eval_pop = new_individual_list
         self._expand_trajectory(traj)
         
-        # enum for cooling schedules: 
-        # DEF ... default
-        # LOG ... logartihmic
-        # EXP ... exponential
-        # LINMULT .. linear multiplicative cooling. 
-        # QUADMULT .. quadratic multiplicative cooling
-        # LINADD ... linear additive cooling
-        # QUADADD ... quadratic additive cooling
-        # EXPADD ... exponential additive cooling
-        # TRIGADD ...trigonometric additive cooling
-        self.available_cooling_schedules = Enum('Schedule', 'DEF LOG EXP LINMULT QUADMULT LINADD QUADADD EXPADD TRIGADD')
+        self.cooling_schedule = parameters.cooling_schedule
 
     def cooling(self,temperature, cooling_schedule, temperature_decay, temperature_end, steps_total):        
         # assumes, that the temperature always starts at 1
         T0 = 1
         k = self.g + 1        
         
-        if cooling_schedule == self.available_cooling_schedules.DEF:
+        if cooling_schedule == AvailableCoolingSchedules.DEF:
             return temperature * temperature_decay
           
         # Simulated Annealing and Boltzmann Machines: 
@@ -132,7 +134,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         # Kirkpatrick, Gelatt and Vecchi (1983)
         if cooling_schedule == self.available_cooling_schedules.EXP:
             alpha = 0.85 
-            return T0 * alpha ^ (k)
+            return T0 * (alpha ** (k))
         if cooling_schedule == self.available_cooling_schedules.LINMULT:
             alpha = 1
             return T0 / (1 + alpha * k)
@@ -146,7 +148,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         if cooling_schedule == self.available_cooling_schedules.QUADADD:
             return temperature_end + (T0 - temperature) * np.square((steps_total - k) / steps_total)
         if cooling_schedule == self.available_cooling_schedules.EXPADD:            
-            return temperature_end + (T0 - temperature) * (1 / (1 + np.exp(2 * np.log(T0 - temperature_end) / steps_total)(k - steps_total / 2)))
+            return temperature_end + (T0 - temperature) * (1 / (1 + np.exp(2 * np.log(T0 - temperature_end) / steps_total) * (k - steps_total / 2)))
         if cooling_schedule == self.available_cooling_schedules.TRIGADD:
             return temperature_end + (T0 - temperature_end) * (1 + np.cos(k * 3.1415 / steps_total)) / 2
 
@@ -158,11 +160,9 @@ class SimulatedAnnealingOptimizer(Optimizer):
             traj.noisy_step, traj.temp_decay, traj.n_iteration, traj.stop_criterion
         old_eval_pop = self.eval_pop.copy()
         self.eval_pop.clear()
-        cooling_schedule = self.available_cooling_schedules.QUADMULT
         temperature_end = 0
         temperature = self.T
-        self.T = self.cooling(temperature, cooling_schedule, temp_decay, temperature_end,0)
-
+        self.T = self.cooling(temperature, self.cooling_schedule, temp_decay, temperature_end,0)
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
         # NOTE: Currently works with only one individual at a time.
         # In principle, can be used with many different individuals evaluated in parallel
@@ -216,15 +216,6 @@ class SimulatedAnnealingOptimizer(Optimizer):
             fitnesses_results.clear()
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
-
-    # get tthe transistion probability between two simulated annealing systems with
-    # tempereatures T and energies E
-    #def metropolis_hasting(E1,E2,T1,T2):
-    #       p = np.exp(-np.abs((E1-E2)*(1/(k*T1)-1/(k*T2))))
-    #        if p < 1:
-    #            return p
-    #        
-    #        return 1
             
     def end(self):
         """
