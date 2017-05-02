@@ -301,7 +301,7 @@ def convert_dict_to_numpy(input_dict):
 
     :param input_dict: This is the dictionary to convert
 
-    :returns output_dict: The converted output dictionary
+    :returns: The converted output dictionary
     """
     output_dict = {}
     for key, value in input_dict.items():
@@ -344,19 +344,21 @@ def get(obj, key, default_value):
 def stdout_redirected(filename):
     '''
     This context manager causes all writes to stdout (whether within python or its
-    subprocesses) to be redirected to the filename specified
+    subprocesses) to be redirected to the filename specified. For usage, look at
+    example below::
 
-    USAGE
-    -----
+        import os
 
-    import os
-
-    with stdout_redirected(filename):
-        print("from Python")
-        os.system("echo non-Python applications are also supported")
+        with stdout_redirected(filename):
+            print("from Python")
+            os.system("echo non-Python applications are also supported")
 
     inspired from the article
     http://eli.thegreenplace.net/2015/redirecting-all-kinds-of-stdout-in-python/
+    
+    :param filename: The filename (NOT file stream object, this is to ensure that
+        the stream is always a valid file object) to which the stdout is to be
+        redirected
     '''
 
     os_stdout_fd = sys.stdout.fileno()
@@ -390,17 +392,14 @@ def stdout_redirected(filename):
 def stdout_discarded():
     '''
     This context manager causes all writes to stdout (whether within python or its
-    subprocesses) to be redirected to os.devnull, thereby effectively discarding the
-    output
+    subprocesses) to be redirected to `os.devnull`, thereby effectively discarding the
+    output. For usage look at example below::
 
-    USAGE
-    -----
+        import os
 
-    import os
-
-    with stdout_discarded():
-        print("from Python")
-        os.system("echo non-Python applications are also supported")
+        with stdout_discarded():
+            print("from Python")
+            os.system("echo non-Python applications are also supported")
     '''
     with stdout_redirected(os.devnull):
         yield
