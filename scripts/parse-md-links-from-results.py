@@ -20,6 +20,7 @@ def main():
         with open(res, 'r') as ifile:
             experiment_text = ifile.read()
             path = res.replace("result_details.md", "")
+            path = path.replace(args.dir_name, "results")
             experiment_text = experiment_text.replace('href="optimizee_parameters.yml"',
                                                       'href="' + master_branch_results_path + path + 'optimizee_parameters.yml"')
             experiment_text = experiment_text.replace('href="optimizer_parameters.yml"',
