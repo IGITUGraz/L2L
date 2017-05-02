@@ -16,7 +16,7 @@ logger = logging.getLogger('ltl-fun-ce')
 
 def main():
     name = 'LTL-FUN-CE'
-    root_dir_path = '/home/scherr/simulations'  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
     
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \
