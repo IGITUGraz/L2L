@@ -1,17 +1,20 @@
-import logging.config
 import os
+import warnings
+import logging.config
 
 import yaml
 from pypet import Environment
 from pypet import pypetconstants
 
-from ltl.optimizees.functions import tools as function_tools
-from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
-from ltl.optimizers.crossentropy.distribution import NoisyGaussian
+from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
+from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
+from ltl.optimizers.crossentropy.distribution import NoisyBayesianGaussianMixture
 from ltl.recorder import Recorder
+
+warnings.filterwarnings("ignore")
 
 logger = logging.getLogger('ltl-fun-ce')
 
@@ -58,7 +61,6 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    # NOTE: Benchmark function
     function_id = 4
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
@@ -72,12 +74,13 @@ def main():
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
     parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=5,
-                                        distribution=NoisyGaussian(additive_noise=[1., 1.],
-                                                                   noise_decay=0.95))
+                                        distribution=NoisyBayesianGaussianMixture(2,
+                                                                                  additive_noise=[1., 1.],
+                                                                                  noise_decay=0.9))
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                      optimizee_fitness_weights=(-0.1,),
-                                      parameters=parameters,
-                                      optimizee_bounding_func=optimizee.bounding_func)
+                                            optimizee_fitness_weights=(-0.1,),
+                                            parameters=parameters,
+                                            optimizee_bounding_func=optimizee.bounding_func)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)

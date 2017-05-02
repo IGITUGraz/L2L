@@ -5,5 +5,6 @@ matplotlib
 pypet==0.4.0
 scoop==0.7.1.1
 sphinx
+sklearn
 jinja2
 gitpython
