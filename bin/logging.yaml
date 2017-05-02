@@ -12,10 +12,6 @@ handlers:
     formatter: simple
     filename: output.log
 loggers:
-  ltl-lsm:
-    level: INFO
-    handlers: [console]
-    propagate: no
   ltl-ga:
     level: INFO
     handlers: [console]
@@ -44,11 +40,7 @@ loggers:
     level: INFO
     handlers: [console]
     propagate: no
-  ltl-lsm-ga:
-    level: INFO
-    handlers: [console]
-    propagate: no
-  ltl-lsm-sa:
+  ltl-gradientdescent:
     level: INFO
     handlers: [console]
     propagate: no
@@ -57,6 +49,10 @@ loggers:
     handlers: [console]
     propagate: no
   ltl-fun-gs:
+    level: INFO
+    handlers: [console]
+    propagate: no
+  ltl-fun-all:
     level: INFO
     handlers: [console]
     propagate: no

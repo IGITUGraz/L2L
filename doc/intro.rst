@@ -183,12 +183,14 @@ Individual-Dict:
 Optimizee
 ~~~~~~~~~
 
-The optimizee subclasses :class:`~ltl.optimizees.optimizee.Optimizee` with a class that contains three mandatory methods
+The optimizee subclasses :class:`~ltl.optimizees.optimizee.Optimizee` with a class that contains four mandatory methods
 (Documentation linked below):
 
 1. :meth:`~ltl.optimizees.optimizee.Optimizee.create_individual` : Called to return a random individual_ (returns an Individual-Dict_)
 2. :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` : Runs the actual simulation and returns a fitness vector
 3. :meth:`~ltl.optimizees.optimizee.Optimizee.end` : Tertiary method to do cleanup, printing results etc.
+4. :meth:`~ltl.optimizees.optimizee.Optimizee.get_params` : Getter method for getting optimizee parameters 
+    used by :meth:`~ltl.recorder.Recorder`
 
 In order to maintain a consistent framework for communication between the optimizer, optimizee, and :ref:`PyPet <Pypet-Section>`
 it is required to enforce certain requirements on the behaviour of the above functions. The details of these requirements for the
@@ -245,6 +247,8 @@ The optimizer subclasses :class:`~ltl.optimizers.optimizer.Optimizer` with a cla
 2. :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` : knowing the fitness for the current parameters, it
    generates a new set of parameters and runs the next batch of simulations.
 3. :meth:`~ltl.optimizers.optimizer.Optimizer.end` : Tertiary method to do cleanup, printing results etc.
+4. :meth:`~ltl.optimizers.optimizer.Optimizer.get_params` : Getter method for getting optimizer parameters 
+    used by :meth:`~ltl.recorder.Recorder`
 
 Note that in order to maintain a consistent framework for communication between the optimizer, optimizee, and
 :ref:`PyPet <Pypet-Section>`, we enforce a certain protocol for the above function. The details of this protocol
@@ -322,8 +326,8 @@ Recorder enables user to record the results of the simulation in form of .md fil
 ready to publish.
 
 To implement the ability for recording the results, the user creates an instance of
-:class:`~postproc.recorder.Recorder` and calls :meth:`~postproc.recorder.Recorder.start`.
-At the end of the simulation the user calls :meth:`~postproc.recorder.Recorder.end`
+:class:`~ltl.recorder.Recorder` and calls :meth:`~ltl.recorder.Recorder.start`.
+At the end of the simulation the user calls :meth:`~ltl.recorder.Recorder.end`
 method which is responsible for generating the details of the simulated session.
 
 To enable the recorder functionality the simulation is run as following (for some arbitrary
@@ -332,7 +336,8 @@ bin/ltl-example simulation)::
   `python3 bin/ltl-example.py --record-experiment --username <username> --description <one_line_description>`
 
 If the `bin/ltl-example.py` provides the recording functionality, you should be able to find a `result_details.md`
-file in the current directory.
+file in the "results/<optimizer_name>-<benchmark_name>-<dd-mm-yyyy--hh-MM-ss>" together with .yaml files representing
+additional experiment info. The results should then be checked in to the master-branch.
 
 
 Additional Utilities and Protocols

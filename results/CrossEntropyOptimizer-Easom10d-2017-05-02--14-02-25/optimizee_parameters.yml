@@ -1,0 +1,6 @@
+benchmark_id: 13
+dims: 10
+functions:
+- EasomParameters: {}
+mu: 0.0
+sigma: 0.01
