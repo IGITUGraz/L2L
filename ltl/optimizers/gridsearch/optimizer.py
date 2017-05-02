@@ -4,9 +4,10 @@ from collections import namedtuple
 import numpy as np
 from pypet.utils.explore import cartesian_product
 
-from ltl.optimizers.optimizer import Optimizer
-from ltl import dict_to_list
 from ltl import DictEntryType
+from ltl import dict_to_list
+from ltl import list_to_dict
+from ltl.optimizers.optimizer import Optimizer
 
 logger = logging.getLogger("ltl-gs")
 
@@ -64,7 +65,10 @@ class GridSearchOptimizer(Optimizer):
                  optimizee_param_grid):
         super().__init__(traj, optimizee_create_individual, optimizee_fitness_weights,
                          parameters)
-        
+
+        self.recorder_parameters = parameters
+        self.best_individual = None
+        self.best_fitness = None
         # Initializing basic variables
         self.optimizee_create_individual = optimizee_create_individual
         self.optimizee_fitness_weights = optimizee_fitness_weights
@@ -78,6 +82,7 @@ class GridSearchOptimizer(Optimizer):
         # Generate parameter dictionary based on optimizee_param_grid
         self.param_list = {}
         _, optimizee_individual_param_spec = dict_to_list(sample_individual, get_dict_spec=True)
+        self.optimizee_individual_dict_spec = optimizee_individual_param_spec
 
         for param_name, param_type, param_length in optimizee_individual_param_spec:
             param_lower_bound = optimizee_param_grid[param_name][0]
@@ -103,9 +108,16 @@ class GridSearchOptimizer(Optimizer):
         self.param_list = {('individual.' + key):value for key, value in self.param_list.items()}
         traj.f_expand(self.param_list)
         #: The current generation number
-        self.g = None
+        self.g = 0
         #: The population (i.e. list of individuals) to be evaluated at the next iteration
         self.eval_pop = None
+
+    def get_params(self):
+        """
+        Get parameters used for recorder
+        :return: Dictionary containing recorder parameters
+        """
+        return self.recorder_parameters._asdict()
 
     def post_process(self, traj, fitnesses_results):
         """
@@ -138,16 +150,24 @@ class GridSearchOptimizer(Optimizer):
         individual = traj.par.individual
         for param_node in individual.f_iter_leaves():
             logger.info('  %s: %s', param_node.v_name, param_node.f_get())
-        
+            self.best_individual = param_node.f_get()
+
+        self.best_fitness = fitness_array[max_fitness_indiv_index]
         logger.info('  with fitness: %s', fitness_array[max_fitness_indiv_index])
         logger.info('  with weighted fitness: %s', weighted_fitness_array[max_fitness_indiv_index])
 
+        self.g += 1
         traj.v_idx = -1
 
-    def end(self):
+    def end(self, traj):
         """
         Run any code required to clean-up, print final individuals etc.
         """
+        best_last_indiv_dict = list_to_dict(self.best_individual.tolist(),
+                                            self.optimizee_individual_dict_spec)
+        traj.f_add_result('final_individual', best_last_indiv_dict)
+        traj.f_add_result('final_fitness', self.best_fitness)
+        traj.f_add_result('n_iteration', self.g)
 
         logger.info('x -------------------------------- x')
         logger.info('  Completed SUCCESSFUL Grid Search  ')

@@ -1,0 +1,24 @@
+| | |
+| --- | --- |
+| Date | {{cur_date_}} |
+| Username | {{username_}} |
+| Description | {{description_}} |
+| Optimizee name | {{optimizee_name_}} |
+| Optimizee params | {% if isinstance(optimizee_parameters_, str)
+%} <a href="{{ optimizee_parameters_ }}">{{ optimizee_parameters_ }}</a> {% else
+%} {% for key, value in optimizee_parameters_.items()
+%} {{key}} : {{value}} </br> {% endfor %} {% endif %} |
+| Optimizer name | {{optimizer_name_}} |
+| Optimizer params: | {% if isinstance(optimizer_parameters_, str)
+%} <a href="{{ optimizer_parameters_ }}">{{ optimizer_parameters_ }}</a> {% else
+%} {% for key, value in optimizer_parameters_.items()
+%} {{key}} : {{value}} </br> {% endfor %} {% endif %} |
+| Number of iterations | {{n_iteration_}} |
+| Fitness at optima | {{optima_found_}} |
+| Coordinates of optima | {% if isinstance(individual_found_, str)
+%} <a href="{{ individual_found_ }}">{{ individual_found_ }}</a> {% else
+%} {% for key, value in individual_found_.items()
+%} {{key}} : {{value}} </br> {% endfor %} {% endif %} |
+| Actual optima | {% if actual_optima_ == None %} Unknown {% else %} {{actual_optima_}} {% endif %} |
+| runtime | {{runtime_}} |
+| git commit id | {{git_commit_id}} |

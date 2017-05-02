@@ -1,8 +1,11 @@
-from git import Repo
-import datetime
-from jinja2 import Environment, FileSystemLoader
 import argparse
+import datetime
 import os
+import yaml
+import warnings
+
+from git import Repo
+from jinja2 import Environment, FileSystemLoader
 
 
 class Recorder:
@@ -12,24 +15,26 @@ class Recorder:
     need to be made. end() ends the recording session and produces an .md table and a plot of
     the fitness progress.
 
-    :param description:
-      One-line description of the run
-    :param ~pypet.environment.Environment:
-      Environment that was used for recording data during the simulation
-    :param optimizee_name:
-      Optimizee name
-    :param optimizee_description:
-      Optimizee description
+    :param  ~pypet.trajectory.Trajectory trajectory: PyPet trajectory
+    :param optimizee_id:
+      One of the ids given to the Optimizee. Currently applies only to the benchmark functions
+    :param str optimizee_name:
+      Name of the optimizee
+    :param optimizee_parameters:
+      Optimizee parameters (:obj:`dict` or :obj:`namedtuple`)
     :param optimizer_name:
-      Optimizer name
-    :param optimizer_parameters:
+      Name of the Optimizer 
+    :param ~collections.namedtuple optimizer_parameters:
       Optimizer parameters as named tuple.
     """
     def __init__(self, trajectory,
-                 optimizee_id, optimizee_name, optimizee_parameters, optimizer_name, optimizer_parameters):
+                 optimizee_name, optimizee_parameters, optimizer_name, optimizer_parameters):
+        if optimizee_parameters is None:
+            warnings.warn("optimizee_parameters is set to None.")
+        if optimizer_parameters is None:
+            warnings.warn("optimizer_parameters is set to None.")
         self.record_flag, self.username, self.description = self._process_args()
         self.trajectory = trajectory
-        self.optimizee_id = optimizee_id
         self.optimizee_name = optimizee_name
         self.optimizee_parameters = optimizee_parameters
         self.optimizer_name = optimizer_name
@@ -66,6 +71,7 @@ class Recorder:
 
         traj = self.trajectory
         self.optima_found = traj.res.final_fitness
+        self.individual_found = traj.res.final_individual
         self.n_iteration = traj.res.n_iteration
 
         self.end_time = datetime.datetime.now()
@@ -74,38 +80,59 @@ class Recorder:
 
     def _parse_md(self):
         fname = "result_details.md"
-        env = Environment(loader=FileSystemLoader('postproc/templates'))
+        env = Environment(loader=FileSystemLoader('ltl/recorder/templates'))
+        dir_name = "results/"
+        dir_name += self.optimizer_name + "-"
+        dir_name += self.optimizee_name + "-"
+        end_time_parsed = str(self.end_time.strftime("%Y-%m-%d %H:%M:%S")).replace(":","-")
+        end_time_parsed = end_time_parsed.replace(" ","--")
+        dir_name += end_time_parsed + "/"
+        if not os.path.exists(dir_name):
+            os.makedirs(dir_name)
 
-        context = {'cur_date_': self.end_time,
+        with open(dir_name + 'optimizee_parameters.yml', 'w') as ofile:
+            yaml.dump(dict(self.optimizee_parameters), ofile, default_flow_style=None)
+        self.optimizee_parameters = 'optimizee_parameters.yml'
+
+        with open(dir_name + 'optimizer_parameters.yml', 'w') as ofile:
+            yaml.dump(dict(self.optimizer_parameters), ofile, default_flow_style=None)
+        self.optimizer_parameters = 'optimizer_parameters.yml'
+        with open(dir_name + 'optima_coordinates.yml', 'w') as ofile:
+            print(self.individual_found)
+            yaml.dump(self.individual_found, ofile, default_flow_style=None)
+        self.individual_found = 'optima_coordinates.yml'
+
+        context = {'cur_date_': self.end_time.strftime("%Y-%m-%d %H:%M:%S"),
                    'username_': self.username,
                    'description_': self.description,
                    'optimizee_name_': self.optimizee_name,
-                   'optimizee_id_': self.optimizee_id,
                    'optimizee_parameters_': self.optimizee_parameters,
                    'optimizer_name_': self.optimizer_name,
-                   'optimizer_params_': self.optimizer_parameters,
+                   'optimizer_parameters_': self.optimizer_parameters,
                    'n_iteration_': self.n_iteration,
                    'optima_found_': self.optima_found,
+                   'individual_found_': self.individual_found,
                    'actual_optima_': self.actual_optima,
                    'runtime_': self.runtime,
                    'git_commit_id': self.git_commit_id,
                    'hasattr': hasattr,
+                   'isinstance': isinstance,
                    'str': str}
         template = env.get_template("md-template.jinja")
-        with open(fname, 'w') as f:
+        with open(dir_name + fname, 'w') as f:
             rendered_data = template.render(context)
             f.write(rendered_data)
-        print("Recorder details have been written to " + os.curdir + "/" + f.name)
+        print("Recorder details have been written to " + f.name)
 
     def _process_args(self):
         parser = argparse.ArgumentParser(description="Main parser.")
-        parser.add_argument('--record_experiment', dest='record_flag', action='store_true')
+        parser.add_argument('--record-experiment', dest='record_flag', action='store_true')
         parser.add_argument('--username', dest="username", type=str, required=False)
         parser.add_argument('--description', dest="description", type=str, required=False)
         args = parser.parse_args()
 
         if args.record_flag and (args.username is None or args.description is None):
-            raise Exception("--record_experiment requires --name and --description")
+            raise Exception("--record-experiment requires --name and --description")
         name = args.username
         description = args.description
         record_flag = args.record_flag

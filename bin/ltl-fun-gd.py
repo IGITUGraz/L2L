@@ -1,35 +1,36 @@
-import os
-import warnings
-
 import logging.config
+import os
 
 import numpy as np
 import yaml
-
 from pypet import Environment
 from pypet import pypetconstants
 
+from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
-from ltl.optimizees.functions.function_generator import GaussianParameters, FunctionGenerator
-from ltl.optimizers.gd.optimizer import GradientDescentOptimizer
-#from ltl.optimizers.gd.optimizer import ClassicGDParameters
-#from ltl.optimizers.gd.optimizer import StochasticGDParameters
-#from ltl.optimizers.gd.optimizer import AdamParameters
-from ltl.optimizers.gd.optimizer import RMSPropParameters
+from ltl.optimizees.functions import tools as function_tools
+from ltl.optimizers.gradientdescent.optimizer import GradientDescentOptimizer
+# from ltl.optimizers.gradientdescent.optimizer import ClassicGDParameters
+# from ltl.optimizers.gradientdescent.optimizer import StochasticGDParameters
+# from ltl.optimizers.gradientdescent.optimizer import AdamParameters
+from ltl.optimizers.gradientdescent.optimizer import RMSPropParameters
 from ltl.paths import Paths
+from ltl.recorder import Recorder
 
-warnings.filterwarnings("ignore")
-
-logger = logging.getLogger('ltl-lsm-gd')
+logger = logging.getLogger('ltl-lsm-gradientdescent')
 
 
 def main():
     name = 'LTL-FUN-GD'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
-    assert root_dir_path is not None, \
-           "You have not set the root path to store your results." \
-           " Set it manually in the code (by setting the variable 'root_dir_path')" \
-           " before running the simulation"
+    try:
+        with open('bin/path.conf') as f:
+            root_dir_path = f.read().strip()
+    except FileNotFoundError:
+        raise FileNotFoundError(
+            "You have not set the root path to store your results."
+            " Write the path to a path.conf text file in the bin directory"
+            " before running the simulation"
+        )
     paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
 
     with open("bin/logging.yaml") as f:
@@ -61,31 +62,44 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
+    # NOTE: Benchmark function
+    function_id = 4
+    bench_functs = BenchmarkedFunctions()
+    (benchmark_name, benchmark_function), benchmark_parameters = \
+        bench_functs.get_function_by_index(function_id, noise=True)
+
+    function_tools.plot(benchmark_function)
+
     # NOTE: Innerloop simulator
-    fg_instance = FunctionGenerator([GaussianParameters(sigma=[[1., 0.], [0., 1.]], mean=[1., 1.])],
-                                    dims=2, bound=[0, 2])
-    optimizee = FunctionGeneratorOptimizee(traj, fg_instance)
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
 
-    #parameters = ClassicGDParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, n_iteration=100, 
+    # parameters = ClassicGDParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, n_iteration=100,
     #                                 stop_criterion=np.Inf)
-    #parameters = AdamParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, first_order_decay=0.8,
+    # parameters = AdamParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, first_order_decay=0.8,
     #                            second_order_decay=0.8, n_iteration=100, stop_criterion=np.Inf)
-    #parameters = StochasticGDParameters(learning_rate=0.01, stochastic_deviation=1, stochastic_decay=0.99,
+    # parameters = StochasticGDParameters(learning_rate=0.01, stochastic_deviation=1, stochastic_decay=0.99,
     #                                    exploration_rate=0.01, n_random_steps=5, n_iteration=100,
     #                                    stop_criterion=np.Inf)
     parameters = RMSPropParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, momentum_decay=0.5,
                                    n_iteration=100, stop_criterion=np.Inf)
 
     optimizer = GradientDescentOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                                  optimizee_fitness_weights=(0.1,),
-                                                  parameters=parameters,
-                                                  optimizee_bounding_func=optimizee.bounding_func)
+                                         optimizee_fitness_weights=(0.1,),
+                                         parameters=parameters,
+                                         optimizee_bounding_func=optimizee.bounding_func)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
+
+    # Add Recorder
+    recorder = Recorder(trajectory=traj,
+                        optimizee_name=benchmark_name, optimizee_parameters=benchmark_parameters,
+                        optimizer_name=optimizer.__class__.__name__,
+                        optimizer_parameters=optimizer.get_params())
+    recorder.start()
 
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
@@ -93,7 +107,8 @@ def main():
     # NOTE: Innerloop optimizee end
     optimizee.end()
     # NOTE: Outerloop optimizer end
-    optimizer.end()
+    optimizer.end(traj)
+    recorder.end()
 
     # Finally disable logging and close all log-files
     env.disable_logging()
