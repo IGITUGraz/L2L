@@ -3,7 +3,6 @@ import os
 
 import yaml
 from pypet import Environment
-from pypet import pypetconstants
 
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
@@ -45,10 +44,6 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      freeze_input=True,
-                      multiproc=True,
-                      use_scoop=True,
-                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
@@ -69,15 +64,13 @@ def main():
     optimizee = FunctionGeneratorOptimizee(traj, benchmark_function)
 
     # NOTE: Outerloop optimizer initialization
-    # TODO: Change the optimizer to the appropriate Optimizer class
     n_grid_divs_per_axis = 30
-    parameters = GridSearchParameters()
+    parameters = GridSearchParameters(param_grid={
+        'coords': (optimizee.bound[0], optimizee.bound[1], n_grid_divs_per_axis)
+    })
     optimizer = GridSearchOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                     optimizee_fitness_weights=(-0.1,),
-                                    parameters=parameters,
-                                    optimizee_param_grid={
-                                        'coords': (optimizee.bound[0], optimizee.bound[1], n_grid_divs_per_axis)
-                                    })
+                                    parameters=parameters)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
