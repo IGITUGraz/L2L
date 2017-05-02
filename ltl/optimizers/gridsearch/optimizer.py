@@ -86,7 +86,7 @@ class GridSearchOptimizer(Optimizer):
             if param_type == DictEntryType.Scalar:
                 self.param_list[param_name] = np.linspace(param_lower_bound, param_upper_bound, param_n_steps + 1)
             elif param_type == DictEntryType.Sequence:
-                curr_param_list = np.linspace(param_lower_bound, param_upper_bound)
+                curr_param_list = np.linspace(param_lower_bound, param_upper_bound, param_n_steps + 1)
                 curr_param_list = np.meshgrid(*([curr_param_list] * param_length), indexing='ij')
                 curr_param_list = [x.ravel() for x in curr_param_list]
                 curr_param_list = np.stack(curr_param_list, axis=-1)
