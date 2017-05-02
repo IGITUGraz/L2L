@@ -81,7 +81,8 @@ class CrossEntropyOptimizer(Optimizer):
                  optimizee_bounding_func=None):
         
         super().__init__(traj, optimizee_create_individual=optimizee_create_individual,
-                         optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters)
+                         optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters,
+                         optimizee_bounding_func=optimizee_bounding_func)
         
         self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func

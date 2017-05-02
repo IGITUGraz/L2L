@@ -1,0 +1,6 @@
+benchmark_id: 4
+dims: 2
+functions:
+- AckleyParameters: {}
+mu: 0.0
+sigma: 0.01
