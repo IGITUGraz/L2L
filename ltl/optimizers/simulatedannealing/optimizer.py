@@ -178,7 +178,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         best_last_indiv = self.current_individual_list[best_last_indiv_index]
         best_last_fitness = self.current_fitness_value_list[best_last_indiv_index]
 
-        best_last_indiv_dict = list_to_dict(best_last_indiv, self.optimizee_individual_dict_spec)
+        best_last_indiv_dict = list_to_dict(best_last_indiv.tolist(), self.optimizee_individual_dict_spec)
         traj.f_add_result('final_individual', best_last_indiv_dict)
         traj.f_add_result('final_fitness', best_last_fitness)
         traj.f_add_result('n_iteration', self.g + 1)
