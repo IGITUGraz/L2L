@@ -3,6 +3,7 @@ import datetime
 import os
 import yaml
 import warnings
+import ltl
 
 from git import Repo
 from jinja2 import Environment, FileSystemLoader
@@ -80,7 +81,8 @@ class Recorder:
 
     def _parse_md(self):
         fname = "result_details.md"
-        env = Environment(loader=FileSystemLoader('ltl/recorder/templates'))
+        abs_ltl_path = os.path.abspath(ltl.__file__).replace("/__init__.py","")
+        env = Environment(loader=FileSystemLoader(abs_ltl_path + '/recorder/templates'))
         dir_name = "results/"
         dir_name += self.optimizer_name + "-"
         dir_name += self.optimizee_name + "-"
