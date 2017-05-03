@@ -62,7 +62,7 @@ class Recorder:
             raise Exception('Commit your changes first.(use "git add" and then "git commit")')
         self.start_time = datetime.datetime.now()
         self.git_commit_id = repo.head.commit.hexsha
-        self.git_url = (repo.remotes.origin.url).replace(".git", "/")
+        self.git_url = (repo.remotes.origin.url).replace(".git", "/commit/") + repo.head.commit.hexsha
 
     def end(self):
         """
