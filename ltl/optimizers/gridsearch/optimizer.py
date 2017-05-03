@@ -11,7 +11,7 @@ from ltl.optimizers.optimizer import Optimizer
 
 logger = logging.getLogger("ltl-gs")
 
-GridSearchParameters = namedtuple('GridSearchParameters', [])
+GridSearchParameters = namedtuple('GridSearchParameters', ['param_grid'])
 
 
 class GridSearchOptimizer(Optimizer):
@@ -62,9 +62,10 @@ class GridSearchOptimizer(Optimizer):
                  optimizee_create_individual,
                  optimizee_fitness_weights,
                  parameters,
-                 optimizee_param_grid):
-        super().__init__(traj, optimizee_create_individual, optimizee_fitness_weights,
-                         parameters)
+                 optimizee_bounding_func=None):
+        super().__init__(traj, optimizee_create_individual=optimizee_create_individual,
+                         optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters,
+                         optimizee_bounding_func=optimizee_bounding_func)
 
         self.recorder_parameters = parameters
         self.best_individual = None
@@ -75,14 +76,15 @@ class GridSearchOptimizer(Optimizer):
         
         sample_individual = self.optimizee_create_individual()
 
-        # Assert validity of optimizee_param_grid
-        assert set(sample_individual.keys()) == set(optimizee_param_grid.keys()), \
-            "The Parameters of optimizee_param_grid don't match those of the optimizee individual"
-        
         # Generate parameter dictionary based on optimizee_param_grid
         self.param_list = {}
         _, optimizee_individual_param_spec = dict_to_list(sample_individual, get_dict_spec=True)
         self.optimizee_individual_dict_spec = optimizee_individual_param_spec
+
+        optimizee_param_grid = parameters.param_grid
+        # Assert validity of optimizee_param_grid
+        assert set(sample_individual.keys()) == set(optimizee_param_grid.keys()), \
+            "The Parameters of optimizee_param_grid don't match those of the optimizee individual"
 
         for param_name, param_type, param_length in optimizee_individual_param_spec:
             param_lower_bound = optimizee_param_grid[param_name][0]
@@ -91,7 +93,7 @@ class GridSearchOptimizer(Optimizer):
             if param_type == DictEntryType.Scalar:
                 self.param_list[param_name] = np.linspace(param_lower_bound, param_upper_bound, param_n_steps + 1)
             elif param_type == DictEntryType.Sequence:
-                curr_param_list = np.linspace(param_lower_bound, param_upper_bound)
+                curr_param_list = np.linspace(param_lower_bound, param_upper_bound, param_n_steps + 1)
                 curr_param_list = np.meshgrid(*([curr_param_list] * param_length), indexing='ij')
                 curr_param_list = [x.ravel() for x in curr_param_list]
                 curr_param_list = np.stack(curr_param_list, axis=-1)

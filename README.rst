@@ -12,7 +12,7 @@ Choose one of the following options to get started:
 * If you are developing a new Optimizee or want to try out a new Optimizee with the Optimizers in the LTL package, install LTL as a python package. See section `Installing the LTL Package`_ for more details (this automatically installs all requirements). See the `wiki <https://github.com/IGITUGraz/LTL/wiki/Writing-new-Optimizees>`_ for more details.
 * If you want to add a new Optimizer or want to modify the function Optimizees in the LTL package, install the requirements according to `Installing Requirements`_.
 
-In both cases, you should build the documentation according to `Building Documentation`_ and read it.
+In both cases, you should build the documentation according to `Building Documentation`_ and **read it**!
    
 
 Installing the LTL Package
