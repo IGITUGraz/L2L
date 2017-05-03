@@ -3,6 +3,7 @@ import datetime
 import os
 import yaml
 import warnings
+import ltl
 
 from git import Repo
 from jinja2 import Environment, FileSystemLoader
@@ -23,7 +24,7 @@ class Recorder:
     :param optimizee_parameters:
       Optimizee parameters (:obj:`dict` or :obj:`namedtuple`)
     :param optimizer_name:
-      Name of the Optimizer 
+      Name of the Optimizer
     :param ~collections.namedtuple optimizer_parameters:
       Optimizer parameters as named tuple.
     """
@@ -44,6 +45,7 @@ class Recorder:
         self.actual_optima = None
         self.runtime = None
         self.git_commit_id = None
+        self.git_commit_url = None
         self.start_time = None
         self.end_time = None
 
@@ -60,6 +62,7 @@ class Recorder:
             raise Exception('Commit your changes first.(use "git add" and then "git commit")')
         self.start_time = datetime.datetime.now()
         self.git_commit_id = repo.head.commit.hexsha
+        self.git_commit_url = (repo.remotes.origin.url).replace(".git", "/commit/") + repo.head.commit.hexsha
 
     def end(self):
         """
@@ -80,7 +83,8 @@ class Recorder:
 
     def _parse_md(self):
         fname = "result_details.md"
-        env = Environment(loader=FileSystemLoader('ltl/recorder/templates'))
+        abs_ltl_path = os.path.abspath(ltl.__file__).replace("/__init__.py","")
+        env = Environment(loader=FileSystemLoader(abs_ltl_path + '/recorder/templates'))
         dir_name = "results/"
         dir_name += self.optimizer_name + "-"
         dir_name += self.optimizee_name + "-"
@@ -115,6 +119,7 @@ class Recorder:
                    'actual_optima_': self.actual_optima,
                    'runtime_': self.runtime,
                    'git_commit_id': self.git_commit_id,
+                   'git_commit_url_': self.git_commit_url,
                    'hasattr': hasattr,
                    'isinstance': isinstance,
                    'str': str}
