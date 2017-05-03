@@ -45,6 +45,7 @@ class Recorder:
         self.actual_optima = None
         self.runtime = None
         self.git_commit_id = None
+        self.git_commit_url = None
         self.start_time = None
         self.end_time = None
 
@@ -61,6 +62,7 @@ class Recorder:
             raise Exception('Commit your changes first.(use "git add" and then "git commit")')
         self.start_time = datetime.datetime.now()
         self.git_commit_id = repo.head.commit.hexsha
+        self.git_url = (repo.remotes.origin.url).replace(".git", "/") + self.git_commit_id
 
     def end(self):
         """
@@ -117,6 +119,7 @@ class Recorder:
                    'actual_optima_': self.actual_optima,
                    'runtime_': self.runtime,
                    'git_commit_id': self.git_commit_id,
+                   'git_commit_url_': self.git_commit_url,
                    'hasattr': hasattr,
                    'isinstance': isinstance,
                    'str': str}
