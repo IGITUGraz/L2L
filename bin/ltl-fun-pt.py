@@ -1,30 +1,32 @@
-import os
-import warnings
-
 import logging.config
+import os
 
 import numpy as np
 import yaml
-
 from pypet import Environment
 from pypet import pypetconstants
 
-from ltl.optimizees.functions.optimizee import FunctionOptimizee
+from ltl.optimizees.functions import tools as function_tools
+from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
+from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizers.paralleltempering.optimizer import ParallelTemperingParameters, ParallelTemperingOptimizer, AvailableCoolingSchedules
 from ltl.paths import Paths
+from ltl.recorder import Recorder
 
-warnings.filterwarnings("ignore")
-
-logger = logging.getLogger('ltl-lsm-ga')
+logger = logging.getLogger('ltl-lsm-pt')
 
 
 def main():
-    name = 'LTL-FUN-PT'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
-    assert root_dir_path is not None, \
-           "You have not set the root path to store your results." \
-           " Set it manually in the code (by setting the variable 'root_dir_path')" \
-           " before running the simulation"
+    name = 'LTL-FunctionGenerator-PT'
+    try:
+        with open('bin/path.conf') as f:
+            root_dir_path = f.read().strip()
+    except FileNotFoundError:
+        raise FileNotFoundError(
+            "You have not set the root path to store your results."
+            " Write the path to a path.conf text file in the bin directory"
+            " before running the simulation"
+        )
     paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
 
     with open("bin/logging.yaml") as f:
@@ -52,27 +54,41 @@ def main():
                       log_stdout=True,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
                       )
-
+    
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    # NOTE: Innerloop simulator
-    optimizee = FunctionOptimizee(traj, 'rastrigin')
+    # NOTE: Benchmark function
+    function_id = 1
+    bench_functs = BenchmarkedFunctions()
+    (benchmark_name, benchmark_function), benchmark_parameters = \
+        bench_functs.get_function_by_index(function_id, noise=True)
 
-    # configure settings for parallel tempering
+    function_tools.plot(benchmark_function)
+
+    # NOTE: Innerloop simulator
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function)
+
+    #--------------------------------------------------------------------------
+    # configure settings for parallel tempering:
+    # for each of the parallel runs chose
+    # a cooling schedule
+    # an upper and lower temperature bound
+    # a decay parameter
+    #--------------------------------------------------------------------------
     n_parallel_runs = 9
-    #available_cooling_schedules = Enum('Schedule', 'DEF LOG EXP LINMULT QUADMULT LINADD QUADADD EXPADD TRIGADD')
-    #cooling_schedules= np.zeros((n_parallel_runs,1))
-    cooling_schedules = [AvailableCoolingSchedules for _ in range(9)]
-    cooling_schedules[0] = AvailableCoolingSchedules.DEF
-    cooling_schedules[1] = AvailableCoolingSchedules.LOG
-    cooling_schedules[2] = AvailableCoolingSchedules.EXP
-    cooling_schedules[3] = AvailableCoolingSchedules.LINMULT
-    cooling_schedules[4] = AvailableCoolingSchedules.QUADMULT
-    cooling_schedules[5] = AvailableCoolingSchedules.LINADD
-    cooling_schedules[6] = AvailableCoolingSchedules.QUADADD
-    cooling_schedules[7] = AvailableCoolingSchedules.EXPADD
-    cooling_schedules[8] = AvailableCoolingSchedules.TRIGADD
+
+    cooling_schedules = [AvailableCoolingSchedules for _ in range(n_parallel_runs)]
+    cooling_schedules[0] = AvailableCoolingSchedules.DEFAULT
+    cooling_schedules[1] = AvailableCoolingSchedules.LOGARITHMIC
+    cooling_schedules[2] = AvailableCoolingSchedules.EXPONENTIAL
+    cooling_schedules[3] = AvailableCoolingSchedules.LINEAR_MULTIPLICATIVE
+    cooling_schedules[4] = AvailableCoolingSchedules.QUADRATIC_MULTIPLICATIVE
+    cooling_schedules[5] = AvailableCoolingSchedules.LINEAR_ADDAPTIVE
+    cooling_schedules[6] = AvailableCoolingSchedules.QUADRATIC_ADDAPTIVE
+    cooling_schedules[7] = AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE
+    cooling_schedules[8] = AvailableCoolingSchedules.TRIGONOMETRIC_ADDAPTIVE
+
     #has to be from 1 to 0, first entry hast to be larger than second
     temperature_bounds = np.zeros((n_parallel_runs,2))
     temperature_bounds[0] = [1,0]
@@ -84,11 +100,19 @@ def main():
     temperature_bounds[6] = [1,0.2]
     temperature_bounds[7] = [1,0.3]
     temperature_bounds[8] = [1,0.4]
+
     # decay parameter for each schedule seperately
     decay_parameters = np.zeros((n_parallel_runs))
     for i in range(0,n_parallel_runs):
         decay_parameters[i] = 0.98 #all the same for now
-
+    #--------------------------------------------------------------------------
+    # end of configuration
+    #--------------------------------------------------------------------------
+    
+    # Check, if the temperature bounds and decay parameters are reasonable. 
+    assert (((temperature_bounds.all() <= 1) and (temperature_bounds.all() >= 0)) and (temperature_bounds[:,0].all() > temperature_bounds[:,1].all())), print("Warning: Temperature bounds are not within specifications.")
+    assert ((decay_parameters.all() <= 1) and (decay_parameters.all() >= 0)), print("Warning: Decay parameter not within specifications.")
+    
     # NOTE: Outerloop optimizer initialization
     parameters = ParallelTemperingParameters(n_parallel_runs, noisy_step=.3, n_iteration=100, stop_criterion=np.Inf,
                                               seed=np.random.randint(1e5), cooling_schedules=cooling_schedules, 
@@ -100,6 +124,13 @@ def main():
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
+
+    # Add Recorder
+    recorder = Recorder(trajectory=traj,
+                        optimizee_name=benchmark_name, optimizee_parameters=benchmark_parameters,
+                        optimizer_name=optimizer.__class__.__name__,
+                        optimizer_parameters=optimizer.get_params())
+    recorder.start()
 
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)

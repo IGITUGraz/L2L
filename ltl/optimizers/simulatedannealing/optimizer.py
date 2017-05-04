@@ -31,7 +31,7 @@ SimulatedAnnealingParameters.__doc__ = """
 # QUADADD ... quadratic additive cooling
 # EXPADD ... exponential additive cooling
 # TRIGADD ...trigonometric additive cooling
-AvailableCoolingSchedules = Enum('Schedule', 'DEF LOG EXP LINMULT QUADMULT LINADD QUADADD EXPADD TRIGADD')
+AvailableCoolingSchedules = Enum('Schedule', 'DEFAULT LOGARITHMIC EXPONENTIAL LINEAR_MULTIPLICATIVE QUADRATIC_MULTIPLICATIVE LINEAR_ADDAPTIVE QUADRATIC_ADDAPTIVE EXPONENTIAL_ADDAPTIVE TRIGONOMETRIC_ADDAPTIVE')
 
 
 class SimulatedAnnealingOptimizer(Optimizer):
@@ -96,8 +96,6 @@ class SimulatedAnnealingOptimizer(Optimizer):
         self.current_individual_list = [np.array(dict_to_list(self.optimizee_create_individual()))
                                         for _ in range(parameters.n_parallel_runs)]
 
-        traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
-
         # The following parameters are NOT recorded
         self.T = 1.  # Initialize temperature
         self.g = 0  # the current generation
@@ -117,40 +115,46 @@ class SimulatedAnnealingOptimizer(Optimizer):
         self._expand_trajectory(traj)
         
         self.cooling_schedule = parameters.cooling_schedule
+            
+        schedule_known = True
+        for i in range(np.size(self.cooling_schedules)):
+            schedule_known = schedule_known and self.cooling_schedules[i] in AvailableCoolingSchedules
 
     def cooling(self,temperature, cooling_schedule, temperature_decay, temperature_end, steps_total):        
         # assumes, that the temperature always starts at 1
         T0 = 1
         k = self.g + 1        
-        
-        if cooling_schedule == AvailableCoolingSchedules.DEF:
+                
+        if cooling_schedule == AvailableCoolingSchedules.DEFAULT:
             return temperature * temperature_decay
           
         # Simulated Annealing and Boltzmann Machines: 
         # A Stochastic Approach to Combinatorial Optimization and Neural Computing (1989)
-        if cooling_schedule == self.available_cooling_schedules.LOG:
+        elif cooling_schedule == self.available_cooling_schedules.LOGARITHMIC:
             return T0 / (1 + np.log(1 + k))
             
         # Kirkpatrick, Gelatt and Vecchi (1983)
-        if cooling_schedule == self.available_cooling_schedules.EXP:
+        elif cooling_schedule == self.available_cooling_schedules.EXPONENTIAL:
             alpha = 0.85 
             return T0 * (alpha ** (k))
-        if cooling_schedule == self.available_cooling_schedules.LINMULT:
+        elif cooling_schedule == self.available_cooling_schedules.LINEAR_MULTIPLICATIVE:
             alpha = 1
             return T0 / (1 + alpha * k)
-        if cooling_schedule == self.available_cooling_schedules.QUADMULT:
+        elif cooling_schedule == self.available_cooling_schedules.QUADRATIC_MULTIPLICATIVE:
             alpha = 1
             return T0 / (1 + alpha * np.square(k))
             
         # Additive monotonic cooling B. T. Luke (2005) 
-        if cooling_schedule == self.available_cooling_schedules.LINADD:
+        elif cooling_schedule == self.available_cooling_schedules.LINEAR_ADDAPTIVE:
             return temperature_end + (T0 - temperature) * ((steps_total - k) / steps_total)
-        if cooling_schedule == self.available_cooling_schedules.QUADADD:
+        elif cooling_schedule == self.available_cooling_schedules.QUADRATIC_ADDAPTIVE:
             return temperature_end + (T0 - temperature) * np.square((steps_total - k) / steps_total)
-        if cooling_schedule == self.available_cooling_schedules.EXPADD:            
+        elif cooling_schedule == self.available_cooling_schedules.EXPONENTIAL_ADDAPTIVE:            
             return temperature_end + (T0 - temperature) * (1 / (1 + np.exp(2 * np.log(T0 - temperature_end) / steps_total) * (k - steps_total / 2)))
-        if cooling_schedule == self.available_cooling_schedules.TRIGADD:
+        elif cooling_schedule == self.available_cooling_schedules.TRIGONOMETRIC_ADDAPTIVE:
             return temperature_end + (T0 - temperature_end) * (1 + np.cos(k * 3.1415 / steps_total)) / 2
+
+        return -1
 
     def post_process(self, traj, fitnesses_results):
         """
@@ -160,9 +164,9 @@ class SimulatedAnnealingOptimizer(Optimizer):
             traj.noisy_step, traj.temp_decay, traj.n_iteration, traj.stop_criterion
         old_eval_pop = self.eval_pop.copy()
         self.eval_pop.clear()
-        temperature_end = 0
         temperature = self.T
-        self.T = self.cooling(temperature, self.cooling_schedule, temp_decay, temperature_end,0)
+        temperature_end = 0
+        self.T = self.cooling(temperature, self.cooling_schedule, temp_decay, temperature_end, n_iteration)
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
         # NOTE: Currently works with only one individual at a time.
         # In principle, can be used with many different individuals evaluated in parallel

@@ -9,8 +9,8 @@ from enum import Enum
 from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list
 from ltl import list_to_dict
-#todo: change all the names to parallel tempering
-logger = logging.getLogger("ltl-sa")
+
+logger = logging.getLogger("ltl-pt")
 
 ParallelTemperingParameters = namedtuple('ParallelTemperingParameters',
                                           ['n_parallel_runs', 'noisy_step', 'n_iteration', 'stop_criterion', 'seed', 'cooling_schedules', 'temperature_bounds', 'decay_parameters'])
@@ -23,13 +23,13 @@ ParallelTemperingParameters.__doc__ = """
 :param seed: Random seed
 """
 
-AvailableCoolingSchedules = Enum('Schedule', 'DEF LOG EXP LINMULT QUADMULT LINADD QUADADD EXPADD TRIGADD')
+AvailableCoolingSchedules = Enum('Schedule', 'DEFAULT LOGARITHMIC EXPONENTIAL LINEAR_MULTIPLICATIVE QUADRATIC_MULTIPLICATIVE LINEAR_ADDAPTIVE QUADRATIC_ADDAPTIVE EXPONENTIAL_ADDAPTIVE TRIGONOMETRIC_ADDAPTIVE')
 
 
 class ParallelTemperingOptimizer(Optimizer):
     """
-    Class for a generic simulate annealing solver.
-    In the pseudo code the algorithm does:
+    Class for a parallel tempering solver.
+    The algorithm does:
 
     For n iterations do:
         - Take a step of size noisy step in a random direction
@@ -74,8 +74,6 @@ class ParallelTemperingOptimizer(Optimizer):
         traj.f_add_parameter('n_parallel_runs', parameters.n_parallel_runs,
                              comment='Number of parallel simulated annealing runs / Size of Population')
         traj.f_add_parameter('noisy_step', parameters.noisy_step, comment='Size of the random step')
-        #traj.f_add_parameter('cooling_schedules', parameters.cooling_schedules,
-        #                     comment='A the schedules used, to decrease the temperature')
         traj.f_add_parameter('temperature_bounds', parameters.temperature_bounds,
                              comment='The max and min temperature of the respective schedule')
         traj.f_add_parameter('decay_parameters', parameters.decay_parameters,
@@ -113,6 +111,7 @@ class ParallelTemperingOptimizer(Optimizer):
         self.eval_pop = new_individual_list
         self._expand_trajectory(traj)
         
+        #initialize container for the indices of the parallel runs
         self.parallel_indices = []
         for i in range(0,traj.n_parallel_runs):
             self.parallel_indices.append(i)
@@ -127,37 +126,43 @@ class ParallelTemperingOptimizer(Optimizer):
         # QUADADD ... quadratic additive cooling
         # EXPADD ... exponential additive cooling
         # TRIGADD ...trigonometric additive cooling
-        self.available_cooling_schedules = Enum('Schedule', 'DEF LOG EXP LINMULT QUADMULT LINADD QUADADD EXPADD TRIGADD')
-
+        self.available_cooling_schedules = AvailableCoolingSchedules
+    
+        schedule_known = True
+        for i in range(np.size(self.cooling_schedules)):
+            schedule_known = schedule_known and self.cooling_schedules[i] in AvailableCoolingSchedules
+        
+        assert schedule_known, print("Warning: Unknown cooling schedule")
+        
     def cooling(self,temperature, cooling_schedule, decay_parameter, temperature_bounds, steps_total):        
-        # assumes, that the temperature always starts at 1
-        T0 = temperature_bounds[0]
-        temperature_end = temperature_bounds[1]
+        
+        T0, temperature_end = temperature_bounds
+        
         k = self.g + 1        
-        if cooling_schedule == AvailableCoolingSchedules.DEF:
+        if cooling_schedule == AvailableCoolingSchedules.DEFAULT:
             return temperature * decay_parameter
       
         # Simulated Annealing and Boltzmann Machines: 
         # A Stochastic Approach to Combinatorial Optimization and Neural Computing (1989)
-        if cooling_schedule == AvailableCoolingSchedules.LOG:
+        elif cooling_schedule == AvailableCoolingSchedules.LOGARITHMIC:
             return T0 / (1 + np.log(1 + k))
             
         # Kirkpatrick, Gelatt and Vecchi (1983)
-        if cooling_schedule == AvailableCoolingSchedules.EXP:
+        elif cooling_schedule == AvailableCoolingSchedules.EXPONENTIAL:
             return T0 * (decay_parameter ** (k))
-        if cooling_schedule == AvailableCoolingSchedules.LINMULT:
+        elif cooling_schedule == AvailableCoolingSchedules.LINEAR_MULTIPLICATIVE:
             return T0 / (1 + decay_parameter * k)
-        if cooling_schedule == AvailableCoolingSchedules.QUADMULT:
+        elif cooling_schedule == AvailableCoolingSchedules.QUADRATIC_MULTIPLICATIVE:
             return T0 / (1 + decay_parameter * np.square(k))
             
         # Additive monotonic cooling B. T. Luke (2005) 
-        if cooling_schedule == AvailableCoolingSchedules.LINADD:
+        elif cooling_schedule == AvailableCoolingSchedules.LINEAR_ADDAPTIVE:
             return temperature_end + (T0 - temperature) * ((steps_total - k) / steps_total)
-        if cooling_schedule == AvailableCoolingSchedules.QUADADD:
+        elif cooling_schedule == AvailableCoolingSchedules.QUADRATIC_ADDAPTIVE:
             return temperature_end + (T0 - temperature) * np.square((steps_total - k) / steps_total)
-        if cooling_schedule == AvailableCoolingSchedules.EXPADD: 
+        elif cooling_schedule == AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE: 
             return temperature_end + (T0 - temperature) * (1 / (1 + np.exp(2 * np.log(T0 - temperature_end) / steps_total) * (k - steps_total / 2)))
-        if cooling_schedule == AvailableCoolingSchedules.TRIGADD:
+        elif cooling_schedule == AvailableCoolingSchedules.TRIGONOMETRIC_ADDAPTIVE:
             return temperature_end + (T0 - temperature_end) * (1 + np.cos(k * 3.1415 / steps_total)) / 2
 
         return -1
@@ -268,4 +273,4 @@ class ParallelTemperingOptimizer(Optimizer):
         best_last_fitness = self.current_fitness_value_list[best_last_indiv_index]
 
         logger.info("The best last individual was %s with fitness %s", best_last_indiv, best_last_fitness)
-        logger.info("-- End of (successful) annealing --")
+        logger.info("-- End of (successful) parallel tempering --")
