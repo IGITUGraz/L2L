@@ -12,8 +12,6 @@ with warnings.catch_warnings():
 
     # matplotlib.rcParams.update({'text.usetex': False})
     # matplotlib.use('gtk3agg')
-    # matplotlib.use('svg')
-    # matplotlib.use('agg')
     # matplotlib.use('qt4agg')
     # matplotlib.use('svg')
     matplotlib.use('agg')

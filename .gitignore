@@ -44,11 +44,22 @@
 **/scratchpad.py
 
 **/ipython-log.py
-dpca/.ipynb_checkpoints/dPCA_demo-checkpoint.ipynb
 
 _build/
 
 **/.nfs*
 
+# Style Report Directory
+/style-reports
+
+# Package egg-info directory
+/Learning_to_Learn.egg-info
+
 # unison temp files
 **/.unison*
+
+# Mac OS X
+**/.DS_Store
+
+# root path config file
+bin/path.conf
