@@ -28,7 +28,7 @@ class FunctionGeneratorOptimizee(Optimizee):
         Get the important parameters of the optimizee. This is used by :class:`ltl.recorder`
         for recording the optimizee parameters.
 
-        :return: a :class:`dict
+        :return: a :class:`dict`
         """
         return self.fg_instance.get_params()
 
