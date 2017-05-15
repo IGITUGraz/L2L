@@ -1,27 +1,41 @@
 import numpy as np
 
 from ltl.optimizees.optimizee import Optimizee
+import copy
+import time
 
 
 class FunctionGeneratorOptimizee(Optimizee):
     """
     Implements a simple function optimizee. Functions are generated using the FunctionGenerator.
     NOTE: Make sure the optimizee_fitness_weights is set to (-1,) to minimize the value of the function
-
-    :param fg_instance: Instance of the FunctionGenerator class
+    
+    :param traj: The trajectory used to conduct the optimization.
+    :param fg_instance: Instance of the FunctionGenerator class.
+    :param seed: The random seed used for generation of optimizee individuals. It uses a copy of
+        the fg_instance and overrides the random generator using one seeded by `seed`. Note that this
+        random generator is also the one used by the :class:`.FunctionGeneratorOptimizee` itself.
+        NOTE that this seed is converted to an np.uint32.
     """
 
-    def __init__(self, traj, fg_instance):
+    def __init__(self, traj, fg_instance, seed):
         super().__init__(traj)
-        self.dims = fg_instance.dims
-        self.cost_fn = fg_instance.cost_function
-        self.bound = fg_instance.bound
-        self.fg_instance = fg_instance
+
+        seed = np.uint32(seed)
+        self.random_state = np.random.RandomState(seed=seed)
+
+        self.fg_instance = copy.copy(fg_instance)
+        self.fg_instance.set_random_state(self.random_state)
+
+        self.dims = self.fg_instance.dims
+        self.cost_fn = self.fg_instance.cost_function
+        self.bound = self.fg_instance.bound
 
         # create_individual can be called because __init__ is complete except for traj initializtion
         indiv_dict = self.create_individual()
         for key, val in indiv_dict.items():
             traj.individual.f_add_parameter(key, val)
+        traj.individual.f_add_parameter('seed', seed)
 
     def get_params(self):
         """
@@ -37,7 +51,7 @@ class FunctionGeneratorOptimizee(Optimizee):
         Creates a random value of parameter within given bounds
         """
         # Define the first solution candidate randomly
-        return {'coords': (np.random.rand(self.dims) * (self.bound[1] - self.bound[0]) + self.bound[0])}
+        return {'coords': (self.random_state.rand(self.dims) * (self.bound[1] - self.bound[0]) + self.bound[0])}
 
     def bounding_func(self, individual):
         """
