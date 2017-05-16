@@ -67,7 +67,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
                              comment='A temperature decay parameter (multiplicative)')
         traj.f_add_parameter('n_iteration', parameters.n_iteration, comment='Number of iteration to perform')
         traj.f_add_parameter('stop_criterion', parameters.stop_criterion, comment='Stopping criterion parameter')
-        traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
+        traj.f_add_parameter('seed', np.uint32(parameters.seed), comment='Seed for RNG')
 
         _, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(), get_dict_spec=True)
 
@@ -76,6 +76,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         # Thus needs to handle the optimizee individuals as vectors
         self.current_individual_list = [np.array(dict_to_list(self.optimizee_create_individual()))
                                         for _ in range(parameters.n_parallel_runs)]
+        self.random_state = np.random.RandomState(parameters.seed)
 
         # The following parameters are NOT recorded
         self.T = 1.  # Initialize temperature
@@ -86,7 +87,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
 
         new_individual_list = [
             list_to_dict(
-                ind_as_list + np.random.normal(0.0, parameters.noisy_step, ind_as_list.size) * traj.noisy_step * self.T,
+                ind_as_list + self.random_state.normal(0.0, parameters.noisy_step, ind_as_list.size) * traj.noisy_step * self.T,
                 self.optimizee_individual_dict_spec)
             for ind_as_list in self.current_individual_list
         ]
@@ -134,7 +135,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
 
             # Accept or reject the new solution
             current_fitness_value_i = self.current_fitness_value_list[i]
-            r = np.random.rand()
+            r = self.random_state.rand()
             p = np.exp((weighted_fitness - current_fitness_value_i) / self.T)
 
             # Accept
@@ -148,7 +149,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
 
             current_individual = self.current_individual_list[i]
             new_individual = list_to_dict(
-                current_individual + np.random.randn(current_individual.size) * noisy_step * self.T,
+                current_individual + self.random_state.randn(current_individual.size) * noisy_step * self.T,
                 self.optimizee_individual_dict_spec)
             if self.optimizee_bounding_func is not None:
                 new_individual = self.optimizee_bounding_func(new_individual)

@@ -71,7 +71,7 @@ def main():
     function_tools.plot(benchmark_function)
 
     # NOTE: Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function)
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=100)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
@@ -84,7 +84,7 @@ def main():
     #                                    exploration_rate=0.01, n_random_steps=5, n_iteration=100,
     #                                    stop_criterion=np.Inf)
     parameters = RMSPropParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, momentum_decay=0.5,
-                                   n_iteration=100, stop_criterion=np.Inf)
+                                   n_iteration=100, stop_criterion=np.Inf, seed=99)
 
     optimizer = GradientDescentOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                          optimizee_fitness_weights=(0.1,),

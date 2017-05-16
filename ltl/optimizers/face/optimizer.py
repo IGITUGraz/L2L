@@ -10,8 +10,7 @@ logger = logging.getLogger("ltl-face")
 
 FACEParameters = namedtuple('FACEParameters',
                             ['min_pop_size', 'max_pop_size', 'n_elite', 'smoothing', 'temp_decay', 'n_iteration',
-                             'distribution', 'stop_criterion', 'n_expand'])
-FACEParameters.__new__.__defaults__ = (30, 50, 10, 0.2, 0, 10, None, np.inf, 5)
+                             'distribution', 'stop_criterion', 'n_expand', 'seed'])
 
 FACEParameters.__doc__ = """
 :param min_pop_size: Minimal number of individuals per simulation.
@@ -92,6 +91,8 @@ class FACEOptimizer(Optimizer):
             raise Exception("temp_decay not in range")
         if parameters.smoothing >= 1 or parameters.smoothing < 0:
             raise Exception("smoothing has to be in interval [0, 1)")
+        if parameters.seed is None:
+            raise Exception("The 'seed' must be set")
 
         # The following parameters are recorded
         traj.f_add_parameter('min_pop_size', parameters.min_pop_size,
@@ -110,7 +111,10 @@ class FACEOptimizer(Optimizer):
                              comment='Weight of old parameters in smoothing')
         traj.f_add_parameter('temp_decay', parameters.temp_decay,
                              comment='Decay factor for temperature')
+        traj.f_add_parameter('seed', np.uint32(parameters.seed),
+                             comment='Random seed used by optimizer')
 
+        self.random_state = np.random.RandomState(seed=traj.par.seed)
         temp_indiv, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(),
                                                                        get_dict_spec=True)
         traj.f_add_derived_parameter('dimension', len(temp_indiv),
@@ -146,6 +150,7 @@ class FACEOptimizer(Optimizer):
 
         # Max Likelihood
         self.current_distribution = parameters.distribution
+        self.current_distribution.init_random_state(self.random_state)
         self.current_distribution.fit(self.eval_pop_asarray)
 
         self._expand_trajectory(traj)
@@ -242,9 +247,9 @@ class FACEOptimizer(Optimizer):
             # Temperature dependent sampling of non elite individuals
             if temp_decay > 0:
                 # Keeping non-elite samples with certain probability dependent on temperature (like Simulated Annealing)
-                non_elite_selection_probs = np.exp((weighted_fitness_list[n_elite:] - self.gamma) / self.T)
-                non_elite_selected_indices = np.random.random(
-                    non_elite_selection_probs.size) < non_elite_selection_probs
+                non_elite_selection_probs = np.clip(np.exp((weighted_fitness_list[n_elite:] - self.gamma) / self.T),
+                                                    amin=0.0, a_max=1.0)
+                non_elite_selected_indices = self.random_state.binomial(1, p=non_elite_selection_probs)
                 non_elite_eval_pop_asarray = sorted_population[n_elite:][non_elite_selected_indices]
                 individuals_to_be_fitted = np.concatenate((elite_individuals, non_elite_eval_pop_asarray))
 
@@ -296,5 +301,5 @@ class FACEOptimizer(Optimizer):
         # ------------ Finished all runs and print result --------------- #
         logger.info("-- End of (successful) FACE optimization --")
         logger.info("-- Final distribution parameters --")
-        for parameter_key, parameter_value in self.distribution_results.items():
+        for parameter_key, parameter_value in sorted(self.distribution_results.items()):
             logger.info('  %s: %s', parameter_key, parameter_value)

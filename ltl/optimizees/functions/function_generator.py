@@ -53,13 +53,20 @@ class FunctionGenerator:
             bound_max = np.max(bounds_max)
             self.bound = [bound_min, bound_max]
 
-    def cost_function(self, x):
+    def cost_function(self, x, random_state=None):
+        """It gets the value of the function. If the function includes noise, the `random_state`
+        parameter must be specified
+
+        :param ~numpy.random.RandomState random_state: The random generator used to generate the
+            noise for the function.
+        """
         res = 0.
         for f in self.gen_functions:
             res += f(x)
 
         if self.noise:
-            res += np.random.normal(self.mu, self.sigma)
+            assert isinstance(random_state, np.random.RandomState)
+            res += random_state.normal(self.mu, self.sigma)
 
         return res
 
