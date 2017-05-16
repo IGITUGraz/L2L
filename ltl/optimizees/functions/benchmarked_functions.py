@@ -13,21 +13,23 @@ class BenchmarkedFunctions:
     :param sigma: Scalar indicating the standard deviation of the Gaussian noise.
     """
     def __init__(self):
-        self.function_name_map = [("Rastrigin2d", self._create_rastrigin2d()),
-                                  ("Rastrigin10d", self._create_rastrigin10d()),
-                                  ("Rosenbrock2d", self._create_rosenbrock2d()),
-                                  ("Rosenbrock10d", self._create_rosenbrock10d()),
-                                  ("Ackley2d", self._create_ackley2d()),
-                                  ("Ackley10d", self._create_ackley10d()),
-                                  ("Chasm", self._create_chasm()),
-                                  ("Gauss2d", self._create_gauss2d()),
-                                  ("Shekel2d", self._create_shekel2d()),
-                                  ("Langermann2d", self._create_langermann()),
-                                  ("Michalewicz2d", self._create_michalewicz2d()),
-                                  ("Permutation2d", self._create_permutation2d()),
-                                  ("Easom2d", self._create_easom2d()),
-                                  ("Easom10d", self._create_easom10d()),
-                                  ("3Gaussians2d", self._create_3gaussians2d())]
+        self.function_name_map = [("Rastrigin2d", self._create_rastrigin2d),
+                                  ("Rastrigin10d", self._create_rastrigin10d),
+                                  ("Rosenbrock2d", self._create_rosenbrock2d),
+                                  ("Rosenbrock10d", self._create_rosenbrock10d),
+                                  ("Ackley2d", self._create_ackley2d),
+                                  ("Ackley10d", self._create_ackley10d),
+                                  ("Chasm", self._create_chasm),
+                                  ("Gauss2d", self._create_gauss2d),
+                                  ("Shekel2d", self._create_shekel2d),
+                                  ("Langermann2d", self._create_langermann),
+                                  ("Michalewicz2d", self._create_michalewicz2d),
+                                  ("Permutation2d", self._create_permutation2d),
+                                  ("Easom2d", self._create_easom2d),
+                                  ("Easom10d", self._create_easom10d),
+                                  ("3Gaussians2d", self._create_3gaussians2d)]
+        self.function_name_index_map = OrderedDict([(name, index)
+                                                    for index, (name, _) in enumerate(self.function_name_map)])
 
     def get_function_by_index(self, id_, noise=False, mu=0., sigma=0.01):
         """
@@ -41,13 +43,37 @@ class BenchmarkedFunctions:
         """
 
         #first update the noise for the given function
-        self.function_name_map[id_][1].noise = noise
-        self.function_name_map[id_][1].mu = mu
-        self.function_name_map[id_][1].sigma = sigma
+        return_function_name, return_function_creator = self.function_name_map[id_]
+        return_function = return_function_creator()
+        return_function.noise = noise
+        return_function.mu = mu
+        return_function.sigma = sigma
 
-        return self.function_name_map[id_], self.get_params(id_, noise, mu, sigma)
+        return (return_function_name, return_function), self.get_params(return_function, id_, noise, mu, sigma)
 
-    def get_params(self, id, noise, mu, sigma):
+    def get_function_by_name(self, name, noise=False, mu=0., sigma=0.01):
+        """
+        Get the benchmarked function with given id
+        :param name_: Function name in self.function_name_map
+        :param noise: Indicates whether the function should provide noisy values
+        :param mu: mean of the noise
+        :param sigma: convariance of the noise
+
+        :return function_name_map entry for the given id and the parameters for the benchmark
+        """
+        try:
+            id_ = self.function_name_index_map[name]
+        except KeyError:
+            raise ValueError('There exists no function by name {}'.format(name))
+        return_function_name, return_function_creator = self.function_name_map[id_]
+        return_function = return_function_creator()
+        return_function.noise = noise
+        return_function.mu = mu
+        return_function.sigma = sigma
+
+        return (return_function_name, return_function), self.get_params(return_function, id_, noise, mu, sigma)
+
+    def get_params(self, fg_object, id, noise, mu, sigma):
         # if noise:
         #     params_dict_items = [("benchmark_id", id),
         #                          ("mu", mu),
@@ -56,7 +82,7 @@ class BenchmarkedFunctions:
         #     params_dict_items = [("benchmark_id", id)]
         params_dict_items = [("benchmark_id", id)]
         # params_dict = OrderedDict(params_dict_items)
-        function_params_items = self.function_name_map[id][1].get_params().items()
+        function_params_items = fg_object.get_params().items()
         params_dict_items += function_params_items
         return OrderedDict(params_dict_items)
 
