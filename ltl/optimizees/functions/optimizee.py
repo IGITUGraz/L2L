@@ -1,8 +1,6 @@
 import numpy as np
 
 from ltl.optimizees.optimizee import Optimizee
-import copy
-import time
 
 
 class FunctionGeneratorOptimizee(Optimizee):
@@ -24,9 +22,7 @@ class FunctionGeneratorOptimizee(Optimizee):
         seed = np.uint32(seed)
         self.random_state = np.random.RandomState(seed=seed)
 
-        self.fg_instance = copy.copy(fg_instance)
-        self.fg_instance.set_random_state(self.random_state)
-
+        self.fg_instance = fg_instance
         self.dims = self.fg_instance.dims
         self.cost_fn = self.fg_instance.cost_function
         self.bound = self.fg_instance.bound
@@ -67,4 +63,5 @@ class FunctionGeneratorOptimizee(Optimizee):
         :return: a single element :obj:`tuple` containing the value of the chosen function
         """
         individual = np.array(traj.individual.coords)
-        return (self.cost_fn(individual),)
+        random_state = np.random.RandomState(seed=traj.parameters.individual.seed + traj.v_idx + 1)
+        return (self.cost_fn(individual, random_state=random_state),)

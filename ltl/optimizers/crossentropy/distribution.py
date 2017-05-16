@@ -11,9 +11,28 @@ logger = logging.getLogger('ltl-distribution')
 class Distribution(metaclass=ABCMeta):
     """Generic base for a distribution. Needs to implement the functions fit and sample.
     """
-    
     @abc.abstractmethod
-    def fit(self, individuals):
+    def __init__(self):
+        """Initializes the distribution members along with the random generator used
+        to sample and fit the distributions
+        """
+        pass
+
+    @abc.abstractmethod
+    def init_random_state(self, random_state):
+        """
+        Used to initialize the random number generator which is used to fit/sample data. Note
+        that if the random_state is already set, this raises an `AssertionError`. The reason
+        this is not a part of the constructor is that the distribution random state must be
+        initialized only by the optimizer and not in the main function (where it is
+        constructed). It is essential to call this function before using the distribution
+
+        :param random_state: An instance of class:`numpy.random.RandomState`
+        """
+        pass
+
+    @abc.abstractmethod
+    def fit(self, data_list):
         """This function fits the distributions parameters to the given samples
         in maximum likelihood fashion.
 
@@ -27,7 +46,6 @@ class Distribution(metaclass=ABCMeta):
         """Samples n_individuals from the current parametrized distribution.
 
         :param n_individuals: An integer specifiyng the amount of individuals to sample
-
         :returns: A list or array of n_individuals
         """
         pass
@@ -43,10 +61,18 @@ class Gaussian(Distribution):
     """
     
     def __init__(self):
-        """Initializes the distributions members
+        """" Initialize the distribution
+        
+        :param random_state: The random generator used to fit and sample
         """
+        self.random_state = None
         self.mean = None
         self.cov = None
+
+    def init_random_state(self, random_state):
+        assert self.random_state is None, "The random_state has already been set for the distribution"
+        assert isinstance(random_state, np.random.RandomState)
+        self.random_state = random_state
 
     def get_params(self):
         params_dict_items = [("distribution_name", self.__class__.__name__)]
@@ -62,6 +88,10 @@ class Gaussian(Distribution):
         
         :returns dict specifying current parametrization
         """
+        assert self.random_state is not None, \
+            "The random_state for the distribution has not been set, call the"\
+            " 'init_random_state' member function to set it"
+
         mean = np.mean(data_list, axis=0)
         cov_mat = np.cov(data_list, rowvar=False)
 
@@ -84,7 +114,10 @@ class Gaussian(Distribution):
  
         :returns numpy array with n_individual rows of individuals
         """
-        return np.random.multivariate_normal(self.mean, self.cov, n_individuals)
+        assert self.random_state is not None, \
+            "The random_state for the distribution has not been set, call the"\
+            " 'init_random_state' member function to set it"
+        return self.random_state.multivariate_normal(self.mean, self.cov, n_individuals)
 
 
 class BayesianGaussianMixture():
@@ -94,15 +127,24 @@ class BayesianGaussianMixture():
     """
     def __init__(self, n_components=2, **kwargs):
         """ Initialize the distribution
-
+        
         :param n_components: components of the mixture model
         """
+        self.random_state = None
         self.bayesian_mixture = sklearn.mixture.BayesianGaussianMixture(
-            n_components, weight_concentration_prior_type='dirichlet_distribution', **kwargs)
+            n_components,
+            weight_concentration_prior_type='dirichlet_distribution',
+            random_state=self.random_state, **kwargs)
         # taken from check_fitted function of BaysianGaussianMixture in the sklearn repository
         self.parametrization = ('covariances_', 'means_', 'weight_concentration_', 'weights_',
                                 'mean_precision_', 'degrees_of_freedom_', 'precisions_', 'precisions_cholesky_')
         self.n_components = n_components
+
+    def init_random_state(self, random_state):
+        assert self.random_state is None, "The random_state has already been set for the distribution"
+        assert isinstance(random_state, np.random.RandomState)
+        self.random_state = random_state
+        self.bayesian_mixture.random_state = self.random_state
 
     def _postprocess_fitted(self, model):
         """postprocesses the fitted model, adding the possibility to add noise or something
@@ -130,6 +172,10 @@ class BayesianGaussianMixture():
         account for the new distribution.
         :return: dict specifiying current parametrization
         """
+        assert self.random_state is not None, \
+            "The random_state for the distribution has not been set, call the"\
+            " 'init_random_state' member function to set it"
+
         old = self.bayesian_mixture
         self.bayesian_mixture.fit(data_list)
         self._postprocess_fitted(self.bayesian_mixture)
@@ -162,6 +208,9 @@ class BayesianGaussianMixture():
         :param n_individuals: number of individuals to sample
         :return: numpy array with n_individuals rows of individuals
         """
+        assert self.random_state is not None, \
+            "The random_state for the distribution has not been set, call the"\
+            " 'init_random_state' member function to set it"
         individuals, _ = self.bayesian_mixture.sample(n_individuals)
         return individuals
 
@@ -172,13 +221,15 @@ class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
     def __init__(self, n_components, additive_noise=None, noise_decay=0.95, **kwargs):
         """
         Initializes the Noisy Bayesian Gaussian Mixture Model with noise components
+
+        :param random_state: The random generator used to fit and sample
         :param n_components: number of components in the mixture model
         :param additive_noise: vector representing the diagonal covariances that get added to the 
         diagonalized covariance matrix. If None it will get to np.ones
         :param noise_decay: factor that will decay the additive noise
         :param kwargs: additional arguments that get passed to the underlying scikit learn model
         """
-        BayesianGaussianMixture.__init__(self, n_components, **kwargs)
+        BayesianGaussianMixture.__init__(self, n_components=n_components, **kwargs)
         self.noise_decay = noise_decay
         if additive_noise is not None:
             self.additive_noise = np.array(additive_noise, dtype=np.float)
@@ -219,7 +270,8 @@ class NoisyGaussian(Gaussian):
     """
     def __init__(self, additive_noise=None, noise_decay=0.95):
         """Initializes the noisy distribution
-
+        
+        :param random_state: The random generator used to fit and sample
         :param additive_noise: vector representing the diagonal covariances that get added to the 
         diagonalized covariance matrix. If None it will get to np.ones
         :param noise_decay: Multiplicative decay of the noise components
@@ -248,6 +300,10 @@ class NoisyGaussian(Gaussian):
 
         :returns dict describing parameter configuration
         """
+        assert self.random_state is not None, \
+            "The random_state for the distribution has not been set, call the"\
+            " 'init_random_state' member function to set it"
+
         Gaussian.fit(self, data_list, smooth_update)
         eigenvalues, eigenvectors = np.linalg.eig(self.cov)
 
@@ -267,4 +323,8 @@ class NoisyGaussian(Gaussian):
 
         :returns n_individuals Individuals
         """
-        return np.random.multivariate_normal(self.mean, self.noisy_cov, n_individuals)
+        assert self.random_state is not None, \
+            "The random_state for the distribution has not been set, call the"\
+            " 'init_random_state' member function to set it"
+
+        return self.random_state.multivariate_normal(self.mean, self.noisy_cov, n_individuals)

@@ -9,8 +9,8 @@ from ltl.optimizers.optimizer import Optimizer
 logger = logging.getLogger("ltl-ce")
 
 CrossEntropyParameters = namedtuple('CrossEntropyParameters',
-                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distribution', 'stop_criterion'])
-CrossEntropyParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0, 10, None, np.inf)
+                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distribution', 'stop_criterion', 'seed'])
+CrossEntropyParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0, 10, None, np.inf, None)
 
 CrossEntropyParameters.__doc__ = """
 :param pop_size: Minimal number of individuals per simulation.
@@ -28,6 +28,7 @@ CrossEntropyParameters.__doc__ = """
 :param n_iteration: Number of iterations to perform
 :param distribution: Distribution object to use. Has to implement a fit and sample function.
 :param stop_criterion: (Optional) Stop if this fitness is reached.
+:param seed: The random seed used to sample and fit the distribution. The :class:`.CrossEntropyOptimizer` uses a random generator seeded with this seed
 """
 
 
@@ -104,7 +105,10 @@ class CrossEntropyOptimizer(Optimizer):
         traj.f_add_parameter('smoothing', parameters.smoothing,
                              comment='Weight of old parameters in smoothing')
         traj.f_add_parameter('temp_decay', parameters.temp_decay,
-                             comment='Decay factor for temperature')        
+                             comment='Decay factor for temperature')
+        traj.f_add_parameter('seed', np.uint32(parameters.seed),
+                             comment='Seed used for random number generation in optimizer')
+        self.random_state = np.random.RandomState(traj.parameters.individual.seed)
 
         temp_indiv, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(),
                                                                        get_dict_spec=True)
@@ -144,6 +148,7 @@ class CrossEntropyOptimizer(Optimizer):
         
         # Max Likelihood
         self.current_distribution = parameters.distribution
+        self.current_distribution.init_random_state(self.random_state)
         self.current_distribution.fit(self.eval_pop_asarray)
         
         self._expand_trajectory(traj)
@@ -241,8 +246,9 @@ class CrossEntropyOptimizer(Optimizer):
         # Temperature dependent sampling of non elite individuals
         if temp_decay > 0:
             # Keeping non-elite samples with certain probability dependent on temperature (like Simulated Annealing)
-            non_elite_selection_probs = np.exp((weighted_fitness_list[n_elite:] - self.gamma) / self.T)
-            non_elite_selected_indices = np.random.random(non_elite_selection_probs.size) < non_elite_selection_probs
+            non_elite_selection_probs = np.clip(np.exp((weighted_fitness_list[n_elite:] - self.gamma) / self.T), 
+                                                a_min=0.0, a_max=1.0)
+            non_elite_selected_indices = self.random_state.binomial(1, non_elite_selection_probs).astype(bool)
             non_elite_eval_pop_asarray = sorted_population[n_elite:][non_elite_selected_indices]
             individuals_to_be_fitted = np.concatenate((elite_individuals, non_elite_eval_pop_asarray))
         
@@ -290,5 +296,5 @@ class CrossEntropyOptimizer(Optimizer):
         # ------------ Finished all runs and print result --------------- #
         logger.info("-- End of (successful) CE optimization --")
         logger.info("-- Final distribution parameters --")
-        for parameter_key, parameter_value in self.distribution_results.items():
+        for parameter_key, parameter_value in sorted(self.distribution_results.items()):
             logger.info('  %s: %s', parameter_key, parameter_value)

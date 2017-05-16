@@ -18,12 +18,9 @@ class FunctionGenerator:
     :param noise: Boolean value indicating if the Gaussian noise will be applied on the resulting function.
     :param mu: Scalar indicating the mean of the Gaussian noise.
     :param sigma: Scalar indicating the standard deviation of the Gaussian noise.
-    :param random_state: The random number generator used in the generation of the functions for instance in the
-        addition of noise
     """
 
-    def __init__(self, fg_params, dims=2, bound=None, noise=False, mu=0., sigma=0.01,
-                 random_state=numpy_global_random_state):
+    def __init__(self, fg_params, dims=2, bound=None, noise=False, mu=0., sigma=0.01):
         self.dims = dims
         self.noise = noise
         self.mu = mu
@@ -42,7 +39,6 @@ class FunctionGenerator:
 
         self.gen_functions = []
         self.function_parameters = fg_params
-        self.random_state = random_state
         # The class name of the parameter named tuple indexes the actual function class,
         # which is initialized using the given param and dims
         for param in fg_params:
@@ -58,18 +54,22 @@ class FunctionGenerator:
             bound_max = np.max(bounds_max)
             self.bound = [bound_min, bound_max]
 
-    def cost_function(self, x):
+    def cost_function(self, x, random_state=None):
+        """It gets the value of the function. If the function includes noise, he `random_state`
+        parameter must be specified
+
+        :param ~numpy.random.RandomState random_state: The random generator used to generate the
+            noise for the function.
+        """
         res = 0.
         for f in self.gen_functions:
             res += f(x)
 
         if self.noise:
-            res += self.random_state.normal(self.mu, self.sigma)
+            assert isinstance(random_state, np.random.RandomState)
+            res += random_state.normal(self.mu, self.sigma)
 
         return res
-
-    def set_random_state(self, random_state):
-        self.random_state = random_state
 
     def get_params(self):
         fg_params = []

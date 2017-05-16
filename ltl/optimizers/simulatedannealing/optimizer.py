@@ -67,7 +67,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
                              comment='A temperature decay parameter (multiplicative)')
         traj.f_add_parameter('n_iteration', parameters.n_iteration, comment='Number of iteration to perform')
         traj.f_add_parameter('stop_criterion', parameters.stop_criterion, comment='Stopping criterion parameter')
-        traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
+        traj.f_add_parameter('seed', np.uint32(parameters.seed), comment='Seed for RNG')
 
         _, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(), get_dict_spec=True)
 

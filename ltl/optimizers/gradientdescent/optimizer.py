@@ -53,7 +53,7 @@ AdamParameters.__doc__ = """
 
 RMSPropParameters = namedtuple(
     'RMSPropParameters',
-    ['learning_rate', 'exploration_rate', 'n_random_steps', 'momentum_decay', 'n_iteration', 'stop_criterion'])
+    ['learning_rate', 'exploration_rate', 'n_random_steps', 'momentum_decay', 'n_iteration', 'stop_criterion', 'seed'])
 RMSPropParameters.__doc__ = """
 :param learning_rate: The rate of learning per step of gradient descent
 :param exploration_rate: The standard deviation of random steps used for finite difference gradient
@@ -61,6 +61,7 @@ RMSPropParameters.__doc__ = """
 :param momentum_decay: Specifies the decay of the historic momentum at each gradient descent step
 :param n_iteration: number of iteration to perform
 :param stop_criterion: Stop if change in fitness is below this value
+:param seed: The random seed used for random number generation in the optimizer
 """
 
 
@@ -120,8 +121,10 @@ class GradientDescentOptimizer(Optimizer):
                              comment='Amount of random steps taken for calculating the gradient')
         traj.f_add_parameter('n_iteration', parameters.n_iteration, comment='Number of iteration to perform')
         traj.f_add_parameter('stop_criterion', parameters.stop_criterion, comment='Stopping criterion parameter')
-
+        traj.f_add_parameter('seed', np.uint32(parameters.seed), comment='Optimizer random seed')
+        
         _, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(), get_dict_spec=True)
+        self.random_state = np.random.RandomState(seed=traj.par.seed)
 
         # Note that this array stores individuals as an np.array of floats as opposed to Individual-Dicts
         # This is because this array is used within the context of the gradient descent algorithm and
@@ -146,7 +149,7 @@ class GradientDescentOptimizer(Optimizer):
         # Explore the neighbourhood in the parameter space of current individual
         new_individual_list = [
             list_to_dict(self.current_individual + 
-                         np.random.normal(0.0, parameters.exploration_rate, self.current_individual.size),
+                         self.random_state.normal(0.0, parameters.exploration_rate, self.current_individual.size),
                          self.optimizee_individual_dict_spec)
             for i in range(parameters.n_random_steps)
         ]
@@ -215,7 +218,7 @@ class GradientDescentOptimizer(Optimizer):
             # Explore the neighbourhood in the parameter space of the current individual
             new_individual_list = [
                 list_to_dict(self.current_individual + 
-                             np.random.normal(0.0, traj.exploration_rate, self.current_individual.size),
+                             self.random_state.normal(0.0, traj.exploration_rate, self.current_individual.size),
                              self.optimizee_individual_dict_spec)
                 for i in range(traj.n_random_steps)
             ]
@@ -367,6 +370,6 @@ class GradientDescentOptimizer(Optimizer):
         :return:
         """
 
-        gradient += (np.random.normal(0.0, traj.stochastic_deviation, self.current_individual.size) * 
+        gradient += (self.random_state.normal(0.0, traj.stochastic_deviation, self.current_individual.size) * 
                      traj.stochastic_decay**(self.g + 1))
         self.current_individual += traj.learning_rate * gradient
