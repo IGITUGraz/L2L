@@ -77,7 +77,7 @@ def main():
     # TODO: Change the optimizer to the appropriate Optimizer class
     parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=5,
                                         distribution=NoisyBayesianGaussianMixture(2,
-                                                                                  additive_noise=[1., 1.],
+                                                                                  noise_level=0.1,
                                                                                   noise_decay=0.9),
                                         stop_criterion=np.inf, seed=103)
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
