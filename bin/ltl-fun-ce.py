@@ -13,6 +13,7 @@ from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEn
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
+import numpy as np
 logger = logging.getLogger('ltl-fun-ce')
 
 
@@ -74,7 +75,7 @@ def main():
     parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=5,
                                         distribution=NoisyGaussian(additive_noise=[1., 1.],
                                                                    noise_decay=0.95),
-                                        seed=102)
+                                        stop_criterion=np.inf, seed=102)
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                       optimizee_fitness_weights=(-0.1,),
                                       parameters=parameters,

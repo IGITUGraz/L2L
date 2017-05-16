@@ -2,6 +2,8 @@ import os
 import warnings
 import logging.config
 
+import numpy as np
+
 import yaml
 from pypet import Environment
 from pypet import pypetconstants
@@ -77,7 +79,7 @@ def main():
                                         distribution=NoisyBayesianGaussianMixture(2,
                                                                                   additive_noise=[1., 1.],
                                                                                   noise_decay=0.9),
-                                        seed=103)
+                                        stop_criterion=np.inf, seed=103)
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                             optimizee_fitness_weights=(-0.1,),
                                             parameters=parameters,

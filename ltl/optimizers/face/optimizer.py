@@ -11,7 +11,6 @@ logger = logging.getLogger("ltl-face")
 FACEParameters = namedtuple('FACEParameters',
                             ['min_pop_size', 'max_pop_size', 'n_elite', 'smoothing', 'temp_decay', 'n_iteration',
                              'distribution', 'stop_criterion', 'n_expand', 'seed'])
-FACEParameters.__new__.__defaults__ = (30, 50, 10, 0.2, 0, 10, None, np.inf, 5, None)
 
 FACEParameters.__doc__ = """
 :param min_pop_size: Minimal number of individuals per simulation.

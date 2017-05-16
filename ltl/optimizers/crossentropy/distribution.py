@@ -13,13 +13,6 @@ class Distribution(metaclass=ABCMeta):
     """
     
     @abc.abstractmethod
-    def __init__(self):
-        """Initializes the distribution members along with the random generator used
-        to sample and fit the distributions
-        """
-        pass
-
-    @abc.abstractmethod
     def init_random_state(self, random_state):
         """
         Used to initialize the random number generator which is used to fit/sample data. Note

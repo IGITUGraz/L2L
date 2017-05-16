@@ -10,7 +10,6 @@ logger = logging.getLogger("ltl-ce")
 
 CrossEntropyParameters = namedtuple('CrossEntropyParameters',
                                     ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distribution', 'stop_criterion', 'seed'])
-CrossEntropyParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0, 10, None, np.inf, None)
 
 CrossEntropyParameters.__doc__ = """
 :param pop_size: Minimal number of individuals per simulation.
