@@ -11,6 +11,7 @@ logger = logging.getLogger('ltl-distribution')
 class Distribution(metaclass=ABCMeta):
     """Generic base for a distribution. Needs to implement the functions fit and sample.
     """
+    
     @abc.abstractmethod
     def __init__(self):
         """Initializes the distribution members along with the random generator used
@@ -46,6 +47,7 @@ class Distribution(metaclass=ABCMeta):
         """Samples n_individuals from the current parametrized distribution.
 
         :param n_individuals: An integer specifiyng the amount of individuals to sample
+
         :returns: A list or array of n_individuals
         """
         pass
@@ -127,7 +129,7 @@ class BayesianGaussianMixture():
     """
     def __init__(self, n_components=2, **kwargs):
         """ Initialize the distribution
-        
+
         :param n_components: components of the mixture model
         """
         self.random_state = None
@@ -270,7 +272,7 @@ class NoisyGaussian(Gaussian):
     """
     def __init__(self, additive_noise=None, noise_decay=0.95):
         """Initializes the noisy distribution
-        
+
         :param random_state: The random generator used to fit and sample
         :param additive_noise: vector representing the diagonal covariances that get added to the 
         diagonalized covariance matrix. If None it will get to np.ones

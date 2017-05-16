@@ -64,10 +64,10 @@ def main():
     (benchmark_name, benchmark_function), benchmark_parameters = \
         bench_functs.get_function_by_index(function_id, noise=True)
 
+    function_tools.plot(benchmark_function)
+
     # NOTE: Innerloop simulator
     optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=101)
-
-    function_tools.plot(benchmark_function)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class

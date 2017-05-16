@@ -28,7 +28,8 @@ CrossEntropyParameters.__doc__ = """
 :param n_iteration: Number of iterations to perform
 :param distribution: Distribution object to use. Has to implement a fit and sample function.
 :param stop_criterion: (Optional) Stop if this fitness is reached.
-:param seed: The random seed used to sample and fit the distribution. The :class:`.CrossEntropyOptimizer` uses a random generator seeded with this seed
+:param seed: The random seed used to sample and fit the distribution. :class:`.CrossEntropyOptimizer`
+    uses a random generator seeded with this seed.
 """
 
 

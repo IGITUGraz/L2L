@@ -49,10 +49,10 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      # freeze_input=True,
-                      # multiproc=True,
-                      # use_scoop=True,
-                      # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                      freeze_input=True,
+                      multiproc=True,
+                      use_scoop=True,
+                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
@@ -66,10 +66,10 @@ def main():
     (benchmark_name, benchmark_function), benchmark_parameters = \
         bench_functs.get_function_by_index(function_id, noise=True)
 
+    function_tools.plot(benchmark_function)
+
     # NOTE: Innerloop simulator
     optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=102)
-
-    function_tools.plot(benchmark_function)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class

@@ -7,7 +7,6 @@ from deap.tools import HallOfFame
 
 from ltl import dict_to_list, list_to_dict
 from ltl.optimizers.optimizer import Optimizer
-import numpy as np
 
 logger = logging.getLogger("ltl-ga")
 
@@ -52,7 +51,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         self.optimizee_bounding_func = optimizee_bounding_func
         __, self.optimizee_individual_dict_spec = dict_to_list(optimizee_create_individual(), get_dict_spec=True)
 
-        traj.f_add_parameter('seed', np.uint32(parameters.seed), comment='Seed for RNG')
+        traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
         traj.f_add_parameter('popsize', parameters.popsize, comment='Population size')  # 185
         traj.f_add_parameter('CXPB', parameters.CXPB, comment='Crossover term')
         traj.f_add_parameter('MUTPB', parameters.MUTPB, comment='Mutation probability')

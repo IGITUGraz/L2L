@@ -2,8 +2,7 @@ from abc import ABC, abstractmethod
 from collections import namedtuple, OrderedDict
 
 import numpy as np
-from numpy.random import beta
-numpy_global_random_state = beta.__self__
+
 
 class FunctionGenerator:
     """
@@ -55,7 +54,7 @@ class FunctionGenerator:
             self.bound = [bound_min, bound_max]
 
     def cost_function(self, x, random_state=None):
-        """It gets the value of the function. If the function includes noise, he `random_state`
+        """It gets the value of the function. If the function includes noise, the `random_state`
         parameter must be specified
 
         :param ~numpy.random.RandomState random_state: The random generator used to generate the

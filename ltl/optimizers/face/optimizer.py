@@ -302,5 +302,5 @@ class FACEOptimizer(Optimizer):
         # ------------ Finished all runs and print result --------------- #
         logger.info("-- End of (successful) FACE optimization --")
         logger.info("-- Final distribution parameters --")
-        for parameter_key, parameter_value in self.distribution_results.items():
+        for parameter_key, parameter_value in sorted(self.distribution_results.items()):
             logger.info('  %s: %s', parameter_key, parameter_value)
