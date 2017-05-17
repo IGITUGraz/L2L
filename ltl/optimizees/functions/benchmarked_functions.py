@@ -44,12 +44,9 @@ class BenchmarkedFunctions:
 
         #first update the noise for the given function
         return_function_name, return_function_creator = self.function_name_map[id_]
-        return_function = return_function_creator()
-        return_function.noise = noise
-        return_function.mu = mu
-        return_function.sigma = sigma
+        return_function = return_function_creator(noise, mu, sigma)
 
-        return (return_function_name, return_function), self.get_params(return_function, id_, noise, mu, sigma)
+        return (return_function_name, return_function), self.get_params(return_function, id_)
 
     def get_function_by_name(self, name, noise=False, mu=0., sigma=0.01):
         """
@@ -66,70 +63,74 @@ class BenchmarkedFunctions:
         except KeyError:
             raise ValueError('There exists no function by name {}'.format(name))
         return_function_name, return_function_creator = self.function_name_map[id_]
-        return_function = return_function_creator()
-        return_function.noise = noise
-        return_function.mu = mu
-        return_function.sigma = sigma
+        return_function = return_function_creator(noise, mu, sigma)
 
-        return (return_function_name, return_function), self.get_params(return_function, id_, noise, mu, sigma)
+        return (return_function_name, return_function), self.get_params(return_function, id_)
 
-    def get_params(self, fg_object, id, noise, mu, sigma):
-        # if noise:
-        #     params_dict_items = [("benchmark_id", id),
-        #                          ("mu", mu),
-        #                          ("sigma", sigma)]
-        # else:
-        #     params_dict_items = [("benchmark_id", id)]
+    def get_params(self, fg_object, id):
         params_dict_items = [("benchmark_id", id)]
-        # params_dict = OrderedDict(params_dict_items)
         function_params_items = fg_object.get_params().items()
         params_dict_items += function_params_items
         return OrderedDict(params_dict_items)
 
-    def _create_rastrigin2d(self):
-        return FunctionGenerator([RastriginParameters()], dims=2)
+    def _create_rastrigin2d(self, noise, mu, sigma):
+        return FunctionGenerator([RastriginParameters()],
+                                 dims=2, noise=noise, mu=mu, sigma=sigma)
 
-    def _create_rastrigin10d(self):
-        return FunctionGenerator([RastriginParameters()], dims=10)
+    def _create_rastrigin10d(self, noise, mu, sigma):
+        return FunctionGenerator([RastriginParameters()],
+                                 dims=10, noise=noise, mu=mu, sigma=sigma)
 
-    def _create_rosenbrock2d(self):
-        return FunctionGenerator([RosenbrockParameters()], dims=2)
+    def _create_rosenbrock2d(self, noise, mu, sigma):
+        return FunctionGenerator([RosenbrockParameters()],
+                                 dims=2, noise=noise, mu=mu, sigma=sigma)
 
-    def _create_rosenbrock10d(self):
-        return FunctionGenerator([RosenbrockParameters()], dims=10)
+    def _create_rosenbrock10d(self, noise, mu, sigma):
+        return FunctionGenerator([RosenbrockParameters()],
+                                 dims=10, noise=noise, mu=mu, sigma=sigma)
 
-    def _create_ackley2d(self):
-        return FunctionGenerator([AckleyParameters()], dims=2)
+    def _create_ackley2d(self, noise, mu, sigma):
+        return FunctionGenerator([AckleyParameters()],
+                                 dims=2, noise=noise, mu=mu, sigma=sigma)
 
-    def _create_ackley10d(self):
-        return FunctionGenerator([AckleyParameters()], dims=10)
+    def _create_ackley10d(self, noise, mu, sigma):
+        return FunctionGenerator([AckleyParameters()],
+                                 dims=10, noise=noise, mu=mu, sigma=sigma)
 
-    def _create_chasm(self):
-        return FunctionGenerator([ChasmParameters()], dims=2)
+    def _create_chasm(self, noise, mu, sigma):
+        return FunctionGenerator([ChasmParameters()],
+                                 dims=2, noise=noise, mu=mu, sigma=sigma)
 
-    def _create_gauss2d(self):
-        return FunctionGenerator([GaussianParameters(sigma=[[1.5, .1], [.1, .3]], mean=[-1., -1.])], dims=2)
+    def _create_gauss2d(self, noise, mu, sigma):
+        return FunctionGenerator([GaussianParameters(sigma=[[1.5, .1], [.1, .3]], mean=[-1., -1.])],
+                                 dims=2, noise=noise, mu=mu, sigma=sigma)
 
-    def _create_shekel2d(self):
-        return FunctionGenerator([ShekelParameters(A='default', c='default')], dims=2)
+    def _create_shekel2d(self, noise, mu, sigma):
+        return FunctionGenerator([ShekelParameters(A='default', c='default')],
+                                 dims=2, noise=noise, mu=mu, sigma=sigma)
 
-    def _create_michalewicz2d(self):
-        return FunctionGenerator([MichalewiczParameters(m='default')], dims=2)
+    def _create_michalewicz2d(self, noise, mu, sigma):
+        return FunctionGenerator([MichalewiczParameters(m='default')],
+                                 dims=2, noise=noise, mu=mu, sigma=sigma)
 
-    def _create_permutation2d(self):
-        return FunctionGenerator([PermutationParameters(beta=0.005)], dims=2)
+    def _create_permutation2d(self, noise, mu, sigma):
+        return FunctionGenerator([PermutationParameters(beta=0.005)],
+                                 dims=2, noise=noise, mu=mu, sigma=sigma)
 
-    def _create_easom2d(self):
-        return FunctionGenerator([EasomParameters()], dims=2)
+    def _create_easom2d(self, noise, mu, sigma):
+        return FunctionGenerator([EasomParameters()],
+                                 dims=2, noise=noise, mu=mu, sigma=sigma)
 
-    def _create_easom10d(self):
-        return FunctionGenerator([EasomParameters()], dims=10)
+    def _create_easom10d(self, noise, mu, sigma):
+        return FunctionGenerator([EasomParameters()],
+                                 dims=10, noise=noise, mu=mu, sigma=sigma)
 
-    def _create_langermann(self):
-        return FunctionGenerator([LangermannParameters(A='default', c='default')], dims=2)
+    def _create_langermann(self, noise, mu, sigma):
+        return FunctionGenerator([LangermannParameters(A='default', c='default')],
+                                 dims=2, noise=noise, mu=mu, sigma=sigma)
 
-    def _create_3gaussians2d(self):
+    def _create_3gaussians2d(self, noise, mu, sigma):
         fg_params = [GaussianParameters(sigma=[[1.5, .1], [.1, .3]], mean=[-1., -1.]),
                      GaussianParameters(sigma=[[.25, .3], [.3, 1.]], mean=[1., 1.]),
                      GaussianParameters(sigma=[[.5, .25], [.25, 1.3]], mean=[2., -2.])]
-        return FunctionGenerator(fg_params, dims=2)
+        return FunctionGenerator(fg_params, dims=2, noise=noise, mu=mu, sigma=sigma)
