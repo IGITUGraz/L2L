@@ -46,10 +46,10 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      freeze_input=True,
-                      multiproc=True,
-                      use_scoop=True,
-                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+#                      freeze_input=True,
+#                      multiproc=True,
+#                      use_scoop=True,
+#                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=True,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
@@ -59,7 +59,7 @@ def main():
     traj = env.trajectory
 
     # NOTE: Benchmark function
-    function_id = 1
+    function_id = 2
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
         bench_functs.get_function_by_index(function_id, noise=True)
@@ -76,35 +76,27 @@ def main():
     # an upper and lower temperature bound
     # a decay parameter
     #--------------------------------------------------------------------------
-    n_parallel_runs = 9
+    n_parallel_runs = 5
 
     cooling_schedules = [AvailableCoolingSchedules for _ in range(n_parallel_runs)]
-    cooling_schedules[0] = AvailableCoolingSchedules.DEFAULT
-    cooling_schedules[1] = AvailableCoolingSchedules.LOGARITHMIC
-    cooling_schedules[2] = AvailableCoolingSchedules.EXPONENTIAL
-    cooling_schedules[3] = AvailableCoolingSchedules.LINEAR_MULTIPLICATIVE
-    cooling_schedules[4] = AvailableCoolingSchedules.QUADRATIC_MULTIPLICATIVE
-    cooling_schedules[5] = AvailableCoolingSchedules.LINEAR_ADDAPTIVE
-    cooling_schedules[6] = AvailableCoolingSchedules.QUADRATIC_ADDAPTIVE
-    cooling_schedules[7] = AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE
-    cooling_schedules[8] = AvailableCoolingSchedules.TRIGONOMETRIC_ADDAPTIVE
+    cooling_schedules[0] = AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE
+    cooling_schedules[1] = AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE
+    cooling_schedules[2] = AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE
+    cooling_schedules[3] = AvailableCoolingSchedules.LINEAR_ADDAPTIVE
+    cooling_schedules[4] = AvailableCoolingSchedules.LINEAR_ADDAPTIVE
 
     #has to be from 1 to 0, first entry hast to be larger than second
     temperature_bounds = np.zeros((n_parallel_runs,2))
-    temperature_bounds[0] = [1,0]
-    temperature_bounds[1] = [0.9,0]
-    temperature_bounds[2] = [0.8,0]
-    temperature_bounds[3] = [0.7,0]
-    temperature_bounds[4] = [0.6,0]
-    temperature_bounds[5] = [1,0.1]
-    temperature_bounds[6] = [1,0.2]
-    temperature_bounds[7] = [1,0.3]
-    temperature_bounds[8] = [1,0.4]
+    temperature_bounds[0] = [0.8,0]
+    temperature_bounds[1] = [0.7,0]
+    temperature_bounds[2] = [0.6,0]
+    temperature_bounds[3] = [1,0.1]
+    temperature_bounds[4] = [0.9,0.2]
 
     # decay parameter for each schedule seperately
     decay_parameters = np.zeros((n_parallel_runs))
     for i in range(0,n_parallel_runs):
-        decay_parameters[i] = 0.98 #all the same for now
+        decay_parameters[i] = 0.99  #all the same for now
     #--------------------------------------------------------------------------
     # end of configuration
     #--------------------------------------------------------------------------
@@ -114,11 +106,11 @@ def main():
     assert ((decay_parameters.all() <= 1) and (decay_parameters.all() >= 0)), print("Warning: Decay parameter not within specifications.")
     
     # NOTE: Outerloop optimizer initialization
-    parameters = ParallelTemperingParameters(n_parallel_runs, noisy_step=.3, n_iteration=100, stop_criterion=np.Inf,
+    parameters = ParallelTemperingParameters(n_parallel_runs, noisy_step=.03, n_iteration=1000, stop_criterion=np.Inf,
                                               seed=np.random.randint(1e5), cooling_schedules=cooling_schedules, 
                                               temperature_bounds=temperature_bounds, decay_parameters=decay_parameters)
     optimizer = ParallelTemperingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                                  optimizee_fitness_weights=(-0.1,),
+                                                  optimizee_fitness_weights=(-1,),
                                                   parameters=parameters,
                                                   optimizee_bounding_func=optimizee.bounding_func)
 

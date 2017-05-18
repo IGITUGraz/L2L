@@ -110,42 +110,43 @@ class SimulatedAnnealingOptimizer(Optimizer):
         
         self.cooling_schedule = parameters.cooling_schedule
             
-        schedule_known = True
-        for i in range(np.size(self.cooling_schedules)):
-            schedule_known = schedule_known and self.cooling_schedules[i] in AvailableCoolingSchedules
+#        schedule_known = True
+#        for i in range(np.size(self.cooling_schedule)):
+#            schedule_known = schedule_known and self.cooling_schedule[i] in AvailableCoolingSchedules
 
     def cooling(self,temperature, cooling_schedule, temperature_decay, temperature_end, steps_total):        
         # assumes, that the temperature always starts at 1
         T0 = 1
-        k = self.g + 1        
+        k = self.g + 1    
+
                 
         if cooling_schedule == AvailableCoolingSchedules.DEFAULT:
             return temperature * temperature_decay
           
         # Simulated Annealing and Boltzmann Machines: 
         # A Stochastic Approach to Combinatorial Optimization and Neural Computing (1989)
-        elif cooling_schedule == self.available_cooling_schedules.LOGARITHMIC:
+        elif cooling_schedule == AvailableCoolingSchedules.LOGARITHMIC:
             return T0 / (1 + np.log(1 + k))
             
         # Kirkpatrick, Gelatt and Vecchi (1983)
-        elif cooling_schedule == self.available_cooling_schedules.EXPONENTIAL:
+        elif cooling_schedule == AvailableCoolingSchedules.EXPONENTIAL:
             alpha = 0.85 
             return T0 * (alpha ** (k))
-        elif cooling_schedule == self.available_cooling_schedules.LINEAR_MULTIPLICATIVE:
+        elif cooling_schedule == AvailableCoolingSchedules.LINEAR_MULTIPLICATIVE:
             alpha = 1
             return T0 / (1 + alpha * k)
-        elif cooling_schedule == self.available_cooling_schedules.QUADRATIC_MULTIPLICATIVE:
+        elif cooling_schedule == AvailableCoolingSchedules.QUADRATIC_MULTIPLICATIVE:
             alpha = 1
             return T0 / (1 + alpha * np.square(k))
             
         # Additive monotonic cooling B. T. Luke (2005) 
-        elif cooling_schedule == self.available_cooling_schedules.LINEAR_ADDAPTIVE:
+        elif cooling_schedule == AvailableCoolingSchedules.LINEAR_ADDAPTIVE:
             return temperature_end + (T0 - temperature) * ((steps_total - k) / steps_total)
-        elif cooling_schedule == self.available_cooling_schedules.QUADRATIC_ADDAPTIVE:
+        elif cooling_schedule == AvailableCoolingSchedules.QUADRATIC_ADDAPTIVE:
             return temperature_end + (T0 - temperature) * np.square((steps_total - k) / steps_total)
-        elif cooling_schedule == self.available_cooling_schedules.EXPONENTIAL_ADDAPTIVE:            
-            return temperature_end + (T0 - temperature) * (1 / (1 + np.exp(2 * np.log(T0 - temperature_end) / steps_total) * (k - steps_total / 2)))
-        elif cooling_schedule == self.available_cooling_schedules.TRIGONOMETRIC_ADDAPTIVE:
+        elif cooling_schedule == AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE:            
+            return temperature_end + (T0 - temperature) * (1 / (1 + np.exp((2 * np.log(T0 - temperature_end) / steps_total) * (k - steps_total / 2))))
+        elif cooling_schedule == AvailableCoolingSchedules.TRIGONOMETRIC_ADDAPTIVE:
             return temperature_end + (T0 - temperature_end) * (1 + np.cos(k * 3.1415 / steps_total)) / 2
 
         return -1
@@ -191,7 +192,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
             current_fitness_value_i = self.current_fitness_value_list[i]
             r = np.random.rand()
             p = np.exp((weighted_fitness - current_fitness_value_i) / self.T)
-
+            
             # Accept
             if r < p or weighted_fitness >= current_fitness_value_i:
                 self.current_fitness_value_list[i] = weighted_fitness
@@ -223,7 +224,6 @@ class SimulatedAnnealingOptimizer(Optimizer):
             fitnesses_results.clear()
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
-
 
     def end(self, traj):
         """

@@ -4,6 +4,7 @@ import os
 import numpy as np
 import yaml
 from pypet import Environment
+from pypet import pypetconstants
 
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
@@ -58,7 +59,7 @@ def main():
     traj = env.trajectory
 
     # NOTE: Benchmark function
-    function_id = 1
+    function_id = 0
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
         bench_functs.get_function_by_index(function_id, noise=True)
@@ -70,9 +71,8 @@ def main():
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = SimulatedAnnealingParameters(n_parallel_runs=1, noisy_step=.03, temp_decay=.99, n_iteration=10,
-                                              stop_criterion=np.Inf, seed=np.random.randint(1e5), cooling_schedule=AvailableCoolingSchedules.DEFAULT)
-                                              stop_criterion=np.Inf, seed=np.random.randint(1e5))
+    parameters = SimulatedAnnealingParameters(n_parallel_runs=50, noisy_step=.03, temp_decay=.99, n_iteration=100,
+                                              stop_criterion=np.Inf, seed=np.random.randint(1e5), cooling_schedule=AvailableCoolingSchedules.QUADRATIC_ADDAPTIVE)
     optimizer = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                             optimizee_fitness_weights=(-1,),
                                             parameters=parameters,

@@ -67,7 +67,9 @@ class ParallelTemperingOptimizer(Optimizer):
         super().__init__(traj,
                          optimizee_create_individual=optimizee_create_individual,
                          optimizee_fitness_weights=optimizee_fitness_weights,
-                         parameters=parameters)
+                         parameters=parameters, optimizee_bounding_func=optimizee_bounding_func)
+
+        self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func
         
         # The following parameters are recorded
@@ -116,16 +118,6 @@ class ParallelTemperingOptimizer(Optimizer):
         for i in range(0,traj.n_parallel_runs):
             self.parallel_indices.append(i)
         
-        # enum for cooling schedules: 
-        # DEF ... default
-        # LOG ... logartihmic
-        # EXP ... exponential
-        # LINMULT .. linear multiplicative cooling. 
-        # QUADMULT .. quadratic multiplicative cooling
-        # LINADD ... linear additive cooling
-        # QUADADD ... quadratic additive cooling
-        # EXPADD ... exponential additive cooling
-        # TRIGADD ...trigonometric additive cooling
         self.available_cooling_schedules = AvailableCoolingSchedules
     
         schedule_known = True
@@ -161,7 +153,7 @@ class ParallelTemperingOptimizer(Optimizer):
         elif cooling_schedule == AvailableCoolingSchedules.QUADRATIC_ADDAPTIVE:
             return temperature_end + (T0 - temperature) * np.square((steps_total - k) / steps_total)
         elif cooling_schedule == AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE: 
-            return temperature_end + (T0 - temperature) * (1 / (1 + np.exp(2 * np.log(T0 - temperature_end) / steps_total) * (k - steps_total / 2)))
+            return temperature_end + (T0 - temperature) * (1 / (1 + np.exp((2 * np.log(T0 - temperature_end) / steps_total) * (k - steps_total / 2))))
         elif cooling_schedule == AvailableCoolingSchedules.TRIGONOMETRIC_ADDAPTIVE:
             return temperature_end + (T0 - temperature_end) * (1 + np.cos(k * 3.1415 / steps_total)) / 2
 
@@ -170,7 +162,9 @@ class ParallelTemperingOptimizer(Optimizer):
     # get tthe transistion probability between two simulated annealing systems with
     # tempereatures T and energies E
     def metropolis_hasting(self,E1,E2,T1,T2):
-        k = 1.387 * (10 ** -23)  # boltzmann konstant
+        # k = 1.387 * (10 ** -23)  # boltzmann konstant
+        # Note: do not use real Blotzmann kosntant, because both energies and temperatures are divorced from any real physical representation
+        k = 5
         p = np.exp(-np.abs((E1 - E2) * (1 / (k * T1) - 1 / (k * T2))))
         if p < 1:
             return p
