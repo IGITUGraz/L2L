@@ -86,15 +86,15 @@ class ParallelTemperingOptimizer(Optimizer):
         decay_list = []
         schedules_list = []
         for i in range(0,traj.n_parallel_runs):
-            bounds_list.apped(str(parameters.temperature_bounds[i,:]))
-            bounds_list.apped(' ')
+            bounds_list.append(str(parameters.temperature_bounds[i,:]))
+            bounds_list.append(' ')
             decay_list.append(str(parameters.decay_parameters[i]))
-            decay_list.apped(' ')
+            decay_list.append(' ')
             schedules_list.append(str(parameters.cooling_schedules[i]))
-            schedules_list.apped(' ')
+            schedules_list.append(' ')
         temperature_bounds_string.join(bounds_list)
-        decay_parameters_string(decay_list)
-        cooling_schedules_string(schedules_list)
+        decay_parameters_string.join(decay_list)
+        cooling_schedules_string.join(schedules_list)
         traj.f_add_parameter('temperature_bounds', temperature_bounds_string,
                              comment='The max and min temperature of the respective schedule')
         traj.f_add_parameter('decay_parameters', decay_parameters_string,
