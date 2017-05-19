@@ -78,8 +78,7 @@ class ParallelTemperingOptimizer(Optimizer):
         traj.f_add_parameter('n_iteration', parameters.n_iteration, comment='Number of iteration to perform')
         traj.f_add_parameter('stop_criterion', parameters.stop_criterion, comment='Stopping criterion parameter')
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
-        temperature_bounds_string = ''
-        decay_parameters_string = ''
+        
         cooling_schedules_string = ''
         bounds_list = []
         decay_list = []
@@ -91,11 +90,9 @@ class ParallelTemperingOptimizer(Optimizer):
             decay_list.append(' ')
             schedules_list.append(str(parameters.cooling_schedules[i]))
             schedules_list.append(' ')
-        temperature_bounds_string.join(bounds_list)
-        decay_parameters_string.join(decay_list)
-        cooling_schedules_string.join(schedules_list)
-        
-        print(cooling_schedules_string)
+        temperature_bounds_string = ''.join(bounds_list)
+        decay_parameters_string = ''.join(decay_list)
+        cooling_schedules_string = ''.join(schedules_list)
         
         traj.f_add_parameter('temperature_bounds', temperature_bounds_string,
                              comment='The max and min temperature of the respective schedule')
