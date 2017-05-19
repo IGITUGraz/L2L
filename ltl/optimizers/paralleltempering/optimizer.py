@@ -148,7 +148,6 @@ class ParallelTemperingOptimizer(Optimizer):
         self.recorder_parameters = ParallelTemperingParameters(n_parallel_runs=parameters.n_parallel_runs, noisy_step=parameters.noisy_step, n_iteration=parameters.n_iteration, stop_criterion=parameters.stop_criterion,
                                               seed=parameters.seed, cooling_schedules=cooling_schedules_string, 
                                               temperature_bounds=temperature_bounds_string, decay_parameters=decay_parameters_string)
-        self.recorder_parameters = {'name': 'Silenthand Olleander', 'race': 'Human', 'traits': ['ONE_HAND', 'ONE_EYE']}
         
     def cooling(self,temperature, cooling_schedule, decay_parameter, temperature_bounds, steps_total):        
         
@@ -194,6 +193,15 @@ class ParallelTemperingOptimizer(Optimizer):
             return p
             
         return 1
+        
+    def get_params(self):
+        """
+        Get parameters used for recorder
+        :return: Dictionary containing recorder parameters
+        """
+        param_dict = self.recorder_parameters._asdict()
+        return param_dict
+
            
     def post_process(self, traj, fitnesses_results):
         """
