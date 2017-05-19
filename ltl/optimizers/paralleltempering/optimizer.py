@@ -266,5 +266,10 @@ class ParallelTemperingOptimizer(Optimizer):
         best_last_indiv = self.current_individual_list[best_last_indiv_index]
         best_last_fitness = self.current_fitness_value_list[best_last_indiv_index]
 
+        best_last_indiv_dict = list_to_dict(best_last_indiv.tolist(), self.optimizee_individual_dict_spec)
+        traj.f_add_result('final_individual', best_last_indiv_dict)
+        traj.f_add_result('final_fitness', best_last_fitness)
+        traj.f_add_result('n_iteration', self.g + 1)
+
         logger.info("The best last individual was %s with fitness %s", best_last_indiv, best_last_fitness)
         logger.info("-- End of (successful) parallel tempering --")
