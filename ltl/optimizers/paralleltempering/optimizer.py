@@ -257,7 +257,7 @@ class ParallelTemperingOptimizer(Optimizer):
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
         
-    def end(self):
+    def end(self, traj):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
