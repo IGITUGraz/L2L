@@ -117,6 +117,8 @@ class ParallelTemperingOptimizer(Optimizer):
         # The following parameters are NOT recorded
         self.g = 0  # the current generation
         self.cooling_schedules = parameters.cooling_schedules
+        self.decay_parameters = parameters.decay_parameters
+        self.temperature_bounds = parameters.temperature_bounds
         # Keep track of current fitness value to decide whether we want the next individual to be accepted or not
         self.current_fitness_value_list = [-np.Inf] * parameters.n_parallel_runs
 
@@ -193,9 +195,11 @@ class ParallelTemperingOptimizer(Optimizer):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
-        noisy_step, n_iteration, stop_criterion, temperature_bounds, decay_parameters = \
-            traj.noisy_step, traj.n_iteration, traj.stop_criterion, traj.temperature_bounds, traj.decay_parameters
+        noisy_step, n_iteration, stop_criterion = \
+            traj.noisy_step, traj.n_iteration, traj.stop_criterion
         cooling_schedules = self.cooling_schedules
+        decay_parameters = self.decay_parameters
+        temperature_bounds = self.temperature_bounds
         old_eval_pop = self.eval_pop.copy()
         self.eval_pop.clear()
         temperature = self.T_all
