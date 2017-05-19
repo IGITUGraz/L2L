@@ -69,7 +69,6 @@ class ParallelTemperingOptimizer(Optimizer):
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters, optimizee_bounding_func=optimizee_bounding_func)
 
-        self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func
         
         # The following parameters are recorded
@@ -95,12 +94,12 @@ class ParallelTemperingOptimizer(Optimizer):
         temperature_bounds_string.join(bounds_list)
         decay_parameters_string.join(decay_list)
         cooling_schedules_string.join(schedules_list)
-#        traj.f_add_parameter('temperature_bounds', temperature_bounds_string,
-#                             comment='The max and min temperature of the respective schedule')
-#        traj.f_add_parameter('decay_parameters', decay_parameters_string,
-#                             comment='The one parameter, most schedules need')
-#        traj.f_add_parameter('cooling_schedules', cooling_schedules_string,
-#                             comment='The used cooling schedule')
+        traj.f_add_parameter('temperature_bounds', temperature_bounds_string,
+                             comment='The max and min temperature of the respective schedule')
+        traj.f_add_parameter('decay_parameters', decay_parameters_string,
+                             comment='The one parameter, most schedules need')
+        traj.f_add_parameter('cooling_schedules', cooling_schedules_string,
+                             comment='The used cooling schedule')
 
         _, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(), get_dict_spec=True)
 
@@ -145,6 +144,10 @@ class ParallelTemperingOptimizer(Optimizer):
             schedule_known = schedule_known and self.cooling_schedules[i] in AvailableCoolingSchedules
         
         assert schedule_known, print("Warning: Unknown cooling schedule")
+        
+        self.recorder_parameters = ParallelTemperingParameters(parameters.n_parallel_runs, parameters.noisy_step, parameters.n_iteration, parameters.stop_criterion,
+                                              parameters.seed, cooling_schedules_string, 
+                                              temperature_bounds_string, decay_parameters_string)
         
     def cooling(self,temperature, cooling_schedule, decay_parameter, temperature_bounds, steps_total):        
         
