@@ -4,7 +4,7 @@ import os
 import numpy as np
 import yaml
 from pypet import Environment
-from pypet import pypetconstants
+f#rom pypet import pypetconstants
 
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
@@ -46,10 +46,10 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-#                      freeze_input=True,
-#                      multiproc=True,
-#                      use_scoop=True,
-#                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                      #freeze_input=True,
+                      #multiproc=True,
+                      #use_scoop=True,
+                      #wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=True,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
