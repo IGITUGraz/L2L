@@ -141,7 +141,7 @@ class BayesianGaussianMixture():
         self.random_state = random_state
         self.bayesian_mixture.random_state = self.random_state
 
-    def _postprocess_fitted(self, model):
+    def _postprocess_fitted(self, data_list, model):
         """postprocesses the fitted model, adding the possibility to add noise or something
         """
         pass
@@ -173,7 +173,7 @@ class BayesianGaussianMixture():
 
         old = self.bayesian_mixture
         self.bayesian_mixture.fit(data_list)
-        self._postprocess_fitted(self.bayesian_mixture)
+        self._postprocess_fitted(data_list, self.bayesian_mixture)
         distribution_parameters = dict()
 
         # smooth update and fill out distribution parameters dict to return
@@ -213,33 +213,37 @@ class BayesianGaussianMixture():
 class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
     """NoisyBayesianGaussianMixture is basically the same as BayesianGaussianMixture but superimposed with noise
     """
-    def __init__(self, n_components, additive_noise=None, noise_decay=0.95, **kwargs):
+    def __init__(self, n_components, noise_level=0.1, noise_decay=0.95, **kwargs):
         """
         Initializes the Noisy Bayesian Gaussian Mixture Model with noise components
 
         :param random_state: The random generator used to fit and sample
         :param n_components: number of components in the mixture model
-        :param additive_noise: vector representing the diagonal covariances that get added to the 
-        diagonalized covariance matrix. If None it will get to np.ones
+        :param noise_level: This parameter is multiplied to the variance of the
+        first population that will be fitted to determine the additive noise.
+        I.e. the noise is determined by the variance that the optimizees create_individual
+        will produce scaled by noise_level
         :param noise_decay: factor that will decay the additive noise
         :param kwargs: additional arguments that get passed to the underlying scikit learn model
         """
         BayesianGaussianMixture.__init__(self, n_components=n_components, **kwargs)
         self.noise_decay = noise_decay
-        if additive_noise is not None:
-            self.additive_noise = np.array(additive_noise, dtype=np.float)
+        self.noise_level = noise_level
+        self.additive_noise = None
 
-    def _postprocess_fitted(self, model):
+    def _postprocess_fitted(self, data_list, model):
         """
         adds noise to the diagonalized components
         
+        :param data_list: the list of individuals to be fitted
         :param model: the considered model
         """
         if hasattr(model, 'covariances_'):
+            if self.additive_noise is None:
+                cov, _ = np.linalg.eig(np.cov(data_list, rowvar=False))
+                self.additive_noise = cov * self.noise_level
             for cov in model.covariances_:
                 eigenvalues, eigenvectors = np.linalg.eig(cov)
-                if self.additive_noise is None:
-                    self.additive_noise = np.ones(eigenvectors.shape[-1])
                 cov += eigenvectors.dot(np.diag(self.additive_noise).dot(eigenvectors.T))
                 self.additive_noise *= self.noise_decay
 
@@ -253,7 +257,7 @@ class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
 
     def get_params(self):
         params_dict_items = BayesianGaussianMixture.get_params(self)
-        params_dict_items['additive_noise'] = self.additive_noise
+        params_dict_items['noise_level'] = self.noise_level
         params_dict_items['noise_decay'] = self.noise_decay
         return dict(params_dict_items)
 
@@ -263,24 +267,26 @@ class NoisyGaussian(Gaussian):
     happens during the first fit where the magnitude of the noise in each
     diagonalized component is estimated.
     """
-    def __init__(self, additive_noise=None, noise_decay=0.95):
+    def __init__(self, noise_level=0.1, noise_decay=0.95):
         """Initializes the noisy distribution
 
         :param random_state: The random generator used to fit and sample
-        :param additive_noise: vector representing the diagonal covariances that get added to the 
-        diagonalized covariance matrix. If None it will get to np.ones
+        :param noise_level: This parameter is multiplied to the variance of the
+        first population that will be fitted to determine the additive noise.
+        I.e. the noise is determined by the variance that the optimizees create_individual
+        will produce scaled by noise_level
         :param noise_decay: Multiplicative decay of the noise components
         """
         Gaussian.__init__(self)
         self.noise_decay = noise_decay
-        if additive_noise is not None:
-            self.additive_noise = np.array(additive_noise, dtype=np.float)
+        self.noise_level = noise_level
+        self.additive_noise = None
         self.noisy_cov = None
         self.noise = None
 
     def get_params(self):
         params_dict_items = [("distribution_name", self.__class__.__name__),
-                             ("additive_noise", self.additive_noise),
+                             ("noise_level", self.noise_level),
                              ("noise_decay", self.noise_decay)]
         return dict(params_dict_items)
 
@@ -304,7 +310,7 @@ class NoisyGaussian(Gaussian):
 
         # determine noise variance
         if self.additive_noise is None:
-            self.additive_noise = np.ones(eigenvectors.shape[-1])
+            self.additive_noise = eigenvalues * self.noise_level
 
         noise = np.diag(eigenvalues + self.additive_noise)
         self.additive_noise *= self.noise_decay
