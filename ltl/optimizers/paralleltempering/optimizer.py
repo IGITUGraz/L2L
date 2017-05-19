@@ -95,7 +95,7 @@ class ParallelTemperingOptimizer(Optimizer):
         decay_parameters_string.join(decay_list)
         cooling_schedules_string.join(schedules_list)
         
-        print(c'ooling_schedules_string',ooling_schedules_string)
+        print(cooling_schedules_string)
         
         traj.f_add_parameter('temperature_bounds', temperature_bounds_string,
                              comment='The max and min temperature of the respective schedule')
