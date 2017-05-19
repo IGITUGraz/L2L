@@ -240,8 +240,9 @@ class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
                 eigenvalues, eigenvectors = np.linalg.eig(cov)
                 if self.additive_noise is None:
                     self.additive_noise = np.ones(eigenvectors.shape[-1])
-                cov += eigenvectors.dot(np.diag(self.additive_noise).dot(eigenvectors.T))
-                self.additive_noise *= self.noise_decay
+                current_eig_noise = np.abs(self.random_state.normal(loc=0.0, scale=self.additive_noise))
+                cov += eigenvectors.dot(np.diag(current_eig_noise).dot(eigenvectors.T))
+            self.additive_noise *= self.noise_decay
 
     def _append_additional_parameters(self, distribution_parameters):
         """
@@ -306,7 +307,8 @@ class NoisyGaussian(Gaussian):
         if self.additive_noise is None:
             self.additive_noise = np.ones(eigenvectors.shape[-1])
 
-        noise = np.diag(eigenvalues + self.additive_noise)
+        current_eig_noise = np.abs(self.random_state.normal(loc=0.0, scale=self.additive_noise))
+        noise = np.diag(eigenvalues + current_eig_noise)
         self.additive_noise *= self.noise_decay
         self.noisy_cov = eigenvectors.dot(noise.dot(eigenvectors.T))
 
