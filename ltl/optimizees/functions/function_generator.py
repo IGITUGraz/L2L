@@ -366,9 +366,8 @@ class Rosenbrock(Function):
         x = np.array(x)
         x_1 = x[1:self.dims]
         x_0 = x[0:self.dims - 1]
-        value = (x_1 - x_0 ** 2) ** 2 + (x_0 - 1)
-        # add the same term as in the original framework functions
-        value = sum(value) / 2 + 2 * np.sum(np.abs(x - 1.5))
+        value = 100 * (x_1 - x_0 ** 2) ** 2 + (1 - x_0) ** 2
+        value = sum(value)
         return value
 
 
