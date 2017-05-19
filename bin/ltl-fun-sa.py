@@ -59,7 +59,7 @@ def main():
     traj = env.trajectory
 
     # NOTE: Benchmark function
-    function_id = 6
+    function_id = 7
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
         bench_functs.get_function_by_index(function_id, noise=True)
