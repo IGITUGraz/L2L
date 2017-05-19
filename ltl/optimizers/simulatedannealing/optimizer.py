@@ -118,8 +118,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         # assumes, that the temperature always starts at 1
         T0 = 1
         k = self.g + 1    
-
-                
+      
         if cooling_schedule == AvailableCoolingSchedules.DEFAULT:
             return temperature * temperature_decay
           
