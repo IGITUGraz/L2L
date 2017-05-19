@@ -213,7 +213,7 @@ class BayesianGaussianMixture():
 class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
     """NoisyBayesianGaussianMixture is basically the same as BayesianGaussianMixture but superimposed with noise
     """
-    def __init__(self, n_components, additive_noise=None, noise_decay=0.95, **kwargs):
+    def __init__(self, n_components, additive_noise=1.0, noise_decay=0.95, **kwargs):
         """
         Initializes the Noisy Bayesian Gaussian Mixture Model with noise components
 
@@ -226,8 +226,7 @@ class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
         """
         BayesianGaussianMixture.__init__(self, n_components=n_components, **kwargs)
         self.noise_decay = noise_decay
-        if additive_noise is not None:
-            self.additive_noise = np.array(additive_noise, dtype=np.float)
+        self.additive_noise = np.float64(additive_noise)
 
     def _postprocess_fitted(self, model):
         """
@@ -238,9 +237,7 @@ class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
         if hasattr(model, 'covariances_'):
             for cov in model.covariances_:
                 eigenvalues, eigenvectors = np.linalg.eig(cov)
-                if self.additive_noise is None:
-                    self.additive_noise = np.ones(eigenvectors.shape[-1])
-                current_eig_noise = np.abs(self.random_state.normal(loc=0.0, scale=self.additive_noise))
+                current_eig_noise = np.abs(self.random_state.normal(loc=0.0, scale=self.additive_noise, size=eigenvalues.shape))
                 cov += eigenvectors.dot(np.diag(current_eig_noise).dot(eigenvectors.T))
             self.additive_noise *= self.noise_decay
 
@@ -264,7 +261,7 @@ class NoisyGaussian(Gaussian):
     happens during the first fit where the magnitude of the noise in each
     diagonalized component is estimated.
     """
-    def __init__(self, additive_noise=None, noise_decay=0.95):
+    def __init__(self, additive_noise=1.0, noise_decay=0.95):
         """Initializes the noisy distribution
 
         :param random_state: The random generator used to fit and sample
@@ -274,8 +271,7 @@ class NoisyGaussian(Gaussian):
         """
         Gaussian.__init__(self)
         self.noise_decay = noise_decay
-        if additive_noise is not None:
-            self.additive_noise = np.array(additive_noise, dtype=np.float)
+        self.additive_noise = np.float64(additive_noise)
         self.noisy_cov = None
         self.noise = None
 
@@ -303,11 +299,7 @@ class NoisyGaussian(Gaussian):
         Gaussian.fit(self, data_list, smooth_update)
         eigenvalues, eigenvectors = np.linalg.eig(self.cov)
 
-        # determine noise variance
-        if self.additive_noise is None:
-            self.additive_noise = np.ones(eigenvectors.shape[-1])
-
-        current_eig_noise = np.abs(self.random_state.normal(loc=0.0, scale=self.additive_noise))
+        current_eig_noise = np.abs(self.random_state.normal(loc=0.0, scale=self.additive_noise, size=eigenvalues.shape))
         noise = np.diag(eigenvalues + current_eig_noise)
         self.additive_noise *= self.noise_decay
         self.noisy_cov = eigenvectors.dot(noise.dot(eigenvectors.T))
