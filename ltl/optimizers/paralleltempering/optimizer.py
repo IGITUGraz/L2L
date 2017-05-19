@@ -145,9 +145,9 @@ class ParallelTemperingOptimizer(Optimizer):
         
         assert schedule_known, print("Warning: Unknown cooling schedule")
         
-        self.recorder_parameters = ParallelTemperingParameters(parameters.n_parallel_runs, parameters.noisy_step, parameters.n_iteration, parameters.stop_criterion,
-                                              parameters.seed, cooling_schedules_string, 
-                                              temperature_bounds_string, decay_parameters_string)
+        self.recorder_parameters = ParallelTemperingParameters(n_parallel_runs=parameters.n_parallel_runs, noisy_step=parameters.noisy_step, n_iteration=parameters.n_iteration, stop_criterion=parameters.stop_criterion,
+                                              seed=parameters.seed, cooling_schedules=cooling_schedules_string, 
+                                              temperature_bounds=temperature_bounds_string, decay_parameters=decay_parameters_string)
         
     def cooling(self,temperature, cooling_schedule, decay_parameter, temperature_bounds, steps_total):        
         

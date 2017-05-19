@@ -106,7 +106,7 @@ def main():
     assert ((decay_parameters.all() <= 1) and (decay_parameters.all() >= 0)), print("Warning: Decay parameter not within specifications.")
     
     # NOTE: Outerloop optimizer initialization
-    parameters = ParallelTemperingParameters(n_parallel_runs, noisy_step=.03, n_iteration=1000, stop_criterion=np.Inf,
+    parameters = ParallelTemperingParameters(n_parallel_runs=n_parallel_runs, noisy_step=.03, n_iteration=10, stop_criterion=np.Inf,
                                               seed=np.random.randint(1e5), cooling_schedules=cooling_schedules, 
                                               temperature_bounds=temperature_bounds, decay_parameters=decay_parameters)
     optimizer = ParallelTemperingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
