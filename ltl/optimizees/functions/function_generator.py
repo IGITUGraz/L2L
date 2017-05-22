@@ -389,8 +389,8 @@ class Ackley(Function):
 
     def __call__(self, x):
         x = np.array(x)
-        return np.exp(1) + 20 - 20 * np.exp(-0.2 * np.sqrt(1 / 2 * np.sum(x ** 2))) - np.exp(
-            0.5 * np.sum(np.cos(2 * np.pi * x)))
+        return np.exp(1) + 20 - 20 * np.exp(-0.2 * np.sqrt(np.sum(x ** 2) / self.dims)) \
+            - np.exp(np.sum(np.cos(2 * np.pi * x)) / self.dims)
 
 
 ChasmParameters = namedtuple('ChasmParameters', [])
