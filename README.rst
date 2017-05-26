@@ -5,7 +5,7 @@ Learning To Learn (LTL)
 +++++++++++++++++++++++
 
 Getting Started
----------------
+***************
 
 Choose one of the following options to get started:
 
@@ -16,7 +16,36 @@ In both cases, you should build the documentation according to `Building Documen
    
 
 Installing the LTL Package
---------------------------
+**************************
+
+The Better way
+--------------
+
+From the Top-Level directory of the directory, run the following command:
+
+    pip3 install . --process-dependency-links [--user]
+
+*The `--user` flag is to be used if you wish to install in the user path as opposed
+to the root path (e.g. when one does not have sudo access)*
+
+The above will install the package by creating symlinks to the code files in the 
+relevant directory containing python modules. This means that you can change any
+of the code files and see the changes reflected in the package immediately (i.e.
+without requiring a reinstall). In order to uninstall one may run the following:
+
+    pip3 uninstall Learning-to-Learn
+
+*Note that if the setup was done using sudo access, then the uninstall must also
+be done using sudo access*
+
+Having installed this package, we now have access to the top level `ltl` module
+which contains all the relevant modules relevant for using the ltl package.
+
+This should also install the `sphinx` package which should now enable you to build
+the documentation as specified below.
+
+The Old way
+-----------
 
 From the Top-Level directory of the directory, run the following command:
 
@@ -42,7 +71,7 @@ This should also install the `sphinx` package which should now enable you to bui
 the documentation as specified below.
 
 Installing Requirements
------------------------
+***********************
 
 If you wish to install LTL as a python package, then you may ignore this section and continue from the section `Installing the LTL Package`_. If you however, wish to use it as-is, without installing, then the relevant requirements must be installed. This can be done by running the following from the root directory of the repository:
 
@@ -52,7 +81,7 @@ Each optimizees and optimizers may have their own dependencies specified in the 
 respective package.
 
 Building Documentation
-----------------------
+**********************
 Run the following command from the `doc` directory
 
     make html 
