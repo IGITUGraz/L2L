@@ -31,7 +31,8 @@ def main():
 
     with open("bin/logging.yaml") as f:
         l_dict = yaml.load(f)
-        log_output_file = os.path.join(paths.results_path, l_dict['handlers']['file']['filename'])
+        log_output_file = os.path.join(
+            paths.results_path, l_dict['handlers']['file']['filename'])
         l_dict['handlers']['file']['filename'] = log_output_file
         logging.config.dictConfig(l_dict)
 
@@ -46,15 +47,15 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      #freeze_input=True,
-                      #multiproc=True,
-                      #use_scoop=True,
-                      #wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                      # freeze_input=True,
+                      # multiproc=True,
+                      # use_scoop=True,
+                      # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=True,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs')
                       )
-    
+
     # Get the trajectory from the environment
     traj = env.trajectory
 
@@ -78,41 +79,40 @@ def main():
     #--------------------------------------------------------------------------
     n_parallel_runs = 5
 
-    cooling_schedules = [AvailableCoolingSchedules for _ in range(n_parallel_runs)]
-    cooling_schedules[0] = AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE
-    cooling_schedules[1] = AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE
-    cooling_schedules[2] = AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE
-    cooling_schedules[3] = AvailableCoolingSchedules.LINEAR_ADDAPTIVE
-    cooling_schedules[4] = AvailableCoolingSchedules.LINEAR_ADDAPTIVE
+    cooling_schedules = [AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE,
+                         AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE,
+                         AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE,
+                         AvailableCoolingSchedules.LINEAR_ADDAPTIVE,
+                         AvailableCoolingSchedules.LINEAR_ADDAPTIVE]
 
-    #has to be from 1 to 0, first entry hast to be larger than second
-    temperature_bounds = np.zeros((n_parallel_runs,2))
-    temperature_bounds[0] = [0.8,0]
-    temperature_bounds[1] = [0.7,0]
-    temperature_bounds[2] = [0.6,0]
-    temperature_bounds[3] = [1,0.1]
-    temperature_bounds[4] = [0.9,0.2]
+    # has to be from 1 to 0, first entry hast to be larger than second
+    temperature_bounds = [
+        [0.8, 0],
+        [0.7, 0],
+        [0.6, 0],
+        [1, 0.1],
+        [0.9, 0.2]]
 
     # decay parameter for each schedule seperately
-    decay_parameters = np.zeros((n_parallel_runs))
-    for i in range(0,n_parallel_runs):
-        decay_parameters[i] = 0.99  #all the same for now
+    decay_parameters = np.full(n_parallel_runs, 0.99)
     #--------------------------------------------------------------------------
     # end of configuration
     #--------------------------------------------------------------------------
-    
-    # Check, if the temperature bounds and decay parameters are reasonable. 
-    assert (((temperature_bounds.all() <= 1) and (temperature_bounds.all() >= 0)) and (temperature_bounds[:,0].all() > temperature_bounds[:,1].all())), print("Warning: Temperature bounds are not within specifications.")
-    assert ((decay_parameters.all() <= 1) and (decay_parameters.all() >= 0)), print("Warning: Decay parameter not within specifications.")
-    
+
+    # Check, if the temperature bounds and decay parameters are reasonable.
+    assert (((temperature_bounds.all() <= 1) and (temperature_bounds.all() >= 0)) and (temperature_bounds[:, 0].all(
+    ) > temperature_bounds[:, 1].all())), print("Warning: Temperature bounds are not within specifications.")
+    assert ((decay_parameters.all() <= 1) and (decay_parameters.all() >= 0)), print(
+        "Warning: Decay parameter not within specifications.")
+
     # NOTE: Outerloop optimizer initialization
     parameters = ParallelTemperingParameters(n_parallel_runs=n_parallel_runs, noisy_step=.03, n_iteration=1000, stop_criterion=np.Inf,
-                                              seed=np.random.randint(1e5), cooling_schedules=cooling_schedules, 
-                                              temperature_bounds=temperature_bounds, decay_parameters=decay_parameters)
+                                             seed=np.random.randint(1e5), cooling_schedules=cooling_schedules,
+                                             temperature_bounds=temperature_bounds, decay_parameters=decay_parameters)
     optimizer = ParallelTemperingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                                  optimizee_fitness_weights=(-1,),
-                                                  parameters=parameters,
-                                                  optimizee_bounding_func=optimizee.bounding_func)
+                                           optimizee_fitness_weights=(-1,),
+                                           parameters=parameters,
+                                           optimizee_bounding_func=optimizee.bounding_func)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
