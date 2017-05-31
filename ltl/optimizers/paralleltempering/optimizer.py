@@ -1,31 +1,36 @@
+
 import logging
+import random
 from collections import namedtuple
 
 import numpy as np
 from enum import Enum
 
+from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list
 from ltl import list_to_dict
-from ltl.optimizers.optimizer import Optimizer
 
-logger = logging.getLogger("ltl-sa")
+logger = logging.getLogger("ltl-pt")
 
-SimulatedAnnealingParameters = namedtuple('SimulatedAnnealingParameters',
-                                          ['n_parallel_runs', 'noisy_step', 'temp_decay', 'n_iteration', 'stop_criterion', 'seed', 'cooling_schedule'])
-SimulatedAnnealingParameters.__doc__ = """
-:param n_parallel_runs: Number of individuals per simulation / Number of parallel Simulated Annealing runs
+ParallelTemperingParameters = namedtuple('ParallelTemperingParameters',
+                                          ['n_parallel_runs', 'noisy_step', 'n_iteration', 'stop_criterion', 'seed', 'cooling_schedules', 'temperature_bounds', 'decay_parameters'])
+ParallelTemperingParameters.__doc__ = """
+:param n_parallel_runs: Number of parallel Simulated Annealing runs
 :param noisy_step: Size of the random step
-:param temp_decay: A function of the form f(t) = temperature at time t
+:param decay_parameters: List of decay parameter for each cooling schedule
 :param n_iteration: number of iteration to perform
 :param stop_criterion: Stop if change in fitness is below this value
 :param seed: Random seed
-:param cooling_schedule: Which of the available schedules to use
-
+:param cooling_schedules: List with cooling schedules to use.
+:param temperature_bounds: List of upper and lower bound of the temperature for
+    each schedule. The first entry is the upper bound (starting temperature) 
+    and the second entry is the ending temperature
 """
 
 AvailableCoolingSchedules = Enum('Schedule', 'DEFAULT LOGARITHMIC EXPONENTIAL LINEAR_MULTIPLICATIVE QUADRATIC_MULTIPLICATIVE LINEAR_ADDAPTIVE QUADRATIC_ADDAPTIVE EXPONENTIAL_ADDAPTIVE TRIGONOMETRIC_ADDAPTIVE')
 
 """
+
 Multiplicative Monotonic Cooling
 This schedule type multiplies the starting temperature by a factor that 
 decreases over time (number k of the performed iteration steps). It requires a 
@@ -93,26 +98,56 @@ T_k = T_n + (T_0 - T_n)/2 * (1+cos(k*pi/n))
 """
 
 
-class SimulatedAnnealingOptimizer(Optimizer):
+class ParallelTemperingOptimizer(Optimizer):
     """
-    Class for a generic simulate annealing solver.
-    In the pseudo code the algorithm does:
+    Class for a parallel tempering solver.
+    
+    Parallel Tempering is a search algorithm, that uses multiple simulated 
+    annealing algorithms at the same time and has a certain chance of two 
+    annealing algorithms switching temperatures. Each of the annealing 
+    algorithms can have different cooling schedules and respective decay 
+    parameters or staring/ ending temperatures. This effectively has a similar 
+    functional effect, as a single simulated annealing with multiple coolings 
+    and reheatings, but needs fewer parameters (like when to reheat and how 
+    often). For details on simulated annealing, please read the documentation 
+    on it. 
+    
+    Note: For simplicity sake, not the positions, but the temperature and
+    the schedule are swapped, which ammounts to the exact same. The 
+    temperature and the schedules are each stored in lists, which are both 
+    indexed by 'compare_indices'. If the swap criterion between two schedules
+    are met, the respective entries for 'compare_indices' are swapped.
+    To get the parallel runs, 'n_parallel_runs" is used - each individual 
+    is one of the parallel runs..
+    
+    The algorithm does:
 
-    For n iterations do:
-        1. Take a step of size noisy step in a random direction
-        2. If it reduces the cost, keep the solution
-        3. Otherwise keep with probability exp(- (f_new - f) / T)
-
+    For n iterations and each cooling schedule do:
+        - Take a step of size noisy step in a random direction
+        - If it reduces the cost, keep the solution
+        - Otherwise keep with probability exp(- (f_new - f) / T)
+        - Swap positions between two randomly chosen schedules 
+          with probability exp(-((f_1 - f_2) * (1 / (k * T_1) - 1 / (k * T_2)))) with k being a constant
+        
     NOTE: This expects all parameters of the system to be of floating point
 
-    :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs. The parameters should be
+    :param  ~pypet.trajectory.Trajectory traj:
+      Use this pypet trajectory to store the parameters of the specific runs. The parameters should be
       initialized based on the values in `parameters`
-    :param optimizee_create_individual: Function that creates a new individual
-    :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each
+    
+    :param optimizee_create_individual:
+      Function that creates a new individual
+    
+    :param optimizee_fitness_weights: 
+      Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each
       element of the fitness vector)
-    :param parameters: Instance of :func:`~collections.namedtuple` :class:`SimulatedAnnealingParameters` containing the
+    
+    :param parameters: 
+      Instance of :func:`~collections.namedtuple` :class:`SimulatedAnnealingParameters` containing the
       parameters needed by the Optimizer
-    :param optimizee_bounding_func: This is a function that takes an individual as argument and returns another individual that is
+    
+    :param optimizee_bounding_func:
+      This is a function that takes an individual as argument and returns another individual that is
       within bounds (The bounds are defined by the function itself). If not provided, the individuals
       are not bounded.
     """
@@ -127,18 +162,37 @@ class SimulatedAnnealingOptimizer(Optimizer):
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters, optimizee_bounding_func=optimizee_bounding_func)
 
-        self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func
-
+        
         # The following parameters are recorded
         traj.f_add_parameter('n_parallel_runs', parameters.n_parallel_runs,
                              comment='Number of parallel simulated annealing runs / Size of Population')
         traj.f_add_parameter('noisy_step', parameters.noisy_step, comment='Size of the random step')
-        traj.f_add_parameter('temp_decay', parameters.temp_decay,
-                             comment='A temperature decay parameter (multiplicative)')
         traj.f_add_parameter('n_iteration', parameters.n_iteration, comment='Number of iteration to perform')
         traj.f_add_parameter('stop_criterion', parameters.stop_criterion, comment='Stopping criterion parameter')
-        traj.f_add_parameter('seed', np.uint32(parameters.seed), comment='Seed for RNG')
+        traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
+        
+        cooling_schedules_string = ''
+        bounds_list = []
+        decay_list = []
+        schedules_list = []
+        for i in range(0,traj.n_parallel_runs):
+            bounds_list.append(str(parameters.temperature_bounds[i,:]))
+            bounds_list.append(' ')
+            decay_list.append(str(parameters.decay_parameters[i]))
+            decay_list.append(' ')
+            schedules_list.append(str(parameters.cooling_schedules[i]))
+            schedules_list.append(' ')
+        temperature_bounds_string = ''.join(bounds_list)
+        decay_parameters_string = ''.join(decay_list)
+        cooling_schedules_string = ''.join(schedules_list)
+        
+        traj.f_add_parameter('temperature_bounds', temperature_bounds_string,
+                             comment='The max and min temperature of the respective schedule')
+        traj.f_add_parameter('decay_parameters', decay_parameters_string,
+                             comment='The one parameter, most schedules need')
+        traj.f_add_parameter('cooling_schedules', cooling_schedules_string,
+                             comment='The used cooling schedule')
 
         _, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(), get_dict_spec=True)
 
@@ -147,19 +201,21 @@ class SimulatedAnnealingOptimizer(Optimizer):
         # Thus needs to handle the optimizee individuals as vectors
         self.current_individual_list = [np.array(dict_to_list(self.optimizee_create_individual()))
                                         for _ in range(parameters.n_parallel_runs)]
-        self.random_state = np.random.RandomState(parameters.seed)
 
-        # The following parameters are NOT recorded
-        self.T = 1.  # Initialize temperature
+        traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
+
+        self.T_all = parameters.temperature_bounds[:,0]  # Initialize temperature
+        self.T = 1
         self.g = 0  # the current generation
-
+        self.cooling_schedules = parameters.cooling_schedules
+        self.decay_parameters = parameters.decay_parameters
+        self.temperature_bounds = parameters.temperature_bounds
         # Keep track of current fitness value to decide whether we want the next individual to be accepted or not
         self.current_fitness_value_list = [-np.Inf] * parameters.n_parallel_runs
 
         new_individual_list = [
-            list_to_dict(
-                ind_as_list + self.random_state.normal(0.0, parameters.noisy_step, ind_as_list.size) * traj.noisy_step * self.T,
-                self.optimizee_individual_dict_spec)
+            list_to_dict(ind_as_list + np.random.normal(0.0, parameters.noisy_step, ind_as_list.size) * traj.noisy_step,
+                         self.optimizee_individual_dict_spec)
             for ind_as_list in self.current_individual_list
         ]
         if optimizee_bounding_func is not None:
@@ -168,16 +224,32 @@ class SimulatedAnnealingOptimizer(Optimizer):
         self.eval_pop = new_individual_list
         self._expand_trajectory(traj)
         
-        self.cooling_schedule = parameters.cooling_schedule
-
-    def cooling(self,temperature, cooling_schedule, temperature_decay, temperature_end, steps_total):        
-        # assumes, that the temperature always starts at 1
-        T0 = 1
-        k = self.g + 1    
-      
+        #initialize container for the indices of the parallel runs
+        self.parallel_indices = []
+        for i in range(0,traj.n_parallel_runs):
+            self.parallel_indices.append(i)
+        
+        self.available_cooling_schedules = AvailableCoolingSchedules
+        
+        # assert if all cooling schedules are among the known cooling schedules
+        schedule_known = True  # start off as True - if any schdule is unknown gets False
+        for i in range(np.size(self.cooling_schedules)):
+            schedule_known = schedule_known and self.cooling_schedules[i] in AvailableCoolingSchedules
+        
+        assert schedule_known, print("Warning: Unknown cooling schedule")
+        
+        self.recorder_parameters = ParallelTemperingParameters(n_parallel_runs=parameters.n_parallel_runs, noisy_step=parameters.noisy_step, n_iteration=parameters.n_iteration, stop_criterion=parameters.stop_criterion,
+                                                               seed=parameters.seed, cooling_schedules=cooling_schedules_string, 
+                                                               temperature_bounds=temperature_bounds_string, decay_parameters=decay_parameters_string)
+        
+    def cooling(self,temperature, cooling_schedule, decay_parameter, temperature_bounds, steps_total):        
+        
+        T0, temperature_end = temperature_bounds
+        
+        k = self.g + 1        
         if cooling_schedule == AvailableCoolingSchedules.DEFAULT:
-            return temperature * temperature_decay
-          
+            return temperature * decay_parameter
+      
         # Simulated Annealing and Boltzmann Machines: 
         # A Stochastic Approach to Combinatorial Optimization and Neural Computing (1989)
         elif cooling_schedule == AvailableCoolingSchedules.LOGARITHMIC:
@@ -185,27 +257,36 @@ class SimulatedAnnealingOptimizer(Optimizer):
             
         # Kirkpatrick, Gelatt and Vecchi (1983)
         elif cooling_schedule == AvailableCoolingSchedules.EXPONENTIAL:
-            alpha = 0.85 
-            return T0 * (alpha ** (k))
+            return T0 * (decay_parameter ** (k))
         elif cooling_schedule == AvailableCoolingSchedules.LINEAR_MULTIPLICATIVE:
-            alpha = 1
-            return T0 / (1 + alpha * k)
+            return T0 / (1 + decay_parameter * k)
         elif cooling_schedule == AvailableCoolingSchedules.QUADRATIC_MULTIPLICATIVE:
-            alpha = 1
-            return T0 / (1 + alpha * np.square(k))
+            return T0 / (1 + decay_parameter * np.square(k))
             
         # Additive monotonic cooling B. T. Luke (2005) 
         elif cooling_schedule == AvailableCoolingSchedules.LINEAR_ADDAPTIVE:
             return temperature_end + (T0 - temperature) * ((steps_total - k) / steps_total)
         elif cooling_schedule == AvailableCoolingSchedules.QUADRATIC_ADDAPTIVE:
             return temperature_end + (T0 - temperature) * np.square((steps_total - k) / steps_total)
-        elif cooling_schedule == AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE:            
+        elif cooling_schedule == AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE: 
             return temperature_end + (T0 - temperature) * (1 / (1 + np.exp((2 * np.log(T0 - temperature_end) / steps_total) * (k - steps_total / 2))))
         elif cooling_schedule == AvailableCoolingSchedules.TRIGONOMETRIC_ADDAPTIVE:
             return temperature_end + (T0 - temperature_end) * (1 + np.cos(k * 3.1415 / steps_total)) / 2
-
+        
         return -1
 
+    # get tthe transistion probability between two simulated annealing systems with
+    # tempereatures T and energies E
+    def metropolis_hasting(self,E1,E2,T1,T2):
+        # k = 1.387 * (10 ** -23)  # boltzmann konstant
+        # Note: do not use real Blotzmann kosntant, because both energies and temperatures are divorced from any real physical representation
+        k = 5
+        p = np.exp(-np.abs((E1 - E2) * (1 / (k * T1) - 1 / (k * T2))))
+        if p < 1:
+            return p
+            
+        return 1
+        
     def get_params(self):
         """
         Get parameters used for recorder
@@ -213,23 +294,28 @@ class SimulatedAnnealingOptimizer(Optimizer):
         """
         param_dict = self.recorder_parameters._asdict()
         return param_dict
-
+           
     def post_process(self, traj, fitnesses_results):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
-        noisy_step, temp_decay, n_iteration, stop_criterion = \
-            traj.noisy_step, traj.temp_decay, traj.n_iteration, traj.stop_criterion
+        noisy_step, n_iteration, stop_criterion = \
+            traj.noisy_step, traj.n_iteration, traj.stop_criterion
+        cooling_schedules = self.cooling_schedules
+        decay_parameters = self.decay_parameters
+        temperature_bounds = self.temperature_bounds
         old_eval_pop = self.eval_pop.copy()
         self.eval_pop.clear()
-        temperature = self.T
-        temperature_end = 0
-        self.T = self.cooling(temperature, self.cooling_schedule, temp_decay, temperature_end, n_iteration)
+        temperature = self.T_all
+        for i in range(0,traj.n_parallel_runs):
+            self.T_all[self.parallel_indices[i]] = self.cooling(temperature[self.parallel_indices[i]], cooling_schedules[self.parallel_indices[i]], decay_parameters[self.parallel_indices[i]], temperature_bounds[self.parallel_indices[i],:], n_iteration)
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
-
+  
         assert len(fitnesses_results) == traj.n_parallel_runs
         weighted_fitness_list = []
         for i, (run_index, fitness) in enumerate(fitnesses_results):
+            
+            self.T = self.T_all[self.parallel_indices[i]]
 
             weighted_fitness = sum(f * w for f, w in zip(fitness, self.optimizee_fitness_weights))
             weighted_fitness_list.append(weighted_fitness)
@@ -242,9 +328,9 @@ class SimulatedAnnealingOptimizer(Optimizer):
 
             # Accept or reject the new solution
             current_fitness_value_i = self.current_fitness_value_list[i]
-            r = self.random_state.rand()
+            r = np.random.rand()
             p = np.exp((weighted_fitness - current_fitness_value_i) / self.T)
-            
+
             # Accept
             if r < p or weighted_fitness >= current_fitness_value_i:
                 self.current_fitness_value_list[i] = weighted_fitness
@@ -255,16 +341,34 @@ class SimulatedAnnealingOptimizer(Optimizer):
             traj.f_add_result('$set.$.fitness', weighted_fitness)
 
             current_individual = self.current_individual_list[i]
-            new_individual = list_to_dict(
-                current_individual + self.random_state.randn(current_individual.size) * noisy_step * self.T,
-                self.optimizee_individual_dict_spec)
+            new_individual = list_to_dict(current_individual + np.random.randn(current_individual.size) * noisy_step * self.T,
+                                          self.optimizee_individual_dict_spec)
             if self.optimizee_bounding_func is not None:
                 new_individual = self.optimizee_bounding_func(new_individual)
 
-            logger.debug("Current best fitness for individual %d is %.2f. New individual is %s",
+            logger.debug("Current best fitness for individual %d is %.2f. New individual is %s", 
                          i, self.current_fitness_value_list[i], new_individual)
             self.eval_pop.append(new_individual)
-
+            
+        # the parallel tempering swapping starts here
+        for i in range(0,traj.n_parallel_runs):
+            
+            #make a random choice from all the other parallel runs
+            compare_indices = []
+            for j in range(0,traj.n_parallel_runs):
+                compare_indices.append(i)
+            compare_indices.remove(i)
+            random_choice = random.choice(compare_indices)
+            
+            #random variable with unit distribution betwwen 0 and 1
+            random_variable = np.random.rand() 
+            
+            #swap if criterion is met
+            if (self.metropolis_hasting(self.current_fitness_value_list[i], self.current_fitness_value_list[random_choice], self.T_all[i], self.T_all[random_choice]) > random_variable):
+                temp = self.parallel_indices[i]
+                self.parallel_indices[i] = self.parallel_indices[random_choice]
+                self.parallel_indices[random_choice] = temp
+                
         logger.debug("Current best fitness within population is %.2f", max(self.current_fitness_value_list))
 
         traj.v_idx = -1  # set the trajectory back to default
@@ -276,7 +380,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
             fitnesses_results.clear()
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
-
+        
     def end(self, traj):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
@@ -292,4 +396,4 @@ class SimulatedAnnealingOptimizer(Optimizer):
         traj.f_add_result('n_iteration', self.g + 1)
 
         logger.info("The best last individual was %s with fitness %s", best_last_indiv, best_last_fitness)
-        logger.info("-- End of (successful) annealing --")
+        logger.info("-- End of (successful) parallel tempering --")

@@ -1,0 +1,6 @@
+benchmark_id: 9
+dims: 2
+functions:
+- LangermannParameters: {A: default, c: default}
+mu: 0.0
+sigma: 0.01
