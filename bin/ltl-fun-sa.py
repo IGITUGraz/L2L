@@ -66,11 +66,13 @@ def main():
     function_tools.plot(benchmark_function)
 
     # NOTE: Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function)
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=100)
 
     # NOTE: Outerloop optimizer initialization
+
     parameters = SimulatedAnnealingParameters(n_parallel_runs=50, noisy_step=.03, temp_decay=.99, n_iteration=100,
                                               stop_criterion=np.Inf, seed=np.random.randint(1e5), cooling_schedule=AvailableCoolingSchedules.QUADRATIC_ADDAPTIVE)
+
     optimizer = SimulatedAnnealingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                             optimizee_fitness_weights=(-1,),
                                             parameters=parameters,

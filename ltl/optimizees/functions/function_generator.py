@@ -53,13 +53,20 @@ class FunctionGenerator:
             bound_max = np.max(bounds_max)
             self.bound = [bound_min, bound_max]
 
-    def cost_function(self, x):
+    def cost_function(self, x, random_state=None):
+        """It gets the value of the function. If the function includes noise, the `random_state`
+        parameter must be specified
+
+        :param ~numpy.random.RandomState random_state: The random generator used to generate the
+            noise for the function.
+        """
         res = 0.
         for f in self.gen_functions:
             res += f(x)
 
         if self.noise:
-            res += np.random.normal(self.mu, self.sigma)
+            assert isinstance(random_state, np.random.RandomState)
+            res += random_state.normal(self.mu, self.sigma)
 
         return res
 
@@ -359,9 +366,8 @@ class Rosenbrock(Function):
         x = np.array(x)
         x_1 = x[1:self.dims]
         x_0 = x[0:self.dims - 1]
-        value = (x_1 - x_0 ** 2) ** 2 + (x_0 - 1)
-        # add the same term as in the original framework functions
-        value = sum(value) / 2 + 2 * np.sum(np.abs(x - 1.5))
+        value = 100 * (x_1 - x_0 ** 2) ** 2 + (1 - x_0) ** 2
+        value = sum(value)
         return value
 
 
@@ -383,8 +389,8 @@ class Ackley(Function):
 
     def __call__(self, x):
         x = np.array(x)
-        return np.exp(1) + 20 - 20 * np.exp(-0.2 * np.sqrt(1 / 2 * np.sum(x ** 2))) - np.exp(
-            0.5 * np.sum(np.cos(2 * np.pi * x)))
+        return np.exp(1) + 20 - 20 * np.exp(-0.2 * np.sqrt(np.sum(x ** 2) / self.dims)) \
+            - np.exp(np.sum(np.cos(2 * np.pi * x)) / self.dims)
 
 
 ChasmParameters = namedtuple('ChasmParameters', [])

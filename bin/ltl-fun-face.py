@@ -1,6 +1,8 @@
 import logging.config
 import os
 
+import numpy as np
+
 import yaml
 from pypet import Environment
 from pypet import pypetconstants
@@ -67,13 +69,13 @@ def main():
     function_tools.plot(benchmark_function)
 
     # NOTE: Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function)
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=110)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
     parameters = FACEParameters(min_pop_size=20, max_pop_size=50, n_elite=10, smoothing=0.2, temp_decay=0,
                                 n_iteration=30,
-                                distribution=Gaussian(), n_expand=5)
+                                distribution=Gaussian(), n_expand=5, stop_criterion=np.inf, seed=109)
     optimizer = FACEOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                               optimizee_fitness_weights=(-0.1,),
                               parameters=parameters,

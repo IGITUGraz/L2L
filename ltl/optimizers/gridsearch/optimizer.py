@@ -6,7 +6,6 @@ from pypet.utils.explore import cartesian_product
 
 from ltl import DictEntryType
 from ltl import dict_to_list
-from ltl import list_to_dict
 from ltl.optimizers.optimizer import Optimizer
 
 logger = logging.getLogger("ltl-gs")
@@ -150,9 +149,10 @@ class GridSearchOptimizer(Optimizer):
 
         traj.v_idx = run_idx_array[max_fitness_indiv_index]
         individual = traj.par.individual
-        for param_node in individual.f_iter_leaves():
-            logger.info('  %s: %s', param_node.v_name, param_node.f_get())
-            self.best_individual = param_node.f_get()
+        self.best_individual = {}
+        for param_name, _, _ in self.optimizee_individual_dict_spec:
+            logger.info('  %s: %s', param_name, individual[param_name])
+            self.best_individual[param_name] = individual[param_name]
 
         self.best_fitness = fitness_array[max_fitness_indiv_index]
         logger.info('  with fitness: %s', fitness_array[max_fitness_indiv_index])
@@ -165,9 +165,7 @@ class GridSearchOptimizer(Optimizer):
         """
         Run any code required to clean-up, print final individuals etc.
         """
-        best_last_indiv_dict = list_to_dict(self.best_individual.tolist(),
-                                            self.optimizee_individual_dict_spec)
-        traj.f_add_result('final_individual', best_last_indiv_dict)
+        traj.f_add_result('final_individual', self.best_individual)
         traj.f_add_result('final_fitness', self.best_fitness)
         traj.f_add_result('n_iteration', self.g)
 

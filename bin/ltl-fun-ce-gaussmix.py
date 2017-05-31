@@ -2,6 +2,8 @@ import os
 import warnings
 import logging.config
 
+import numpy as np
+
 import yaml
 from pypet import Environment
 from pypet import pypetconstants
@@ -69,14 +71,16 @@ def main():
     function_tools.plot(benchmark_function)
 
     # NOTE: Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function)
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=102)
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
     parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=5,
-                                        distribution=NoisyBayesianGaussianMixture(2,
-                                                                                  additive_noise=[1., 1.],
-                                                                                  noise_decay=0.9))
+                                        distribution=NoisyBayesianGaussianMixture(n_components=3,
+                                                                                  additive_noise=1.,
+                                                                                  noise_decay=0.9,
+                                                                                  weight_concentration_prior=1.5),
+                                        stop_criterion=np.inf, seed=103)
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                             optimizee_fitness_weights=(-0.1,),
                                             parameters=parameters,

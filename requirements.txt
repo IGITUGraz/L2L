@@ -2,8 +2,8 @@ numpy
 scipy
 pyyaml
 matplotlib
-pypet==0.4.0
 git+https://github.com/soravux/scoop.git@b700f5c#egg=scoop-0.7.2.0
+git+https://github.com/IGITUGraz/pypet.git@258bf78#egg=pypet-0.4.1dev1
 sphinx
 sklearn
 jinja2

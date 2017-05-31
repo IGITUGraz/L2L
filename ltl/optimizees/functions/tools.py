@@ -16,7 +16,7 @@ def plot(function):
     X = np.arange(function.bound[0], function.bound[1], 0.05)
     Y = np.arange(function.bound[0], function.bound[1], 0.05)
     X, Y = np.meshgrid(X, Y)
-    Z = [function.cost_function([x, y]) for x, y in zip(X.ravel(), Y.ravel())]
+    Z = [function.cost_function([x, y], random_state=np.random.RandomState()) for x, y in zip(X.ravel(), Y.ravel())]
     Z = np.array(Z).reshape(X.shape)
 
     # Plot the surface.
