@@ -4,7 +4,6 @@ import os
 import numpy as np
 import yaml
 from pypet import Environment
-#from pypet import pypetconstants
 
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
@@ -77,8 +76,13 @@ def main():
     # an upper and lower temperature bound
     # a decay parameter
     #--------------------------------------------------------------------------
+    
+    # specify the number of parallel running schedules. Each following container
+    # has to have an entry for each parallel run 
     n_parallel_runs = 5
 
+    # for detailed information on the cooling schedules see either the wiki or
+    # the documentaition in ltl.optimizers.paralleltempering.optimizer 
     cooling_schedules = [AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE,
                          AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE,
                          AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE,
@@ -86,6 +90,7 @@ def main():
                          AvailableCoolingSchedules.LINEAR_ADDAPTIVE]
 
     # has to be from 1 to 0, first entry hast to be larger than second
+    # represents the starting temperature and the ending temperature
     temperature_bounds = [
         [0.8, 0],
         [0.7, 0],
@@ -93,7 +98,8 @@ def main():
         [1, 0.1],
         [0.9, 0.2]]
 
-    # decay parameter for each schedule seperately
+    # decay parameter for each schedule. If needed can be different for each
+    # schedule
     decay_parameters = np.full(n_parallel_runs, 0.99)
     #--------------------------------------------------------------------------
     # end of configuration

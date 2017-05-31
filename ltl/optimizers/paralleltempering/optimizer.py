@@ -15,27 +15,120 @@ logger = logging.getLogger("ltl-pt")
 ParallelTemperingParameters = namedtuple('ParallelTemperingParameters',
                                           ['n_parallel_runs', 'noisy_step', 'n_iteration', 'stop_criterion', 'seed', 'cooling_schedules', 'temperature_bounds', 'decay_parameters'])
 ParallelTemperingParameters.__doc__ = """
-:param n_parallel_runs: Number of individuals per simulation / Number of parallel Simulated Annealing runs
+:param n_parallel_runs: Number of parallel Simulated Annealing runs
 :param noisy_step: Size of the random step
-:param temp_decay: A function of the form f(t) = temperature at time t
+:param decay_parameters: List of decay parameter for each cooling schedule
 :param n_iteration: number of iteration to perform
 :param stop_criterion: Stop if change in fitness is below this value
 :param seed: Random seed
+:param cooling_schedules: List with cooling schedules to use.
+:param temperature_bounds: List of upper and lower bound of the temperature for
+    each schedule. The first entry is the upper bound (starting temperature) 
+    and the second entry is the ending temperature
 """
 
 AvailableCoolingSchedules = Enum('Schedule', 'DEFAULT LOGARITHMIC EXPONENTIAL LINEAR_MULTIPLICATIVE QUADRATIC_MULTIPLICATIVE LINEAR_ADDAPTIVE QUADRATIC_ADDAPTIVE EXPONENTIAL_ADDAPTIVE TRIGONOMETRIC_ADDAPTIVE')
+
+"""
+
+Multiplicative Monotonic Cooling
+This schedule type multiplies the starting temperature by a factor that 
+decreases over time (number k of the performed iteration steps). It requires a 
+decay parameter (alpha) but not an ending temperature, as the prgression of the 
+temperature is well definded by the decay parameter only. The Multiplicative 
+Monotonic Cooling schedules are: Exponential multiplicative cooling, 
+Logarithmical multiplicative cooling, Linear multiplicative cooling and 
+Quadratic multiplicative cooling.
+Source: Kirkpatrick, Gelatt and Vecchi (1983)
+
+- Exponential multiplicative cooling
+Default cooling schedule for typical applications of simulated annealing. Each 
+step, the temperature T_k is multiplied by the factor alpha (which has to be 
+between 0 and 1) or in other words it is the starting temperature T_0 
+multiplied by the factor alpha by the power of k: T_k = T_0 * alpha^k
+
+- Logarithmical multiplicative cooling
+The factor by which the temperature decreases, is indirectly proportional to 
+the log of k.  Therefore it slows down the cooling, the further progressed 
+the schedule is. Alpha has to be largert than one. 
+T_k = T_0 / ( 1 + alpha* log (1 + k) )
+
+- Linear multiplicative cooling
+Behaves similar to Logarithmical multiplicative cooling in that the decrease 
+gets lower over time, but not as pronounced. The decrease is indirectly 
+proportional to alpha times k and alpha has to be larger than zero:
+T_k = T_0 / ( 1 + alpha*k)
+
+- Quadratic multiplicative cooling 
+This schedule stays at high temperatures longer, than the other schedules and 
+has a steeper cooling later in the process. Alpha has to be larger than zero.
+T_k = T_0 / ( 1 + alpha*k^2)
+
+Additive Monotonic Cooling
+The differences to Multiplicative Monotonic Cooling are, that the final 
+temperature T_n and the number of iterations n are needed also. So this 
+cannot be used as intended, if the stop criterion is something different, 
+than a certain number of iteration steps. A decay parameter is not needed. 
+Each temperature is computed, by adding a term to the final temperature. The 
+Additive Monotonic Cooling schedules are: Linear additive cooling, Quadratic 
+additive cooling, Exponential additive cooling and Trigonometric additive 
+cooling.
+Source. Additive monotonic cooling B. T. Luke (2005) 
+
+- Linear additive cooling 
+This schedule adds a term to the final temperature, which decreases linearily 
+with the progression of the schedule.
+T_k = T_n + (T_0 -T_n)*((n-k)/n)
+
+- Quadratic additive cooling 
+This schedule adds a term to the final temperature, which decreases q
+uadratically with the progression of the schedule.
+T_k = T_n + (T_0 -T_n)*((n-k)/n)^2
+
+- Exponential additive
+Uses a complicated formula, to come up with a schedule, that has a slow start, 
+a steep decrease in temperature in the middle and a slow decrease at the end 
+of the process.
+T_k = T_n + (T_0 - T_n) * (1/(1+exp( 2*ln(T_0 - T_n)/n * (k- n/2) ) ) )
+
+- Trigonometric additive cooling
+This schedule has a similar behavior as Exponential additive, but less pronounced. 
+T_k = T_n + (T_0 - T_n)/2 * (1+cos(k*pi/n))
+
+"""
 
 
 class ParallelTemperingOptimizer(Optimizer):
     """
     Class for a parallel tempering solver.
+    
+    Parallel Tempering is a search algorithm, that uses multiple simulated 
+    annealing algorithms at the same time and has a certain chance of two 
+    annealing algorithms switching temperatures. Each of the annealing 
+    algorithms can have different cooling schedules and respective decay 
+    parameters or staring/ ending temperatures. This effectively has a similar 
+    functional effect, as a single simulated annealing with multiple coolings 
+    and reheatings, but needs fewer parameters (like when to reheat and how 
+    often). For details on simulated annealing, please read the documentation 
+    on it. 
+    
+    Note: For simplicity sake, not the positions, but the temperature and
+    the schedule are swapped, which ammounts to the exact same. The 
+    temperature and the schedules are each stored in lists, which are both 
+    indexed by 'compare_indices'. If the swap criterion between two schedules
+    are met, the respective entries for 'compare_indices' are swapped.
+    To get the parallel runs, 'n_parallel_runs" is used - each individual 
+    is one of the parallel runs..
+    
     The algorithm does:
 
-    For n iterations do:
+    For n iterations and each cooling schedule do:
         - Take a step of size noisy step in a random direction
         - If it reduces the cost, keep the solution
         - Otherwise keep with probability exp(- (f_new - f) / T)
-
+        - Swap positions between two randomly chosen schedules 
+          with probability exp(-((f_1 - f_2) * (1 / (k * T_1) - 1 / (k * T_2)))) with k being a constant
+        
     NOTE: This expects all parameters of the system to be of floating point
 
     :param  ~pypet.trajectory.Trajectory traj:
@@ -113,7 +206,6 @@ class ParallelTemperingOptimizer(Optimizer):
 
         self.T_all = parameters.temperature_bounds[:,0]  # Initialize temperature
         self.T = 1
-        # The following parameters are NOT recorded
         self.g = 0  # the current generation
         self.cooling_schedules = parameters.cooling_schedules
         self.decay_parameters = parameters.decay_parameters
@@ -138,8 +230,9 @@ class ParallelTemperingOptimizer(Optimizer):
             self.parallel_indices.append(i)
         
         self.available_cooling_schedules = AvailableCoolingSchedules
-    
-        schedule_known = True
+        
+        # assert if all cooling schedules are among the known cooling schedules
+        schedule_known = True  # start off as True - if any schdule is unknown gets False
         for i in range(np.size(self.cooling_schedules)):
             schedule_known = schedule_known and self.cooling_schedules[i] in AvailableCoolingSchedules
         
@@ -179,7 +272,7 @@ class ParallelTemperingOptimizer(Optimizer):
             return temperature_end + (T0 - temperature) * (1 / (1 + np.exp((2 * np.log(T0 - temperature_end) / steps_total) * (k - steps_total / 2))))
         elif cooling_schedule == AvailableCoolingSchedules.TRIGONOMETRIC_ADDAPTIVE:
             return temperature_end + (T0 - temperature_end) * (1 + np.cos(k * 3.1415 / steps_total)) / 2
-
+        
         return -1
 
     # get tthe transistion probability between two simulated annealing systems with
@@ -217,15 +310,13 @@ class ParallelTemperingOptimizer(Optimizer):
         for i in range(0,traj.n_parallel_runs):
             self.T_all[self.parallel_indices[i]] = self.cooling(temperature[self.parallel_indices[i]], cooling_schedules[self.parallel_indices[i]], decay_parameters[self.parallel_indices[i]], temperature_bounds[self.parallel_indices[i],:], n_iteration)
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
-        # NOTE: Currently works with only one individual at a time.
-        # In principle, can be used with many different individuals evaluated in parallel
+  
         assert len(fitnesses_results) == traj.n_parallel_runs
         weighted_fitness_list = []
         for i, (run_index, fitness) in enumerate(fitnesses_results):
             
             self.T = self.T_all[self.parallel_indices[i]]
-            # Update fitnesses
-            # NOTE: The fitness here is a tuple! For now, we'll only support fitnesses with one element
+
             weighted_fitness = sum(f * w for f, w in zip(fitness, self.optimizee_fitness_weights))
             weighted_fitness_list.append(weighted_fitness)
 

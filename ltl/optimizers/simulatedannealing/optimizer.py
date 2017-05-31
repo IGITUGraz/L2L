@@ -19,19 +19,78 @@ SimulatedAnnealingParameters.__doc__ = """
 :param n_iteration: number of iteration to perform
 :param stop_criterion: Stop if change in fitness is below this value
 :param seed: Random seed
+:param cooling_schedule: Which of the available schedules to use
+
 """
 
-# enum for cooling schedules: 
-# DEF ... default
-# LOG ... logartihmic
-# EXP ... exponential
-# LINMULT .. linear multiplicative cooling. 
-# QUADMULT .. quadratic multiplicative cooling
-# LINADD ... linear additive cooling
-# QUADADD ... quadratic additive cooling
-# EXPADD ... exponential additive cooling
-# TRIGADD ...trigonometric additive cooling
 AvailableCoolingSchedules = Enum('Schedule', 'DEFAULT LOGARITHMIC EXPONENTIAL LINEAR_MULTIPLICATIVE QUADRATIC_MULTIPLICATIVE LINEAR_ADDAPTIVE QUADRATIC_ADDAPTIVE EXPONENTIAL_ADDAPTIVE TRIGONOMETRIC_ADDAPTIVE')
+
+"""
+Multiplicative Monotonic Cooling
+This schedule type multiplies the starting temperature by a factor that 
+decreases over time (number k of the performed iteration steps). It requires a 
+decay parameter (alpha) but not an ending temperature, as the prgression of the 
+temperature is well definded by the decay parameter only. The Multiplicative 
+Monotonic Cooling schedules are: Exponential multiplicative cooling, 
+Logarithmical multiplicative cooling, Linear multiplicative cooling and 
+Quadratic multiplicative cooling.
+Source: Kirkpatrick, Gelatt and Vecchi (1983)
+
+- Exponential multiplicative cooling
+Default cooling schedule for typical applications of simulated annealing. Each 
+step, the temperature T_k is multiplied by the factor alpha (which has to be 
+between 0 and 1) or in other words it is the starting temperature T_0 
+multiplied by the factor alpha by the power of k: T_k = T_0 * alpha^k
+
+- Logarithmical multiplicative cooling
+The factor by which the temperature decreases, is indirectly proportional to 
+the log of k.  Therefore it slows down the cooling, the further progressed 
+the schedule is. Alpha has to be largert than one. 
+T_k = T_0 / ( 1 + alpha* log (1 + k) )
+
+- Linear multiplicative cooling
+Behaves similar to Logarithmical multiplicative cooling in that the decrease 
+gets lower over time, but not as pronounced. The decrease is indirectly 
+proportional to alpha times k and alpha has to be larger than zero:
+T_k = T_0 / ( 1 + alpha*k)
+
+- Quadratic multiplicative cooling 
+This schedule stays at high temperatures longer, than the other schedules and 
+has a steeper cooling later in the process. Alpha has to be larger than zero.
+T_k = T_0 / ( 1 + alpha*k^2)
+
+Additive Monotonic Cooling
+The differences to Multiplicative Monotonic Cooling are, that the final 
+temperature T_n and the number of iterations n are needed also. So this 
+cannot be used as intended, if the stop criterion is something different, 
+than a certain number of iteration steps. A decay parameter is not needed. 
+Each temperature is computed, by adding a term to the final temperature. The 
+Additive Monotonic Cooling schedules are: Linear additive cooling, Quadratic 
+additive cooling, Exponential additive cooling and Trigonometric additive 
+cooling.
+Source. Additive monotonic cooling B. T. Luke (2005) 
+
+- Linear additive cooling 
+This schedule adds a term to the final temperature, which decreases linearily 
+with the progression of the schedule.
+T_k = T_n + (T_0 -T_n)*((n-k)/n)
+
+- Quadratic additive cooling 
+This schedule adds a term to the final temperature, which decreases q
+uadratically with the progression of the schedule.
+T_k = T_n + (T_0 -T_n)*((n-k)/n)^2
+
+- Exponential additive
+Uses a complicated formula, to come up with a schedule, that has a slow start, 
+a steep decrease in temperature in the middle and a slow decrease at the end 
+of the process.
+T_k = T_n + (T_0 - T_n) * (1/(1+exp( 2*ln(T_0 - T_n)/n * (k- n/2) ) ) )
+
+- Trigonometric additive cooling
+This schedule has a similar behavior as Exponential additive, but less pronounced. 
+T_k = T_n + (T_0 - T_n)/2 * (1+cos(k*pi/n))
+
+"""
 
 
 class SimulatedAnnealingOptimizer(Optimizer):
@@ -109,10 +168,6 @@ class SimulatedAnnealingOptimizer(Optimizer):
         self._expand_trajectory(traj)
         
         self.cooling_schedule = parameters.cooling_schedule
-            
-#        schedule_known = True
-#        for i in range(np.size(self.cooling_schedule)):
-#            schedule_known = schedule_known and self.cooling_schedule[i] in AvailableCoolingSchedules
 
     def cooling(self,temperature, cooling_schedule, temperature_decay, temperature_end, steps_total):        
         # assumes, that the temperature always starts at 1
@@ -170,14 +225,11 @@ class SimulatedAnnealingOptimizer(Optimizer):
         temperature_end = 0
         self.T = self.cooling(temperature, self.cooling_schedule, temp_decay, temperature_end, n_iteration)
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
-        # NOTE: Currently works with only one individual at a time.
-        # In principle, can be used with many different individuals evaluated in parallel
+
         assert len(fitnesses_results) == traj.n_parallel_runs
         weighted_fitness_list = []
         for i, (run_index, fitness) in enumerate(fitnesses_results):
 
-            # Update fitnesses
-            # NOTE: The fitness here is a tuple! For now, we'll only support fitnesses with one element
             weighted_fitness = sum(f * w for f, w in zip(fitness, self.optimizee_fitness_weights))
             weighted_fitness_list.append(weighted_fitness)
 
