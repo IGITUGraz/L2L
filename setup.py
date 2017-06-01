@@ -27,7 +27,7 @@ def get_requirements(filename):
 requirements, dependency_links = get_requirements('requirements.txt')
 setup(
     name="Learning to Learn",
-    version="0.2.0",
+    version="0.2.1",
     packages=['ltl'],
     author="Anand Subramoney, Arjun Rao",
     author_email="anand@igi.tugraz.at, arjun@igi.tugraz.at",
