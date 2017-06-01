@@ -2,13 +2,13 @@ import functools
 
 import os
 import sys
-import time
 from collections import OrderedDict
 from contextlib import contextmanager
 from warnings import warn
 from enum import Enum
 from collections import Iterable, Mapping
 from numbers import Integral, Real
+from timeit import default_timer as timer
 
 import numpy as np
 
@@ -420,7 +420,7 @@ class DummyTrajectory:
 
 @contextmanager
 def timed(logger):
-    start = time.time()
+    start = timer()
     yield
-    end = time.time()
+    end = timer()()
     logger.info("Run took {:.2f} seconds".format(end - start))
