@@ -127,3 +127,26 @@ class TestOptimizers(unittest.TestCase):
                 self.assertLess(fitness, 0.01, "Fitness goal not reached for variant {}".format(variant))
                 # print("Points", [dict_to_list(fv) for fv in final_vales])
                 # print("Fitnesses", [self.fn.cost_function(dict_to_list(fv)) for fv in final_vales])
+
+    def test_cross_entropy(self):
+        traj = DummyTrajectory()
+
+        from ltl.optimizers.crossentropy.optimizer import CrossEntropyParameters
+        from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer
+        from ltl.optimizers.crossentropy.distribution import NoisyGaussian
+
+        parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=5,
+                                            distribution=NoisyGaussian(additive_noise=1,
+                                                                       noise_decay=0.95),
+                                            stop_criterion=np.inf, seed=102)
+
+        optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=self.optimizee.create_individual,
+                                          optimizee_fitness_weights=(-0.1,),
+                                          parameters=parameters,
+                                          optimizee_bounding_func=self.optimizee.bounding_func)
+
+        final_vales = self._optimize(traj, optimizer)
+        for fitness in [self.fn.cost_function(dict_to_list(fv)) for fv in final_vales]:
+            self.assertLess(fitness, 0.01, "Fitness goal not reached")
+            # print("Points", [dict_to_list(fv) for fv in final_vales])
+            # print("Fitnesses", [self.fn.cost_function(dict_to_list(fv)) for fv in final_vales])
