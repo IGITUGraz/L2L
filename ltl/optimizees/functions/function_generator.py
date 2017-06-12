@@ -34,7 +34,8 @@ class FunctionGenerator:
                               RastriginParameters=Rastrigin,
                               RosenbrockParameters=Rosenbrock,
                               AckleyParameters=Ackley,
-                              ChasmParameters=Chasm)
+                              ChasmParameters=Chasm,
+                              QuadraticParameters=Quadratic)
 
         self.gen_functions = []
         self.function_parameters = fg_params
@@ -390,7 +391,7 @@ class Ackley(Function):
     def __call__(self, x):
         x = np.array(x)
         return np.exp(1) + 20 - 20 * np.exp(-0.2 * np.sqrt(np.sum(x ** 2) / self.dims)) \
-            - np.exp(np.sum(np.cos(2 * np.pi * x)) / self.dims)
+               - np.exp(np.sum(np.cos(2 * np.pi * x)) / self.dims)
 
 
 ChasmParameters = namedtuple('ChasmParameters', [])
@@ -414,3 +415,30 @@ class Chasm(Function):
     def __call__(self, x):
         x = np.array(x)
         return 1e3 * np.abs(x[0]) / (1e3 * np.abs(x[0]) + 1) + 1e-2 * np.abs(x[1])
+
+
+QuadraticParameters = namedtuple('QuadraticParameters', ['a', 'b', 'c'])
+QuadraticParameters.__doc__ = """
+The function is a quadratic function of the form f(x) = a x^2 + b x + c
+If x is of dimension d, then a, b, c should be of dimension d.
+:param a: 
+:param b: 
+:param c: 
+"""
+
+
+class Quadratic(Function):
+    """
+    Chasm is characterized by a large flat area with a very large slope that halves the two parts of the
+    function.
+
+    :param dims: dimensionality of the function
+    """
+
+    def __init__(self, params, dims):
+        self.a, self.b, self.c = params.a, params.b, params.c
+        self.bound = [-1, 1]
+
+    def __call__(self, x):
+        x = np.array(x)
+        return self.a * x ** 2 + self.b * x + self.c

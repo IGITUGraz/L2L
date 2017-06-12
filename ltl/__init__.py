@@ -253,7 +253,7 @@ def list_to_dict(input_list, dict_spec):
         elif value_type == DictEntryType.Scalar:
             return_dict[key] = input_list[cursor]
         cursor += value_len
-    assert cursor == len(input_list), "Incorrect Parameter List length, Somethings not right"
+    assert cursor == len(input_list), "Incorrect Parameter list length {}. Something's not right".format(len(input_list))
     return return_dict
 
 
@@ -407,14 +407,28 @@ def stdout_discarded():
 
 class DummyTrajectory:
     def __init__(self):
-        self.individual = lambda: None
+        self.parameter = lambda: None
+        self.result = lambda: None
 
-        def f_add_parameter(*args, **kwargs):
+        def f_add_parameter(name, value, *args, **kwargs):
+            self.parameter.__setattr__(name, value)
+
+        def f_add_result(name, value, *args, **kwargs):
+            self.result.__setattr__(name, value)
+
+        def f_add_result_group(*args, **kwargs):
             pass
 
-        self.individual.f_add_parameter = f_add_parameter
+        # self.individual.f_add_parameter = f_add_parameter
+        self.f_add_parameter = f_add_parameter
+        self.f_add_derived_parameter = f_add_parameter
+        self.f_add_result = f_add_result
+        self.f_add_result_group = f_add_result_group
 
     def f_add_parameter_group(self, *args, **kwargs):
+        pass
+
+    def f_expand(self, d):
         pass
 
 
