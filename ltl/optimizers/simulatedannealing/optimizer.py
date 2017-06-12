@@ -23,7 +23,7 @@ SimulatedAnnealingParameters.__doc__ = """
 
 """
 
-AvailableCoolingSchedules = Enum('Schedule', 'DEFAULT LOGARITHMIC EXPONENTIAL LINEAR_MULTIPLICATIVE QUADRATIC_MULTIPLICATIVE LINEAR_ADDAPTIVE QUADRATIC_ADDAPTIVE EXPONENTIAL_ADDAPTIVE TRIGONOMETRIC_ADDAPTIVE')
+AvailableCoolingSchedules = Enum('AvailableCoolingSchedules', 'DEFAULT LOGARITHMIC EXPONENTIAL LINEAR_MULTIPLICATIVE QUADRATIC_MULTIPLICATIVE LINEAR_ADDAPTIVE QUADRATIC_ADDAPTIVE EXPONENTIAL_ADDAPTIVE TRIGONOMETRIC_ADDAPTIVE')
 
 """
 Multiplicative Monotonic Cooling
@@ -158,7 +158,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
 
         new_individual_list = [
             list_to_dict(
-                ind_as_list + self.random_state.normal(0.0, parameters.noisy_step, ind_as_list.size) * traj.noisy_step * self.T,
+                ind_as_list + self.random_state.normal(0.0, parameters.noisy_step, ind_as_list.size) * traj.parameter.noisy_step * self.T,
                 self.optimizee_individual_dict_spec)
             for ind_as_list in self.current_individual_list
         ]
@@ -219,7 +219,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
         noisy_step, temp_decay, n_iteration, stop_criterion = \
-            traj.noisy_step, traj.temp_decay, traj.n_iteration, traj.stop_criterion
+            traj.parameter.noisy_step, traj.parameter.temp_decay, traj.parameter.n_iteration, traj.parameter.stop_criterion
         old_eval_pop = self.eval_pop.copy()
         self.eval_pop.clear()
         temperature = self.T
@@ -227,7 +227,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         self.T = self.cooling(temperature, self.cooling_schedule, temp_decay, temperature_end, n_iteration)
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
 
-        assert len(fitnesses_results) == traj.n_parallel_runs
+        assert len(fitnesses_results) == traj.parameter.n_parallel_runs
         weighted_fitness_list = []
         for i, (run_index, fitness) in enumerate(fitnesses_results):
 
@@ -237,7 +237,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
             # We need to convert the current run index into an ind_idx
             # (index of individual within one generation)
             traj.v_idx = run_index
-            ind_index = traj.par.ind_idx
+            ind_index = traj.parameter.ind_idx
             individual = old_eval_pop[ind_index]
 
             # Accept or reject the new solution
