@@ -2,7 +2,7 @@ numpy
 scipy
 pyyaml
 matplotlib
-git+https://github.com/IGITUGraz/scoop.git@4d648fb#egg=scoop-0.7.2.0-r2
+git+https://github.com/IGITUGraz/scoop.git@53df7cc#egg=scoop-0.7.2.0-dev6
 git+https://github.com/IGITUGraz/pypet.git@15104ce#egg=pypet-0.4.1-r1
 sphinx
 sklearn
