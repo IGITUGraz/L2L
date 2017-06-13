@@ -11,7 +11,7 @@ logger = logging.getLogger('ltl-distribution')
 class Distribution(metaclass=ABCMeta):
     """Generic base for a distribution. Needs to implement the functions fit and sample.
     """
-    
+
     @abc.abstractmethod
     def init_random_state(self, random_state):
         """
@@ -54,7 +54,7 @@ class Distribution(metaclass=ABCMeta):
 class Gaussian(Distribution):
     """Gaussian distribution.
     """
-    
+
     def __init__(self):
         """" Initialize the distribution
         
@@ -84,11 +84,12 @@ class Gaussian(Distribution):
         :returns dict specifying current parametrization
         """
         assert self.random_state is not None, \
-            "The random_state for the distribution has not been set, call the"\
+            "The random_state for the distribution has not been set, call the" \
             " 'init_random_state' member function to set it"
 
         mean = np.mean(data_list, axis=0)
-        cov_mat = np.cov(data_list, rowvar=False)
+        # cov_mat = np.cov(data_list, rowvar=False)
+        cov_mat = np.matmul((data_list - mean).T, (data_list - mean)) / data_list.shape[0]
 
         if self.mean is None:
             self.mean = mean
@@ -99,9 +100,9 @@ class Gaussian(Distribution):
 
         logger.debug('Gaussian center\n%s', self.mean)
         logger.debug('Gaussian cov\n%s', self.cov)
-        
+
         return {'mean': self.mean, 'covariance_matrix': self.cov}
-        
+
     def sample(self, n_individuals):
         """Sample n_individuals individuals under the current parametrization
  
@@ -110,7 +111,7 @@ class Gaussian(Distribution):
         :returns numpy array with n_individual rows of individuals
         """
         assert self.random_state is not None, \
-            "The random_state for the distribution has not been set, call the"\
+            "The random_state for the distribution has not been set, call the" \
             " 'init_random_state' member function to set it"
         return self.random_state.multivariate_normal(self.mean, self.cov, n_individuals)
 
@@ -120,6 +121,7 @@ class BayesianGaussianMixture():
     Unlike normal Gaussian mixture, the algorithm has tendency to set the weights of non present modes close to zero.
     Meaning that it effectively inferences the number of active modes present in the given data.
     """
+
     def __init__(self, n_components=2, **kwargs):
         """ Initialize the distribution
 
@@ -168,7 +170,7 @@ class BayesianGaussianMixture():
         :return: dict specifiying current parametrization
         """
         assert self.random_state is not None, \
-            "The random_state for the distribution has not been set, call the"\
+            "The random_state for the distribution has not been set, call the" \
             " 'init_random_state' member function to set it"
 
         old = self.bayesian_mixture
@@ -204,7 +206,7 @@ class BayesianGaussianMixture():
         :return: numpy array with n_individuals rows of individuals
         """
         assert self.random_state is not None, \
-            "The random_state for the distribution has not been set, call the"\
+            "The random_state for the distribution has not been set, call the" \
             " 'init_random_state' member function to set it"
         individuals, _ = self.bayesian_mixture.sample(n_individuals)
         return individuals
@@ -213,6 +215,7 @@ class BayesianGaussianMixture():
 class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
     """NoisyBayesianGaussianMixture is basically the same as BayesianGaussianMixture but superimposed with noise
     """
+
     def __init__(self, n_components, additive_noise=1.0, noise_decay=0.95, **kwargs):
         """
         Initializes the Noisy Bayesian Gaussian Mixture Model with noise components
@@ -237,7 +240,8 @@ class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
         if hasattr(model, 'covariances_'):
             for cov in model.covariances_:
                 eigenvalues, eigenvectors = np.linalg.eig(cov)
-                current_eig_noise = np.abs(self.random_state.normal(loc=0.0, scale=self.additive_noise, size=eigenvalues.shape))
+                current_eig_noise = np.abs(
+                    self.random_state.normal(loc=0.0, scale=self.additive_noise, size=eigenvalues.shape))
                 cov += eigenvectors.dot(np.diag(current_eig_noise).dot(eigenvectors.T))
             self.additive_noise *= self.noise_decay
 
@@ -261,6 +265,7 @@ class NoisyGaussian(Gaussian):
     happens during the first fit where the magnitude of the noise in each
     diagonalized component is estimated.
     """
+
     def __init__(self, additive_noise=1.0, noise_decay=0.95):
         """Initializes the noisy distribution
 
@@ -293,7 +298,7 @@ class NoisyGaussian(Gaussian):
         :returns dict describing parameter configuration
         """
         assert self.random_state is not None, \
-            "The random_state for the distribution has not been set, call the"\
+            "The random_state for the distribution has not been set, call the" \
             " 'init_random_state' member function to set it"
 
         Gaussian.fit(self, data_list, smooth_update)
@@ -313,7 +318,7 @@ class NoisyGaussian(Gaussian):
         :returns n_individuals Individuals
         """
         assert self.random_state is not None, \
-            "The random_state for the distribution has not been set, call the"\
+            "The random_state for the distribution has not been set, call the" \
             " 'init_random_state' member function to set it"
 
         return self.random_state.multivariate_normal(self.mean, self.noisy_cov, n_individuals)

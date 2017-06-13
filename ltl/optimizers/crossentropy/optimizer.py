@@ -109,7 +109,7 @@ class CrossEntropyOptimizer(Optimizer):
                              comment='Decay factor for temperature')
         traj.f_add_parameter('seed', np.uint32(parameters.seed),
                              comment='Seed used for random number generation in optimizer')
-        self.random_state = np.random.RandomState(traj.parameter.seed)
+        self.random_state = np.random.RandomState(traj.parameters.seed)
 
         temp_indiv, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(),
                                                                        get_dict_spec=True)
@@ -150,6 +150,7 @@ class CrossEntropyOptimizer(Optimizer):
         # Max Likelihood
         self.current_distribution = parameters.distribution
         self.current_distribution.init_random_state(self.random_state)
+        print(self.eval_pop_asarray.shape)
         self.current_distribution.fit(self.eval_pop_asarray)
 
         self._expand_trajectory(traj)
@@ -170,8 +171,8 @@ class CrossEntropyOptimizer(Optimizer):
         """
 
         n_iteration, smoothing, temp_decay = \
-            traj.n_iteration, traj.smoothing, traj.temp_decay
-        stop_criterion, n_elite = traj.stop_criterion, traj.n_elite
+            traj.parameters.n_iteration, traj.parameters.smoothing, traj.parameters.temp_decay
+        stop_criterion, n_elite = traj.parameters.stop_criterion, traj.parameters.n_elite
 
         weighted_fitness_list = []
         # **************************************************************************************************************
@@ -182,7 +183,7 @@ class CrossEntropyOptimizer(Optimizer):
             # We need to convert the current run index into an ind_idx
             # (index of individual within one generation)
             traj.v_idx = run_index
-            ind_index = traj.par.ind_idx
+            ind_index = traj.parameters.ind_idx
 
             traj.f_add_result('$set.$.individual', self.eval_pop[ind_index])
             traj.f_add_result('$set.$.fitness', fitness)
@@ -234,8 +235,8 @@ class CrossEntropyOptimizer(Optimizer):
         }
 
         generation_name = 'generation_{}'.format(self.g)
-        traj.results.generation_params.f_add_result_group(generation_name)
-        traj.results.generation_params.f_add_result(
+        traj.f_add_result_group('generation_params.' + generation_name)
+        traj.f_add_result('generation_params.' +
             generation_name + '.algorithm_params', generation_result_dict,
             comment="These are the parameters that correspond to the algorithm, look at the source code"
                     " for `CrossEntropyOptimizer::post_process()` for comments documenting these"
@@ -257,7 +258,7 @@ class CrossEntropyOptimizer(Optimizer):
         self.distribution_results = self.current_distribution.fit(individuals_to_be_fitted, smoothing)
 
         # Add the results of the distribution fitting to the trajectory
-        traj.results.generation_params.f_add_result(
+        traj.f_add_result('generation_params.' +
             generation_name + '.distribution_params', self.distribution_results,
             comment="These are the parameters of the distribution inferred from the currently evaluated"
                     " generation")

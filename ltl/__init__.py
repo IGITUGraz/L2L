@@ -407,14 +407,14 @@ def stdout_discarded():
 
 class DummyTrajectory:
     def __init__(self):
-        self.parameter = lambda: None
-        self.result = lambda: None
+        self.parameters = lambda: None
+        self.results = lambda: None
 
         def f_add_parameter(name, value, *args, **kwargs):
-            self.parameter.__setattr__(name, value)
+            self.parameters.__setattr__(name, value)
 
         def f_add_result(name, value, *args, **kwargs):
-            self.result.__setattr__(name, value)
+            self.results.__setattr__(name, value)
 
         def f_add_result_group(*args, **kwargs):
             pass
@@ -424,6 +424,7 @@ class DummyTrajectory:
         self.f_add_derived_parameter = f_add_parameter
         self.f_add_result = f_add_result
         self.f_add_result_group = f_add_result_group
+
 
     def f_add_parameter_group(self, *args, **kwargs):
         pass
