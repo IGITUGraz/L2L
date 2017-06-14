@@ -12,10 +12,10 @@ logger = logging.getLogger("ltl-gradientdescent")
 
 ClassicGDParameters = namedtuple(
     'ClassicGDParameters',
-    ['learning_rate', 'exploration_rate', 'n_random_steps', 'n_iteration', 'stop_criterion', 'seed'])
+    ['learning_rate', 'exploration_step_size', 'n_random_steps', 'n_iteration', 'stop_criterion', 'seed'])
 ClassicGDParameters.__doc__ = """
 :param learning_rate: The rate of learning per step of gradient descent
-:param exploration_rate: The standard deviation of random steps used for finite difference gradient
+:param exploration_step_size: The standard deviation of random steps used for finite difference gradient
 :param n_random_steps: The amount of random steps used to estimate gradient
 :param n_iteration: number of iteration to perform
 :param stop_criterion: Stop if change in fitness is below this value
@@ -23,14 +23,14 @@ ClassicGDParameters.__doc__ = """
 
 StochasticGDParameters = namedtuple(
     'StochGDParameters',
-    ['learning_rate', 'stochastic_deviation', 'stochastic_decay', 'exploration_rate', 'n_random_steps', 'n_iteration',
+    ['learning_rate', 'stochastic_deviation', 'stochastic_decay', 'exploration_step_size', 'n_random_steps', 'n_iteration',
      'stop_criterion', 'seed'])
 StochasticGDParameters.__doc__ = """
 :param learning_rate: The rate of learning per step of gradient descent
 :param stochastic_deviation: The standard deviation of the random vector used to perturbate the gradient
 :param stochastic_decay: The decay of the influence of the random vector that is added to the gradient 
     (set to 0 to disable stochastic perturbation)
-:param exploration_rate: The standard deviation of random steps used for finite difference gradient
+:param exploration_step_size: The standard deviation of random steps used for finite difference gradient
 :param n_random_steps: The amount of random steps used to estimate gradient
 :param n_iteration: number of iteration to perform
 :param stop_criterion: Stop if change in fitness is below this value
@@ -38,11 +38,11 @@ StochasticGDParameters.__doc__ = """
 
 AdamParameters = namedtuple(
     'AdamParameters',
-    ['learning_rate', 'exploration_rate', 'n_random_steps', 'first_order_decay', 'second_order_decay', 'n_iteration',
+    ['learning_rate', 'exploration_step_size', 'n_random_steps', 'first_order_decay', 'second_order_decay', 'n_iteration',
      'stop_criterion', 'seed'])
 AdamParameters.__doc__ = """
 :param learning_rate: The rate of learning per step of gradient descent
-:param exploration_rate: The standard deviation of random steps used for finite difference gradient
+:param exploration_step_size: The standard deviation of random steps used for finite difference gradient
 :param n_random_steps: The amount of random steps used to estimate gradient
 :param first_order_decay: Specifies the amount of decay of the historic first order momentum per gradient descent step
 :param second_order_decay: Specifies the amount of decay of the historic second order momentum per gradient descent step
@@ -53,10 +53,10 @@ AdamParameters.__doc__ = """
 
 RMSPropParameters = namedtuple(
     'RMSPropParameters',
-    ['learning_rate', 'exploration_rate', 'n_random_steps', 'momentum_decay', 'n_iteration', 'stop_criterion', 'seed'])
+    ['learning_rate', 'exploration_step_size', 'n_random_steps', 'momentum_decay', 'n_iteration', 'stop_criterion', 'seed'])
 RMSPropParameters.__doc__ = """
 :param learning_rate: The rate of learning per step of gradient descent
-:param exploration_rate: The standard deviation of random steps used for finite difference gradient
+:param exploration_step_size: The standard deviation of random steps used for finite difference gradient
 :param n_random_steps: The amount of random steps used to estimate gradient
 :param momentum_decay: Specifies the decay of the historic momentum at each gradient descent step
 :param n_iteration: number of iteration to perform
@@ -115,7 +115,7 @@ class GradientDescentOptimizer(Optimizer):
         self.optimizee_bounding_func = optimizee_bounding_func
         
         traj.f_add_parameter('learning_rate', parameters.learning_rate, comment='Value of learning rate')
-        traj.f_add_parameter('exploration_rate', parameters.exploration_rate, 
+        traj.f_add_parameter('exploration_step_size', parameters.exploration_step_size, 
                              comment='Standard deviation of the random steps')
         traj.f_add_parameter('n_random_steps', parameters.n_random_steps, 
                              comment='Amount of random steps taken for calculating the gradient')
@@ -149,7 +149,7 @@ class GradientDescentOptimizer(Optimizer):
         # Explore the neighbourhood in the parameter space of current individual
         new_individual_list = [
             list_to_dict(self.current_individual + 
-                         self.random_state.normal(0.0, parameters.exploration_rate, self.current_individual.size),
+                         self.random_state.normal(0.0, parameters.exploration_step_size, self.current_individual.size),
                          self.optimizee_individual_dict_spec)
             for i in range(parameters.n_random_steps)
         ]
@@ -218,7 +218,7 @@ class GradientDescentOptimizer(Optimizer):
             # Explore the neighbourhood in the parameter space of the current individual
             new_individual_list = [
                 list_to_dict(self.current_individual + 
-                             self.random_state.normal(0.0, traj.exploration_rate, self.current_individual.size),
+                             self.random_state.normal(0.0, traj.exploration_step_size, self.current_individual.size),
                              self.optimizee_individual_dict_spec)
                 for i in range(traj.n_random_steps)
             ]
