@@ -12,7 +12,7 @@ logger = logging.getLogger("ltl-gradientdescent")
 
 ClassicGDParameters = namedtuple(
     'ClassicGDParameters',
-    ['learning_rate', 'exploration_rate', 'n_random_steps', 'n_iteration', 'stop_criterion'])
+    ['learning_rate', 'exploration_rate', 'n_random_steps', 'n_iteration', 'stop_criterion', 'seed'])
 ClassicGDParameters.__doc__ = """
 :param learning_rate: The rate of learning per step of gradient descent
 :param exploration_rate: The standard deviation of random steps used for finite difference gradient
@@ -24,7 +24,7 @@ ClassicGDParameters.__doc__ = """
 StochasticGDParameters = namedtuple(
     'StochGDParameters',
     ['learning_rate', 'stochastic_deviation', 'stochastic_decay', 'exploration_rate', 'n_random_steps', 'n_iteration',
-     'stop_criterion'])
+     'stop_criterion', 'seed'])
 StochasticGDParameters.__doc__ = """
 :param learning_rate: The rate of learning per step of gradient descent
 :param stochastic_deviation: The standard deviation of the random vector used to perturbate the gradient
@@ -39,7 +39,7 @@ StochasticGDParameters.__doc__ = """
 AdamParameters = namedtuple(
     'AdamParameters',
     ['learning_rate', 'exploration_rate', 'n_random_steps', 'first_order_decay', 'second_order_decay', 'n_iteration',
-     'stop_criterion'])
+     'stop_criterion', 'seed'])
 AdamParameters.__doc__ = """
 :param learning_rate: The rate of learning per step of gradient descent
 :param exploration_rate: The standard deviation of random steps used for finite difference gradient
