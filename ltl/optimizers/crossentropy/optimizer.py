@@ -108,7 +108,7 @@ class CrossEntropyOptimizer(Optimizer):
                              comment='Decay factor for temperature')
         traj.f_add_parameter('seed', np.uint32(parameters.seed),
                              comment='Seed used for random number generation in optimizer')
-        self.random_state = np.random.RandomState(traj.parameters.individual.seed)
+        self.random_state = np.random.RandomState(traj.parameters.seed)
 
         temp_indiv, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(),
                                                                        get_dict_spec=True)
