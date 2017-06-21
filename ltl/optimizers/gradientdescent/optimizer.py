@@ -214,7 +214,10 @@ class GradientDescentOptimizer(Optimizer):
         if self.g < traj.n_iteration - 1 and traj.stop_criterion > self.current_fitness:
             # Create new individual using the appropriate gradient descent
             self.update_function(traj, np.dot(np.linalg.pinv(dx), fitnesses - self.current_fitness))
-        
+            current_individual_dict = list_to_dict(self.current_individual, self.optimizee_individual_dict_spec)
+            current_individual_dict = self.optimizee_bounding_func(current_individual_dict)
+            self.current_individual = np.array(dict_to_list(current_individual_dict))
+
             # Explore the neighbourhood in the parameter space of the current individual
             new_individual_list = [
                 list_to_dict(self.current_individual + 
@@ -222,9 +225,10 @@ class GradientDescentOptimizer(Optimizer):
                              self.optimizee_individual_dict_spec)
                 for i in range(traj.n_random_steps)
             ]
-            new_individual_list.append(list_to_dict(self.current_individual, self.optimizee_individual_dict_spec))
             if self.optimizee_bounding_func is not None:
                 new_individual_list = [self.optimizee_bounding_func(ind) for ind in new_individual_list]
+            new_individual_list.append(current_individual_dict)
+
             fitnesses_results.clear()
             self.eval_pop = new_individual_list
             self.g += 1  # Update generation counter
