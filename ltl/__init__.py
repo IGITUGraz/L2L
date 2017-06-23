@@ -419,7 +419,7 @@ class DummyTrajectory:
 
 
 @contextmanager
-def timed(section_name, logger):
+def timed(logger, section_name='Run'):
     start = timer()
     yield
     end = timer()
