@@ -419,8 +419,8 @@ class DummyTrajectory:
 
 
 @contextmanager
-def timed(logger):
+def timed(section_name, logger):
     start = timer()
     yield
-    end = timer()()
-    logger.info("Run took {:.2f} seconds".format(end - start))
+    end = timer()
+    logger.info("{} took {:.3f} seconds".format(section_name, end - start))
