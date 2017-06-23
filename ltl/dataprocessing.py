@@ -1,11 +1,10 @@
-from collections import OrderedDict
 from pypet import Trajectory, pypetconstants, ParameterGroup
 
 from . import timed
 import logging
 
-
 logger = logging.getLogger('ltl.dataprocessing')
+
 
 def get_var_from_generations(traj: Trajectory, variable_name_full: str, status_interval=None):
     """
@@ -54,7 +53,9 @@ def get_var_from_generations(traj: Trajectory, variable_name_full: str, status_i
     status_interval = int(status_interval) if status_interval else None
 
     top_group = traj.f_load_child('results.generation_params', recursive=True, load_data=pypetconstants.LOAD_SKELETON)
-    get_generation_id = lambda gen_name: int(gen_name[11:])  # generation_XXXX
+
+    def get_generation_id(gen_name):
+        return int(gen_name.rsplit('_', maxsplit=1)[-1])  # generation_XXXX
 
     result_list = []
     gen_counter = 0
@@ -138,7 +139,7 @@ def get_var_from_runs(traj: Trajectory, variable_name_full: str, run_ids=None, w
         for run_id in run_ids:
             run_id_list.append(run_id)
             traj.v_idx = run_id
-            if not isinstance(top_group, ParameterGroup) :
+            if not isinstance(top_group, ParameterGroup):
                 result_list.append(top_group.f_get('$set.$.' + variable_name,
                                                    auto_load=True, fast_access=True))
             else:

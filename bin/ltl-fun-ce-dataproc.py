@@ -14,6 +14,7 @@ from ltl.matplotlib_ import plt
 
 import ipdb
 
+
 def get_root_dir():
     try:
         with open('bin/path.conf') as f:
@@ -25,6 +26,7 @@ def get_root_dir():
             " before running the simulation"
         )
     return root_dir_path
+
 
 def run_experiment():
     name = 'LTL-FUN-CE-dataproc'
@@ -80,6 +82,7 @@ def run_experiment():
     env.disable_logging()
     return traj.v_storage_service.filename, traj.v_name
 
+
 def process_results(filename, trajname):
     traj = get_skeleton_traj(filename, trajname)
 
@@ -116,6 +119,7 @@ def process_results(filename, trajname):
 def main():
     filename, trajname = run_experiment()
     process_results(filename, trajname)
+
 
 if __name__ == '__main__':
     with ipdb.launch_ipdb_on_exception():
