@@ -1,5 +1,5 @@
-from optimizer import FACEParameters
-from optimizer import FACEOptimizer
+from .optimizer import FACEParameters
+from .optimizer import FACEOptimizer
 
 __all__ = [
     'FACEParameters',
