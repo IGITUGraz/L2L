@@ -185,7 +185,7 @@ def get_skeleton_traj(filename, name_or_index=-1):
         load_params_dict['index'] = index
 
     # Loading Trajectory from file.
-    with timed("Primary Loading of The HDF File", logger):
+    with timed(logger, "Primary Loading of The HDF File"):
         traj.f_load(**load_params_dict)
     logger.info("Finished Primary Loading")
     return traj
@@ -219,7 +219,7 @@ def get_empty_traj(filename, name_or_index=-1):
         load_params_dict['index'] = index
 
     # Loading Trajectory from file.
-    with timed("Primary Loading of The HDF File", logger):
+    with timed(logger, "Primary Loading of The HDF File"):
         traj.f_load(**load_params_dict)
     logger.info("Finished Primary Loading")
     return traj
