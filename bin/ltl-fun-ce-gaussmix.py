@@ -75,9 +75,9 @@ def main():
 
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=5,
+    parameters = CrossEntropyParameters(pop_size=50, rho=0.9, smoothing=0.0, temp_decay=0, n_iteration=160,
                                         distribution=NoisyBayesianGaussianMixture(n_components=3,
-                                                                                  additive_noise=1.,
+                                                                                  noise_magnitude=1.,
                                                                                   noise_decay=0.9,
                                                                                   weight_concentration_prior=1.5),
                                         stop_criterion=np.inf, seed=103)
