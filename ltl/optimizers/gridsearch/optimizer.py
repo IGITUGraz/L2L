@@ -67,6 +67,7 @@ class GridSearchOptimizer(Optimizer):
                          optimizee_bounding_func=optimizee_bounding_func)
 
         self.recorder_parameters = parameters
+        self.optimizee_bounding_func = optimizee_bounding_func
         self.best_individual = None
         self.best_fitness = None
         # Initializing basic variables
@@ -89,8 +90,16 @@ class GridSearchOptimizer(Optimizer):
             param_lower_bound = optimizee_param_grid[param_name][0]
             param_upper_bound = optimizee_param_grid[param_name][1]
             param_n_steps = optimizee_param_grid[param_name][2]
+            if len(optimizee_param_grid[param_name]) > 3 and optimizee_param_grid[param_name][3]:
+                param_log_scale = True
+            else:
+                param_log_scale = False
             if param_type == DictEntryType.Scalar:
-                self.param_list[param_name] = np.linspace(param_lower_bound, param_upper_bound, param_n_steps + 1)
+                if param_log_scale:
+                    self.param_list[param_name] = np.logspace(np.log10(param_lower_bound), np.log10(param_upper_bound),
+                                                              param_n_steps + 1)
+                else:
+                    self.param_list[param_name] = np.linspace(param_lower_bound, param_upper_bound, param_n_steps + 1)
             elif param_type == DictEntryType.Sequence:
                 curr_param_list = np.linspace(param_lower_bound, param_upper_bound, param_n_steps + 1)
                 curr_param_list = np.meshgrid(*([curr_param_list] * param_length), indexing='ij')
@@ -99,14 +108,14 @@ class GridSearchOptimizer(Optimizer):
                 self.param_list[param_name] = curr_param_list
 
         self.param_list = cartesian_product(self.param_list, tuple(sorted(optimizee_param_grid.keys())))
-        
+
         # Adding the bounds information to the trajectory
         traj.par.f_add_parameter_group('grid_spec')
         for param_name, param_grid_spec in optimizee_param_grid.items():
             traj.par.grid_spec.f_add_parameter(param_name + '.lower_bound', )
         
         # Expanding the trajectory
-        self.param_list = {('individual.' + key):value for key, value in self.param_list.items()}
+        self.param_list = {('individual.' + key): value for key, value in self.param_list.items()}
         traj.f_expand(self.param_list)
         #: The current generation number
         self.g = 0
