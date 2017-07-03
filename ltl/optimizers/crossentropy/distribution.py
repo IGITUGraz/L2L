@@ -117,8 +117,10 @@ class Gaussian(Distribution):
 
 class BayesianGaussianMixture():
     """BayesianGaussianMixture from sklearn
-    Unlike normal Gaussian mixture, the algorithm has tendency to set the weights of non present modes close to zero.
-    Meaning that it effectively inferences the number of active modes present in the given data.
+
+    Unlike normal Gaussian mixture, the algorithm has tendency to set the weights of
+    non present modes close to zero. Meaning that it effectively inferences the
+    number of active modes present in the given data.
     """
     def __init__(self, n_components=2, **kwargs):
         """ Initialize the distribution
@@ -150,7 +152,8 @@ class BayesianGaussianMixture():
         """
         appends additional parametrization
         
-        :param distribution_parameters: the dictionary that contains the distributions parametrization
+        :param distribution_parameters: the dictionary that contains the distributions
+            parametrization
         """
         pass
 
@@ -163,8 +166,8 @@ class BayesianGaussianMixture():
         """Fits data_list on the parametrized model
         
         :param data_list: list or numpy array with individuals as rows
-        :param smooth_update: determines to which extent the new samples
-        account for the new distribution.
+        :param smooth_update: determines to which extent the new samples account for the
+            new distribution.
         :return: dict specifiying current parametrization
         """
         assert self.random_state is not None, \
@@ -211,22 +214,33 @@ class BayesianGaussianMixture():
 
 
 class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
-    """NoisyBayesianGaussianMixture is basically the same as BayesianGaussianMixture but superimposed with noise
+    """NoisyBayesianGaussianMixture is basically the same as BayesianGaussianMixture
+    but superimposed with noise
     """
-    def __init__(self, n_components, additive_noise=1.0, noise_decay=0.95, **kwargs):
+    def __init__(self, n_components, noise_magnitude=1.0, coordinate_scale=None, noise_decay=0.95, **kwargs):
         """
         Initializes the Noisy Bayesian Gaussian Mixture Model with noise components
 
         :param random_state: The random generator used to fit and sample
         :param n_components: number of components in the mixture model
-        :param additive_noise: vector representing the diagonal covariances that get added to the 
-        diagonalized covariance matrix. If None it will get to np.ones
+        :param noise_magnitude: scalar factor that affects the magnitude of noise
+            applied on the distribution parameters
+        :param coordinate_scale: This should be a vector representing the scaling of
+            the coordinates. The noise applied to each cootdinate `i` is
+            `noise_magnitude*coordinate_scale[i]`
         :param noise_decay: factor that will decay the additive noise
-        :param kwargs: additional arguments that get passed to the underlying scikit learn model
+        :param kwargs: additional arguments that get passed to
+            :class:`.BayesianGaussianMixture` distribution
         """
         BayesianGaussianMixture.__init__(self, n_components=n_components, **kwargs)
         self.noise_decay = noise_decay
-        self.additive_noise = np.float64(additive_noise)
+        self.noise_magnitude = np.float64(noise_magnitude)
+        if coordinate_scale is None:
+            self.coordinate_scale = np.float64(1)
+        else:
+            self.coordinate_scale = np.array(coordinate_scale).astype(np.float64)
+        self.current_noise_magnitude = self.noise_magnitude
+        self.noise_value = None  # list containing the additive noise values for each component
 
     def _postprocess_fitted(self, model):
         """
@@ -235,11 +249,15 @@ class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
         :param model: the considered model
         """
         if hasattr(model, 'covariances_'):
-            for cov in model.covariances_:
-                eigenvalues, eigenvectors = np.linalg.eig(cov)
-                current_eig_noise = np.abs(self.random_state.normal(loc=0.0, scale=self.additive_noise, size=eigenvalues.shape))
-                cov += eigenvectors.dot(np.diag(current_eig_noise).dot(eigenvectors.T))
-            self.additive_noise *= self.noise_decay
+            self.noise_value = []
+            n_dims = model.covariances_[0].shape[0]
+            for i, cov in enumerate(model.covariances_):
+                current_noise_value = \
+                    np.abs(self.random_state.normal(loc=0.0,
+                                                    scale=self.current_noise_magnitude * self.coordinate_scale,
+                                                    size=n_dims))
+                model.covariances_[i] += np.diag(current_noise_value)
+            self.current_noise_magnitude *= self.noise_decay
 
     def _append_additional_parameters(self, distribution_parameters):
         """
@@ -247,13 +265,15 @@ class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
         
         :param distribution_parameters: the dictionary that contains the distributions parametrization
         """
-        distribution_parameters['additive_noise'] = self.additive_noise
+        distribution_parameters['noise_value'] = self.noise_value
 
     def get_params(self):
-        params_dict_items = BayesianGaussianMixture.get_params(self)
-        params_dict_items['additive_noise'] = self.additive_noise
-        params_dict_items['noise_decay'] = self.noise_decay
-        return dict(params_dict_items)
+        params_dict = super().get_params()
+        params_dict.update(dict(distribution_name=self.__class__.__name__,
+                                noise_magnitude=self.noise_magnitude,
+                                coordinate_scale=self.coordinate_scale,
+                                noise_decay=self.noise_decay))
+        return dict(params_dict)
 
 
 class NoisyGaussian(Gaussian):
@@ -261,25 +281,33 @@ class NoisyGaussian(Gaussian):
     happens during the first fit where the magnitude of the noise in each
     diagonalized component is estimated.
     """
-    def __init__(self, additive_noise=1.0, noise_decay=0.95):
+    def __init__(self, noise_magnitude=1.0, coordinate_scale=None, noise_decay=0.95):
         """Initializes the noisy distribution
-
-        :param random_state: The random generator used to fit and sample
-        :param additive_noise: vector representing the diagonal covariances that get added to the 
-        diagonalized covariance matrix. If None it will get to np.ones
+        :param noise_magnitude: scalar factor that affects the magnitude of noise
+            applied on the distribution parameters
+        :param coordinate_scale: This should be a vector representing the scaling of
+            the coordinates. The noise applied to each cootdinate `i` is
+            `noise_magnitude*coordinate_scale[i]`
         :param noise_decay: Multiplicative decay of the noise components
         """
         Gaussian.__init__(self)
         self.noise_decay = noise_decay
-        self.additive_noise = np.float64(additive_noise)
+        self.noise_magnitude = np.float64(noise_magnitude)
+        if coordinate_scale is None:
+            self.coordinate_scale = np.float64(1)
+        else:
+            self.coordinate_scale = np.array(coordinate_scale).astype(np.float64)
+        self.current_noise_magnitude = self.noise_magnitude
+        self.noise_value = None  # vector containing the 
         self.noisy_cov = None
-        self.noise = None
 
     def get_params(self):
-        params_dict_items = [("distribution_name", self.__class__.__name__),
-                             ("additive_noise", self.additive_noise),
-                             ("noise_decay", self.noise_decay)]
-        return dict(params_dict_items)
+        params_dict = super().get_params()
+        params_dict.update(dict(distribution_name=self.__class__.__name__,
+                                noise_magnitude=self.noise_magnitude,
+                                coordinate_scale=self.coordinate_scale,
+                                noise_decay=self.noise_decay))
+        return params_dict
 
     def fit(self, data_list, smooth_update=0):
         """Fits the parameters to the given data (see .Gaussian) and additionally
@@ -297,15 +325,14 @@ class NoisyGaussian(Gaussian):
             " 'init_random_state' member function to set it"
 
         Gaussian.fit(self, data_list, smooth_update)
-        eigenvalues, eigenvectors = np.linalg.eig(self.cov)
-
-        current_eig_noise = np.abs(self.random_state.normal(loc=0.0, scale=self.additive_noise, size=eigenvalues.shape))
-        noise = np.diag(eigenvalues + current_eig_noise)
-        self.additive_noise *= self.noise_decay
-        self.noisy_cov = eigenvectors.dot(noise.dot(eigenvectors.T))
+        n_dims = self.cov.shape[0]
+        self.noise_value = np.abs(self.random_state.normal(loc=0.0, scale=self.current_noise_magnitude * self.coordinate_scale,
+                                                           size=n_dims))
+        self.noisy_cov = self.cov + np.diag(self.noise_value)
+        self.current_noise_magnitude *= self.noise_decay
 
         logger.debug('Noisy cov\n%s', self.noisy_cov)
-        return {'mean': self.mean, 'covariance_matrix': self.noisy_cov, 'additive_noise': self.additive_noise}
+        return {'mean': self.mean, 'covariance_matrix': self.noisy_cov, 'noise_value': self.noise_value}
 
     def sample(self, n_individuals):
         """Samples from current parametrization
