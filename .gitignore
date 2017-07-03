@@ -65,4 +65,4 @@ _build/
 bin/path.conf
 
 # Some files that are generated during testing
-/ce-processing-results.png
+/*.png
