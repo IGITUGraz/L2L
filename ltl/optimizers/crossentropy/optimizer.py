@@ -108,6 +108,7 @@ class CrossEntropyOptimizer(Optimizer):
                              comment='Decay factor for temperature')
         traj.f_add_parameter('seed', np.uint32(parameters.seed),
                              comment='Seed used for random number generation in optimizer')
+
         self.random_state = np.random.RandomState(traj.parameters.seed)
 
         temp_indiv, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(),
@@ -148,6 +149,12 @@ class CrossEntropyOptimizer(Optimizer):
         
         # Max Likelihood
         self.current_distribution = parameters.distribution
+        # Adding the distribution parameters
+        traj.f_add_parameter_group('distribution', comment="Parameters for the distribution class")
+        distribution_params = self.current_distribution.get_params()
+        for param_name, param_value in distribution_params.items():
+            traj.parameters.distribution.f_add_parameter(param_name, param_value)
+
         self.current_distribution.init_random_state(self.random_state)
         self.current_distribution.fit(self.eval_pop_asarray)
         

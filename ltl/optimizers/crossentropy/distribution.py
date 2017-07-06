@@ -256,6 +256,7 @@ class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
                     np.abs(self.random_state.normal(loc=0.0,
                                                     scale=self.current_noise_magnitude * self.coordinate_scale,
                                                     size=n_dims))
+                self.noise_value.append(current_noise_value)
                 model.covariances_[i] += np.diag(current_noise_value)
             self.current_noise_magnitude *= self.noise_decay
 
@@ -265,7 +266,7 @@ class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
         
         :param distribution_parameters: the dictionary that contains the distributions parametrization
         """
-        distribution_parameters['noise_value'] = self.noise_value
+        distribution_parameters['noise_value'] = np.array(self.noise_value)
 
     def get_params(self):
         params_dict = super().get_params()
