@@ -58,6 +58,9 @@ _build/
 # unison temp files
 **/.unison*
 
+# An ignored directory to put all files that are to be ignored
+/ignored
+
 # Mac OS X
 **/.DS_Store
 
