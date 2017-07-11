@@ -378,6 +378,7 @@ def stdout_redirected(filename):
     def _revert_stdout():
         sys.stdout.close()
         os.dup2(old_stdout_fd_dup, os_stdout_fd)
+        os.close(old_stdout_fd_dup)
         sys.stdout = old_stdout
 
     with open(filename, 'w') as file:
