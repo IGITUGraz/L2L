@@ -12,8 +12,6 @@ from ltl.paths import Paths
 
 from ltl.matplotlib_ import plt
 
-import ipdb
-
 
 def get_root_dir():
     try:
@@ -31,7 +29,7 @@ def get_root_dir():
 def run_experiment():
     name = 'LTL-FUN-CE-dataproc'
     root_dir = get_root_dir()
-    paths = Paths(root_dir_name=name, root_dir_path=root_dir, param_dict={'run_no':'test'})
+    paths = Paths(root_dir_name=name, root_dir_path=root_dir, param_dict={'run_no': 'test'})
 
     env = Environment(trajectory=name, filename=paths.results_path, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
@@ -45,7 +43,7 @@ def run_experiment():
                       log_levels=(logging.INFO, logging.INFO, logging.INFO, logging.INFO),
                       log_stdout=False,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs'))
-    
+
     traj = env.trajectory
 
     function_name = 'Rosenbrock2d'
@@ -73,9 +71,6 @@ def run_experiment():
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
-    # NOTE: Innerloop optimizee end
-    optimizee.end()
-
     # NOTE: Outerloop optimizer end
     optimizer.end(traj)
 
@@ -96,7 +91,7 @@ def process_results(filename, trajname):
     pop_size_list = np.array(pop_size_list)
 
     pop_size_list_cumsum = np.cumsum(pop_size_list)
-    gen_no_list = np.zeros_like(run_id_list)   # gen_no_list[i] = gen no of ith run
+    gen_no_list = np.zeros_like(run_id_list)  # gen_no_list[i] = gen no of ith run
     gen_no_list[pop_size_list_cumsum[:-1]] = 1
     gen_no_list = np.cumsum(gen_no_list)
 
@@ -122,5 +117,4 @@ def main():
 
 
 if __name__ == '__main__':
-    with ipdb.launch_ipdb_on_exception():
-        main()
+    main()

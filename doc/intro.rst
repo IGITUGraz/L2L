@@ -183,14 +183,13 @@ Individual-Dict:
 Optimizee
 ~~~~~~~~~
 
-The optimizee subclasses :class:`~ltl.optimizees.optimizee.Optimizee` with a class that contains five mandatory methods
+The optimizee subclasses :class:`~ltl.optimizees.optimizee.Optimizee` with a class that contains four mandatory methods
 (Documentation linked below):
 
 1. :meth:`~ltl.optimizees.optimizee.Optimizee.create_individual` : Called to return a random individual_ (returns an Individual-Dict_)
 2. :meth:`~ltl.optimizees.optimizee.Optimizee.bounding_func` : Called to return a clipped version of individual_ (returns an Individual-Dict_)
 3. :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` : Runs the actual simulation and returns a fitness vector
-4. :meth:`~ltl.optimizees.optimizee.Optimizee.end` : Tertiary method to do cleanup, printing results etc.
-5. :meth:`~ltl.optimizees.optimizee.Optimizee.get_params` : Getter method for getting optimizee parameters
+4. :meth:`~ltl.optimizees.optimizee.Optimizee.get_params` : Getter method for getting optimizee parameters
     used by :meth:`~ltl.recorder.Recorder`
 
 In order to maintain a consistent framework for communication between the optimizer, optimizee, and :ref:`PyPet <Pypet-Section>`

@@ -70,7 +70,7 @@ def main():
 
     # NOTE: Innerloop simulator
     # TODO when using the template: Change the optimizee to the appropriate Optimizee class
-    optimizee = Optimizee()
+    optimizee = Optimizee(traj)
 
     # NOTE: Outerloop optimizer initialization
     # TODO when using the template: Change the optimizer to the appropriate Optimizer class
@@ -84,18 +84,15 @@ def main():
 
     # Add Recorder
     # TODO: Change the names, ids and parameters passed in
-    recorder = Recorder(trajectory=traj, optimizee_id='optimizee_id',
-                        optimizee_name='optimizee', optimizee_parameters=dict(),
+    recorder = Recorder(trajectory=traj, optimizee_name='optimizee', optimizee_parameters=dict(),
                         optimizer_name=optimizer.__class__.__name__, optimizer_parameters=dict())
     recorder.start()
 
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
-    # NOTE: Innerloop optimizee end
-    optimizee.end()
     # NOTE: Outerloop optimizer end
-    optimizer.end()
+    optimizer.end(traj)
 
     recorder.end()
 

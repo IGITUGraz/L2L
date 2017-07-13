@@ -52,8 +52,3 @@ class Optimizee:
             multi-dimensional fitness function.
 
         """
-
-    def end(self):
-        """
-        Run any code required to clean-up, print final individuals etc.
-        """

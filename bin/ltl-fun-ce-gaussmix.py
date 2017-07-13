@@ -99,8 +99,6 @@ def main():
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
-    # NOTE: Innerloop optimizee end
-    optimizee.end()
     # NOTE: Outerloop optimizer end
     optimizer.end(traj)
     recorder.end()
