@@ -22,15 +22,6 @@ class Optimizee:
         :return: a :class:`dict`
         """
 
-        def get_params(self):
-            """
-            Get the important parameters of the optimizee. This is used by :class:`ltl.recorder`
-            for recording the optimizee parameters.
-
-            :return: a :class:`dict`
-            """
-            pass
-
     def create_individual(self):
         """
         Create one individual i.e. one instance of parameters. This instance must be a dictionary
@@ -39,7 +30,14 @@ class Optimizee:
         individual/parameters. After that, the change in parameters is model specific e.g. In
         simulated annealing, it is perturbed on specific criteria
 
-        :return: a :class:`list`
+        :return dict: A dictionary containing the names of the paramters and their values
+        """
+
+    def bounding_func(self, individual):
+        """
+        Bounds the individual within the required bounds via coordinate clipping
+
+        :return dict: A dictionary in the same format as :ref:`.create_individual`, with the values clipped as needed.
         """
 
     def simulate(self, traj):
