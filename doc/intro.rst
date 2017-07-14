@@ -7,9 +7,9 @@ LTL
 
 Introduction
 ************
-This is Learning to Learn framework for experimenting with many different algorithm. The basic idea behind "Learning to
-Learn" is to have an "outer loop" optimizer optimizing the parameters an "inner loop" optimizee. This particular
-framwork is written for the case where the cycle goes as follows:
+This is the Learning to Learn framework for experimenting with many different algorithms. The basic idea behind "Learning to
+Learn" is to have an "outer loop" optimizer optimizing the parameters of an "inner loop" optimizee. This particular
+framework is written for the case where the cycle goes as follows:
 
 1. The outer-loop optimizer generates an instance of a set of parameters and provides it to the inner-loop optimizee
 2. The inner-loop optimizee evaluates how well this set of parameters performs and returns a "fitness" vector for each
