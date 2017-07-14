@@ -38,6 +38,8 @@ class Optimizer:
         # Initializing basic variables
         self.optimizee_create_individual = optimizee_create_individual
         self.optimizee_fitness_weights = optimizee_fitness_weights
+        self.optimizee_bounding_func = optimizee_bounding_func
+        self.parameters = parameters
 
         #: The current generation number
         self.g = None

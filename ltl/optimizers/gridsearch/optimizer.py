@@ -72,9 +72,6 @@ class GridSearchOptimizer(Optimizer):
         self.recorder_parameters = parameters
         self.best_individual = None
         self.best_fitness = None
-        # Initializing basic variables
-        self.optimizee_create_individual = optimizee_create_individual
-        self.optimizee_fitness_weights = optimizee_fitness_weights
 
         sample_individual = self.optimizee_create_individual()
 
@@ -89,9 +86,7 @@ class GridSearchOptimizer(Optimizer):
             "The Parameters of optimizee_param_grid don't match those of the optimizee individual"
 
         for param_name, param_type, param_length in optimizee_individual_param_spec:
-            param_lower_bound = optimizee_param_grid[param_name][0]
-            param_upper_bound = optimizee_param_grid[param_name][1]
-            param_n_steps = optimizee_param_grid[param_name][2]
+            param_lower_bound, param_upper_bound, param_n_steps = optimizee_param_grid[param_name]
             if param_type == DictEntryType.Scalar:
                 self.param_list[param_name] = np.linspace(param_lower_bound, param_upper_bound, param_n_steps + 1)
             elif param_type == DictEntryType.Sequence:
@@ -104,9 +99,9 @@ class GridSearchOptimizer(Optimizer):
         self.param_list = cartesian_product(self.param_list, tuple(sorted(optimizee_param_grid.keys())))
 
         # Adding the bounds information to the trajectory
-        traj.par.f_add_parameter_group('grid_spec')
+        traj.parameters.f_add_parameter_group('grid_spec')
         for param_name, param_grid_spec in optimizee_param_grid.items():
-            traj.par.grid_spec.f_add_parameter(param_name + '.lower_bound', )
+            traj.parameters.grid_spec.f_add_parameter(param_name + '.lower_bound', )
 
         # Expanding the trajectory
         self.param_list = {('individual.' + key): value for key, value in self.param_list.items()}
