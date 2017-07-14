@@ -144,7 +144,10 @@ class GradientDescentOptimizer(Optimizer):
         else:
             raise Exception('Class of the provided "parameters" argument is not among the supported types')
 
-        traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
+        # Added a generation-wise parameter logging
+        traj.results.f_add_result_group('generation_params',
+                                        comment='This contains the optimizer parameters that are'
+                                                ' common across a generation')
 
         # Explore the neighbourhood in the parameter space of current individual
         new_individual_list = [
@@ -213,7 +216,15 @@ class GradientDescentOptimizer(Optimizer):
 
         traj.v_idx = -1  # set the trajectory back to default
 
-        traj.f_add_result('current_fitness', self.current_fitness, generation=self.g)
+        generation_result_dict = {
+            'generation': self.g,
+            'current_fitness': self.current_fitness,
+        }
+
+        generation_name = 'generation_{}'.format(self.g)
+        traj.results.generation_params.f_add_result_group(generation_name)
+        traj.results.generation_params.f_add_result(
+            generation_name + '.algorithm_params', generation_result_dict)
 
         logger.info("-- End of iteration {}, current fitness is {} --".format(self.g, self.current_fitness))
 
