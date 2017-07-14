@@ -9,9 +9,10 @@ logger = logging.getLogger('ltl-distribution')
 
 
 class Distribution(metaclass=ABCMeta):
-    """Generic base for a distribution. Needs to implement the functions fit and sample.
     """
-    
+    Generic base for a distribution. Needs to implement the functions fit and sample.
+    """
+
     @abc.abstractmethod
     def init_random_state(self, random_state):
         """
@@ -30,8 +31,8 @@ class Distribution(metaclass=ABCMeta):
         """This function fits the distributions parameters to the given samples
         in maximum likelihood fashion.
 
-        :param individuals: A list or array of individuals to fit to.
-        :returns a dict describing the current parametrization
+        :param data_list: A list or array of individuals to fit to.
+        :return dict: a dict describing the current parametrization
         """
         pass
 
@@ -39,27 +40,26 @@ class Distribution(metaclass=ABCMeta):
     def sample(self, n_individuals):
         """Samples n_individuals from the current parametrized distribution.
 
-        :param n_individuals: An integer specifiyng the amount of individuals to sample
+        :param n_individuals: An integer specifying the amount of individuals to sample
 
-        :returns: A list or array of n_individuals
+        :return: A list or array of n_individuals
         """
         pass
 
     @abc.abstractmethod
     def get_params(self):
-        """Returns the parametrization of the distribution as a dict"""
+        """
+        :return: the parametrization of the distribution as a dict
+        """
         pass
 
 
 class Gaussian(Distribution):
-    """Gaussian distribution.
     """
-    
+    Gaussian distribution.
+    """
+
     def __init__(self):
-        """" Initialize the distribution
-        
-        :param random_state: The random generator used to fit and sample
-        """
         self.random_state = None
         self.mean = None
         self.cov = None
@@ -74,17 +74,17 @@ class Gaussian(Distribution):
         return dict(params_dict_items)
 
     def fit(self, data_list, smooth_update=0):
-        """Fit a gaussian distribution to the given data
+        """
+        Fit a gaussian distribution to the given data
 
         :param data_list: list or numpy array with individuals as rows
-        :param smooth_update: determines to which extent the new samples
-        account for the new distribution.
-        default is 0 -> old parameters are fully discarded
+        :param smooth_update: determines to which extent the new samples account for the new distribution.
+          default is 0 -> old parameters are fully discarded
         
-        :returns dict specifying current parametrization
+        :return dict: specifying current parametrization
         """
         assert self.random_state is not None, \
-            "The random_state for the distribution has not been set, call the"\
+            "The random_state for the distribution has not been set, call the" \
             " 'init_random_state' member function to set it"
 
         mean = np.mean(data_list, axis=0)
@@ -99,34 +99,35 @@ class Gaussian(Distribution):
 
         logger.debug('Gaussian center\n%s', self.mean)
         logger.debug('Gaussian cov\n%s', self.cov)
-        
+
         return {'mean': self.mean, 'covariance_matrix': self.cov}
-        
+
     def sample(self, n_individuals):
         """Sample n_individuals individuals under the current parametrization
  
         :param n_individuals: number of individuals to sample.
  
-        :returns numpy array with n_individual rows of individuals
+        :return: numpy array with n_individual rows of individuals
         """
         assert self.random_state is not None, \
-            "The random_state for the distribution has not been set, call the"\
+            "The random_state for the distribution has not been set, call the" \
             " 'init_random_state' member function to set it"
         return self.random_state.multivariate_normal(self.mean, self.cov, n_individuals)
 
 
-class BayesianGaussianMixture():
-    """BayesianGaussianMixture from sklearn
+class BayesianGaussianMixture(Distribution):
+    """
+    BayesianGaussianMixture from sklearn
 
     Unlike normal Gaussian mixture, the algorithm has tendency to set the weights of
     non present modes close to zero. Meaning that it effectively inferences the
     number of active modes present in the given data.
-    """
-    def __init__(self, n_components=2, **kwargs):
-        """ Initialize the distribution
 
-        :param n_components: components of the mixture model
-        """
+    :param n_components: components of the mixture model
+    :param kwargs: Additional arguments that get passed on to :class:`sklearn.mixture.BayesianGaussianMixture`
+    """
+
+    def __init__(self, n_components=2, **kwargs):
         self.random_state = None
         self.bayesian_mixture = sklearn.mixture.BayesianGaussianMixture(
             n_components,
@@ -144,7 +145,8 @@ class BayesianGaussianMixture():
         self.bayesian_mixture.random_state = self.random_state
 
     def _postprocess_fitted(self, model):
-        """postprocesses the fitted model, adding the possibility to add noise or something
+        """
+        postprocesses the fitted model, adding the possibility to add noise or something
         """
         pass
 
@@ -163,7 +165,8 @@ class BayesianGaussianMixture():
         return dict(params_dict_items)
 
     def fit(self, data_list, smooth_update=0):
-        """Fits data_list on the parametrized model
+        """
+        Fits data_list on the parametrized model
         
         :param data_list: list or numpy array with individuals as rows
         :param smooth_update: determines to which extent the new samples account for the
@@ -171,7 +174,7 @@ class BayesianGaussianMixture():
         :return: dict specifiying current parametrization
         """
         assert self.random_state is not None, \
-            "The random_state for the distribution has not been set, call the"\
+            "The random_state for the distribution has not been set, call the" \
             " 'init_random_state' member function to set it"
 
         old = self.bayesian_mixture
@@ -201,37 +204,41 @@ class BayesianGaussianMixture():
         return distribution_parameters
 
     def sample(self, n_individuals):
-        """Sample n_individuals individuals under the current parametrization
+        """
+        Sample n_individuals individuals under the current parametrization
         
         :param n_individuals: number of individuals to sample
         :return: numpy array with n_individuals rows of individuals
         """
         assert self.random_state is not None, \
-            "The random_state for the distribution has not been set, call the"\
+            "The random_state for the distribution has not been set, call the" \
             " 'init_random_state' member function to set it"
         individuals, _ = self.bayesian_mixture.sample(n_individuals)
         return individuals
 
 
 class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
-    """NoisyBayesianGaussianMixture is basically the same as BayesianGaussianMixture
-    but superimposed with noise
     """
-    def __init__(self, n_components, noise_magnitude=1.0, coordinate_scale=None, noise_decay=0.95, **kwargs):
-        """
-        Initializes the Noisy Bayesian Gaussian Mixture Model with noise components
+    NoisyBayesianGaussianMixture is basically the same as BayesianGaussianMixture
+    but superimposed with noise
 
-        :param random_state: The random generator used to fit and sample
-        :param n_components: number of components in the mixture model
-        :param noise_magnitude: scalar factor that affects the magnitude of noise
-            applied on the distribution parameters
-        :param coordinate_scale: This should be a vector representing the scaling of
-            the coordinates. The noise applied to each cootdinate `i` is
-            `noise_magnitude*coordinate_scale[i]`
-        :param noise_decay: factor that will decay the additive noise
-        :param kwargs: additional arguments that get passed to
-            :class:`.BayesianGaussianMixture` distribution
-        """
+    :param n_components: number of components in the mixture model
+    :param noise_magnitude: scalar factor that affects the magnitude of noise
+        applied on the fitted distribution parameters+
+
+    :param coordinate_scale: This should be a vector representing the scaling of
+        the coordinates. The noise applied to each coordinate `i` is
+
+          noise_magnitude * coordinate_scale[i]
+
+        Defaults to 1 for each coordinate.
+
+    :param noise_decay: factor that will decay the additive noise
+    :param kwargs: additional arguments that get passed on to
+        :class:`.BayesianGaussianMixture` distribution
+    """
+
+    def __init__(self, n_components, noise_magnitude=1.0, coordinate_scale=None, noise_decay=0.95, **kwargs):
         BayesianGaussianMixture.__init__(self, n_components=n_components, **kwargs)
         self.noise_decay = noise_decay
         self.noise_magnitude = np.float64(noise_magnitude)
@@ -278,19 +285,20 @@ class NoisyBayesianGaussianMixture(BayesianGaussianMixture):
 
 
 class NoisyGaussian(Gaussian):
-    """Additive Noisy Gaussian distribution. The initialization of its noise components
+    """
+    Additive Noisy Gaussian distribution. The initialization of its noise components
     happens during the first fit where the magnitude of the noise in each
     diagonalized component is estimated.
+
+    :param noise_magnitude: scalar factor that affects the magnitude of noise
+        applied on the distribution parameters
+    :param coordinate_scale: This should be a vector representing the scaling of
+        the coordinates. The noise applied to each coordinate `i` is
+        `noise_magnitude*coordinate_scale[i]`
+    :param noise_decay: Multiplicative decay of the noise components
     """
+
     def __init__(self, noise_magnitude=1.0, coordinate_scale=None, noise_decay=0.95):
-        """Initializes the noisy distribution
-        :param noise_magnitude: scalar factor that affects the magnitude of noise
-            applied on the distribution parameters
-        :param coordinate_scale: This should be a vector representing the scaling of
-            the coordinates. The noise applied to each cootdinate `i` is
-            `noise_magnitude*coordinate_scale[i]`
-        :param noise_decay: Multiplicative decay of the noise components
-        """
         Gaussian.__init__(self)
         self.noise_decay = noise_decay
         self.noise_magnitude = np.float64(noise_magnitude)
@@ -311,7 +319,8 @@ class NoisyGaussian(Gaussian):
         return params_dict
 
     def fit(self, data_list, smooth_update=0):
-        """Fits the parameters to the given data (see .Gaussian) and additionally
+        """
+        Fits the parameters to the given data (see :class:`.Gaussian`) and additionally
         adds noise in form of variance to the covariance matrix. Also, the noise
         is decayed after each step
 
@@ -319,16 +328,17 @@ class NoisyGaussian(Gaussian):
         :param smooth_update: Smooth the parameter update with regard to the
             previous configuration
 
-        :returns dict describing parameter configuration
+        :return dict: describing parameter configuration
         """
         assert self.random_state is not None, \
-            "The random_state for the distribution has not been set, call the"\
+            "The random_state for the distribution has not been set, call the" \
             " 'init_random_state' member function to set it"
 
         Gaussian.fit(self, data_list, smooth_update)
         n_dims = self.cov.shape[0]
-        self.noise_value = np.abs(self.random_state.normal(loc=0.0, scale=self.current_noise_magnitude * self.coordinate_scale,
-                                                           size=n_dims))
+        self.noise_value = np.abs(
+            self.random_state.normal(loc=0.0, scale=self.current_noise_magnitude * self.coordinate_scale,
+                                     size=n_dims))
         self.noisy_cov = self.cov + np.diag(self.noise_value)
         self.current_noise_magnitude *= self.noise_decay
 
@@ -336,12 +346,13 @@ class NoisyGaussian(Gaussian):
         return {'mean': self.mean, 'covariance_matrix': self.noisy_cov, 'noise_value': self.noise_value}
 
     def sample(self, n_individuals):
-        """Samples from current parametrization
+        """
+        Samples from current parametrization
 
-        :returns n_individuals Individuals
+        :return: n_individuals Individuals
         """
         assert self.random_state is not None, \
-            "The random_state for the distribution has not been set, call the"\
+            "The random_state for the distribution has not been set, call the" \
             " 'init_random_state' member function to set it"
 
         return self.random_state.multivariate_normal(self.mean, self.noisy_cov, n_individuals)

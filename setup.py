@@ -1,11 +1,13 @@
+from setuptools import setup
+import re
+
+from ltl.version import FULL_VERSION
+
 """
 This file installs the ltl package.
 Note that it does not perform any installation of the documentation. For this, follow the specified procedure in the
- README
+ README. For updating the version, update MAJOR_VERSION and FULL_VERSION in ltl/version.py
 """
-
-from setuptools import setup
-import re
 
 
 def get_requirements(filename):
@@ -27,7 +29,7 @@ def get_requirements(filename):
 requirements, dependency_links = get_requirements('requirements.txt')
 setup(
     name="Learning to Learn",
-    version="0.2.1",
+    version=FULL_VERSION,
     packages=['ltl'],
     author="Anand Subramoney, Arjun Rao",
     author_email="anand@igi.tugraz.at, arjun@igi.tugraz.at",

@@ -144,7 +144,10 @@ class GradientDescentOptimizer(Optimizer):
         else:
             raise Exception('Class of the provided "parameters" argument is not among the supported types')
 
-        traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
+        # Added a generation-wise parameter logging
+        traj.results.f_add_result_group('generation_params',
+                                        comment='This contains the optimizer parameters that are'
+                                                ' common across a generation')
 
         # Explore the neighbourhood in the parameter space of current individual
         new_individual_list = [
@@ -190,6 +193,16 @@ class GradientDescentOptimizer(Optimizer):
         dx = np.zeros((traj.n_random_steps, len(self.current_individual)))
 
         for i, (run_index, fitness) in enumerate(fitnesses_results):
+            # We need to convert the current run index into an ind_idx
+            # (index of individual within one generation
+            traj.v_idx = run_index
+            ind_index = traj.par.ind_idx
+        
+            individual = old_eval_pop[ind_index]
+
+            traj.f_add_result('$set.$.individual', individual)
+            traj.f_add_result('$set.$.fitness', fitness)
+
             ind_fitness = sum(f * w for f, w in zip(fitness, self.optimizee_fitness_weights))
 
             # The last element of the list is the evaluation of the individual obtained via gradient descent
@@ -197,25 +210,30 @@ class GradientDescentOptimizer(Optimizer):
                 self.current_fitness = ind_fitness
             else:
                 fitnesses[i] = ind_fitness
-
-                # We need to convert the current run index into an ind_idx
-                # (index of individual within one generation
-                traj.v_idx = run_index
-                ind_index = traj.par.ind_idx
-                individual = old_eval_pop[ind_index]
-                
                 dx[i] = np.array(dict_to_list(individual)) - self.current_individual
-            
+
         logger.debug("Current fitness is %.2f", self.current_fitness) 
 
         traj.v_idx = -1  # set the trajectory back to default
+
+        generation_result_dict = {
+            'generation': self.g,
+            'current_fitness': self.current_fitness,
+        }
+
+        generation_name = 'generation_{}'.format(self.g)
+        traj.results.generation_params.f_add_result_group(generation_name)
+        traj.results.generation_params.f_add_result(
+            generation_name + '.algorithm_params', generation_result_dict)
+
         logger.info("-- End of iteration {}, current fitness is {} --".format(self.g, self.current_fitness))
 
         if self.g < traj.n_iteration - 1 and traj.stop_criterion > self.current_fitness:
             # Create new individual using the appropriate gradient descent
             self.update_function(traj, np.dot(np.linalg.pinv(dx), fitnesses - self.current_fitness))
             current_individual_dict = list_to_dict(self.current_individual, self.optimizee_individual_dict_spec)
-            current_individual_dict = self.optimizee_bounding_func(current_individual_dict)
+            if self.optimizee_bounding_func is not None:
+                current_individual_dict = self.optimizee_bounding_func(current_individual_dict)
             self.current_individual = np.array(dict_to_list(current_individual_dict))
 
             # Explore the neighbourhood in the parameter space of the current individual

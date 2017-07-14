@@ -9,7 +9,8 @@ from ltl.optimizers.optimizer import Optimizer
 logger = logging.getLogger("ltl-ce")
 
 CrossEntropyParameters = namedtuple('CrossEntropyParameters',
-                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distribution', 'stop_criterion', 'seed'])
+                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distribution',
+                                     'stop_criterion', 'seed'])
 
 CrossEntropyParameters.__doc__ = """
 :param pop_size: Minimal number of individuals per simulation.
@@ -19,13 +20,14 @@ CrossEntropyParameters.__doc__ = """
   parameters while calculating the new distribution parameters. The smoothing is done as a linear combination of the 
   optimal parameters for the current data, and the previous distribution as follows:
     
-    new_params = smoothing*old_params + (1-smoothing)*optimal_new_params
+    new_params = smoothing * old_params + (1 - smoothing) * optimal_new_params
 
 :param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
-  generation. To see the use of temperature, look at the documentation of :class:`CrossEntropyOptimizer`
+  generation. To see the use of temperature, look at the documentation of :class:`.CrossEntropyOptimizer`
 
 :param n_iteration: Number of iterations to perform
-:param distribution: Distribution object to use. Has to implement a fit and sample function.
+:param distribution: Distribution object to use. Has to implement a fit and sample function. Should be one of 
+  :class:`~.Gaussian`, :class:`~.NoisyGaussian`, :class:`~.BayesianGaussianMixture`, :class:`~.NoisyBayesianGaussianMixture`
 :param stop_criterion: (Optional) Stop if this fitness is reached.
 :param seed: The random seed used to sample and fit the distribution. :class:`.CrossEntropyOptimizer`
     uses a random generator seeded with this seed.
@@ -69,7 +71,7 @@ class CrossEntropyOptimizer(Optimizer):
       element of the fitness vector)
     
     :param parameters: 
-      Instance of :func:`~collections.namedtuple` :class:`CrossEntropyParameters` containing the
+      Instance of :func:`~collections.namedtuple` :class:`.CrossEntropyParameters` containing the
       parameters needed by the Optimizer
     
     :param optimizee_bounding_func:
@@ -78,13 +80,13 @@ class CrossEntropyOptimizer(Optimizer):
       are not bounded.
     """
 
-    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters, 
+    def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters,
                  optimizee_bounding_func=None):
-        
+
         super().__init__(traj, optimizee_create_individual=optimizee_create_individual,
                          optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters,
                          optimizee_bounding_func=optimizee_bounding_func)
-        
+
         self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func
 
@@ -92,7 +94,7 @@ class CrossEntropyOptimizer(Optimizer):
             raise Exception("pop_size needs to be greater than 0")
         if parameters.smoothing >= 1 or parameters.smoothing < 0:
             raise Exception("smoothing has to be in interval [0, 1)")
-        
+
         # The following parameters are recorded
         traj.f_add_parameter('pop_size', parameters.pop_size,
                              comment='Number of minimal individuals simulated in each run')
@@ -122,7 +124,7 @@ class CrossEntropyOptimizer(Optimizer):
         traj.results.f_add_result_group('generation_params',
                                         comment='This contains the optimizer parameters that are'
                                                 ' common across a generation')
-        
+
         # The following parameters are recorded as generation parameters i.e. once per generation
         self.g = 0  # the current generation
         # This is the value above which the samples are considered elite in the
@@ -135,7 +137,7 @@ class CrossEntropyOptimizer(Optimizer):
 
         # The first iteration does not pick the values out of the Gaussian distribution. It picks randomly
         # (or at-least as randomly as optimizee_create_individual creates individuals)
-        
+
         # Note that this array stores individuals as an np.array of floats as opposed to Individual-Dicts
         # This is because this array is used within the context of the cross entropy algorithm and
         # Thus needs to handle the optimizee individuals as vectors
@@ -146,7 +148,7 @@ class CrossEntropyOptimizer(Optimizer):
 
         self.eval_pop = current_eval_pop
         self.eval_pop_asarray = np.array([dict_to_list(x) for x in self.eval_pop])
-        
+
         # Max Likelihood
         self.current_distribution = parameters.distribution
         # Adding the distribution parameters
@@ -157,7 +159,7 @@ class CrossEntropyOptimizer(Optimizer):
 
         self.current_distribution.init_random_state(self.random_state)
         self.current_distribution.fit(self.eval_pop_asarray)
-        
+
         self._expand_trajectory(traj)
 
     def get_params(self):
@@ -178,7 +180,7 @@ class CrossEntropyOptimizer(Optimizer):
         n_iteration, smoothing, temp_decay = \
             traj.n_iteration, traj.smoothing, traj.temp_decay
         stop_criterion, n_elite = traj.stop_criterion, traj.n_elite
-            
+
         weighted_fitness_list = []
         #**************************************************************************************************************
         # Storing run-information in the trajectory
@@ -189,7 +191,7 @@ class CrossEntropyOptimizer(Optimizer):
             # (index of individual within one generation)
             traj.v_idx = run_index
             ind_index = traj.par.ind_idx
-            
+
             traj.f_add_result('$set.$.individual', self.eval_pop[ind_index])
             traj.f_add_result('$set.$.fitness', fitness)
 
@@ -202,7 +204,7 @@ class CrossEntropyOptimizer(Optimizer):
         # Sorting the data according to fitness
         sorted_population = self.eval_pop_asarray[fitness_sorting_indices]
         sorted_fitess = np.asarray(weighted_fitness_list)[fitness_sorting_indices]
-        
+
         # Elite individuals are with performance better than or equal to the (1-rho) quantile.
         # See original describtion of cross entropy for optimization
         elite_individuals = sorted_population[:n_elite]
@@ -253,12 +255,12 @@ class CrossEntropyOptimizer(Optimizer):
         # Temperature dependent sampling of non elite individuals
         if temp_decay > 0:
             # Keeping non-elite samples with certain probability dependent on temperature (like Simulated Annealing)
-            non_elite_selection_probs = np.clip(np.exp((weighted_fitness_list[n_elite:] - self.gamma) / self.T), 
+            non_elite_selection_probs = np.clip(np.exp((weighted_fitness_list[n_elite:] - self.gamma) / self.T),
                                                 a_min=0.0, a_max=1.0)
             non_elite_selected_indices = self.random_state.binomial(1, non_elite_selection_probs).astype(bool)
             non_elite_eval_pop_asarray = sorted_population[n_elite:][non_elite_selected_indices]
             individuals_to_be_fitted = np.concatenate((elite_individuals, non_elite_eval_pop_asarray))
-        
+
         # Fitting New distribution parameters.
         self.distribution_results = self.current_distribution.fit(individuals_to_be_fitted, smoothing)
 

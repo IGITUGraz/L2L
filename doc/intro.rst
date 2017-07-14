@@ -187,9 +187,9 @@ The optimizee subclasses :class:`~ltl.optimizees.optimizee.Optimizee` with a cla
 (Documentation linked below):
 
 1. :meth:`~ltl.optimizees.optimizee.Optimizee.create_individual` : Called to return a random individual_ (returns an Individual-Dict_)
-2. :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` : Runs the actual simulation and returns a fitness vector
-3. :meth:`~ltl.optimizees.optimizee.Optimizee.end` : Tertiary method to do cleanup, printing results etc.
-4. :meth:`~ltl.optimizees.optimizee.Optimizee.get_params` : Getter method for getting optimizee parameters 
+2. :meth:`~ltl.optimizees.optimizee.Optimizee.bounding_func` : Called to return a clipped version of individual_ (returns an Individual-Dict_)
+3. :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` : Runs the actual simulation and returns a fitness vector
+4. :meth:`~ltl.optimizees.optimizee.Optimizee.get_params` : Getter method for getting optimizee parameters
     used by :meth:`~ltl.recorder.Recorder`
 
 In order to maintain a consistent framework for communication between the optimizer, optimizee, and :ref:`PyPet <Pypet-Section>`
@@ -203,7 +203,7 @@ Constructor of Optimizee
 
 This function may perform any one-time initialization operations that are required for the particular optimizee.
 In addition to this, It *must perform* the job of initializing parameters in the trajectory. These parameters must
-be created in the parameter subgroup named `individual` (i.e. using ``traj.par.individual.f_add_parameter()``). The
+be created in the parameter subgroup named `individual` (i.e. using ``traj.parameter.individual.f_add_parameter()``). The
 following is a contract that must be obeyed by this constructor.
 
   All parameters that are explored for the optimizee must be created in the trajectory under the `individual`
