@@ -23,7 +23,7 @@ import sys
 sys.path.insert(0, os.path.abspath('../bin'))
 sys.path.insert(0, os.path.abspath('..'))
 
-from ltl.version import MAJOR_VERSION, FULL_VERSION
+from ltl.version import MAJOR_VERSION, FULL_VERSION  # noqa: E402
 
 # -- General configuration ------------------------------------------------
 
