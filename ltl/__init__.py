@@ -285,7 +285,7 @@ def get_grouped_dict(dict_iter):
 
 def convert_dict_to_numpy(input_dict):
     """
-    This function takes a dictionary as input and converts the arguments to
+    This function takes a dictionary as input and converts the values to
     numpy data types. This is useful when importing parameters from config
     files.
 
