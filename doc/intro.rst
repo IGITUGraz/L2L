@@ -203,7 +203,7 @@ Constructor of Optimizee
 
 This function may perform any one-time initialization operations that are required for the particular optimizee.
 In addition to this, It *must perform* the job of initializing parameters in the trajectory. These parameters must
-be created in the parameter subgroup named `individual` (i.e. using ``traj.par.individual.f_add_parameter()``). The
+be created in the parameter subgroup named `individual` (i.e. using ``traj.parameter.individual.f_add_parameter()``). The
 following is a contract that must be obeyed by this constructor.
 
   All parameters that are explored for the optimizee must be created in the trajectory under the `individual`

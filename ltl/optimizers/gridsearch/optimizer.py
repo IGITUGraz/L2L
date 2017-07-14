@@ -11,6 +11,19 @@ from ltl.optimizers.optimizer import Optimizer
 logger = logging.getLogger("ltl-gs")
 
 GridSearchParameters = namedtuple('GridSearchParameters', ['param_grid'])
+GridSearchParameters.__doc__ = """
+:param param_grid dict: This is the data structure specifying the grid over which to search. This should be a
+    dictionary as follows::
+    
+        optimizee_param_grid['param_name'] = (lower_bound, higher_bound, n_steps)
+    
+    Where the interval `[lower_bound, upper_bound]` is divided into `n_steps` intervals thereby providing
+    `n_steps + 1` points for the grid.
+    
+    Note that there must be as many keys as there are in the `Individual-Dict` returned by the function
+    :func:`optimizee_create_individual`. Also, if any of the parameters of the individuals is an array, then the above
+    grid specification applies to each element of the array.
+"""
 
 
 class GridSearchOptimizer(Optimizer):
@@ -23,16 +36,16 @@ class GridSearchOptimizer(Optimizer):
 
     1.  This algorithm does not do any kind of adaptive searching and thus the concept of generations does not apply
         per se. That said, it is currently implemented as a series of runs in a single generation. All of these runs
-        are declared in the constructor itself. The :func:`.Optimizer.post_process()` function simply prints the
+        are declared in the constructor itself. The :meth:`.Optimizer.post_process()` function simply prints the
         individual with the maximal fitness.
     
-    2.  This algorithm doesnt make use of self.eval_pop and :func:`.Optimizer::_expand_trajectory()` simply because the
+    2.  This algorithm doesnt make use of self.eval_pop and :meth:`.Optimizer._expand_trajectory()` simply because the
         cartesian product can be used more efficiently directly. (Imagine having to split a dict of 10000 parameter
         combinations into 10000 small `Individual-Dict`s and storing into eval_pop only to join them and call
-        `traj.f_expand()` in :func:`.Optimizer::_expand_trajectory()`)
+        `traj.f_expand()` in :meth:`.Optimizer._expand_trajectory()`)
 
     :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs.
-        The parameters should be initialized based on the values in :param parameters:
+        The parameters should be initialized based on the values in `parameters`
 
     :param optimizee_create_individual: A function which when called returns one instance of parameter (or "individual")
 
@@ -41,19 +54,9 @@ class GridSearchOptimizer(Optimizer):
         multi-dimensional). If some element is negative, the Optimizer minimizes that element of fitness instead of
         maximizing. By default, the `Optimizer` maximizes all fitness dimensions.
     
-    :param optimizee_param_grid: This is the data structure specifying the grid over which to search. This should be a
-        dictionary as follows::
+    :param parameters: An instance of :class:`.GridSearchParameters`
 
-            (lower_bound, higher_bound, n_steps) = optimizee_param_grid['param_name']
-        
-        Where the interval `[lower_bound, upper_bound]` is divided into `n_steps` intervals thereby providing
-        `n_steps+1` points for the grid.
-
-        Note that there must be as many keys as there are in the `Individual-Dict` returned by the function
-        `optimizee_create_individual`. Also, if any of the parameters of the idividuals is an array, then the above
-        grid specification applies to each element of the array.
-
-    :param parameters: A named tuple containing the parameters for the Optimizer class
+    :param optimizee_bounding_func: A function that returns the bound (between some limits) value of an individual
     
     """
 
@@ -72,7 +75,7 @@ class GridSearchOptimizer(Optimizer):
         # Initializing basic variables
         self.optimizee_create_individual = optimizee_create_individual
         self.optimizee_fitness_weights = optimizee_fitness_weights
-        
+
         sample_individual = self.optimizee_create_individual()
 
         # Generate parameter dictionary based on optimizee_param_grid
@@ -99,14 +102,14 @@ class GridSearchOptimizer(Optimizer):
                 self.param_list[param_name] = curr_param_list
 
         self.param_list = cartesian_product(self.param_list, tuple(sorted(optimizee_param_grid.keys())))
-        
+
         # Adding the bounds information to the trajectory
         traj.par.f_add_parameter_group('grid_spec')
         for param_name, param_grid_spec in optimizee_param_grid.items():
             traj.par.grid_spec.f_add_parameter(param_name + '.lower_bound', )
-        
+
         # Expanding the trajectory
-        self.param_list = {('individual.' + key):value for key, value in self.param_list.items()}
+        self.param_list = {('individual.' + key): value for key, value in self.param_list.items()}
         traj.f_expand(self.param_list)
         #: The current generation number
         self.g = 0
