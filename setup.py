@@ -1,5 +1,4 @@
-from setuptools import setup
-from setuptools import find_packages
+from setuptools import setup, find_packages
 import re
 
 from ltl.version import FULL_VERSION
@@ -32,6 +31,7 @@ setup(
     name="Learning to Learn",
     version=FULL_VERSION,
     packages=find_packages(),
+    include_package_data=True,
     author="Anand Subramoney, Arjun Rao",
     author_email="anand@igi.tugraz.at, arjun@igi.tugraz.at",
     description="This module provides the infrastructure create optimizers and "
