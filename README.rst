@@ -75,7 +75,7 @@ Installing Requirements
 
 If you wish to install LTL as a python package, then you may ignore this section and continue from the section `Installing the LTL Package`_. If you however, wish to use it as-is, without installing, then the relevant requirements must be installed. This can be done by running the following from the root directory of the repository:
 
-    pip3 install --user -r requirements.text
+    pip3 install --user -r requirements.txt
 
 Each optimizees and optimizers may have their own dependencies specified in the requirements.txt file within their
 respective package.
