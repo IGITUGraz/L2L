@@ -30,14 +30,14 @@ class Optimizee:
         individual/parameters. After that, the change in parameters is model specific e.g. In
         simulated annealing, it is perturbed on specific criteria
 
-        :return dict: A dictionary containing the names of the paramters and their values
+        :return dict: A dictionary containing the names of the parameters and their values
         """
 
     def bounding_func(self, individual):
         """
         Bounds the individual within the required bounds via coordinate clipping
 
-        :return dict: A dictionary in the same format as :ref:`.create_individual`, with the values clipped as needed.
+        :return dict: A dictionary in the same format as :meth:`~.Optimizee.create_individual`, with the values clipped as needed.
         """
 
     def simulate(self, traj):

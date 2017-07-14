@@ -5,6 +5,8 @@ matplotlib
 git+https://github.com/IGITUGraz/scoop.git@863f46e#egg=scoop-0.7.2.0-dev7
 git+https://github.com/IGITUGraz/pypet.git@15104ce#egg=pypet-0.4.1-r1
 sphinx
+sphinxjp.themes.basicstrap
 sklearn
 jinja2
 gitpython
+scikit-learn
