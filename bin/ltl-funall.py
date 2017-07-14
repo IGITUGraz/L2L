@@ -53,23 +53,29 @@ def main():
         (CrossEntropyOptimizer,
          lambda: CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0,
                                         n_iteration=n_iterations,
-                                        distribution=NoisyGaussian(noise_decay=0.95, noise_bias=0.05))),
+                                        distribution=NoisyGaussian(noise_decay=0.95),
+                                        stop_criterion=np.Inf, seed=0)),
         (FACEOptimizer,
          lambda: FACEParameters(min_pop_size=20, max_pop_size=50, n_elite=10, smoothing=0.2, temp_decay=0,
-                                n_iteration=n_iterations, distribution=Gaussian(), n_expand=5)),
+                                n_iteration=n_iterations, distribution=Gaussian(), n_expand=5,
+                                stop_criterion=np.Inf, seed=0)),
         (GradientDescentOptimizer,
-         lambda: RMSPropParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, momentum_decay=0.5,
-                                   n_iteration=n_iterations, stop_criterion=np.Inf)),
+         lambda: RMSPropParameters(learning_rate=0.01, exploration_step_size=0.01, n_random_steps=5, momentum_decay=0.5,
+                                   n_iteration=n_iterations, stop_criterion=np.Inf, 
+                                   seed=0)),
         (GradientDescentOptimizer,
-         lambda: ClassicGDParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5,
-                                     n_iteration=n_iterations, stop_criterion=np.Inf)),
+         lambda: ClassicGDParameters(learning_rate=0.01, exploration_step_size=0.01, n_random_steps=5,
+                                     n_iteration=n_iterations, stop_criterion=np.Inf,
+                                     seed=0)),
         (GradientDescentOptimizer,
-         lambda: AdamParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, first_order_decay=0.8,
-                                second_order_decay=0.8, n_iteration=n_iterations, stop_criterion=np.Inf)),
+         lambda: AdamParameters(learning_rate=0.01, exploration_step_size=0.01, n_random_steps=5, first_order_decay=0.8,
+                                second_order_decay=0.8, n_iteration=n_iterations, stop_criterion=np.Inf,
+                                seed=0)),
         (GradientDescentOptimizer,
          lambda: StochasticGDParameters(learning_rate=0.01, stochastic_deviation=1, stochastic_decay=0.99,
-                                        exploration_rate=0.01, n_random_steps=5, n_iteration=n_iterations,
-                                        stop_criterion=np.Inf))
+                                        exploration_step_size=0.01, n_random_steps=5, n_iteration=n_iterations,
+                                        stop_criterion=np.Inf,
+                                        seed=0))
     ]
 
     # NOTE: Benchmark functions
@@ -100,7 +106,7 @@ def main():
         (benchmark_name, benchmark_function), benchmark_parameters = \
             bench_functs.get_function_by_index(function_id, noise=True)
 
-        optimizee = FunctionGeneratorOptimizee(traj, benchmark_function)
+        optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=0)
 
         optimizee_fitness_weights = -1.
         # Gradient descent does descent!

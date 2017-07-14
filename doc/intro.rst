@@ -312,7 +312,7 @@ See the class documentation for more details: :class:`~ltl.optimizers.optimizer.
 Running an LTL simulation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Before running a simulation, you need to specify the output directory for your results. To do so, create a new file :file:`bin/path.conf` with a single entry containing the path relative to the top-level LTL directory, e.g. :file:`./output_results/`. Failing to do so raises an error when trying to run any of the test simulations.
+Before running a simulation, you need to specify the output directory for your results. To do so, create a new file :file:`bin/path.conf` with a single entry containing the path relative to the top-level LTL directory, e.g. :file:`./output_results/`, and create an empty folder at the path you specified. You also need to commit any staged files to your local repo. Failing to follow these instructions raises an error when trying to run any of the test simulations.
 
 To run a LTL simulation, copy the file :file:`bin/ltl-template.py` (see :doc:`ltl-bin`) to
 :file:`bin/ltl-{optimizeeabbr}-{optimizerabbr}.py`. Then fill in all the **TODOs** . Especially the parts with the
