@@ -8,6 +8,7 @@ from ltl.optimizees.functions.function_generator import FunctionGenerator, Gauss
     EasomParameters, LangermannParameters, MichalewiczParameters, ShekelParameters, RastriginParameters, \
     RosenbrockParameters, ChasmParameters, AckleyParameters
 from ltl.paths import Paths
+from ltl.optimizees.functions.tools import plot
 
 warnings.filterwarnings("ignore")
 
@@ -40,29 +41,29 @@ def main():
     fg_params = [GaussianParameters(sigma=[[1.5, .1], [.1, .3]], mean=[-1., -1.]),
                  GaussianParameters(sigma=[[.25, .3], [.3, 1.]], mean=[1., 1.]),
                  GaussianParameters(sigma=[[.5, .25], [.25, 1.3]], mean=[2., -2.])]
-    FunctionGenerator(fg_params, dims=2, noise=True).plot()
+    plot(FunctionGenerator(fg_params, dims=2, noise=True), os.path.join(paths.results_path, '3_gaussians.png'))
 
-    FunctionGenerator([PermutationParameters(beta=0.005)], dims=2).plot()
+    plot(FunctionGenerator([PermutationParameters(beta=0.005)], dims=2), os.path.join(paths.results_path, 'permutation.png'))
 
-    FunctionGenerator([EasomParameters()], dims=3).plot()
+    plot(FunctionGenerator([EasomParameters()], dims=3), os.path.join(paths.results_path, 'easom.png'))
 
-    FunctionGenerator([LangermannParameters(A='default', c='default')], dims=2).plot()
+    plot(FunctionGenerator([LangermannParameters(A='default', c='default')], dims=2), os.path.join(paths.results_path, 'langermann.png'))
 
-    FunctionGenerator([MichalewiczParameters(m='default')], dims=2).plot()
+    plot(FunctionGenerator([MichalewiczParameters(m='default')], dims=2), os.path.join(paths.results_path, 'michalewicz.png'))
 
-    FunctionGenerator([ShekelParameters(A='default', c='default')], dims=2).plot()
+    plot(FunctionGenerator([ShekelParameters(A='default', c='default')], dims=2), os.path.join(paths.results_path, 'shekel.png'))
 
     fg_params = [ShekelParameters(A=[[8, 5]], c=[0.08]),
                  LangermannParameters(A='default', c='default')]
-    FunctionGenerator(fg_params, dims=2).plot()
+    plot(FunctionGenerator(fg_params, dims=2), os.path.join(paths.results_path, 'shekel_langermann.png'))
 
-    FunctionGenerator([RastriginParameters()], dims=2).plot()
+    plot(FunctionGenerator([RastriginParameters()], dims=2), os.path.join(paths.results_path, 'rastrigin.png'))
 
-    FunctionGenerator([RosenbrockParameters()], dims=2).plot()
+    plot(FunctionGenerator([RosenbrockParameters()], dims=2), os.path.join(paths.results_path, 'rosenbrock.png'))
 
-    FunctionGenerator([ChasmParameters()], dims=2).plot()
+    plot(FunctionGenerator([ChasmParameters()], dims=2), os.path.join(paths.results_path, 'chasm.png'))
 
-    FunctionGenerator([AckleyParameters()], dims=2).plot()
+    plot(FunctionGenerator([AckleyParameters()], dims=2), os.path.join(paths.results_path, 'ackley.png'))
 
 
 if __name__ == '__main__':
