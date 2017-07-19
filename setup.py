@@ -1,9 +1,4 @@
-<<<<<<< HEAD
 from setuptools import setup, find_packages
-=======
-from setuptools import setup
-from setuptools import find_packages
->>>>>>> master
 import re
 
 from ltl.version import FULL_VERSION
