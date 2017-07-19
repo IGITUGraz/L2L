@@ -14,6 +14,8 @@ from ltl.paths import Paths
 from ltl.recorder import Recorder
 
 import numpy as np
+from ltl.logging_tools import create_shared_logger_data
+
 logger = logging.getLogger('bin.ltl-fun-ce')
 
 
@@ -53,8 +55,13 @@ def main():
                       wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
-                      log_folder=os.path.join(paths.output_dir_path, 'logs')
                       )
+    create_shared_logger_data(logger_names=['bin', 'optimizers'],
+                              log_levels=['INFO', 'INFO'],
+                              log_to_consoles=[True, True],
+                              sim_name=name,
+                              log_directory=paths.logs_path)
+
 
     # Get the trajectory from the environment
     traj = env.trajectory
@@ -73,7 +80,7 @@ def main():
     # NOTE: Outerloop optimizer initialization
     # TODO: Change the optimizer to the appropriate Optimizer class
     parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=5,
-                                        distribution=NoisyGaussian(noise_magnitude=1,                                                                                                                                                    # NEVER do hardcoding of
+                                        distribution=NoisyGaussian(noise_magnitude=1,
                                                                    noise_decay=0.95),
                                         stop_criterion=np.inf, seed=102)
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,

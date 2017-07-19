@@ -12,6 +12,7 @@ from ltl.paths import Paths
 
 from ltl.matplotlib_ import plt
 
+from ltl.logging_tools import create_shared_logger_data
 
 def get_root_dir():
     try:
@@ -41,8 +42,14 @@ def run_experiment():
                       automatic_storing=True,
                       logger_names=('bin.ltl-ce', 'ltl.dataprocessing'),
                       log_levels=(logging.INFO, logging.INFO, logging.INFO, logging.INFO),
-                      log_stdout=False,  # Sends stdout to logs
-                      log_folder=os.path.join(paths.output_dir_path, 'logs'))
+                      log_stdout=False,
+                      )
+    create_shared_logger_data(logger_names=['bin', 'optimizers'],
+                              log_levels=['INFO', 'INFO'],
+                              log_to_consoles=[True, True],
+                              sim_name=name,
+                              log_directory=paths.logs_path)
+
 
     traj = env.trajectory
 

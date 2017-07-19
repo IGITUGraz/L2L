@@ -17,6 +17,8 @@ from ltl.optimizers.gradientdescent.optimizer import RMSPropParameters
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
+from ltl.logging_tools import create_shared_logger_data
+
 logger = logging.getLogger('bin.ltl-fun-gradientdescent')
 
 
@@ -55,9 +57,14 @@ def main():
                       use_scoop=True,
                       wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
-                      log_stdout=True,  # Sends stdout to logs
-                      log_folder=os.path.join(paths.output_dir_path, 'logs')
+                      log_stdout=False,  # Sends stdout to logs
                       )
+    create_shared_logger_data(logger_names=['bin', 'optimizers'],
+                              log_levels=['INFO', 'INFO'],
+                              log_to_consoles=[True, True],
+                              sim_name=name,
+                              log_directory=paths.logs_path)
+
 
     # Get the trajectory from the environment
     traj = env.trajectory
