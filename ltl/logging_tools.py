@@ -8,10 +8,40 @@ import copy
 
 
 def create_shared_logger_data(logger_names, log_levels, log_to_consoles,
-                              sim_name, log_directory, multiproc=True):
-    if multiproc:
-        assert scoop.IS_RUNNING, \
-            "multi_proc=True cannot be called without having scoop running"
+                              sim_name, log_directory):
+    """
+    This function must be called to create a shared copy of information that will be
+    required to setup logging across processes. This must be run exactly once in the
+    root process.
+
+    :param logger_names: This is a list of names of the logggers whose output you're
+        interested in.
+
+    :param log_levels: This is the list of the same size of `logger_names` containing
+        the log levels specified as strings (e.g. 'INFO', 'DEBUG', 'WARNING', 'ERROR').
+
+    :param log_to_consoles: This is a list of the same size of `logger_names` containing
+        boolean values which indicate whether or not to redirect the output of the said
+        logger to stdout or not. Note that with scoop, and output to stdout on any
+        worker gets directed to the console of the main process.
+
+    :param sim_name: This is a string that is used when creating the log files.
+        Short for simulation name.
+
+    :param log_directory: This is the path of the directory in which the log files will
+        be stored. This directory must be an existing directory.
+    """
+
+    # process / validate input
+    assert len(logger_names) == len(log_levels) == len(log_to_consoles), \
+        "The sizes of logger_names, log_levels, log_to_consoles are inconsistent"
+    assert all(isinstance(x, str) for x in logger_names + log_levels), \
+        "'logger_names' and 'log_levels' must be lists of strings"
+    assert os.path.isdir(log_directory), "The log_directory {} is not a vlid log directory".format(log_directory)
+
+    log_to_consoles = [bool(x) for x in log_to_consoles]
+
+    if scoop.IS_RUNNING:
         assert scoop.IS_ORIGIN, \
             "create_shared_logger_data must be called only on the origin worker"
         scoop.shared.setConst(logger_names=logger_names, log_levels=log_levels,
@@ -26,11 +56,29 @@ def create_shared_logger_data(logger_names, log_levels, log_to_consoles,
         log_directory_global = log_directory
 
 
-def configure_loggers(multiproc=False):
-    if multiproc:
-        assert scoop.IS_RUNNING, \
-            "configure_loggers(True) cannot be called without having scoop running"
+def configure_loggers(exactly_once=False):
+    """
+    This function configures the loggers using the shared information that was set by
+    :meth:`.create_shared_logger_data`. This function must be run at the beginning
+    of every function that is parallelized in order to be able to reliably
+    configure the loggers. As an example look at its usage in the method
+    :meth:`~ltl.optimizees.functions.FunctionGeneratorOptimizee.simulate()` from the
+    class :class:`~ltl.optimizees.functions.FunctionGeneratorOptimizee`
 
+    You may also wish to call this function in your main simulation (after calling
+    :meth:`.create_shared_logger_data`) to configure the logging for the root process
+    before any of the parallelized functions are run.
+
+    :param exactly_once: If the configuration of logging is causing a significant
+        overhead per parallelized run (This is a rather unlikely scenario), then this
+        value may be set to `True`. When True, the function will configure the loggers
+        exactly once per scoop worker.
+    """
+
+    if exactly_once and configure_loggers._already_configured:
+        return
+
+    if scoop.IS_RUNNING:
         # Get shared data from scoop and perform the relevant configuration
         logger_names = scoop.shared.getConst('logger_names', timeout=1.0)
         log_levels = scoop.shared.getConst('log_levels', timeout=1.0)
@@ -47,7 +95,7 @@ def configure_loggers(multiproc=False):
         sim_name = sim_name_global
         log_directory = log_directory_global
 
-    if multiproc and not scoop.IS_ORIGIN:
+    if scoop.IS_RUNNING and not scoop.IS_ORIGIN:
         file_name_prefix = '%s_%s_%s_' % (sim_name, socket.gethostname(), os.getpid())
     else:
         file_name_prefix = '%s_' % (sim_name,)
@@ -75,8 +123,9 @@ def configure_loggers(multiproc=False):
             logger_dict['handlers'] = ['file_log', 'file_error']
 
     logging.config.dictConfig(config_dict_copy)
+    configure_loggers._already_configured = True
 
-
+configure_loggers._already_configured = False
 configure_loggers.basic_config_dict = {
     'version': 1,
     'formatters': {
