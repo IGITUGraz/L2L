@@ -1,5 +1,3 @@
-import os
-
 import numpy as np
 import logging
 
@@ -12,7 +10,8 @@ from ltl.paths import Paths
 
 from ltl.matplotlib_ import plt
 
-from ltl.logging_tools import create_shared_logger_data
+from ltl.logging_tools import create_shared_logger_data, configure_loggers
+
 
 def get_root_dir():
     try:
@@ -32,6 +31,8 @@ def run_experiment():
     root_dir = get_root_dir()
     paths = Paths(root_dir_name=name, root_dir_path=root_dir, param_dict={'run_no': 'test'})
 
+    print("All output logs can be found in directory ", paths.logs_path)
+
     env = Environment(trajectory=name, filename=paths.results_path, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
@@ -49,7 +50,7 @@ def run_experiment():
                               log_to_consoles=[True, True],
                               sim_name=name,
                               log_directory=paths.logs_path)
-
+    configure_loggers()
 
     traj = env.trajectory
 
