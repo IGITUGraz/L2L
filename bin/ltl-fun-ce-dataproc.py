@@ -39,7 +39,7 @@ def run_experiment():
                       use_scoop=True,
                       wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
-                      logger_names=('ltl-ce', 'ltl.dataprocessing'),
+                      logger_names=('bin.ltl-ce', 'ltl.dataprocessing'),
                       log_levels=(logging.INFO, logging.INFO, logging.INFO, logging.INFO),
                       log_stdout=False,  # Sends stdout to logs
                       log_folder=os.path.join(paths.output_dir_path, 'logs'))

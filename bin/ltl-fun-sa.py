@@ -12,7 +12,7 @@ from ltl.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParame
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
-logger = logging.getLogger('ltl-fg-sa')
+logger = logging.getLogger('bin.ltl-fun-sa')
 
 
 def main():

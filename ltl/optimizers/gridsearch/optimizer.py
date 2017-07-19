@@ -8,7 +8,7 @@ from ltl import DictEntryType
 from ltl import dict_to_list
 from ltl.optimizers.optimizer import Optimizer
 
-logger = logging.getLogger("ltl-gs")
+logger = logging.getLogger("optimizers.gridsearch")
 
 GridSearchParameters = namedtuple('GridSearchParameters', ['param_grid'])
 GridSearchParameters.__doc__ = """

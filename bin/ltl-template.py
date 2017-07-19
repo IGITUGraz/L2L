@@ -17,7 +17,7 @@ from ltl.paths import Paths
 # various parts of the code.
 from ltl.recorder import Recorder
 
-logger = logging.getLogger('ltl-optimizee-optimizer')
+logger = logging.getLogger('bin.ltl-optimizee-optimizer')
 
 
 def main():

@@ -15,7 +15,7 @@ from ltl.optimizers.face.optimizer import FACEOptimizer, FACEParameters
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
-logger = logging.getLogger('ltl-fun-face')
+logger = logging.getLogger('bin.ltl-fun-face')
 
 
 def main():

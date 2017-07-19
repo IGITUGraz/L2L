@@ -17,7 +17,7 @@ from ltl.optimizers.gradientdescent.optimizer import RMSPropParameters
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
-logger = logging.getLogger('ltl-lsm-gradientdescent')
+logger = logging.getLogger('bin.ltl-fun-gradientdescent')
 
 
 def main():

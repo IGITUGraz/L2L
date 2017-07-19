@@ -6,7 +6,7 @@ import numpy as np
 from ltl import dict_to_list, list_to_dict
 from ltl.optimizers.optimizer import Optimizer
 
-logger = logging.getLogger("ltl-ce")
+logger = logging.getLogger("optimizers.crossentropy")
 
 CrossEntropyParameters = namedtuple('CrossEntropyParameters',
                                     ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distribution',
