@@ -12,7 +12,7 @@ from ltl.optimizers.paralleltempering.optimizer import ParallelTemperingParamete
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
-logger = logging.getLogger('ltl-lsm-pt')
+logger = logging.getLogger('bin.ltl-fun-pt')
 
 
 def main():

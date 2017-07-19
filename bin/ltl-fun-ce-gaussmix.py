@@ -18,7 +18,7 @@ from ltl.recorder import Recorder
 
 warnings.filterwarnings("ignore")
 
-logger = logging.getLogger('ltl-fun-ce')
+logger = logging.getLogger('bin.ltl-fun-ce')
 
 
 def main():

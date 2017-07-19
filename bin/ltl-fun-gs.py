@@ -11,7 +11,7 @@ from ltl.optimizers.gridsearch import GridSearchOptimizer, GridSearchParameters
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
-logger = logging.getLogger('ltl-fun-gs')
+logger = logging.getLogger('bin.ltl-fun-gs')
 
 
 def main():

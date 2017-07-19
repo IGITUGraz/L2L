@@ -14,7 +14,7 @@ from ltl.paths import Paths
 from ltl.recorder import Recorder
 
 import numpy as np
-logger = logging.getLogger('ltl-fun-ce')
+logger = logging.getLogger('bin.ltl-fun-ce')
 
 
 def main():

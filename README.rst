@@ -23,7 +23,7 @@ The Better way
 
 From the Top-Level directory of the directory, run the following command:
 
-    pip3 install . --process-dependency-links [--user]
+    pip3 install --editable . --process-dependency-links [--user]
 
 *The `--user` flag is to be used if you wish to install in the user path as opposed
 to the root path (e.g. when one does not have sudo access)*
@@ -75,7 +75,7 @@ Installing Requirements
 
 If you wish to install LTL as a python package, then you may ignore this section and continue from the section `Installing the LTL Package`_. If you however, wish to use it as-is, without installing, then the relevant requirements must be installed. This can be done by running the following from the root directory of the repository:
 
-    pip3 install --user -r requirements.text
+    pip3 install --user -r requirements.txt
 
 Each optimizees and optimizers may have their own dependencies specified in the requirements.txt file within their
 respective package.
