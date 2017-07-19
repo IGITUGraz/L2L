@@ -397,11 +397,22 @@ Examples
 Logging
 =======
 
-Always use the `logger` object obtained from::
+1.  Always use the `logger` object obtained from::
 
-  logger = logging.getLogger('logger-name')
+      logger = logging.getLogger('heirarchical.logger.name')
 
-to output messages to a console/file. 
+    to output messages to a console/file. 
+
+2.  Setting up logging in a multiprocessing environment is a mind-numbingly painful process. Therefore, to keep users
+    sane, we have provided the module :mod:`~ltl.logging_tools` with 2 functions which can be used to conveniently setup
+    logging. See the module documentation for more details.
+
+3.  As far as using loggers is concerned, the convention is one logger per file. The name of the logger should reflect
+    module heirarcy. For example, the logger used in the file `optimizers/crossentropy/optimizer.py` is named
+    ``'optimizers.crossentropy'``
+
+4.  A logger is uniquely identified by its name throughout the python process (i.e. it's kinda like a global variable).
+    Thus if two different files use ``'optimizer.crossentropy'`` then their logs will be redirect to the same logger.
 
 You can modify the :file:`bin/logging.yaml` file to choose the output level and to redirect messages to console or
 file.
