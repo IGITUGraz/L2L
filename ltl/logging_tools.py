@@ -125,6 +125,7 @@ def configure_loggers(exactly_once=False):
     logging.config.dictConfig(config_dict_copy)
     configure_loggers._already_configured = True
 
+
 configure_loggers._already_configured = False
 configure_loggers.basic_config_dict = {
     'version': 1,
