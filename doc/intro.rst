@@ -215,7 +215,7 @@ the following.
 
     traj.individual.f_add_parameter('sim_control.seed', 1010)
 
-If one intends ``sim_control.seed`` to be a parameter over which to explore, the Individual-Dict describing an
+If one intends ``sim_control.seed`` to be a parameter over which to explore, the Individual-Dict_ describing an
 individual of the optimizee must contain a key named ``'sim_control.seed'``
 
 *NOTE* that the parameter group named `individual` itself is created in the constructor of the base `Optimizee` class.
@@ -312,7 +312,11 @@ See the class documentation for more details: :class:`~ltl.optimizers.optimizer.
 Running an LTL simulation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Before running a simulation for the first time, you need to specify the output directory for your results. To do so, create a new file :file:`bin/path.conf` with a single entry containing an absolute path or a path relative to the top-level LTL directory, e.g. :file:`./output_results/`, and create an empty folder at the path you specified. You also need to commit any staged files to your local repo. Failing to follow these instructions raises an error when trying to run any of the test simulations.
+Before running a simulation for the first time, you need to specify the output directory for your results. To do so,
+create a new file :file:`bin/path.conf` with a single entry containing an absolute path or a path relative to the top-
+level LTL directory, e.g. :file:`./output_results/`, and create an empty folder at the path you specified. You also need
+to commit any staged files to your local repo. Failing to follow these instructions raises an error when trying to run
+any of the test simulations.
 
 To run a LTL simulation, copy the file :file:`bin/ltl-template.py` (see :doc:`ltl-bin`) to
 :file:`bin/ltl-{optimizeeabbr}-{optimizerabbr}.py`. Then fill in all the **TODOs** . Especially the parts with the
@@ -390,6 +394,17 @@ Examples
 * See :class:`~ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer` for an example of an
   implementation of simulated annealing `Optimizer`.
 
+
+.. _data-postprocessing:
+
+Data postprocessing
+===================
+
+Having run the simulation, the next superpower required is the ability to make sense of all the data that we've dumped
+into the trajectory and (consequently) the HDF file. Of course you could use the functions that pypet provides for this
+purpose but the complexity of the interface is rather discouraging. Therefore to cover the most common cases (In fact, I
+really haven't YET come across any other cases), We have created the :mod:`~ltl.dataprocessing` with the relevant
+functions. Look up the documentation of the module for further details.
 
 
 .. _logging:

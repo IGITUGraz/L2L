@@ -1,10 +1,11 @@
-LTL package (Optimizers and Optimizees)
-=======================================
+LTL package (Optimizers, Optimizees, and API reference)
+=======================================================
 
 .. toctree::
 
     ltl.optimizees
     ltl.optimizers
+    ltl.dataprocessing
 
 
 Other module functions
