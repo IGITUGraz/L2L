@@ -10,3 +10,4 @@ sklearn
 jinja2
 gitpython
 scikit-learn
+flake8
