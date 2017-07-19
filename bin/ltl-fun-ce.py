@@ -13,6 +13,7 @@ from ltl.paths import Paths
 from ltl.recorder import Recorder
 
 import numpy as np
+
 from ltl.logging_tools import create_shared_logger_data, configure_loggers
 
 logger = logging.getLogger('bin.ltl-fun-ce')
