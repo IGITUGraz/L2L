@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 from setuptools import setup, find_packages
+=======
+from setuptools import setup
+from setuptools import find_packages
+>>>>>>> master
 import re
 
 from ltl.version import FULL_VERSION
@@ -30,8 +35,7 @@ requirements, dependency_links = get_requirements('requirements.txt')
 setup(
     name="Learning to Learn",
     version=FULL_VERSION,
-    packages=find_packages(),
-    include_package_data=True,
+    packages=find_packages('/ltl'),
     author="Anand Subramoney, Arjun Rao",
     author_email="anand@igi.tugraz.at, arjun@igi.tugraz.at",
     description="This module provides the infrastructure create optimizers and "

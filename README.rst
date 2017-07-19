@@ -23,7 +23,7 @@ The Better way
 
 From the Top-Level directory of the directory, run the following command:
 
-    pip3 install . --process-dependency-links [--user]
+    pip3 install --editable . --process-dependency-links [--user]
 
 *The `--user` flag is to be used if you wish to install in the user path as opposed
 to the root path (e.g. when one does not have sudo access)*
