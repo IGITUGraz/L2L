@@ -188,7 +188,7 @@ def dict_to_list(input_dict, get_dict_spec=False):
     This function converts the given dictionary into a list. 
 
     :param dict input_dict: The dictionary to be converted into a list. It is assumed that each key
-      in the dicionary is a string and each value is either a scalar numerical value or an
+      in the dictionary is a string and each value is either a scalar numerical value or an
       iterable.
 
     :param bool get_dict_spec: This is a flag that indicates whether one wants the dictionary
