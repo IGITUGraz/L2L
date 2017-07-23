@@ -5,7 +5,7 @@ from abc import ABCMeta
 import numpy as np
 import sklearn.mixture
 
-logger = logging.getLogger('ltl-distribution')
+logger = logging.getLogger('optimizers.crossentropy.distribution')
 
 
 class Distribution(metaclass=ABCMeta):
