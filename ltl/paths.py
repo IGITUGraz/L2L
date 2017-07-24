@@ -73,6 +73,16 @@ class Paths:
         os.makedirs(path, exist_ok=True)
         return path
 
+    @property
+    def logs_path(self):
+        """
+        Get the path of the logs directory of the form /root_dir_path/root_dir_name/param1name-param1val-param2name-param2val/logs
+        :return:
+        """
+        path = os.path.join(self.output_dir_path, "logs")
+        os.makedirs(path, exist_ok=True)
+        return path
+
     # General function to generate paths
     def get_fpath(self, name, ext, **kwargs):
         """

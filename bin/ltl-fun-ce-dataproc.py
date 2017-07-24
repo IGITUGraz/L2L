@@ -1,5 +1,3 @@
-import os
-
 import numpy as np
 import logging
 
@@ -11,6 +9,8 @@ from ltl.dataprocessing import get_skeleton_traj, get_var_from_generations, get_
 from ltl.paths import Paths
 
 from ltl.matplotlib_ import plt
+
+from ltl.logging_tools import create_shared_logger_data, configure_loggers
 
 
 def get_root_dir():
@@ -31,6 +31,8 @@ def run_experiment():
     root_dir = get_root_dir()
     paths = Paths(root_dir_name=name, root_dir_path=root_dir, param_dict={'run_no': 'test'})
 
+    print("All output logs can be found in directory ", paths.logs_path)
+
     env = Environment(trajectory=name, filename=paths.results_path, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
@@ -41,8 +43,14 @@ def run_experiment():
                       automatic_storing=True,
                       logger_names=('bin.ltl-ce', 'ltl.dataprocessing'),
                       log_levels=(logging.INFO, logging.INFO, logging.INFO, logging.INFO),
-                      log_stdout=False,  # Sends stdout to logs
-                      log_folder=os.path.join(paths.output_dir_path, 'logs'))
+                      log_stdout=False,
+                      )
+    create_shared_logger_data(logger_names=['bin', 'optimizers'],
+                              log_levels=['INFO', 'INFO'],
+                              log_to_consoles=[True, True],
+                              sim_name=name,
+                              log_directory=paths.logs_path)
+    configure_loggers()
 
     traj = env.trajectory
 

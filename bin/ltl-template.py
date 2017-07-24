@@ -6,7 +6,6 @@ explanations
 import logging.config
 import os
 
-import yaml
 from pypet import Environment
 from pypet import pypetconstants
 
@@ -16,6 +15,8 @@ from ltl.paths import Paths
 # We first setup the logger and read the logging config which controls the verbosity and destination of the logs from
 # various parts of the code.
 from ltl.recorder import Recorder
+
+from ltl.logging_tools import create_shared_logger_data, configure_loggers
 
 logger = logging.getLogger('bin.ltl-optimizee-optimizer')
 
@@ -37,15 +38,8 @@ def main():
     paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
 
     # Load the logging config which tells us where and what to log (loglevel, destination)
-    with open("bin/logging.yaml") as f:
-        l_dict = yaml.load(f)
-        log_output_file = os.path.join(paths.results_path, l_dict['handlers']['file']['filename'])
-        l_dict['handlers']['file']['filename'] = log_output_file
-        logging.config.dictConfig(l_dict)
 
-    print("All output can be found in file ", log_output_file)
-    print("Change the values in logging.yaml to control log level and destination")
-    print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
+    print("All output logs can be found in directory ", paths.logs_path)
 
     traj_file = os.path.join(paths.output_dir_path, 'data.h5')
 
@@ -61,9 +55,14 @@ def main():
                       use_scoop=True,
                       wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
-                      log_stdout=True,  # Sends stdout to logs
-                      log_folder=os.path.join(paths.output_dir_path, 'logs')
+                      log_stdout=False,  # Sends stdout to logs
                       )
+    create_shared_logger_data(logger_names=['bin', 'optimizers'],
+                              log_levels=['INFO', 'INFO'],
+                              log_to_consoles=[True, True],
+                              sim_name=name,
+                              log_directory=paths.logs_path)
+    configure_loggers()
 
     # Get the trajectory from the environment.
     traj = env.trajectory
