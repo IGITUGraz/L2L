@@ -1,7 +1,6 @@
-import functools
-
 import os
 import sys
+import logging
 from collections import OrderedDict
 from contextlib import contextmanager
 from warnings import warn
@@ -13,6 +12,8 @@ from timeit import default_timer as timer
 import numpy as np
 
 __author__ = 'anand'
+
+logger = logging.getLogger('ltl')
 
 
 def static_vars(**kwargs):
@@ -115,20 +116,18 @@ class sdictm(object):
         """
         return self.__class__(self.todict())
 
-    def update(self, quiet=False, **kwargs):
+    def update(self, **kwargs):
         """
         Update the dictionary with the values given in the function (only goes one level down)
         :param kwargs:
         :return:
         """
 
-        print = functools.partial(printq, quiet=quiet)
-
         for key, value in kwargs.items():
             if key in self._data:
-                print("Replacing {} with {} for key {}".format(self._data[key], value, key))
+                logger.debug("Replacing {} with {} for key {}".format(self._data[key], value, key))
             else:
-                print("Adding new key {} with value {}".format(key, value))
+                logger.debug("Adding new key {} with value {}".format(key, value))
             self._data[key] = value
 
         return self
