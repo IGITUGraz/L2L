@@ -48,7 +48,7 @@ class FunctionGeneratorOptimizee(Optimizee):
         Creates a random value of parameter within given bounds
         """
         # Define the first solution candidate randomly
-        return {'coords': list(self.random_state.rand(self.dims) * (self.bound[1] - self.bound[0]) + self.bound[0])}
+        return {'coords': self.random_state.rand(self.dims) * (self.bound[1] - self.bound[0]) + self.bound[0]}
 
     def bounding_func(self, individual):
         """
