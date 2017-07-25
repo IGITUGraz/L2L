@@ -8,6 +8,7 @@ from deap.tools import HallOfFame
 
 from ltl import dict_to_list, list_to_dict
 from ltl.optimizers.optimizer import Optimizer
+from ltl.optimizers.evolution.operators import bits_one_point_crossover, bits_uniform_random_crossover
 
 logger = logging.getLogger("ltl-ga")
 
@@ -87,14 +88,16 @@ class GeneticAlgorithmOptimizer(Optimizer):
                     bounded_individuals = [self.optimizee_bounding_func(x) for x in result_individuals]
                     for i, deap_indiv in enumerate(result_individuals_deap):
                         deap_indiv[:] = dict_to_list(bounded_individuals[i])
-                    print("Bounded Individual: {}".format(bounded_individuals))
+                    # print("Bounded Individual: {}".format(bounded_individuals))
                     return result_individuals_deap
 
             return bounding_wrapper
 
-        toolbox.register("mate", tools.cxBlend, alpha=parameters.matepar)
+        # toolbox.register("mate", tools.cxBlend, alpha=parameters.matepar)
+        toolbox.register("mate", bits_uniform_random_crossover, indpb=0.5)
         toolbox.decorate("mate", bounding_decorator)
         toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=parameters.mutpar, indpb=traj.indpb)
+        # toolbox.register("mutate", tools.mutFlipBit, indpb=traj.indpb)
         toolbox.decorate("mutate", bounding_decorator)
         toolbox.register("select", tools.selTournament, tournsize=traj.tournsize)
 
