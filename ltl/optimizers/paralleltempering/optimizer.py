@@ -10,7 +10,7 @@ from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list
 from ltl import list_to_dict
 
-logger = logging.getLogger("ltl-pt")
+logger = logging.getLogger("optimizers.paralleltempering")
 
 ParallelTemperingParameters = namedtuple('ParallelTemperingParameters',
                                           ['n_parallel_runs', 'noisy_step', 'n_iteration', 'stop_criterion', 'seed', 'cooling_schedules', 'temperature_bounds', 'decay_parameters'])

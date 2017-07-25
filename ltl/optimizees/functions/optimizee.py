@@ -1,6 +1,7 @@
 import numpy as np
 
 from ltl.optimizees.optimizee import Optimizee
+from ltl.logging_tools import configure_loggers
 
 
 class FunctionGeneratorOptimizee(Optimizee):
@@ -62,6 +63,8 @@ class FunctionGeneratorOptimizee(Optimizee):
         :param ~pypet.trajectory.Trajectory traj: Trajectory
         :return: a single element :obj:`tuple` containing the value of the chosen function
         """
+        configure_loggers(exactly_once=True)  # logger configuration is here since this function is paralellised
+
         individual = np.array(traj.individual.coords)
         random_state = np.random.RandomState(seed=traj.parameters.individual.seed + traj.v_idx + 1)
         return (self.cost_fn(individual, random_state=random_state),)

@@ -11,25 +11,17 @@ def get_var_from_generations(traj: Trajectory, variable_name_full: str, status_i
     This function extracts the contents of the variable named as specified in
     `variable_name_full`, from each generation and returns a list containing them.
 
-    NOTE: Unlike get_var_from_runs, we do not allow fetching partially from selected
-    generations and assume that the specified variable is stored for all
+    NOTE: Unlike :meth:`.get_var_from_runs`, we do not allow fetching partially from
+    selected generations and assume that the specified variable is stored for all
     generations.
 
     :param traj: This is the trajectory that contains the relevant information. note
         that the trajectory need not have been fully loaded beforehand as the
         loading can happen dynamically while loading specific variables
 
-    :variable_name_full: This is the full variable name WITHOUT the prefix
+    :param variable_name_full: This is the full variable name WITHOUT the prefix
         'results.generation_params', whose value you want to extract. This variable
-        must be a variable stored in a generation::
-
-            parameters.individual.coords
-            results.fitness
-
-        The first group in the name must be one of `{'results', 'parameters',
-        'derived_parameters'}`. Note that whatever variable is extracted, must have
-        a value corresponding to each run therefore, variables stored per generation
-        cannot be accessed using this function
+        must be a variable stored in a generation. See example
 
     :param status_interval: Sometimes the loading takes too long and you'd like a
         status message, specify this value (an integer) to have the status displayed
@@ -38,17 +30,21 @@ def get_var_from_generations(traj: Trajectory, variable_name_full: str, status_i
     :return: A list with each entry containing the variable value. The index in the
         list gives the generation value
 
-    Example Usage:
-    
-    To get the distribution parameters from each generation of a run of cross-
-    entropy, the following works.
+    :Example Usage: To get the distribution parameters from each generation of a run of cross-
+        entropy, the following works.
 
-        get_var_from_generations(traj, 'distribution_params')
+        For example referring to the case of generation parameters stored by the
+        :meth:`~ltl.optimizers.CrossEntropyOptimizer.post_processing` of the
+        :class:`~ltl.optimizers.CrossEntropyOptimizer`, we may extract the, the
+        variables `algorithm_params` and `distribution_params` as below:: 
 
-    Here, 'distribution_params' is a variable stored once per generation in the
-    trajectory (see the `post_process` function of the
-    :class:`~ltl.optimizers.crossentropy.optimizer.CrossEntropyOptimizer` for
-    further details). 
+            get_var_from_generations(traj, 'distribution_params')
+            get_var_from_generations(traj, 'algorithm_params')
+
+        Here, 'distribution_params' is a variable stored once per generation in the
+        trajectory (see the `post_process` function of the
+        :class:`~ltl.optimizers.crossentropy.optimizer.CrossEntropyOptimizer` for
+        further details).
     """
     status_interval = int(status_interval) if status_interval else None
 
@@ -80,9 +76,9 @@ def get_var_from_runs(traj: Trajectory, variable_name_full: str, run_ids=None, w
         that the trajectory need not have been fully loaded beforehand as the
         loading can happen dynamically while loading specific variables
 
-    :variable_name_full: This is the full variable name whose value you want to
-        extract. This variable must either be a parameter, result or
-        derived_parameter of a run. For example the following names are acceptable::
+    :param variable_name_full: This is the full variable name whose value you want to
+        extract. This variable must either be a parameter, result or derived_parameter
+        of a run. For example the following names are acceptable::
 
             parameters.individual.coords
             results.fitness
@@ -92,7 +88,7 @@ def get_var_from_runs(traj: Trajectory, variable_name_full: str, run_ids=None, w
         a value corresponding to each run therefore, variables stored per generation
         cannot be accessed using this function
 
-    :param run_ids: This should be an iterator returning the run_ids from which you
+    :param run_ids: This should be an iterator returning the `run_ids` from which you
         want the variables. If `None` then the variable is extracted from all runs.
         Note that if the variable is not found in a particular run, an exception is
         raised.
@@ -104,18 +100,19 @@ def get_var_from_runs(traj: Trajectory, variable_name_full: str, run_ids=None, w
         status message, specify this value (an integer) to have the status displayed
         every `status_interval` runs extracted
 
-    :return: A list containing variable value for each run. If run_ids are
-        specified, the entries are arranged in the same order as run_ids, else in
+    :return: A list containing variable value for each run. If `run_ids` are
+        specified, the entries are arranged in the same order as `run_ids`, else in
         order of ascending run indices
 
-        if ``with_ids`` is True then a tuple is returned with the first element as
+        if `with_ids` is True then a tuple is returned with the first element as
         the above list and the second element containing the corresponding list
         indices
 
-    Example Usage:
+    :Example Usage: The following code snippet provides a sample call to this
+        function::
 
-        get_var_from_runs(traj, 'parameters.individual.coords')
-        get_var_from_runs(traj, 'results.fitness')
+            get_var_from_runs(traj, 'parameters.individual.coords')
+            get_var_from_runs(traj, 'results.fitness')
     """
 
     status_interval = int(status_interval) if status_interval else None
@@ -195,7 +192,7 @@ def get_empty_traj(filename, name_or_index=-1):
     """
     This takes an hdf5 filename (which should have been generated by pypet/LTL in
     the first place) and returns a :class:`~pypet.Trajectory` instance loaded from
-    the `index`th Trajectory stored in the file. In this function, nothing is loaded
+    the `index` th Trajectory stored in the file. In this function, nothing is loaded
     for the results and derived parameters, whereas the parameters are fully loaded.
 
     This is recommended when the file size is REALLY LARGE (e.g. > 20GB)
