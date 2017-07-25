@@ -65,14 +65,16 @@ def main():
 
     # NOTE: Outerloop optimizer initialization
     parameters = GeneticAlgorithmParameters(seed=0, popsize=50, CXPB=0.5,
-                                            MUTPB=0.3, NGEN=100, indpb=0.02,
+                                            MUTPB=0.3, NGEN=100, indpb=0.05,
                                             tournsize=15, matepar=0.5,
                                             mutpar=1
                                             )
 
     optimizer = GeneticAlgorithmOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                           optimizee_fitness_weights=(-0.1,),
-                                          parameters=parameters)
+                                          parameters=parameters,
+                                          optimizee_bounding_func=optimizee.bounding_func
+                                          )
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
