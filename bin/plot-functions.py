@@ -11,7 +11,7 @@ from ltl.paths import Paths
 
 warnings.filterwarnings("ignore")
 
-logger = logging.getLogger('plot-function-generator')
+logger = logging.getLogger('bin.plot-function-generator')
 
 
 def main():

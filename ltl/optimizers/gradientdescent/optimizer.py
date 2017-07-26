@@ -8,7 +8,7 @@ from ltl import dict_to_list
 from ltl import list_to_dict
 from ltl.optimizers.optimizer import Optimizer
 
-logger = logging.getLogger("ltl-gradientdescent")
+logger = logging.getLogger("optimizers.gradientdescent")
 
 ClassicGDParameters = namedtuple(
     'ClassicGDParameters',

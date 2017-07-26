@@ -9,11 +9,16 @@ Getting Started
 
 Choose one of the following options to get started:
 
-* If you are developing a new Optimizee or want to try out a new Optimizee with the Optimizers in the LTL package, install LTL as a python package. See section `Installing the LTL Package`_ for more details (this automatically installs all requirements). See the `wiki <https://github.com/IGITUGraz/LTL/wiki/Writing-new-Optimizees>`_ for more details.
-* If you want to add a new Optimizer or want to modify the function Optimizees in the LTL package, install the requirements according to `Installing Requirements`_.
+* If you are developing a new Optimizee or want to try out a new Optimizee with the
+  Optimizers in the LTL package, install LTL as a python package. See section
+  `Installing the LTL Package`_ for more details (this automatically installs all
+  requirements). See the `wiki <https://github.com/IGITUGraz/LTL/wiki/Writing-new-
+  Optimizees>`_ for more details.
+
+* If you want to add a new Optimizer or want to modify the function Optimizees in
+  the LTL package, install the requirements according to `Installing Requirements`_.
 
 In both cases, you should build the documentation according to `Building Documentation`_ and **read it**!
-   
 
 Installing the LTL Package
 **************************
@@ -73,12 +78,15 @@ the documentation as specified below.
 Installing Requirements
 ***********************
 
-If you wish to install LTL as a python package, then you may ignore this section and continue from the section `Installing the LTL Package`_. If you however, wish to use it as-is, without installing, then the relevant requirements must be installed. This can be done by running the following from the root directory of the repository:
+If you wish to install LTL as a python package, then you may ignore this section and
+continue from the section `Installing the LTL Package`_. If you however, wish to use
+it as-is, without installing, then the relevant requirements must be installed. This
+can be done by running the following from the root directory of the repository:
 
     pip3 install --user -r requirements.txt
 
-Each optimizees and optimizers may have their own dependencies specified in the requirements.txt file within their
-respective package.
+Each optimizees and optimizers may have their own dependencies specified in the
+requirements.txt file within their respective package.
 
 Building Documentation
 **********************

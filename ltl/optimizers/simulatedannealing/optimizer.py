@@ -8,7 +8,7 @@ from ltl import dict_to_list
 from ltl import list_to_dict
 from ltl.optimizers.optimizer import Optimizer
 
-logger = logging.getLogger("ltl-sa")
+logger = logging.getLogger("optimizers.simulatedannealing")
 
 SimulatedAnnealingParameters = namedtuple('SimulatedAnnealingParameters',
                                           ['n_parallel_runs', 'noisy_step', 'temp_decay', 'n_iteration', 'stop_criterion', 'seed', 'cooling_schedule'])

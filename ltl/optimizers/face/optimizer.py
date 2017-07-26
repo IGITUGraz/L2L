@@ -6,7 +6,7 @@ import numpy as np
 from ltl import dict_to_list, list_to_dict
 from ltl.optimizers.optimizer import Optimizer
 
-logger = logging.getLogger("ltl-face")
+logger = logging.getLogger("optimizers.face")
 
 FACEParameters = namedtuple('FACEParameters',
                             ['min_pop_size', 'max_pop_size', 'n_elite', 'smoothing', 'temp_decay', 'n_iteration',

@@ -3,7 +3,6 @@ import os
 
 import numpy as np
 
-import yaml
 from pypet import Environment
 from pypet import pypetconstants
 
@@ -15,7 +14,9 @@ from ltl.optimizers.face.optimizer import FACEOptimizer, FACEParameters
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
-logger = logging.getLogger('ltl-fun-face')
+from ltl.logging_tools import create_shared_logger_data, configure_loggers
+
+logger = logging.getLogger('bin.ltl-fun-face')
 
 
 def main():
@@ -31,15 +32,7 @@ def main():
         )
     paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
 
-    with open("bin/logging.yaml") as f:
-        l_dict = yaml.load(f)
-        log_output_file = os.path.join(paths.results_path, l_dict['handlers']['file']['filename'])
-        l_dict['handlers']['file']['filename'] = log_output_file
-        logging.config.dictConfig(l_dict)
-
-    print("All output can be found in file ", log_output_file)
-    print("Change the values in logging.yaml to control log level and destination")
-    print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
+    print("All output logs can be found in directory ", paths.logs_path)
 
     traj_file = os.path.join(paths.output_dir_path, 'data.h5')
 
@@ -54,8 +47,13 @@ def main():
                       wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
-                      log_folder=os.path.join(paths.output_dir_path, 'logs')
                       )
+    create_shared_logger_data(logger_names=['bin', 'optimizers'],
+                              log_levels=['INFO', 'INFO'],
+                              log_to_consoles=[True, True],
+                              sim_name=name,
+                              log_directory=paths.logs_path)
+    configure_loggers()
 
     # Get the trajectory from the environment
     traj = env.trajectory
