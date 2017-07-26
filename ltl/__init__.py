@@ -214,7 +214,7 @@ def dict_to_list(input_dict, get_dict_spec=False):
     for key, value in dict_items:
 
         if isinstance(value, Iterable):
-            value_list = np.array(input_dict[key])
+            value_list = list(input_dict[key])
             return_list.extend(value_list)
             dict_spec.append((key, DictEntryType.Sequence, len(value_list)))
         else:
@@ -222,9 +222,9 @@ def dict_to_list(input_dict, get_dict_spec=False):
             dict_spec.append((key, DictEntryType.Scalar, 1))
 
     if get_dict_spec:
-        return return_list, dict_spec
+        return np.array(return_list), dict_spec
     else:
-        return return_list
+        return np.array(return_list)
 
 
 def list_to_dict(input_list, dict_spec):
