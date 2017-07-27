@@ -19,12 +19,12 @@ def list_to_bitstring(individual, get_spec=False, min_real=-10, max_real=10):
         attr_type = type(attr)
 
         if attr_type == np.float32:
-            encoded_int = np.uint32((attr - min_real)/(max_real - min_real) * np.iinfo(np.uint32).max)
+            encoded_int = np.uint32((attr - min_real) / (max_real - min_real) * np.iinfo(np.uint32).max)
             return BitArray(uint=encoded_int, length=32).bin
         elif attr_type == np.int32:
             return BitArray(int=attr, length=32).bin
         elif attr_type == np.float64:
-            encoded_int = np.uint64((attr - min_real)/(max_real - min_real) * np.iinfo(np.uint64).max)
+            encoded_int = np.uint64((attr - min_real) / (max_real - min_real) * np.iinfo(np.uint64).max)
             return BitArray(uint=encoded_int, length=64).bin
         elif attr_type == np.int64:
             return BitArray(int=attr, length=64).bin
