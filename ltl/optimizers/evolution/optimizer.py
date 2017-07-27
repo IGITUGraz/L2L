@@ -30,7 +30,10 @@ GeneticAlgorithmParameters.__doc__ = """
 
 class GeneticAlgorithmOptimizer(Optimizer):
     """
-    Implements evolutionary algorithm
+    Implements evolutionary algorithm.
+
+    When using the binary operators, real numbers are encoded as integers that discretise the input real interval
+    [-10, 10], which be modified. This is done for better exploration performance.
 
     :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs.
       The parameters should be initialized based on the values in `parameters`
