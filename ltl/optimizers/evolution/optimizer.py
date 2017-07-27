@@ -1,5 +1,6 @@
 import logging
 import random
+
 from collections import namedtuple
 
 from deap import base, creator, tools
@@ -72,7 +73,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
         # Operator registering
-        # This complex piece of code isonly necessary because we're using the
+        # This complex piece of code is only necessary because we're using the
         # DEAP framework and would like to decorate the DEAP mutation operator
         def bounding_decorator(func):
             def bounding_wrapper(*args, **kwargs):
