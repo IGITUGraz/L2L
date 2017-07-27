@@ -8,13 +8,13 @@ from deap.tools import HallOfFame
 
 from ltl import dict_to_list, list_to_dict
 from ltl.optimizers.optimizer import Optimizer
-from ltl.optimizers.evolution.operators import bits_one_point_crossover, bits_uniform_random_crossover
+from ltl.optimizers.evolution.operators import bits_two_point_crossover, bits_random_bitflip_mutation
 
-logger = logging.getLogger("ltl-ga")
+logger = logging.getLogger("optimizers.ltl-ga")
 
 GeneticAlgorithmParameters = namedtuple('GeneticAlgorithmParameters',
                                         ['seed', 'popsize', 'CXPB', 'MUTPB', 'NGEN', 'indpb', 'tournsize', 'matepar',
-                                         'mutpar'])
+                                         'mutpar', 'remutate'])
 GeneticAlgorithmParameters.__doc__ = """
 :param seed: Random seed
 :param popsize: Size of the population
@@ -23,7 +23,8 @@ GeneticAlgorithmParameters.__doc__ = """
 :param NGEN: Number of generations simulation should run for
 :param indpb: Probability of mutation of each element in individual
 :param tournsize: Size of the tournamaent used for fitness evaluation and selection
-:param matepar: Paramter used for blending two values during mating
+:param matepar: Parameter used for blending two values during mating
+:param remutate: Whether to mutate offspring that appear more than once after crossover and initial mutation
 """
 
 
@@ -93,11 +94,9 @@ class GeneticAlgorithmOptimizer(Optimizer):
 
             return bounding_wrapper
 
-        # toolbox.register("mate", tools.cxBlend, alpha=parameters.matepar)
-        toolbox.register("mate", bits_uniform_random_crossover, indpb=0.5)
+        toolbox.register("mate", bits_two_point_crossover)
         toolbox.decorate("mate", bounding_decorator)
-        toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=parameters.mutpar, indpb=traj.indpb)
-        # toolbox.register("mutate", tools.mutFlipBit, indpb=traj.indpb)
+        toolbox.register("mutate", bits_random_bitflip_mutation, flip_prob=traj.indpb)
         toolbox.decorate("mutate", bounding_decorator)
         toolbox.register("select", tools.selTournament, tournsize=traj.tournsize)
 
@@ -171,7 +170,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
                     self.toolbox.mutate(mutant)
                     del mutant.fitness.values
 
-            if len(set(map(tuple, offspring))) < len(offspring):
+            if self.parameters.remutate and len(set(map(tuple, offspring))) < len(offspring):
                 logger.info("Mutating more")
                 for i, o1 in enumerate(offspring):
                     for o2 in offspring[i:]:
@@ -189,7 +188,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 
-    def end(self):
+    def end(self, traj):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
