@@ -5,7 +5,9 @@ import numpy as np
 
 def list_to_bitstring(individual, get_spec=False, min_real=-10, max_real=10):
     """Converts an individual in the form of a list of attributes into a bit string representation, for genetic
-    operator manipulations.
+    operator manipulations. Real numbers are encoded by first discretising the space [min_real, max_real] and indexing
+    into that space by an integer of the same bit-depth. The binary representation of that integer is then used for
+    genetic manipulations.
     Note: only supports 32-bit values (both integral and floating point types), and singly-nested lists thereof.
 
     :param individual: List of attributes that make up an individual.
@@ -44,10 +46,13 @@ def list_to_bitstring(individual, get_spec=False, min_real=-10, max_real=10):
 
 
 def bitstring_to_list(bitstring, list_spec, min_real=-10, max_real=10):
-    """Converts a string of bits into a list of attributes, according to the provided specification.
+    """Converts a string of bits into a list of attributes, according to the provided specification. This performs the
+    reverse operation as list_to_bitstring. Real numbers are decoded by first converting a section of the bit string
+    into an integer, which is then mapped onto a real number by a shifting and rescaling transformation.
 
     :param bitstring: Bit-string representing the individual.
-    :param list_spec: Specification of the individual-list as a list of types, which can be int, float or list of either.
+    :param list_spec: Specification of the individual-list as a list of types, which can be int, float or list of
+    either.
     :param min_real: Minimum real-value bound, to use in decoding real numbers.
     :param max_real: Maximum real-value bound, to use in decoding real numbers."""
 
