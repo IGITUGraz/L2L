@@ -1,9 +1,9 @@
 import logging.config
 import os
 
-import yaml
 from pypet import Environment
 
+from ltl.logging_tools import create_shared_logger_data, configure_loggers
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
@@ -11,7 +11,7 @@ from ltl.optimizers.evolution import GeneticAlgorithmOptimizer, GeneticAlgorithm
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
-logger = logging.getLogger('ltl-fun-ga')
+logger = logging.getLogger('bin.ltl-fun-ga')
 
 
 def main():
@@ -27,15 +27,7 @@ def main():
         )
     paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
 
-    with open("bin/logging.yaml") as f:
-        l_dict = yaml.load(f)
-        log_output_file = os.path.join(paths.results_path, l_dict['handlers']['file']['filename'])
-        l_dict['handlers']['file']['filename'] = log_output_file
-        logging.config.dictConfig(l_dict)
-
-    print("All output can be found in file ", log_output_file)
-    print("Change the values in logging.yaml to control log level and destination")
-    print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
+    print("All output logs can be found in directory ", paths.logs_path)
 
     traj_file = os.path.join(paths.output_dir_path, 'data.h5')
 
@@ -46,8 +38,14 @@ def main():
                       add_time=True,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
-                      log_folder=os.path.join(paths.output_dir_path, 'logs')
                       )
+
+    create_shared_logger_data(logger_names=['bin', 'optimizers'],
+                              log_levels=['INFO', 'INFO'],
+                              log_to_consoles=[True, True],
+                              sim_name=name,
+                              log_directory=paths.logs_path)
+    configure_loggers()
 
     # Get the trajectory from the environment
     traj = env.trajectory
@@ -65,7 +63,7 @@ def main():
 
     # NOTE: Outerloop optimizer initialization
     parameters = GeneticAlgorithmParameters(seed=0, popsize=50, CXPB=0.5,
-                                            MUTPB=0.3, NGEN=100, indpb=0.05,
+                                            MUTPB=1.0, NGEN=100, indpb=0.001,
                                             tournsize=15, matepar=0.5,
                                             mutpar=1
                                             )
