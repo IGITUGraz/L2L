@@ -88,7 +88,7 @@ def main():
     env.run(optimizee.simulate)
 
     # NOTE: Outerloop optimizer end
-    optimizer.end()
+    optimizer.end(traj)
     recorder.end()
 
     # Finally disable logging and close all log-files
