@@ -216,6 +216,7 @@ class CrossEntropyOptimizer(Optimizer):
         logger.info("-- End of generation %d --", self.g)
         logger.info("  Evaluated %d individuals", len(fitnesses_results))
         logger.info('  Best Fitness: %.4f', self.best_fitness_in_run)
+        logger.info('  Average Fitness: %.4f', np.mean(sorted_fitess))
         logger.debug('  Calculated gamma: %.4f', self.gamma)
 
         #**************************************************************************************************************
