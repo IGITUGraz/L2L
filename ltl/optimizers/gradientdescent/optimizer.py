@@ -191,6 +191,7 @@ class GradientDescentOptimizer(Optimizer):
         # We need to collect the directions of the random steps along with the fitness evaluated there
         fitnesses = np.zeros((traj.n_random_steps))
         dx = np.zeros((traj.n_random_steps, len(self.current_individual)))
+        weighted_fitness_list = []
 
         for i, (run_index, fitness) in enumerate(fitnesses_results):
             # We need to convert the current run index into an ind_idx
@@ -203,22 +204,37 @@ class GradientDescentOptimizer(Optimizer):
             traj.f_add_result('$set.$.individual', individual)
             traj.f_add_result('$set.$.fitness', fitness)
 
-            ind_fitness = sum(f * w for f, w in zip(fitness, self.optimizee_fitness_weights))
+            weighted_fitness = np.dot(fitness, self.optimizee_fitness_weights)
+            weighted_fitness_list.append(weighted_fitness)
 
             # The last element of the list is the evaluation of the individual obtained via gradient descent
             if i == len(fitnesses_results) - 1:
-                self.current_fitness = ind_fitness
+                self.current_fitness = weighted_fitness
             else:
-                fitnesses[i] = ind_fitness
+                fitnesses[i] = weighted_fitness
                 dx[i] = np.array(dict_to_list(individual)) - self.current_individual
-
-        logger.debug("Current fitness is %.2f", self.current_fitness) 
-
         traj.v_idx = -1  # set the trajectory back to default
+
+        # Performs descending arg-sort of weighted fitness
+        fitness_sorting_indices = list(reversed(np.argsort(weighted_fitness_list)))
+        old_eval_pop_as_array = np.array([dict_to_list(x) for x in old_eval_pop])
+
+        # Sorting the data according to fitness
+        sorted_population = old_eval_pop_as_array[fitness_sorting_indices]
+        sorted_fitness = np.asarray(weighted_fitness_list)[fitness_sorting_indices]
+
+        logger.info("-- End of generation %d --", self.g)
+        logger.info("  Evaluated %d individuals", len(fitnesses_results))
+        logger.info('  Average Fitness: %.4f', np.mean(sorted_fitness))
+        logger.info("  Current fitness is %.2f", self.current_fitness)
+        logger.info('  Best Fitness: %.4f', sorted_fitness[0])
+        logger.info("  Best individual is %s", sorted_population[0])
 
         generation_result_dict = {
             'generation': self.g,
             'current_fitness': self.current_fitness,
+            'best_fitness_in_run': sorted_fitness[0],
+            'average_fitness_in_run': np.mean(sorted_fitness),
         }
 
         generation_name = 'generation_{}'.format(self.g)
@@ -241,7 +257,7 @@ class GradientDescentOptimizer(Optimizer):
                 list_to_dict(self.current_individual + 
                              self.random_state.normal(0.0, traj.exploration_step_size, self.current_individual.size),
                              self.optimizee_individual_dict_spec)
-                for i in range(traj.n_random_steps)
+                for _ in range(traj.n_random_steps)
             ]
             if self.optimizee_bounding_func is not None:
                 new_individual_list = [self.optimizee_bounding_func(ind) for ind in new_individual_list]

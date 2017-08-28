@@ -203,20 +203,20 @@ class CrossEntropyOptimizer(Optimizer):
 
         # Sorting the data according to fitness
         sorted_population = self.eval_pop_asarray[fitness_sorting_indices]
-        sorted_fitess = np.asarray(weighted_fitness_list)[fitness_sorting_indices]
+        sorted_fitness = np.asarray(weighted_fitness_list)[fitness_sorting_indices]
 
         # Elite individuals are with performance better than or equal to the (1-rho) quantile.
         # See original describtion of cross entropy for optimization
         elite_individuals = sorted_population[:n_elite]
 
         self.best_individual_in_run = sorted_population[0]
-        self.best_fitness_in_run = sorted_fitess[0]
-        self.gamma = sorted_fitess[n_elite - 1]
+        self.best_fitness_in_run = sorted_fitness[0]
+        self.gamma = sorted_fitness[n_elite - 1]
 
         logger.info("-- End of generation %d --", self.g)
         logger.info("  Evaluated %d individuals", len(fitnesses_results))
         logger.info('  Best Fitness: %.4f', self.best_fitness_in_run)
-        logger.info('  Average Fitness: %.4f', np.mean(sorted_fitess))
+        logger.info('  Average Fitness: %.4f', np.mean(sorted_fitness))
         logger.debug('  Calculated gamma: %.4f', self.gamma)
 
         #**************************************************************************************************************
@@ -239,6 +239,7 @@ class CrossEntropyOptimizer(Optimizer):
             'gamma': self.gamma,
             'T': self.T,
             'best_fitness_in_run': self.best_fitness_in_run,
+            'average_fitness_in_run': np.mean(sorted_fitness),
             'pop_size': self.pop_size
         }
 

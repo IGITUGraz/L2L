@@ -63,7 +63,7 @@ def run_experiment():
 
     # NOTE: Outerloop Simulator
     parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=180,
-                                        distribution=NoisyGaussian(additive_noise=1,
+                                        distribution=NoisyGaussian(noise_magnitude=1,
                                                                    noise_decay=0.95),
                                         stop_criterion=np.inf, seed=102)
 
