@@ -8,7 +8,7 @@ def list_to_bitstring(individual, get_spec=False, min_real=-10, max_real=10):
     operator manipulations. Real numbers are encoded by first discretising the space [min_real, max_real] and indexing
     into that space by an integer of the same bit-depth. The binary representation of that integer is then used for
     genetic manipulations.
-    Note: only supports 32-bit values (both integral and floating point types), and singly-nested lists thereof.
+    Note: Supports both integral and floating point types, and singly-nested lists thereof.
 
     :param individual: List of attributes that make up an individual.
     :param get_spec: If true, returns a spec list made of int, float or lists of them, for decoding downstream.
