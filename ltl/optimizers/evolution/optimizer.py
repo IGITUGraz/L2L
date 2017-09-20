@@ -22,7 +22,7 @@ GeneticAlgorithmParameters.__doc__ = """
 :param MUTPB: Mutation probability
 :param NGEN: Number of generations simulation should run for
 :param indpb: Probability of mutation of each element in individual
-:param tournsize: Size of the tournamaent used for fitness evaluation and selection
+:param tournsize: Size of the tournament used for fitness evaluation and selection
 :param matepar: Parameter used for blending two values during mating
 :param remutate: Whether to mutate offspring that appear more than once after crossover and initial mutation
 """
@@ -33,7 +33,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
     Implements evolutionary algorithm.
 
     When using the binary operators, real numbers are encoded as integers that discretise the input real interval
-    [-10, 10], which be modified. This is done for better exploration performance.
+    [-10, 10]; this range can be modified. This is done for better exploration performance.
 
     :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs.
       The parameters should be initialized based on the values in `parameters`

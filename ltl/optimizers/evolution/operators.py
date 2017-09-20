@@ -1,6 +1,10 @@
 from bitstring import BitArray, BitStream
-import random
+
+import logging
 import numpy as np
+import random
+
+logger = logging.getLogger("optimizers.evolution")
 
 
 def list_to_bitstring(individual, get_spec=False, min_real=-10, max_real=10):
@@ -61,13 +65,11 @@ def bitstring_to_list(bitstring, list_spec, min_real=-10, max_real=10):
             return np.int32(bit_stream.read('int:32'))
         elif attr_type == np.float32:
             decoded_int = np.uint32(bit_stream.read('uint:32'))
-            # return np.float32(bit_stream.read('float:32'))
             return np.float32((np.float32(decoded_int) / np.iinfo(np.uint32).max) * (max_real - min_real) + min_real)
         elif attr_type == np.int64:
             return np.int64(bit_stream.read('int:64'))
         elif attr_type == np.float64:
             decoded_int = np.uint64(bit_stream.read('uint:64'))
-            # return np.float64(bit_stream.read('float:64'))
             return np.float64((np.float64(decoded_int) / np.iinfo(np.uint64).max) * (max_real - min_real) + min_real)
 
     bit_stream = BitStream(bin=bitstring)
@@ -83,26 +85,28 @@ def bitstring_to_list(bitstring, list_spec, min_real=-10, max_real=10):
             raise NotImplementedError
 
     if np.isnan(individual).any():
-        print("NaN encountered. Replacing by a random real number.")
+        logging.info("NaN encountered. Replacing by a random real number.")
         individual = [random.uniform(min_real, max_real) if np.isnan(x) else x for x in individual]
 
     return individual
 
 
 # Mating Operators
-def bits_one_point_crossover(ind1, ind2):
+def bits_one_point_crossover(ind1, ind2, min_real=-10, max_real=10):
     """Executes a one-point crossover on the binary representation of input :term:`sequence` individuals.
     The individuals are first converted to a binary representation and then modified. The resulting individuals will
     respectively have the length of the other.
 
     :param ind1: The first individual participating in the crossover.
     :param ind2: The second individual participating in the crossover.
+    :param min_real: Minimum real-value bound, to use in decoding real numbers.
+    :param max_real: Maximum real-value bound, to use in decoding real numbers.
     :returns: A tuple of two offspring (input individuals are modified in-place).
     """
 
     # Get chromosomes and their spec.
-    chrom1, spec1 = list_to_bitstring(ind1, get_spec=True)
-    chrom2, spec2 = list_to_bitstring(ind2, get_spec=True)
+    chrom1, spec1 = list_to_bitstring(ind1, get_spec=True, min_real=min_real, max_real=max_real)
+    chrom2, spec2 = list_to_bitstring(ind2, get_spec=True, min_real=min_real, max_real=max_real)
 
     # Find the crossover point and perform crossover.
     size = min(len(chrom1), len(chrom2))
@@ -112,24 +116,26 @@ def bits_one_point_crossover(ind1, ind2):
     chrom1_new = chrom1[:cxpoint] + chrom2[cxpoint:]
 
     # Convert the chromosome representation back to a phenotype
-    ind1[:] = bitstring_to_list(chrom1_new, spec1)
-    ind2[:] = bitstring_to_list(chrom2_new, spec2)
+    ind1[:] = bitstring_to_list(chrom1_new, spec1, min_real, max_real)
+    ind2[:] = bitstring_to_list(chrom2_new, spec2, min_real, max_real)
 
     return ind1, ind2
 
 
-def bits_two_point_crossover(ind1, ind2):
+def bits_two_point_crossover(ind1, ind2, min_real=-10, max_real=10):
     """Executes a two-point crossover on the binary representation of input :term:`sequence` individuals.
     The individuals are first converted to a binary representation and then modified.
 
     :param ind1: The first individual participating in the crossover.
     :param ind2: The second individual participating in the crossover.
+    :param min_real: Minimum real-value bound, to use in decoding real numbers.
+    :param max_real: Maximum real-value bound, to use in decoding real numbers.
     :returns: A tuple of two offspring (input individuals are modified in-place).
     """
 
     # Get chromosomes and their spec.
-    chrom1, spec1 = list_to_bitstring(ind1, get_spec=True)
-    chrom2, spec2 = list_to_bitstring(ind2, get_spec=True)
+    chrom1, spec1 = list_to_bitstring(ind1, get_spec=True, min_real=min_real, max_real=max_real)
+    chrom2, spec2 = list_to_bitstring(ind2, get_spec=True, min_real=min_real, max_real=max_real)
 
     # Find the crossover points and perform crossover.
     size = min(len(ind1), len(ind2))
@@ -144,13 +150,13 @@ def bits_two_point_crossover(ind1, ind2):
     chrom2_new = chrom2[:cxpoint1] + chrom1[cxpoint1:cxpoint2] + chrom2[cxpoint2:]
 
     # Convert the chromosome representation back to a phenotype
-    ind1[:] = bitstring_to_list(chrom1_new, spec1)
-    ind2[:] = bitstring_to_list(chrom2_new, spec2)
+    ind1[:] = bitstring_to_list(chrom1_new, spec1, min_real=min_real, max_real=max_real)
+    ind2[:] = bitstring_to_list(chrom2_new, spec2, min_real=min_real, max_real=max_real)
 
     return ind1, ind2
 
 
-def bits_uniform_random_crossover(ind1, ind2, swap_prob):
+def bits_uniform_random_crossover(ind1, ind2, swap_prob, min_real=-10, max_real=10):
     """Executes a uniform random crossover on the bit-representation of input :term:`sequence` individuals.
     The individuals are first converted to a bit representation and then modified. The resulting individuals will
     respectively have the length of the other.
@@ -158,14 +164,16 @@ def bits_uniform_random_crossover(ind1, ind2, swap_prob):
     :param ind1: The first individual participating in the crossover.
     :param ind2: The second individual participating in the crossover.
     :param swap_prob: Bit swap probability.
+    :param min_real: Minimum real-value bound, to use in decoding real numbers.
+    :param max_real: Maximum real-value bound, to use in decoding real numbers.
     :returns: A tuple of two offspring (input individuals are modified in-place).
 
     Note: Assumes equal-length chromosomes
     """
 
     # Get chromosomes and their spec.
-    chrom1, spec1 = list_to_bitstring(ind1, get_spec=True)
-    chrom2, spec2 = list_to_bitstring(ind2, get_spec=True)
+    chrom1, spec1 = list_to_bitstring(ind1, get_spec=True, min_real=min_real, max_real=max_real)
+    chrom2, spec2 = list_to_bitstring(ind2, get_spec=True, min_real=min_real, max_real=max_real)
 
     chrom1_new = list(chrom1)
     chrom2_new = list(chrom2)
@@ -178,24 +186,26 @@ def bits_uniform_random_crossover(ind1, ind2, swap_prob):
             chrom2_new[i] = chrom1[i]
 
     # Convert the chromosome representation back to a phenotype
-    ind1[:] = bitstring_to_list(''.join(chrom1_new), spec1)
-    ind2[:] = bitstring_to_list(''.join(chrom2_new), spec2)
+    ind1[:] = bitstring_to_list(''.join(chrom1_new), spec1, min_real, max_real)
+    ind2[:] = bitstring_to_list(''.join(chrom2_new), spec2, min_real, max_real)
 
     return ind1, ind2
 
 
 # Mutation Operators
-def bits_random_bitflip_mutation(ind, flip_prob):
+def bits_random_bitflip_mutation(ind, flip_prob, min_real=-10, max_real=10):
     """Executes a random bitflip mutation on the chromosome of input :term:`sequence` individual.
     The individual is first converted to a bit representation and then modified.
 
     :param ind: The individual to be mutated.
     :param flip_prob: Bit flip probability.
+    :param min_real: Minimum real-value bound, to use in decoding real numbers.
+    :param max_real: Maximum real-value bound, to use in decoding real numbers.
     :returns: A tuple with one mutated individual (which is also modified in-place).
     """
 
     # Get chromosomes and spec.
-    chrom, spec = list_to_bitstring(ind, get_spec=True)
+    chrom, spec = list_to_bitstring(ind, get_spec=True, min_real=min_real, max_real=max_real)
 
     chrom_new = list(chrom)
 
@@ -206,6 +216,6 @@ def bits_random_bitflip_mutation(ind, flip_prob):
             chrom_new[i] = '1' if chrom_new[i] == '0' else '0'
 
     # Convert the chromosome representation back to a phenotype
-    ind[:] = bitstring_to_list(''.join(chrom_new), spec)
+    ind[:] = bitstring_to_list(''.join(chrom_new), spec, min_real, max_real)
 
     return ind,
