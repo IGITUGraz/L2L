@@ -22,4 +22,5 @@ Implemented Examples
     ltl.optimizers.gridsearch
     ltl.optimizers.evolution
     ltl.optimizers.simulatedannealing
+    ltl.optimizers.evolutionstrategies
 
