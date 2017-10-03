@@ -22,32 +22,30 @@ def run_experiment():
         with open('bin/path.conf') as f:
             root_dir_path = f.read().strip()
     except FileNotFoundError:
-        raise FileNotFoundError(
-            "You have not set the root path to store your results."
-            " Write the path to a path.conf text file in the bin directory"
-            " before running the simulation"
-        )
+        raise FileNotFoundError("You have not set the root path to store your results."
+                                " Write the path to a path.conf text file in the bin directory"
+                                " before running the simulation")
     paths = Paths(name, dict(run_num='test'), root_dir_path=root_dir_path)
 
     print("All output logs can be found in directory ", paths.logs_path)
 
     # Create an environment that handles running our simulation
     # This initializes a PyPet environment
-    env = Environment(trajectory=name, filename=paths.output_dir_path, file_title='{} data'.format(name),
-                      comment='{} data'.format(name),
-                      add_time=True,
-                      # freeze_input=True,
-                      # multiproc=True,
-                      # use_scoop=True,
-                      # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
-                      automatic_storing=True,
-                      log_stdout=False,  # Sends stdout to logs
-                      )
-    create_shared_logger_data(logger_names=['bin', 'optimizers'],
-                              log_levels=['INFO', 'INFO'],
-                              log_to_consoles=[True, True],
-                              sim_name=name,
-                              log_directory=paths.logs_path)
+    env = Environment(
+        trajectory=name,
+        filename=paths.output_dir_path,
+        file_title='{} data'.format(name),
+        comment='{} data'.format(name),
+        add_time=True,
+        automatic_storing=True,
+        log_stdout=False,    # Sends stdout to logs
+    )
+    create_shared_logger_data(
+        logger_names=['bin', 'optimizers'],
+        log_levels=['INFO', 'INFO'],
+        log_to_consoles=[True, True],
+        sim_name=name,
+        log_directory=paths.logs_path)
     configure_loggers()
 
     # Get the trajectory from the environment
@@ -66,22 +64,32 @@ def run_experiment():
 
     ## Outerloop optimizer initialization
 
-    parameters = EvolutionStrategiesParameters(learning_rate=0.1, noise_std=1.0, pop_size=10, n_iteration=1000,
-                                               stop_criterion=np.Inf, seed=np.random.randint(1e5))
+    parameters = EvolutionStrategiesParameters(
+        learning_rate=0.1,
+        noise_std=1.0,
+        pop_size=20,
+        n_iteration=1000,
+        stop_criterion=np.Inf,
+        seed=np.random.randint(1e5),
+        use_mirrored_sampling=False)
 
-    optimizer = EvolutionStrategiesOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                             optimizee_fitness_weights=(-1.,),
-                                             parameters=parameters,
-                                             optimizee_bounding_func=optimizee.bounding_func)
+    optimizer = EvolutionStrategiesOptimizer(
+        traj,
+        optimizee_create_individual=optimizee.create_individual,
+        optimizee_fitness_weights=(-1., ),
+        parameters=parameters,
+        optimizee_bounding_func=optimizee.bounding_func)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
 
     # Add Recorder
-    recorder = Recorder(trajectory=traj,
-                        optimizee_name=benchmark_name, optimizee_parameters=benchmark_parameters,
-                        optimizer_name=optimizer.__class__.__name__,
-                        optimizer_parameters=optimizer.get_params())
+    recorder = Recorder(
+        trajectory=traj,
+        optimizee_name=benchmark_name,
+        optimizee_parameters=benchmark_parameters,
+        optimizer_name=optimizer.__class__.__name__,
+        optimizer_parameters=optimizer.get_params())
     recorder.start()
 
     # Run the simulation with all parameter combinations
@@ -114,7 +122,7 @@ def process_results(filename, trajname):
     pop_size_list = [params_dict['pop_size'] for params_dict in algorithm_params_list]
 
     pop_size_list_cumsum = np.cumsum(pop_size_list)
-    gen_no_list = np.zeros_like(run_id_list)  # gen_no_list[i] = gen no of ith run
+    gen_no_list = np.zeros_like(run_id_list)    # gen_no_list[i] = gen no of ith run
     gen_no_list[pop_size_list_cumsum[:-1]] = 1
     gen_no_list = np.cumsum(gen_no_list)
 
