@@ -214,9 +214,10 @@ class EvolutionStrategiesOptimizer(Optimizer):
                     " for `EvolutionStrategiesOptimizer::post_process()` for comments documenting these"
                     " parameters")
 
-        self.current_individual_arr += learning_rate * np.sum(
-            [f * e for f, e in zip(weighted_fitness_list, self.current_perturbations)], axis=0) / (
-                                       len(weighted_fitness_list) * noise_std ** 2)
+        self.current_individual_arr += \
+            learning_rate \
+            * np.sum([f * e for f, e in zip(weighted_fitness_list, self.current_perturbations)], axis=0) \
+            / (len(weighted_fitness_list) * noise_std ** 2)
 
         #**************************************************************************************************************
         # Create the next generation by sampling the inferred distribution

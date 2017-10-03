@@ -1,18 +1,17 @@
 import logging.config
-import os
 
 import numpy as np
 from pypet import Environment
+
 from ltl import dict_to_list
 from ltl.dataprocessing import get_skeleton_traj, get_var_from_runs, get_var_from_generations
+from ltl.logging_tools import create_shared_logger_data, configure_loggers
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizers.evolutionstrategies.optimizer import EvolutionStrategiesParameters, EvolutionStrategiesOptimizer
 from ltl.paths import Paths
 from ltl.recorder import Recorder
-
-from ltl.logging_tools import create_shared_logger_data, configure_loggers
 
 logger = logging.getLogger('bin.ltl-fun-es')
 
