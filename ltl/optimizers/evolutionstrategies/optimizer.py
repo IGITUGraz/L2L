@@ -9,14 +9,24 @@ from ltl.optimizers.optimizer import Optimizer
 logger = logging.getLogger("optimizers.evolutionstrategies")
 
 EvolutionStrategiesParameters = namedtuple('EvolutionStrategiesParameters', [
-    'learning_rate', 'noise_std', 'use_mirrored_sampling', 'pop_size', 'n_iteration', 'stop_criterion', 'seed'
+    'learning_rate',
+    'noise_std',
+    'mirrored_sampling_enabled',
+    'fitness_shaping_enabled',
+    'fitness_shaping_fraction',
+    'pop_size',
+    'n_iteration',
+    'stop_criterion',
+    'seed',
 ])
 
 EvolutionStrategiesParameters.__doc__ = """
 :param learning_rate: Learning rate
 :param noise_std: Standard deviation of the step size (The step has 0 mean)
-:param use_mirrored_sampling: Should we turn on mirrored sampling i.e. sampling both e and -e
-
+:param mirrored_sampling_enabled: Should we turn on mirrored sampling i.e. sampling both e and -e
+:param fitness_shaping_enabled: Should we turn on fitness shaping i.e. using only top `fitness_shaping_ratio` to update
+       current individual?
+:param fitness_shaping_fraction: Fraction of top individuals to use to update the current individual
 :param pop_size: Number of individuals per simulation.
 :param n_iteration: Number of iterations to perform
 :param stop_criterion: (Optional) Stop if this fitness is reached.
@@ -28,7 +38,8 @@ class EvolutionStrategiesOptimizer(Optimizer):
     """
     Class Implementing the evolution strategies optimizer
 
-    as in: Salimans, T., Ho, J., Chen, X. & Sutskever, I. Evolution Strategies as a Scalable Alternative to Reinforcement   Learning. arXiv:1703.03864 [cs, stat] (2017).
+    as in: Salimans, T., Ho, J., Chen, X. & Sutskever, I. Evolution Strategies as a Scalable Alternative to
+            Reinforcement   Learning. arXiv:1703.03864 [cs, stat] (2017).
 
     In the pseudo code the algorithm does:
 
@@ -96,7 +107,15 @@ class EvolutionStrategiesOptimizer(Optimizer):
         traj.f_add_parameter('learning_rate', parameters.learning_rate, comment='Learning rate')
         traj.f_add_parameter('noise_std', parameters.noise_std, comment='Standard deviation of noise')
         traj.f_add_parameter(
-            'use_mirrored_sampling', parameters.use_mirrored_sampling, comment='Flag to enable mirrored sampling')
+            'mirrored_sampling_enabled',
+            parameters.mirrored_sampling_enabled,
+            comment='Flag to enable mirrored sampling')
+        traj.f_add_parameter(
+            'fitness_shaping_enabled', parameters.fitness_shaping_enabled, comment='Flag to enable fitness shaping')
+        traj.f_add_parameter(
+            'fitness_shaping_fraction',
+            parameters.fitness_shaping_fraction,
+            comment='Fraction of top individuals to use for fitness shaping')
         traj.f_add_parameter(
             'pop_size', parameters.pop_size, comment='Number of minimal individuals simulated in each run')
         traj.f_add_parameter('n_iteration', parameters.n_iteration, comment='Number of iterations to run')
@@ -146,9 +165,9 @@ class EvolutionStrategiesOptimizer(Optimizer):
         self._expand_trajectory(traj)
 
     def _get_perturbations(self, traj):
-        pop_size, noise_std, use_mirrored_sampling = traj.pop_size, traj.noise_std, traj.use_mirrored_sampling
+        pop_size, noise_std, mirrored_sampling_enabled = traj.pop_size, traj.noise_std, traj.mirrored_sampling_enabled
         perturbations = noise_std * self.random_state.randn(pop_size, *self.current_individual_arr.shape)
-        if use_mirrored_sampling:
+        if mirrored_sampling_enabled:
             return np.vstack((perturbations, -perturbations))
         return perturbations
 
@@ -166,8 +185,8 @@ class EvolutionStrategiesOptimizer(Optimizer):
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
 
-        n_iteration, stop_criterion, learning_rate, noise_std = \
-            traj.n_iteration, traj.stop_criterion, traj.learning_rate, traj.noise_std
+        n_iteration, stop_criterion, learning_rate, noise_std, fitness_shaping_enabled, fitness_shaping_fraction = \
+            traj.n_iteration, traj.stop_criterion, traj.learning_rate, traj.noise_std, traj.fitness_shaping_enabled, traj.fitness_shaping_fraction
 
         weighted_fitness_list = []
         #**************************************************************************************************************
@@ -186,18 +205,28 @@ class EvolutionStrategiesOptimizer(Optimizer):
             weighted_fitness_list.append(np.dot(fitness, self.optimizee_fitness_weights))
         traj.v_idx = -1    # set trajectory back to default
 
+        # NOTE: It is necessary to clear the finesses_results to clear the data in the reference, and del
+        #^ is used to make sure it's not used in the rest of this function
+        fitnesses_results.clear()
+        del fitnesses_results
+
+        # Last fitness is for the previous `current_individual_arr`
+        weighted_fitness_list = weighted_fitness_list[:-1]
+        current_individual_fitness = weighted_fitness_list[-1]
+
         # Performs descending arg-sort of weighted fitness
         fitness_sorting_indices = list(reversed(np.argsort(weighted_fitness_list)))
 
         # Sorting the data according to fitness
         sorted_population = self.eval_pop_arr[fitness_sorting_indices]
         sorted_fitness = np.asarray(weighted_fitness_list)[fitness_sorting_indices]
+        sorted_perturbations = self.current_perturbations[fitness_sorting_indices]
 
         self.best_individual_in_run = sorted_population[0]
         self.best_fitness_in_run = sorted_fitness[0]
 
         logger.info("-- End of generation %d --", self.g)
-        logger.info("  Evaluated %d individuals", len(fitnesses_results))
+        logger.info("  Evaluated %d individuals", len(weighted_fitness_list) + 1)
         logger.info('  Best Fitness: %.4f', self.best_fitness_in_run)
         logger.info('  Average Fitness: %.4f', np.mean(sorted_fitness))
 
@@ -215,6 +244,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
         generation_result_dict = {
             'generation': self.g,
             'best_fitness_in_run': self.best_fitness_in_run,
+            'current_individual_fitness': current_individual_fitness,
             'average_fitness_in_run': np.mean(sorted_fitness),
             'pop_size': self.pop_size
         }
@@ -224,20 +254,28 @@ class EvolutionStrategiesOptimizer(Optimizer):
         traj.results.generation_params.f_add_result(
             generation_name + '.algorithm_params',
             generation_result_dict,
-            comment="These are the parameters that correspond to the algorithm, look at the source code"
-            " for `EvolutionStrategiesOptimizer::post_process()` for comments documenting these"
-            " parameters")
+            comment="These are the parameters that correspond to the algorithm."
+            "Look at the source code for `EvolutionStrategiesOptimizer::post_process()` for comments documenting these parameters"
+        )
 
-        self.current_individual_arr += \
-            learning_rate \
-            * np.sum([f * e for f, e in zip(weighted_fitness_list, self.current_perturbations)], axis=0) \
-            / (len(weighted_fitness_list) * noise_std ** 2)
+        individuals_to_be_fitted = sorted_fitness
+        perturbations_to_be_fitted = sorted_perturbations
+
+        if fitness_shaping_enabled:
+            n_elite = int(fitness_shaping_fraction * len(sorted_fitness))
+            individuals_to_be_fitted = sorted_fitness[:n_elite]
+            perturbations_to_be_fitted = sorted_perturbations[:n_elite]
+
+        assert len(individuals_to_be_fitted) == len(perturbations_to_be_fitted)
+
+        self.current_individual_arr += learning_rate \
+                * np.sum([f * e for f, e in zip(individuals_to_be_fitted, perturbations_to_be_fitted)], axis=0) \
+                / (len(individuals_to_be_fitted) * noise_std ** 2)
 
         #**************************************************************************************************************
         # Create the next generation by sampling the inferred distribution
         #**************************************************************************************************************
         # Note that this is only done in case the evaluated run is not the last run
-        fitnesses_results.clear()
         self.eval_pop.clear()
 
         # check if to stop
@@ -246,6 +284,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
             current_eval_pop_arr = (self.current_individual_arr + self.current_perturbations).tolist()
 
             self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec) for ind in current_eval_pop_arr]
+            self.eval_pop.append(list_to_dict(self.current_individual_arr, self.optimizee_individual_dict_spec))
 
             # Bounding function has to be applied AFTER the individual has been converted to a dict
             if self.optimizee_bounding_func is not None:

@@ -9,7 +9,7 @@ from ltl.logging_tools import create_shared_logger_data, configure_loggers
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
-from ltl.optimizers.evolutionstrategies.optimizer import EvolutionStrategiesParameters, EvolutionStrategiesOptimizer
+from ltl.optimizers.evolutionstrategies import EvolutionStrategiesParameters, EvolutionStrategiesOptimizer
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
@@ -65,15 +65,17 @@ def run_experiment():
     optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
 
     ## Outerloop optimizer initialization
-
+    optimizer_seed = 1234
     parameters = EvolutionStrategiesParameters(
         learning_rate=0.1,
         noise_std=1.0,
+        mirrored_sampling_enabled=True,
+        fitness_shaping_enabled=True,
+        fitness_shaping_fraction=0.8,
         pop_size=20,
         n_iteration=1000,
         stop_criterion=np.Inf,
-        seed=np.random.randint(1e5),
-        use_mirrored_sampling=False)
+        seed=optimizer_seed)
 
     optimizer = EvolutionStrategiesOptimizer(
         traj,
