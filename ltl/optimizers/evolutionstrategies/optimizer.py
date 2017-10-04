@@ -161,6 +161,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
         current_eval_pop_arr = (self.current_individual_arr + self.current_perturbations).tolist()
 
         self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec) for ind in current_eval_pop_arr]
+        self.eval_pop.append(list_to_dict(self.current_individual_arr, self.optimizee_individual_dict_spec))
 
         # Bounding function has to be applied AFTER the individual has been converted to a dict
         if optimizee_bounding_func is not None:
@@ -211,6 +212,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
             weighted_fitness_list.append(np.dot(fitness, self.optimizee_fitness_weights))
         traj.v_idx = -1  # set trajectory back to default
 
+        weighted_fitness_list = np.array(weighted_fitness_list).ravel()
         # NOTE: It is necessary to clear the finesses_results to clear the data in the reference, and del
         #^ is used to make sure it's not used in the rest of this function
         fitnesses_results.clear()
@@ -265,8 +267,6 @@ class EvolutionStrategiesOptimizer(Optimizer):
                     "for comments documenting these parameters"
         )
 
-        perturbations_to_be_fitted = sorted_perturbations
-
         if fitness_shaping_enabled:
             sorted_utilities = []
             n_individuals = len(sorted_fitness)
@@ -276,15 +276,15 @@ class EvolutionStrategiesOptimizer(Optimizer):
             sorted_utilities = np.array(sorted_utilities)
             sorted_utilities /= np.sum(sorted_utilities)
             sorted_utilities -= (1. / n_individuals)
-            assert np.sum(sorted_utilities) == 0., "Sum of utilities is not 0, but %.4f" % np.sum(sorted_utilities)
+            # assert np.sum(sorted_utilities) == 0., "Sum of utilities is not 0, but %.4f" % np.sum(sorted_utilities)
             fitnesses_to_fit = sorted_utilities
         else:
             fitnesses_to_fit = sorted_fitness
 
-        assert len(fitnesses_to_fit) == len(perturbations_to_be_fitted)
+        assert len(fitnesses_to_fit) == len(sorted_perturbations)
 
         self.current_individual_arr += learning_rate \
-                                       * np.sum([f * e for f, e in zip(fitnesses_to_fit, perturbations_to_be_fitted)], axis=0) \
+                                       * np.sum([f * e for f, e in zip(fitnesses_to_fit, sorted_perturbations)], axis=0) \
                                        / (len(fitnesses_to_fit) * noise_std ** 2)
 
         #**************************************************************************************************************
