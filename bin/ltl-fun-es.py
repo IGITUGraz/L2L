@@ -25,20 +25,23 @@ def run_experiment():
         raise FileNotFoundError("You have not set the root path to store your results."
                                 " Write the path to a path.conf text file in the bin directory"
                                 " before running the simulation")
-    paths = Paths(name, dict(run_num='test'), root_dir_path=root_dir_path)
+
+    trajectory_name = 'mirroring-and-fitness-shaping'
+
+    paths = Paths(name, dict(run_num='test'), root_dir_path=root_dir_path, suffix="-" + trajectory_name)
 
     print("All output logs can be found in directory ", paths.logs_path)
 
     # Create an environment that handles running our simulation
     # This initializes a PyPet environment
     env = Environment(
-        trajectory=name,
+        trajectory=trajectory_name,
         filename=paths.output_dir_path,
         file_title='{} data'.format(name),
         comment='{} data'.format(name),
         add_time=True,
         automatic_storing=True,
-        log_stdout=False,    # Sends stdout to logs
+        log_stdout=False,  # Sends stdout to logs
     )
     create_shared_logger_data(
         logger_names=['bin', 'optimizers'],
@@ -57,7 +60,7 @@ def run_experiment():
     (benchmark_name, benchmark_function), benchmark_parameters = \
         bench_functs.get_function_by_index(function_id, noise=True)
 
-    optimizee_seed = 100
+    optimizee_seed = 200
     random_state = np.random.RandomState(seed=optimizee_seed)
     function_tools.plot(benchmark_function, random_state)
 
@@ -71,7 +74,6 @@ def run_experiment():
         noise_std=1.0,
         mirrored_sampling_enabled=True,
         fitness_shaping_enabled=True,
-        fitness_shaping_fraction=0.8,
         pop_size=20,
         n_iteration=1000,
         stop_criterion=np.Inf,
@@ -80,7 +82,7 @@ def run_experiment():
     optimizer = EvolutionStrategiesOptimizer(
         traj,
         optimizee_create_individual=optimizee.create_individual,
-        optimizee_fitness_weights=(-1., ),
+        optimizee_fitness_weights=(-1.,),
         parameters=parameters,
         optimizee_bounding_func=optimizee.bounding_func)
 
@@ -106,10 +108,10 @@ def run_experiment():
     # Finally disable logging and close all log-files
     env.disable_logging()
 
-    return traj.v_storage_service.filename, traj.v_name
+    return traj.v_storage_service.filename, traj.v_name, paths
 
 
-def process_results(filename, trajname):
+def process_results(filename, trajname, paths):
     # NOTE: This is written specifically for benchmark function number 14
 
     from ltl.matplotlib_ import plt
@@ -122,13 +124,26 @@ def process_results(filename, trajname):
     best_fitness_list = [x['best_fitness_in_run'] for x in algorithm_params_list]
     average_fitness_list = [x['average_fitness_in_run'] for x in algorithm_params_list]
     generation_list = [x['generation'] for x in algorithm_params_list]
+    current_individual_fitness = [x['current_individual_fitness'] for x in algorithm_params_list]
 
     pop_size_list = [params_dict['pop_size'] for params_dict in algorithm_params_list]
 
     pop_size_list_cumsum = np.cumsum(pop_size_list)
-    gen_no_list = np.zeros_like(run_id_list)    # gen_no_list[i] = gen no of ith run
+    gen_no_list = np.zeros_like(run_id_list)  # gen_no_list[i] = gen no of ith run
     gen_no_list[pop_size_list_cumsum[:-1]] = 1
     gen_no_list = np.cumsum(gen_no_list)
+
+    # NOTE: This is because the value of the fitness weight is negative!!
+    fitness_list = -1 * np.array(fitness_list)
+
+    fig, ax = plt.subplots(figsize=(15, 7))
+    ax.plot(gen_no_list, fitness_list, '.', label='fitness distribution')
+    ax.plot(generation_list, current_individual_fitness, label='current individual fitness')
+    ax.plot(generation_list, best_fitness_list, label='best fitness')
+    ax.plot(generation_list, average_fitness_list, label='average fitness')
+    ax.legend()
+    ax.set_title("Testing", fontsize='small')
+    fig.savefig(paths.get_fpath('fitness-v-generation', 'png'))
 
     individual_list, run_id_list = get_var_from_runs(traj, 'results.individual', with_ids=True, status_interval=200)
 
@@ -137,30 +152,20 @@ def process_results(filename, trajname):
     xs = [p[0] for p in individual_list_arr]
     ys = [p[1] for p in individual_list_arr]
 
-    # NOTE: This is because the value of the fitness weight is negative!!
-    fitness_list = -1 * np.array(fitness_list)
-
-    fig, ax = plt.subplots(figsize=(15, 7))
-    ax.plot(gen_no_list, fitness_list, 'g.', label='fitness distrubtion')
-    ax.plot(generation_list, best_fitness_list, label='best fitness')
-    ax.plot(generation_list, average_fitness_list, label='avarage fitness')
-    ax.legend()
-    ax.set_title("Testing", fontsize='small')
-    fig.savefig("es-fitness-v-generation.png")
-
-    fig, ax = plt.subplots(figsize=(7, 7))
+    fig, ax = plt.subplots(figsize=(15, 15))
     ax.scatter(xs, ys)
     # NOTE: -5, 5 'coz this is the range for benchmark function number 14
     ax.set(xlim=(-5, 5), ylim=(-5, 5))
-    fig.savefig("es-explored-points.png")
 
-    plt.show()
+    fig.savefig(paths.get_fpath('es-explored-points', 'png'))
+
+    logger.info("Plots are in %s", paths.results_path)
 
 
 def main():
-    filename, trajname = run_experiment()
+    filename, trajname, paths = run_experiment()
     logger.info("Plotting now")
-    process_results(filename, trajname)
+    process_results(filename, trajname, paths)
 
 
 if __name__ == '__main__':

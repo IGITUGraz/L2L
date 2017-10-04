@@ -13,7 +13,6 @@ EvolutionStrategiesParameters = namedtuple('EvolutionStrategiesParameters', [
     'noise_std',
     'mirrored_sampling_enabled',
     'fitness_shaping_enabled',
-    'fitness_shaping_fraction',
     'pop_size',
     'n_iteration',
     'stop_criterion',
@@ -26,7 +25,6 @@ EvolutionStrategiesParameters.__doc__ = """
 :param mirrored_sampling_enabled: Should we turn on mirrored sampling i.e. sampling both e and -e
 :param fitness_shaping_enabled: Should we turn on fitness shaping i.e. using only top `fitness_shaping_ratio` to update
        current individual?
-:param fitness_shaping_fraction: Fraction of top individuals to use to update the current individual
 :param pop_size: Number of individuals per simulation.
 :param n_iteration: Number of iterations to perform
 :param stop_criterion: (Optional) Stop if this fitness is reached.
@@ -44,13 +42,25 @@ class EvolutionStrategiesOptimizer(Optimizer):
     In the pseudo code the algorithm does:
 
     For n iterations do:
-      - Perturb the current individual with 0 mean and `noise_std` standard deviation
+      - Perturb the current individual by adding a value with 0 mean and `noise_std` standard deviation
+      - If mirrored sampling is enabled, also perturb the current individual by subtracting the same values that were
+        added in the previous step
       - evaluate individuals and get fitness
       - Update the fitness as
 
             theta_{t+1} <- theta_t + alpha  * sum{F_i * e_i} / (n * sigma^2)
 
         where F_i is the fitness and e_i is the perturbation
+      - If fitness shaping is enabled, F_i is replaced with the utility u_i in the previous step, which is calculated as:
+
+            u_i = max(0, log(n/2 + 1) - log(k)) / sum_{k=1}^{n}{max(0, log(n/2 + 1) - log(k))} - 1 / n
+
+        As in the paper: Wierstra, D. et al. Natural Evolution Strategies. Journal of Machine Learning Research 15,
+         949–980 (2014).
+
+        where k and i are the indices of the individuals in descending order of fitness F_i
+
+
 
     NOTE: This is not the most efficient implementation in terms of communication, since the new parameters are
     communicated to the individuals rather than the seed as in the paper.
@@ -113,10 +123,6 @@ class EvolutionStrategiesOptimizer(Optimizer):
         traj.f_add_parameter(
             'fitness_shaping_enabled', parameters.fitness_shaping_enabled, comment='Flag to enable fitness shaping')
         traj.f_add_parameter(
-            'fitness_shaping_fraction',
-            parameters.fitness_shaping_fraction,
-            comment='Fraction of top individuals to use for fitness shaping')
-        traj.f_add_parameter(
             'pop_size', parameters.pop_size, comment='Number of minimal individuals simulated in each run')
         traj.f_add_parameter('n_iteration', parameters.n_iteration, comment='Number of iterations to run')
         traj.f_add_parameter(
@@ -137,11 +143,11 @@ class EvolutionStrategiesOptimizer(Optimizer):
         traj.results.f_add_result_group(
             'generation_params',
             comment='This contains the optimizer parameters that are'
-            ' common across a generation')
+                    ' common across a generation')
 
         # The following parameters are recorded as generation parameters i.e. once per generation
-        self.g = 0    # the current generation
-        self.pop_size = parameters.pop_size    # Population size is dynamic in FACE
+        self.g = 0  # the current generation
+        self.pop_size = parameters.pop_size  # Population size is dynamic in FACE
         self.best_fitness_in_run = -np.inf
         self.best_individual_in_run = None
 
@@ -185,8 +191,8 @@ class EvolutionStrategiesOptimizer(Optimizer):
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
 
-        n_iteration, stop_criterion, learning_rate, noise_std, fitness_shaping_enabled, fitness_shaping_fraction = \
-            traj.n_iteration, traj.stop_criterion, traj.learning_rate, traj.noise_std, traj.fitness_shaping_enabled, traj.fitness_shaping_fraction
+        n_iteration, stop_criterion, learning_rate, noise_std, fitness_shaping_enabled = \
+            traj.n_iteration, traj.stop_criterion, traj.learning_rate, traj.noise_std, traj.fitness_shaping_enabled
 
         weighted_fitness_list = []
         #**************************************************************************************************************
@@ -203,7 +209,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
             traj.f_add_result('$set.$.fitness', fitness)
 
             weighted_fitness_list.append(np.dot(fitness, self.optimizee_fitness_weights))
-        traj.v_idx = -1    # set trajectory back to default
+        traj.v_idx = -1  # set trajectory back to default
 
         # NOTE: It is necessary to clear the finesses_results to clear the data in the reference, and del
         #^ is used to make sure it's not used in the rest of this function
@@ -254,23 +260,32 @@ class EvolutionStrategiesOptimizer(Optimizer):
         traj.results.generation_params.f_add_result(
             generation_name + '.algorithm_params',
             generation_result_dict,
-            comment="These are the parameters that correspond to the algorithm."
-            "Look at the source code for `EvolutionStrategiesOptimizer::post_process()` for comments documenting these parameters"
+            comment="These are the parameters that correspond to the algorithm. "
+                    "Look at the source code for `EvolutionStrategiesOptimizer::post_process()` "
+                    "for comments documenting these parameters"
         )
 
-        individuals_to_be_fitted = sorted_fitness
         perturbations_to_be_fitted = sorted_perturbations
 
         if fitness_shaping_enabled:
-            n_elite = int(fitness_shaping_fraction * len(sorted_fitness))
-            individuals_to_be_fitted = sorted_fitness[:n_elite]
-            perturbations_to_be_fitted = sorted_perturbations[:n_elite]
+            sorted_utilities = []
+            n_individuals = len(sorted_fitness)
+            for i in range(n_individuals):
+                u = max(0., np.log((n_individuals / 2) + 1) - np.log(i + 1))
+                sorted_utilities.append(u)
+            sorted_utilities = np.array(sorted_utilities)
+            sorted_utilities /= np.sum(sorted_utilities)
+            sorted_utilities -= (1. / n_individuals)
+            assert np.sum(sorted_utilities) == 0., "Sum of utilities is not 0, but %.4f" % np.sum(sorted_utilities)
+            fitnesses_to_fit = sorted_utilities
+        else:
+            fitnesses_to_fit = sorted_fitness
 
-        assert len(individuals_to_be_fitted) == len(perturbations_to_be_fitted)
+        assert len(fitnesses_to_fit) == len(perturbations_to_be_fitted)
 
         self.current_individual_arr += learning_rate \
-                * np.sum([f * e for f, e in zip(individuals_to_be_fitted, perturbations_to_be_fitted)], axis=0) \
-                / (len(individuals_to_be_fitted) * noise_std ** 2)
+                                       * np.sum([f * e for f, e in zip(fitnesses_to_fit, perturbations_to_be_fitted)], axis=0) \
+                                       / (len(fitnesses_to_fit) * noise_std ** 2)
 
         #**************************************************************************************************************
         # Create the next generation by sampling the inferred distribution
@@ -292,7 +307,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
 
             self.eval_pop_arr = np.array([dict_to_list(ind) for ind in self.eval_pop])
 
-            self.g += 1    # Update generation counter
+            self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 
     def end(self, traj):
