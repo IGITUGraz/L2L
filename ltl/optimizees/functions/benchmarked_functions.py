@@ -8,9 +8,6 @@ class BenchmarkedFunctions:
     """
     Implements benchmarked functions class for an easier call of the benchmarked functions
 
-    :param noise: Boolean value indicating if the Gaussian noise will be applied on the resulting function.
-    :param mu: Scalar indicating the mean of the Gaussian noise.
-    :param sigma: Scalar indicating the standard deviation of the Gaussian noise.
     """
     def __init__(self):
         self.function_name_map = [("Rastrigin2d", self._create_rastrigin2d),

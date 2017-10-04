@@ -57,10 +57,12 @@ def run_experiment():
     (benchmark_name, benchmark_function), benchmark_parameters = \
         bench_functs.get_function_by_index(function_id, noise=True)
 
-    function_tools.plot(benchmark_function)
+    optimizee_seed = 100
+    random_state = np.random.RandomState(seed=optimizee_seed)
+    function_tools.plot(benchmark_function, random_state)
 
     ## Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=100)
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
 
     ## Outerloop optimizer initialization
 

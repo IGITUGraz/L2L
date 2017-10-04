@@ -60,20 +60,20 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    # NOTE: Benchmark function
+    ## Benchmark function
     function_id = 4
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
         bench_functs.get_function_by_index(function_id, noise=True)
 
-    function_tools.plot(benchmark_function)
+    optimizee_seed = 100
+    random_state = np.random.RandomState(seed=optimizee_seed)
+    function_tools.plot(benchmark_function, random_state)
 
-    # NOTE: Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=100)
+    ## Innerloop simulator
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
 
-    # NOTE: Outerloop optimizer initialization
-    # TODO: Change the optimizer to the appropriate Optimizer class
-
+    ## Outerloop optimizer initialization
     # parameters = ClassicGDParameters(learning_rate=0.01, exploration_step_size=0.01,
     #                                  n_random_steps=5, n_iteration=100,
     #                                  stop_criterion=np.Inf)
@@ -104,7 +104,7 @@ def main():
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
-    # NOTE: Outerloop optimizer end
+    ## Outerloop optimizer end
     optimizer.end(traj)
     recorder.end()
 

@@ -2,13 +2,12 @@ import logging.config
 import os
 
 from pypet import Environment
-from pypet import pypetconstants
 
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizers.crossentropy.distribution import NoisyGaussian
-from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
+from ltl.optimizers.crossentropy import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
@@ -40,10 +39,10 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      freeze_input=True,
-                      multiproc=True,
-                      use_scoop=True,
-                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                      # freeze_input=True,
+                      # multiproc=True,
+                      # use_scoop=True,
+                      # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
                       )
@@ -57,22 +56,22 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    # NOTE: Benchmark function
-    function_id = 4
+    ## Benchmark function
+    function_id = 14
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
         bench_functs.get_function_by_index(function_id, noise=True)
 
-    function_tools.plot(benchmark_function)
+    optimizee_seed = 100
+    random_state = np.random.RandomState(seed=optimizee_seed)
+    function_tools.plot(benchmark_function, random_state)
 
-    # NOTE: Innerloop simulator
+    ## Innerloop simulator
     optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=101)
 
-    # NOTE: Outerloop optimizer initialization
-    # TODO: Change the optimizer to the appropriate Optimizer class
-    parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=5,
-                                        distribution=NoisyGaussian(noise_magnitude=1,
-                                                                   noise_decay=0.95),
+    ## Outerloop optimizer initialization
+    parameters = CrossEntropyParameters(pop_size=10, rho=0.9, smoothing=0.0, temp_decay=0, n_iteration=1000,
+                                        distribution=NoisyGaussian(noise_magnitude=1., noise_decay=0.99),
                                         stop_criterion=np.inf, seed=102)
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                       optimizee_fitness_weights=(-0.1,),
@@ -92,7 +91,7 @@ def main():
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
-    # NOTE: Outerloop optimizer end
+    ## Outerloop optimizer end
     optimizer.end(traj)
     recorder.end()
 

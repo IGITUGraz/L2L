@@ -13,6 +13,7 @@ with warnings.catch_warnings():
     # matplotlib.rcParams.update({'text.usetex': False})
     # matplotlib.use('gtk3agg')
     # matplotlib.use('qt4agg')
+    # matplotlib.use('tkagg')
     # matplotlib.use('svg')
     matplotlib.use('agg')
     import matplotlib.pyplot as plt_

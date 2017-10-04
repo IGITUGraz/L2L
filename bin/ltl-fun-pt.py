@@ -55,16 +55,18 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    # NOTE: Benchmark function
+    ## Benchmark function
     function_id = 14
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
         bench_functs.get_function_by_index(function_id, noise=True)
 
-    function_tools.plot(benchmark_function)
+    optimizee_seed = 100
+    random_state = np.random.RandomState(seed=optimizee_seed)
+    function_tools.plot(benchmark_function, random_state)
 
-    # NOTE: Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function)
+    ## Innerloop simulator
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
 
     #--------------------------------------------------------------------------
     # configure settings for parallel tempering:
@@ -108,7 +110,7 @@ def main():
     assert ((decay_parameters.all() <= 1) and (decay_parameters.all() >= 0)), print(
         "Warning: Decay parameter not within specifications.")
 
-    # NOTE: Outerloop optimizer initialization
+    ## Outerloop optimizer initialization
     parameters = ParallelTemperingParameters(n_parallel_runs=n_parallel_runs, noisy_step=.03, n_iteration=1000, stop_criterion=np.Inf,
                                              seed=np.random.randint(1e5), cooling_schedules=cooling_schedules,
                                              temperature_bounds=temperature_bounds, decay_parameters=decay_parameters)
@@ -130,7 +132,7 @@ def main():
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
-    # NOTE: Outerloop optimizer end
+    ## Outerloop optimizer end
     optimizer.end(traj)
     recorder.end()
 

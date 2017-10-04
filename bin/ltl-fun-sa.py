@@ -55,19 +55,20 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    # NOTE: Benchmark function
+    ## Benchmark function
     function_id = 14
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
         bench_functs.get_function_by_index(function_id, noise=True)
 
-    function_tools.plot(benchmark_function)
+    optimizee_seed = 100
+    random_state = np.random.RandomState(seed=optimizee_seed)
+    function_tools.plot(benchmark_function, random_state)
 
-    # NOTE: Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=100)
+    ## Innerloop simulator
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
 
-    # NOTE: Outerloop optimizer initialization
-
+    ## Outerloop optimizer initialization
     parameters = SimulatedAnnealingParameters(n_parallel_runs=50, noisy_step=.03, temp_decay=.99, n_iteration=100,
                                               stop_criterion=np.Inf, seed=np.random.randint(1e5), cooling_schedule=AvailableCoolingSchedules.QUADRATIC_ADDAPTIVE)
 
@@ -89,7 +90,7 @@ def main():
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
-    # NOTE: Outerloop optimizer end
+    ## Outerloop optimizer end
     optimizer.end(traj)
     recorder.end()
 

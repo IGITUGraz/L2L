@@ -67,11 +67,11 @@ def main():
     # Get the trajectory from the environment.
     traj = env.trajectory
 
-    # NOTE: Innerloop simulator
+    ## Innerloop simulator
     # TODO when using the template: Change the optimizee to the appropriate Optimizee class
     optimizee = Optimizee(traj)
 
-    # NOTE: Outerloop optimizer initialization
+    ## Outerloop optimizer initialization
     # TODO when using the template: Change the optimizer to the appropriate Optimizer class
     # and use the right value for optimizee_fitness_weights. Length is the number of dimensions of fitness, and
     # negative value implies minimization and vice versa
@@ -90,7 +90,7 @@ def main():
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
-    # NOTE: Outerloop optimizer end
+    ## Outerloop optimizer end
     optimizer.end(traj)
 
     recorder.end()

@@ -2,6 +2,7 @@ import logging.config
 import os
 
 from pypet import Environment
+import nump as np
 
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
@@ -50,18 +51,20 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    # NOTE: Benchmark function
+    ## Benchmark function
     function_id = 4
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
         bench_functs.get_function_by_index(function_id, noise=True)
 
-    function_tools.plot(benchmark_function)
+    optimizee_seed = 100
+    random_state = np.random.RandomState(seed=optimizee_seed)
+    function_tools.plot(benchmark_function, random_state)
 
-    # NOTE: Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=0)
+    ## Innerloop simulator
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
 
-    # NOTE: Outerloop optimizer initialization
+    ## Outerloop optimizer initialization
     n_grid_divs_per_axis = 30
     parameters = GridSearchParameters(param_grid={
         'coords': (optimizee.bound[0], optimizee.bound[1], n_grid_divs_per_axis)
@@ -83,7 +86,7 @@ def main():
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
-    # NOTE: Outerloop optimizer end
+    ## Outerloop optimizer end
     optimizer.end(traj)
     recorder.end()
 

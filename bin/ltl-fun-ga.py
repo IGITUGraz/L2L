@@ -3,6 +3,7 @@ import os
 
 import yaml
 from pypet import Environment
+import numpy as np
 
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
@@ -52,18 +53,20 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    # NOTE: Benchmark function
+    ## Benchmark function
     function_id = 4
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
         bench_functs.get_function_by_index(function_id, noise=True)
 
-    function_tools.plot(benchmark_function)
+    optimizee_seed = 100
+    random_state = np.random.RandomState(seed=optimizee_seed)
+    function_tools.plot(benchmark_function, random_state)
 
-    # NOTE: Innerloop simulator
-    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=0)
+    ## Innerloop simulator
+    optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
 
-    # NOTE: Outerloop optimizer initialization
+    ## Outerloop optimizer initialization
     parameters = GeneticAlgorithmParameters(seed=0, popsize=50, CXPB=0.5,
                                             MUTPB=0.3, NGEN=100, indpb=0.02,
                                             tournsize=15, matepar=0.5,
@@ -87,7 +90,7 @@ def main():
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
-    # NOTE: Outerloop optimizer end
+    ## Outerloop optimizer end
     optimizer.end()
     recorder.end()
 
