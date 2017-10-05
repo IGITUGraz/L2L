@@ -34,7 +34,10 @@ class MNISTOptimizee(Optimizee):
             mnist_digits = fetch_mldata('MNIST original')
             n_input = np.prod(mnist_digits.data.shape[1:])
             data_images = mnist_digits.data / 255.  # -> 70000 x 284
+            n_images = len(data_images)
             data_targets = mnist_digits.target
+
+        self.n_images = n_images
         self.data_images, self.data_targets = data_images, data_targets
 
         seed = parameters.seed
@@ -70,9 +73,19 @@ class MNISTOptimizee(Optimizee):
         """
 
         weight_shapes = self.nn.get_weights_shapes()
-        total_num_weights = np.sum([np.product(weight_shape) for weight_shape in weight_shapes])
+        cumulative_num_weights_per_layer = np.cumsum([np.prod(weight_shape) for weight_shape in weight_shapes])
 
-        return dict(weights=self.random_state.randn(total_num_weights))
+        flattened_weights = np.empty(cumulative_num_weights_per_layer[-1])
+        for i, weight_shape in enumerate(weight_shapes):
+            if i == 0:
+                flattened_weights[:cumulative_num_weights_per_layer[i]] = \
+                    self.random_state.randn(np.prod(weight_shape)) / np.sqrt(weight_shape[1])
+            else:
+                flattened_weights[cumulative_num_weights_per_layer[i - 1]:cumulative_num_weights_per_layer[i]] = \
+                    self.random_state.randn(np.prod(weight_shape)) / np.sqrt(weight_shape[1])
+
+        # return dict(weights=self.random_state.randn(cumulative_num_weights_per_layer[-1]))
+        return dict(weights=flattened_weights)
 
     def bounding_func(self, individual):
         """

@@ -1,14 +1,13 @@
 import logging.config
-from datetime import datetime
 
 import numpy as np
 from pypet import Environment
 
-from ltl import dict_to_list
-from ltl.dataprocessing import get_skeleton_traj, get_var_from_runs, get_var_from_generations
+from ltl.dataprocessing import get_skeleton_traj, get_var_from_generations
 from ltl.logging_tools import create_shared_logger_data, configure_loggers
 from ltl.optimizees.mnist.optimizee import MNISTOptimizeeParameters, MNISTOptimizee
-from ltl.optimizers.evolutionstrategies import EvolutionStrategiesParameters, EvolutionStrategiesOptimizer
+from ltl.optimizers.crossentropy import CrossEntropyParameters, CrossEntropyOptimizer
+from ltl.optimizers.crossentropy.distribution import NoisyGaussian
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
@@ -16,7 +15,7 @@ logger = logging.getLogger('bin.ltl-mnist-es')
 
 
 def run_experiment():
-    name = 'LTL-MNIST-ES'
+    name = 'LTL-MNIST-CE'
     try:
         with open('bin/path.conf') as f:
             root_dir_path = f.read().strip()
@@ -25,7 +24,7 @@ def run_experiment():
                                 " Write the path to a path.conf text file in the bin directory"
                                 " before running the simulation")
 
-    trajectory_name = 'small-mnist-full-monty-100-hidden'
+    trajectory_name = 'small-mnist-full-monty'
 
     paths = Paths(name, dict(run_num='test'), root_dir_path=root_dir_path, suffix="-" + trajectory_name)
 
@@ -63,24 +62,16 @@ def run_experiment():
 
     ## Outerloop optimizer initialization
     optimizer_seed = 1234
-    optimizer_parameters = EvolutionStrategiesParameters(
-        learning_rate=0.1,
-        noise_std=0.1,
-        mirrored_sampling_enabled=True,
-        fitness_shaping_enabled=True,
-        pop_size=20,
-        n_iteration=2000,
-        stop_criterion=np.Inf,
-        seed=optimizer_seed)
+    optimizer_parameters = CrossEntropyParameters(pop_size=40, rho=0.9, smoothing=0.0, temp_decay=0, n_iteration=5000,
+                                                  distribution=NoisyGaussian(noise_magnitude=1., noise_decay=0.99),
+                                                  stop_criterion=np.inf, seed=optimizer_seed)
 
     logger.info("Optimizer parameters: %s", optimizer_parameters)
 
-    optimizer = EvolutionStrategiesOptimizer(
-        traj,
-        optimizee_create_individual=optimizee.create_individual,
-        optimizee_fitness_weights=(1.,),
-        parameters=optimizer_parameters,
-        optimizee_bounding_func=optimizee.bounding_func)
+    optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
+                                      optimizee_fitness_weights=(1.,),
+                                      parameters=optimizer_parameters,
+                                      optimizee_bounding_func=optimizee.bounding_func)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
@@ -112,46 +103,46 @@ def process_results(filename, trajname, paths):
 
     traj = get_skeleton_traj(filename, trajname)
 
-    fitness_list, run_id_list = get_var_from_runs(traj, 'results.fitness', with_ids=True, status_interval=200)
+    # fitness_list, run_id_list = get_var_from_runs(traj, 'results.fitness', with_ids=True, status_interval=200)
     algorithm_params_list = get_var_from_generations(traj, 'algorithm_params')
 
     best_fitness_list = [x['best_fitness_in_run'] for x in algorithm_params_list]
     average_fitness_list = [x['average_fitness_in_run'] for x in algorithm_params_list]
     generation_list = [x['generation'] for x in algorithm_params_list]
-    current_individual_fitness = [x['current_individual_fitness'] for x in algorithm_params_list]
+    # current_individual_fitness = [x['current_individual_fitness'] for x in algorithm_params_list]
 
-    pop_size_list = [params_dict['pop_size'] for params_dict in algorithm_params_list]
+    # pop_size_list = [params_dict['pop_size'] for params_dict in algorithm_params_list]
 
-    pop_size_list_cumsum = np.cumsum(pop_size_list)
-    gen_no_list = np.zeros_like(run_id_list)  # gen_no_list[i] = gen no of ith run
-    gen_no_list[pop_size_list_cumsum[:-1]] = 1
-    gen_no_list = np.cumsum(gen_no_list)
-
-    fitness_list = np.array(fitness_list)
+    # pop_size_list_cumsum = np.cumsum(pop_size_list)
+    # gen_no_list = np.zeros_like(run_id_list)  # gen_no_list[i] = gen no of ith run
+    # gen_no_list[pop_size_list_cumsum[:-1]] = 1
+    # gen_no_list = np.cumsum(gen_no_list)
+    #
+    # fitness_list = np.array(fitness_list)
 
     fig, ax = plt.subplots(figsize=(15, 7))
-    ax.plot(gen_no_list, fitness_list, '.', label='fitness distribution')
-    ax.plot(generation_list, current_individual_fitness, label='current individual fitness')
-    ax.plot(generation_list, best_fitness_list, label='best fitness')
-    ax.plot(generation_list, average_fitness_list, label='average fitness')
+    ngen = 5000
+    ax.plot(generation_list[:ngen], best_fitness_list[:ngen], label='best fitness')
+    ax.plot(generation_list[:ngen], average_fitness_list[:ngen], label='average fitness')
+    ax.annotate('%.2f%%' % (best_fitness_list[1000] * 100), xy=(1000, best_fitness_list[1000]), xytext=(1000, 1.05),
+                arrowprops=dict(facecolor='black', shrink=0.05), xycoords='data',
+                )
+    ax.annotate('%.2f%%' % (best_fitness_list[2000] * 100), xy=(2000, best_fitness_list[2000]), xytext=(2000, 1.05),
+                arrowprops=dict(facecolor='black', shrink=0.05), xycoords='data',
+                )
+    ax.annotate('%.2f%%' % (best_fitness_list[3000] * 100), xy=(3000, best_fitness_list[3000]), xytext=(3000, 1.05),
+                arrowprops=dict(facecolor='black', shrink=0.05), xycoords='data',
+                )
+    ax.annotate('%.2f%%' % (best_fitness_list[4000] * 100), xy=(4000, best_fitness_list[4000]), xytext=(4000, 1.05),
+                arrowprops=dict(facecolor='black', shrink=0.05), xycoords='data',
+                )
+    ax.annotate('%.2f%%' % (best_fitness_list[5000] * 100), xy=(5000, best_fitness_list[5000]), xytext=(5000, 1.05),
+                arrowprops=dict(facecolor='black', shrink=0.05), xycoords='data',
+                )
+    ax.set(ylim=[0, 1.1], xlabel='Generation', ylabel="Performance")
     ax.legend()
     ax.set_title("Testing", fontsize='small')
-    fig.savefig(paths.get_fpath('fitness-v-generation', 'png', t=str(datetime.now())))
-
-    individual_list, run_id_list = get_var_from_runs(traj, 'results.individual', with_ids=True, status_interval=200)
-
-    individual_list_arr = [dict_to_list(ind) for ind in individual_list]
-
-    xs = [p[0] for p in individual_list_arr]
-    ys = [p[1] for p in individual_list_arr]
-
-    fig, ax = plt.subplots(figsize=(15, 15))
-    ax.scatter(xs, ys)
-    # ax.set(xlim=(-5, 5), ylim=(-5, 5))
-
-    fig.savefig(paths.get_fpath('es-explored-points', 'png', t=str(datetime.now())))
-
-    logger.info("Plots are in %s", paths.results_path)
+    fig.savefig(paths.get_fpath('mnist-small-ce-performance', '.png'))
 
 
 def main():
