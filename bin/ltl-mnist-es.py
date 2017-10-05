@@ -7,6 +7,7 @@ from pypet import Environment
 from ltl import dict_to_list
 from ltl.dataprocessing import get_skeleton_traj, get_var_from_runs, get_var_from_generations
 from ltl.logging_tools import create_shared_logger_data, configure_loggers
+from ltl.optimizees.mnist.nn import ActivationFunction
 from ltl.optimizees.mnist.optimizee import MNISTOptimizeeParameters, MNISTOptimizee
 from ltl.optimizers.evolutionstrategies import EvolutionStrategiesParameters, EvolutionStrategiesOptimizer
 from ltl.paths import Paths
@@ -53,9 +54,13 @@ def run_experiment():
     # Get the trajectory from the environment
     traj = env.trajectory
 
+    n_optimizer_iterations = 5000
+
     optimizee_seed = 200
 
-    optimizee_parameters = MNISTOptimizeeParameters(n_hidden=10, seed=optimizee_seed, use_small_mnist=True)
+    optimizee_parameters = MNISTOptimizeeParameters(n_hidden=500, seed=optimizee_seed, use_small_mnist=False,
+                                                    activation_function=ActivationFunction.RELU, batch_size=100,
+                                                    n_optimizer_iterations=n_optimizer_iterations)
     ## Innerloop simulator
     optimizee = MNISTOptimizee(traj, optimizee_parameters)
 
@@ -69,7 +74,7 @@ def run_experiment():
         mirrored_sampling_enabled=True,
         fitness_shaping_enabled=True,
         pop_size=20,
-        n_iteration=2000,
+        n_iteration=n_optimizer_iterations,
         stop_criterion=np.Inf,
         seed=optimizer_seed)
 

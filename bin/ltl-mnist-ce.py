@@ -5,6 +5,7 @@ from pypet import Environment
 
 from ltl.dataprocessing import get_skeleton_traj, get_var_from_generations
 from ltl.logging_tools import create_shared_logger_data, configure_loggers
+from ltl.optimizees.mnist.nn import ActivationFunction
 from ltl.optimizees.mnist.optimizee import MNISTOptimizeeParameters, MNISTOptimizee
 from ltl.optimizers.crossentropy import CrossEntropyParameters, CrossEntropyOptimizer
 from ltl.optimizers.crossentropy.distribution import NoisyGaussian
@@ -54,16 +55,20 @@ def run_experiment():
 
     optimizee_seed = 200
 
-    optimizee_parameters = MNISTOptimizeeParameters(n_hidden=10, seed=optimizee_seed, use_small_mnist=True)
-    ## Innerloop simulator
+    n_optimizer_iterations = 5000
+
+    optimizee_parameters = MNISTOptimizeeParameters(n_hidden=500, seed=optimizee_seed, use_small_mnist=False,
+                                                    activation_function=ActivationFunction.RELU, batch_size=100,
+                                                    n_optimizer_iterations=n_optimizer_iterations)  ## Innerloop simulator
     optimizee = MNISTOptimizee(traj, optimizee_parameters)
 
     logger.info("Optimizee parameters: %s", optimizee_parameters)
 
     ## Outerloop optimizer initialization
     optimizer_seed = 1234
-    optimizer_parameters = CrossEntropyParameters(pop_size=40, rho=0.9, smoothing=0.0, temp_decay=0, n_iteration=5000,
-                                                  distribution=NoisyGaussian(noise_magnitude=1., noise_decay=0.99),
+    optimizer_parameters = CrossEntropyParameters(pop_size=40, rho=0.8, smoothing=0.0, temp_decay=0,
+                                                  n_iteration=n_optimizer_iterations,
+                                                  distribution=NoisyGaussian(noise_magnitude=5., noise_decay=0.999),
                                                   stop_criterion=np.inf, seed=optimizer_seed)
 
     logger.info("Optimizer parameters: %s", optimizer_parameters)

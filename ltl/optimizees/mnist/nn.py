@@ -1,3 +1,5 @@
+from enum import Enum
+
 import numpy as np
 
 
@@ -13,18 +15,11 @@ def relu(x):
     return result
 
 
-def softmax(a):
-    """
-    Compute softmax over the last dimension
-    :param a:
-    :return:
-    """
-    exp_a = np.exp(a - np.max(a))
-    return exp_a / np.sum(exp_a, axis=-1)
+ActivationFunction = Enum('ActivationFunction', ['RELU', 'SIGMOID', 'TANH'])
 
 
 class NeuralNetworkClassifier:
-    def __init__(self, n_input, n_hidden, n_output):
+    def __init__(self, n_input, n_hidden, n_output, activation_function):
         """
 
         :param n_input:
@@ -34,6 +29,15 @@ class NeuralNetworkClassifier:
         self.n_input, self.n_hidden, self.n_output = n_input, n_hidden, n_output
         self.hidden_weights = np.zeros((self.n_hidden, self.n_input))
         self.output_weights = np.zeros((self.n_output, self.n_hidden))
+
+        if activation_function == ActivationFunction.RELU:
+            self.activation_function = relu
+        elif activation_function == ActivationFunction.SIGMOID:
+            self.activation_function = sigmoid
+        elif activation_function == ActivationFunction.TANH:
+            self.activation_function = np.tanh
+        else:
+            raise RuntimeError("Unknown activation function %s", activation_function)
 
     def get_weights_shapes(self):
         """
@@ -52,10 +56,11 @@ class NeuralNetworkClassifier:
         :param y: batch_size size
         :return:
         """
-        hidden_activation = sigmoid(np.dot(self.hidden_weights, x.T))  # -> n_hidden x batch_size
+        hidden_activation = self.activation_function(np.dot(self.hidden_weights, x.T))  # -> n_hidden x batch_size
         output_activation = np.dot(self.output_weights, hidden_activation)  # -> n_output x batch_size
         output_labels = np.argmax(output_activation, axis=0)  # -> batch_size
-        assert y.shape == output_labels.shape, "The shapes of y and output labels are %s, %s" % (y.shape, output_labels.shape)
+        assert y.shape == output_labels.shape, "The shapes of y and output labels are %s, %s" % (
+            y.shape, output_labels.shape)
         n_correct = np.count_nonzero(y == output_labels)
         n_total = len(y)
         score = n_correct / n_total

@@ -1,4 +1,5 @@
 from collections import namedtuple
+import logging
 
 import numpy as np
 from sklearn.datasets import load_digits, fetch_mldata
@@ -7,7 +8,11 @@ from ltl.logging_tools import configure_loggers
 from ltl.optimizees.optimizee import Optimizee
 from .nn import NeuralNetworkClassifier
 
-MNISTOptimizeeParameters = namedtuple('MNISTOptimizeeParameters', ['n_hidden', 'seed', 'use_small_mnist'])
+logger = logging.getLogger("optimizees.mnist")
+
+MNISTOptimizeeParameters = namedtuple('MNISTOptimizeeParameters',
+                                      ['n_hidden', 'seed', 'use_small_mnist', 'activation_function', 'batch_size',
+                                       'n_optimizer_iterations'])
 
 
 class MNISTOptimizee(Optimizee):
@@ -21,6 +26,10 @@ class MNISTOptimizee(Optimizee):
 
     def __init__(self, traj, parameters):
         super().__init__(traj)
+        
+        seed = parameters.seed
+        seed = np.uint32(seed)
+        self.random_state = np.random.RandomState(seed=seed)
 
         if parameters.use_small_mnist:
             # 8 x 8 images
@@ -37,26 +46,41 @@ class MNISTOptimizee(Optimizee):
             n_images = len(data_images)
             data_targets = mnist_digits.target
 
-        self.n_images = n_images
-        self.data_images, self.data_targets = data_images, data_targets
+        n_training = int(n_images * 0.85)
+        n_batches = parameters.n_optimizer_iterations
+        batch_size = parameters.batch_size
+        train_data_images, train_data_targets = data_images[n_training:, ...], data_targets[n_training:, ...]
+        self.test_data_images, self.test_data_targets = data_images[:n_training, ...], data_targets[:n_training, ...]
 
-        seed = parameters.seed
-        n_hidden = parameters.n_hidden
+        self.training_batches = []
+        for i in range(n_batches):
+            train_batch = next_batch(batch_size, train_data_images, train_data_targets, self.random_state)
+            self.training_batches.append(train_batch)
+
         self.recorder_parameters = parameters._asdict()
 
-        seed = np.uint32(seed)
-        self.random_state = np.random.RandomState(seed=seed)
-
+        n_hidden = parameters.n_hidden
         n_output = 10  # This is always true for mnist
-        self.nn = NeuralNetworkClassifier(n_input, n_hidden, n_output)
+        activation_function = parameters.activation_function
+        self.nn = NeuralNetworkClassifier(n_input, n_hidden, n_output, activation_function)
 
-        self.random_state = np.random.RandomState(seed=seed)
+        ## Store things in trajectories
 
         # create_individual can be called because __init__ is complete except for traj initializtion
         indiv_dict = self.create_individual()
         for key, val in indiv_dict.items():
             traj.individual.f_add_parameter(key, val)
+
+        traj.f_add_parameter_group('individual.network', 'Contains parameters of the optimizee')
+
+        for key, val in parameters._asdict().items():
+            if key == 'activation_function':
+                val = str(val)
+            traj.individual.network.f_add_parameter(key, val)
+
         traj.individual.f_add_parameter('seed', seed)
+
+        traj.individual.f_add_parameter('n_training', n_training)
 
     def get_params(self):
         """
@@ -84,7 +108,6 @@ class MNISTOptimizee(Optimizee):
                 flattened_weights[cumulative_num_weights_per_layer[i - 1]:cumulative_num_weights_per_layer[i]] = \
                     self.random_state.randn(np.prod(weight_shape)) / np.sqrt(weight_shape[1])
 
-        # return dict(weights=self.random_state.randn(cumulative_num_weights_per_layer[-1]))
         return dict(weights=flattened_weights)
 
     def bounding_func(self, individual):
@@ -100,7 +123,9 @@ class MNISTOptimizee(Optimizee):
         :param ~pypet.trajectory.Trajectory traj: Trajectory
         :return: a single element :obj:`tuple` containing the value of the chosen function
         """
-        configure_loggers(exactly_once=True)  # logger configuration is here since this function is paralellised
+
+        # logger configuration is here since this function is paralellised
+        configure_loggers(exactly_once=True)
 
         flattened_weights = traj.individual.weights
         weight_shapes = self.nn.get_weights_shapes()
@@ -117,4 +142,25 @@ class MNISTOptimizee(Optimizee):
             weights.append(w)
 
         self.nn.set_weights(*weights)
-        return self.nn.score(self.data_images, self.data_targets)
+
+        test_score = self.nn.score(self.test_data_images, self.test_data_targets)
+
+        traj.f_add_result('$set.$.test_score', test_score)
+
+        g = traj.generation
+
+        train_score = self.nn.score(*self.training_batches[g])
+        return train_score
+
+
+def next_batch(num, data, labels, random_state):
+    """
+    Return a total of `num` random samples and labels.
+    """
+    idx = np.arange(0, len(data))
+    random_state.shuffle(idx)
+    idx = idx[:num]
+    data_shuffle = [data[i] for i in idx]
+    labels_shuffle = [labels[i] for i in idx]
+
+    return np.asarray(data_shuffle), np.asarray(labels_shuffle)
