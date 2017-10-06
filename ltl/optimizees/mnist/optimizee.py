@@ -12,7 +12,7 @@ logger = logging.getLogger("optimizees.mnist")
 
 MNISTOptimizeeParameters = namedtuple('MNISTOptimizeeParameters',
                                       ['n_hidden', 'seed', 'use_small_mnist', 'activation_function', 'batch_size',
-                                       'n_optimizer_iterations'])
+                                       'n_optimizer_iterations', 'use_weight_decay', 'weight_decay_parameter'])
 
 
 class MNISTOptimizee(Optimizee):
@@ -26,7 +26,7 @@ class MNISTOptimizee(Optimizee):
 
     def __init__(self, traj, parameters):
         super().__init__(traj)
-        
+
         seed = parameters.seed
         seed = np.uint32(seed)
         self.random_state = np.random.RandomState(seed=seed)
@@ -63,6 +63,9 @@ class MNISTOptimizee(Optimizee):
         n_output = 10  # This is always true for mnist
         activation_function = parameters.activation_function
         self.nn = NeuralNetworkClassifier(n_input, n_hidden, n_output, activation_function)
+
+        self.use_weight_decay = parameters.use_weight_decay
+        self.weight_decay_parameter = parameters.weight_decay_parameter
 
         ## Store things in trajectories
 
@@ -116,6 +119,7 @@ class MNISTOptimizee(Optimizee):
         """
         return individual
 
+    # @profile
     def simulate(self, traj):
         """
         Returns the value of the function chosen during initialization
@@ -145,11 +149,18 @@ class MNISTOptimizee(Optimizee):
 
         test_score = self.nn.score(self.test_data_images, self.test_data_targets)
 
-        traj.f_add_result('$set.$.test_score', test_score)
-
         g = traj.generation
 
         train_score = self.nn.score(*self.training_batches[g])
+
+        if self.use_weight_decay:
+            train_score -= self.weight_decay_parameter * np.sum(flattened_weights ** 2)
+
+        traj.f_add_result('$set.$.test_score', test_score)
+        traj.f_add_result('$set.$.train_score', train_score)
+
+        print(traj.ind_idx)
+
         return train_score
 
 

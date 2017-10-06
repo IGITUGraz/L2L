@@ -182,9 +182,11 @@ class DictEntryType(Enum):
     Scalar = 1
 
 
-def dict_to_list(input_dict, get_dict_spec=False):
+# @profile
+def dict_to_list(input_dict, get_dict_spec=False, convert_to_numpy_array=False):
     """
     This function converts the given dictionary into a list.
+
 
     :param dict input_dict: The dictionary to be converted into a list. It is assumed that each key
       in the dictionary is a string and each value is either a scalar numerical value or an
@@ -205,6 +207,9 @@ def dict_to_list(input_dict, get_dict_spec=False):
         key_type may be one of :attr:`.DictEntryType.Sequence` or :attr:`.DictEntryType.Scalar`. In case the
         object is a scalar, value_length is 1.
 
+    :param convert_to_numpy_array: Should the result be converted to a numpy array? (Option exists because doing this by default is SLOW!)
+
+
     :returns: The list representing the contents of the dict. If get_dict_spec is True, the dict
       specification is also returned. Note that the keys are always sorted ascendingly by name
     """
@@ -214,17 +219,24 @@ def dict_to_list(input_dict, get_dict_spec=False):
     for key, value in dict_items:
 
         if isinstance(value, Iterable):
-            value_list = list(input_dict[key])
+            # value_list = list(input_dict[key])
+            value_list = input_dict[key]
             return_list.extend(value_list)
             dict_spec.append((key, DictEntryType.Sequence, len(value_list)))
         else:
             return_list.append(input_dict[key])
             dict_spec.append((key, DictEntryType.Scalar, 1))
 
-    if get_dict_spec:
-        return np.array(return_list), dict_spec
+    if convert_to_numpy_array:
+        if get_dict_spec:
+            return np.array(return_list), dict_spec
+        else:
+            return np.array(return_list)
     else:
-        return np.array(return_list)
+        if get_dict_spec:
+            return return_list, dict_spec
+        else:
+            return return_list
 
 
 def list_to_dict(input_list, dict_spec):

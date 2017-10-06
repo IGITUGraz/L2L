@@ -2,6 +2,7 @@ import logging
 from collections import namedtuple
 
 import numpy as np
+import randomstate.prng.pcg64 as rnd
 
 from ltl import dict_to_list, list_to_dict
 from ltl.optimizers.optimizer import Optimizer
@@ -134,9 +135,12 @@ class EvolutionStrategiesOptimizer(Optimizer):
 
         self.current_individual_arr, self.optimizee_individual_dict_spec = dict_to_list(
             self.optimizee_create_individual(), get_dict_spec=True)
+
+        self.dimension = np.array(self.current_individual_arr).shape
+
         traj.f_add_derived_parameter(
             'dimension',
-            self.current_individual_arr.shape,
+            self.dimension,
             comment='The dimension of the parameter space of the optimizee')
 
         # Added a generation-wise parameter logging
@@ -171,12 +175,76 @@ class EvolutionStrategiesOptimizer(Optimizer):
 
         self._expand_trajectory(traj)
 
-    def _get_perturbations(self, traj):
-        pop_size, noise_std, mirrored_sampling_enabled = traj.pop_size, traj.noise_std, traj.mirrored_sampling_enabled
-        perturbations = noise_std * self.random_state.randn(pop_size, *self.current_individual_arr.shape)
+    @staticmethod
+    def get_all_agents_perturbations(current_generation, population_size, parameter_size, initial_random_seed,
+                                     noise_std,
+                                     mirrored_sampling_enabled):
+        # In this case we don't care about indices
+        r = rnd.RandomState(seed=initial_random_seed)
+        r.advance(current_generation * population_size * parameter_size)
+        all_perturbations = noise_std * r.standard_normal(size=(population_size, parameter_size))
+
         if mirrored_sampling_enabled:
-            return np.vstack((perturbations, -perturbations))
-        return perturbations
+            return np.vstack((all_perturbations, -all_perturbations))
+
+    @staticmethod
+    def get_single_individual_perturbation(individual_idx, current_generation, population_size, parameter_size,
+                                           initial_random_seed, noise_std, mirrored_sampling_enabled):
+        all_perturbations = EvolutionStrategiesOptimizer.get_all_agents_perturbations(current_generation,
+                                                                                      population_size,
+                                                                                      parameter_size,
+                                                                                      initial_random_seed, noise_std,
+                                                                                      mirrored_sampling_enabled)
+        return all_perturbations[individual_idx, :]
+
+    @staticmethod
+    def get_new_individual(current_individual, weighted_fitness_list, learning_rate, noise_std,
+                                  current_generation,
+                                  population_size,
+                                  parameter_size,
+                                  initial_random_seed,
+                                  mirrored_sampling_enabled, fitness_shaping_enabled):
+        # NOTE: We need to get all perturbations for the previous generation
+        all_perturbations = EvolutionStrategiesOptimizer.get_all_agents_perturbations(current_generation - 1,
+                                                                                      population_size,
+                                                                                      parameter_size,
+                                                                                      initial_random_seed, noise_std,
+                                                                                      mirrored_sampling_enabled)
+
+        # NOTE: It is important that both the fitnesses and the perturbations are sorted by the run indices
+        fitness_sorting_indices = list(reversed(np.argsort(weighted_fitness_list)))
+        sorted_fitness = np.asarray(weighted_fitness_list)[fitness_sorting_indices]
+        sorted_perturbations = all_perturbations[fitness_sorting_indices]
+
+        if fitness_shaping_enabled:
+            sorted_utilities = []
+            n_individuals = len(sorted_fitness)
+            for i in range(n_individuals):
+                u = max(0., np.log((n_individuals / 2) + 1) - np.log(i + 1))
+                sorted_utilities.append(u)
+            sorted_utilities = np.array(sorted_utilities)
+            sorted_utilities /= np.sum(sorted_utilities)
+            sorted_utilities -= (1. / n_individuals)
+            # assert np.sum(sorted_utilities) == 0., "Sum of utilities is not 0, but %.4f" % np.sum(sorted_utilities)
+            fitnesses_to_fit = sorted_utilities
+        else:
+            fitnesses_to_fit = sorted_fitness
+
+        perturbations_to_fit = sorted_perturbations
+
+        assert len(fitnesses_to_fit) == len(sorted_perturbations)
+
+        current_individual += learning_rate \
+                              * np.sum([f * e for f, e in zip(fitnesses_to_fit, perturbations_to_fit)], axis=0) \
+                              / (len(fitnesses_to_fit) * noise_std ** 2)
+        new_individual = current_individual()
+
+    # def _get_perturbations(self, traj):
+    #     pop_size, noise_std, mirrored_sampling_enabled = traj.pop_size, traj.noise_std, traj.mirrored_sampling_enabled
+    #     perturbations = noise_std * self.random_state.randn(pop_size, *self.dimension)
+    #     if mirrored_sampling_enabled:
+    #         return np.vstack((perturbations, -perturbations))
+    #     return perturbations
 
     def get_params(self):
         """
@@ -187,6 +255,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
         param_dict = self.recorder_parameters._asdict()
         return param_dict
 
+    # @profile
     def post_process(self, traj, fitnesses_results):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
@@ -196,6 +265,9 @@ class EvolutionStrategiesOptimizer(Optimizer):
             traj.n_iteration, traj.stop_criterion, traj.learning_rate, traj.noise_std, traj.fitness_shaping_enabled
 
         weighted_fitness_list = []
+
+        # Sort fitness results by run number. This is very important for this to work!
+        fitnesses_results = sorted(fitnesses_results, key=lambda x: x[0])
         #**************************************************************************************************************
         # Storing run-information in the trajectory
         # Reading fitnesses and performing distribution update

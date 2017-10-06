@@ -2,7 +2,7 @@ import logging.config
 from datetime import datetime
 
 import numpy as np
-from pypet import Environment
+from pypet import Environment, pypetconstants
 
 from ltl import dict_to_list
 from ltl.dataprocessing import get_skeleton_traj, get_var_from_runs, get_var_from_generations
@@ -42,6 +42,10 @@ def run_experiment():
         add_time=True,
         automatic_storing=True,
         log_stdout=False,  # Sends stdout to logs
+        # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+        # use_scoop=True,
+        # multiproc=True,
+        # freeze_input=True,
     )
     create_shared_logger_data(
         logger_names=['bin', 'optimizers'],
@@ -54,13 +58,14 @@ def run_experiment():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    n_optimizer_iterations = 5000
+    n_optimizer_iterations = 2
 
     optimizee_seed = 200
 
-    optimizee_parameters = MNISTOptimizeeParameters(n_hidden=500, seed=optimizee_seed, use_small_mnist=False,
+    optimizee_parameters = MNISTOptimizeeParameters(n_hidden=100, seed=optimizee_seed, use_small_mnist=False,
                                                     activation_function=ActivationFunction.RELU, batch_size=100,
-                                                    n_optimizer_iterations=n_optimizer_iterations)
+                                                    n_optimizer_iterations=n_optimizer_iterations,
+                                                    use_weight_decay=True, weight_decay_parameter=0.001)
     ## Innerloop simulator
     optimizee = MNISTOptimizee(traj, optimizee_parameters)
 
@@ -100,7 +105,9 @@ def run_experiment():
     recorder.start()
 
     # Run the simulation with all parameter combinations
+    logger.info("Starting full run")
     env.run(optimizee.simulate)
+    logger.info("Done")
 
     ## Outerloop optimizer end
     optimizer.end(traj)
@@ -166,7 +173,8 @@ def main():
 
 
 if __name__ == '__main__':
-    from ipdb import launch_ipdb_on_exception
+    # from ipdb import launch_ipdb_on_exception
 
-    with launch_ipdb_on_exception():
-        main()
+    # with launch_ipdb_on_exception():
+    #     main()
+    main()

@@ -67,6 +67,7 @@ class NeuralNetworkClassifier:
         return score
 
 
+# @profile
 def main():
     from sklearn.datasets import load_digits, fetch_mldata
 
@@ -87,7 +88,7 @@ def main():
         # im_size_x, im_size_y = 28, 28
 
     n_hidden, n_output = 5, 10
-    nn = NeuralNetworkClassifier(n_input, n_hidden, n_output)
+    nn = NeuralNetworkClassifier(n_input, n_hidden, n_output, ActivationFunction.RELU)
     weight_shapes = nn.get_weights_shapes()
     weights = []
     for weight_shape in weight_shapes:
