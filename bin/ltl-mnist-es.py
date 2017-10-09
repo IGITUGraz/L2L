@@ -4,7 +4,6 @@ from datetime import datetime
 import numpy as np
 from pypet import Environment, pypetconstants
 
-from ltl import dict_to_list
 from ltl.dataprocessing import get_skeleton_traj, get_var_from_runs, get_var_from_generations
 from ltl.logging_tools import create_shared_logger_data, configure_loggers
 from ltl.optimizees.mnist.nn import ActivationFunction
@@ -42,34 +41,25 @@ def run_experiment():
         add_time=True,
         automatic_storing=True,
         log_stdout=False,  # Sends stdout to logs
-        # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
-        # use_scoop=True,
-        # multiproc=True,
+        wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+        use_scoop=True,
+        multiproc=True,
+        # use_pool=True,
         # freeze_input=True,
     )
     create_shared_logger_data(
-        logger_names=['bin', 'optimizers'],
-        log_levels=['INFO', 'INFO'],
-        log_to_consoles=[True, True],
+        logger_names=['bin', 'optimizers', 'optimizees'],
+        log_levels=['INFO', 'INFO', 'INFO'],
+        log_to_consoles=[True, True, True],
         sim_name=name,
         log_directory=paths.logs_path)
+
     configure_loggers()
 
     # Get the trajectory from the environment
     traj = env.trajectory
 
     n_optimizer_iterations = 2
-
-    optimizee_seed = 200
-
-    optimizee_parameters = MNISTOptimizeeParameters(n_hidden=100, seed=optimizee_seed, use_small_mnist=False,
-                                                    activation_function=ActivationFunction.RELU, batch_size=100,
-                                                    n_optimizer_iterations=n_optimizer_iterations,
-                                                    use_weight_decay=True, weight_decay_parameter=0.001)
-    ## Innerloop simulator
-    optimizee = MNISTOptimizee(traj, optimizee_parameters)
-
-    logger.info("Optimizee parameters: %s", optimizee_parameters)
 
     ## Outerloop optimizer initialization
     optimizer_seed = 1234
@@ -84,6 +74,16 @@ def run_experiment():
         seed=optimizer_seed)
 
     logger.info("Optimizer parameters: %s", optimizer_parameters)
+
+    optimizee_seed = 200
+
+    optimizee_parameters = MNISTOptimizeeParameters(n_hidden=100, seed=optimizee_seed, use_small_mnist=False,
+                                                    activation_function=ActivationFunction.RELU, batch_size=100,
+                                                    use_weight_decay=True, weight_decay_parameter=0.001)
+    ## Innerloop simulator
+    optimizee = MNISTOptimizee(traj, optimizee_parameters, optimizer_parameters)
+
+    logger.info("Optimizee parameters: %s", optimizee_parameters)
 
     optimizer = EvolutionStrategiesOptimizer(
         traj,
@@ -130,7 +130,7 @@ def process_results(filename, trajname, paths):
     best_fitness_list = [x['best_fitness_in_run'] for x in algorithm_params_list]
     average_fitness_list = [x['average_fitness_in_run'] for x in algorithm_params_list]
     generation_list = [x['generation'] for x in algorithm_params_list]
-    current_individual_fitness = [x['current_individual_fitness'] for x in algorithm_params_list]
+    # current_individual_fitness = [x['current_individual_fitness'] for x in algorithm_params_list]
 
     pop_size_list = [params_dict['pop_size'] for params_dict in algorithm_params_list]
 
@@ -143,25 +143,25 @@ def process_results(filename, trajname, paths):
 
     fig, ax = plt.subplots(figsize=(15, 7))
     ax.plot(gen_no_list, fitness_list, '.', label='fitness distribution')
-    ax.plot(generation_list, current_individual_fitness, label='current individual fitness')
+    # ax.plot(generation_list, current_individual_fitness, label='current individual fitness')
     ax.plot(generation_list, best_fitness_list, label='best fitness')
     ax.plot(generation_list, average_fitness_list, label='average fitness')
     ax.legend()
     ax.set_title("Testing", fontsize='small')
     fig.savefig(paths.get_fpath('fitness-v-generation', 'png', t=str(datetime.now())))
 
-    individual_list, run_id_list = get_var_from_runs(traj, 'results.individual', with_ids=True, status_interval=200)
-
-    individual_list_arr = [dict_to_list(ind) for ind in individual_list]
-
-    xs = [p[0] for p in individual_list_arr]
-    ys = [p[1] for p in individual_list_arr]
-
-    fig, ax = plt.subplots(figsize=(15, 15))
-    ax.scatter(xs, ys)
-    # ax.set(xlim=(-5, 5), ylim=(-5, 5))
-
-    fig.savefig(paths.get_fpath('es-explored-points', 'png', t=str(datetime.now())))
+    # individual_list, run_id_list = get_var_from_runs(traj, 'results.individual', with_ids=True, status_interval=200)
+    #
+    # individual_list_arr = [dict_to_list(ind) for ind in individual_list]
+    #
+    # xs = [p[0] for p in individual_list_arr]
+    # ys = [p[1] for p in individual_list_arr]
+    #
+    # fig, ax = plt.subplots(figsize=(15, 15))
+    # ax.scatter(xs, ys)
+    # # ax.set(xlim=(-5, 5), ylim=(-5, 5))
+    #
+    # fig.savefig(paths.get_fpath('es-explored-points', 'png', t=str(datetime.now())))
 
     logger.info("Plots are in %s", paths.results_path)
 

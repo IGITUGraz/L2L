@@ -2,7 +2,7 @@ import logging
 from collections import namedtuple
 
 import numpy as np
-import randomstate.prng.pcg64 as rnd
+import randomstate.prng.xoroshiro128plus as rnd
 
 from ltl import dict_to_list, list_to_dict
 from ltl.optimizers.optimizer import Optimizer
@@ -108,9 +108,6 @@ class EvolutionStrategiesOptimizer(Optimizer):
             parameters=parameters,
             optimizee_bounding_func=optimizee_bounding_func)
 
-        self.recorder_parameters = parameters
-        self.optimizee_bounding_func = optimizee_bounding_func
-
         if parameters.pop_size < 1:
             raise Exception("pop_size needs to be greater than 0")
 
@@ -153,65 +150,49 @@ class EvolutionStrategiesOptimizer(Optimizer):
         self.g = 0  # the current generation
         self.pop_size = parameters.pop_size  # Population size is dynamic in FACE
         self.best_fitness_in_run = -np.inf
-        self.best_individual_in_run = None
 
-        # The first iteration does not pick the values out of the Gaussian distribution. It picks randomly
-        # (or at-least as randomly as optimizee_create_individual creates individuals)
-
-        # Note that this array stores individuals as an np.array of floats as opposed to Individual-Dicts
-        # This is because this array is used within the context of the cross entropy algorithm and
-        # Thus needs to handle the optimizee individuals as vectors
-        self.current_perturbations = self._get_perturbations(traj)
-        current_eval_pop_arr = (self.current_individual_arr + self.current_perturbations).tolist()
-
-        self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec) for ind in current_eval_pop_arr]
-        self.eval_pop.append(list_to_dict(self.current_individual_arr, self.optimizee_individual_dict_spec))
-
-        # Bounding function has to be applied AFTER the individual has been converted to a dict
-        if optimizee_bounding_func is not None:
-            self.eval_pop = [self.optimizee_bounding_func(ind) for ind in self.eval_pop]
-
-        self.eval_pop_arr = np.array([dict_to_list(ind) for ind in self.eval_pop])
+        self.eval_pop = [list_to_dict(self.current_individual_arr, self.optimizee_individual_dict_spec) for _ in
+                         range(len(self.current_individual_arr))]
 
         self._expand_trajectory(traj)
 
     @staticmethod
-    def get_all_agents_perturbations(current_generation, population_size, parameter_size, initial_random_seed,
-                                     noise_std,
-                                     mirrored_sampling_enabled):
+    def _get_all_agents_perturbations(current_generation, parameter_size, es_parameters):
+        population_size, initial_random_seed, noise_std, mirrored_sampling_enabled = \
+            es_parameters.pop_size, es_parameters.seed, es_parameters.noise_std, es_parameters.mirrored_sampling_enabled
         # In this case we don't care about indices
-        r = rnd.RandomState(seed=initial_random_seed)
-        r.advance(current_generation * population_size * parameter_size)
+        r = rnd.RandomState(seed=(initial_random_seed + current_generation))
+        # r.advance(current_generation * population_size * parameter_size)
         all_perturbations = noise_std * r.standard_normal(size=(population_size, parameter_size))
 
         if mirrored_sampling_enabled:
             return np.vstack((all_perturbations, -all_perturbations))
 
     @staticmethod
-    def get_single_individual_perturbation(individual_idx, current_generation, population_size, parameter_size,
-                                           initial_random_seed, noise_std, mirrored_sampling_enabled):
-        all_perturbations = EvolutionStrategiesOptimizer.get_all_agents_perturbations(current_generation,
-                                                                                      population_size,
-                                                                                      parameter_size,
-                                                                                      initial_random_seed, noise_std,
-                                                                                      mirrored_sampling_enabled)
+    def _get_single_individual_perturbation(individual_idx, current_generation, parameter_size,
+                                            es_parameters):
+        all_perturbations = EvolutionStrategiesOptimizer._get_all_agents_perturbations(current_generation,
+                                                                                       parameter_size,
+                                                                                       es_parameters)
         return all_perturbations[individual_idx, :]
 
     @staticmethod
-    def get_new_individual(current_individual, weighted_fitness_list, learning_rate, noise_std,
-                                  current_generation,
-                                  population_size,
-                                  parameter_size,
-                                  initial_random_seed,
-                                  mirrored_sampling_enabled, fitness_shaping_enabled):
-        # NOTE: We need to get all perturbations for the previous generation
-        all_perturbations = EvolutionStrategiesOptimizer.get_all_agents_perturbations(current_generation - 1,
-                                                                                      population_size,
-                                                                                      parameter_size,
-                                                                                      initial_random_seed, noise_std,
-                                                                                      mirrored_sampling_enabled)
+    def update_current_individual(current_individual, weighted_fitness_list, previous_generation, parameter_size,
+                                  es_parameters):
+        if previous_generation == -1:
+            assert sum(weighted_fitness_list) == 0
+            return current_individual
+
+        learning_rate, noise_std, fitness_shaping_enabled = \
+            es_parameters.learning_rate, es_parameters.noise_std, es_parameters.fitness_shaping_enabled
+
+        # NOTE: We need to get all perturbations for the previous generation. But this is handled in the optimizee!
+        all_perturbations = EvolutionStrategiesOptimizer._get_all_agents_perturbations(previous_generation,
+                                                                                       parameter_size,
+                                                                                       es_parameters)
 
         # NOTE: It is important that both the fitnesses and the perturbations are sorted by the run indices
+        #^ Here sorting is by fitness
         fitness_sorting_indices = list(reversed(np.argsort(weighted_fitness_list)))
         sorted_fitness = np.asarray(weighted_fitness_list)[fitness_sorting_indices]
         sorted_perturbations = all_perturbations[fitness_sorting_indices]
@@ -237,14 +218,15 @@ class EvolutionStrategiesOptimizer(Optimizer):
         current_individual += learning_rate \
                               * np.sum([f * e for f, e in zip(fitnesses_to_fit, perturbations_to_fit)], axis=0) \
                               / (len(fitnesses_to_fit) * noise_std ** 2)
-        new_individual = current_individual()
+        return current_individual
 
-    # def _get_perturbations(self, traj):
-    #     pop_size, noise_std, mirrored_sampling_enabled = traj.pop_size, traj.noise_std, traj.mirrored_sampling_enabled
-    #     perturbations = noise_std * self.random_state.randn(pop_size, *self.dimension)
-    #     if mirrored_sampling_enabled:
-    #         return np.vstack((perturbations, -perturbations))
-    #     return perturbations
+    @staticmethod
+    def get_new_individual(individual_idx, current_individual, current_generation, parameter_size, es_parameters):
+        perturbation = EvolutionStrategiesOptimizer._get_single_individual_perturbation(individual_idx,
+                                                                                        current_generation,
+                                                                                        parameter_size, es_parameters)
+        new_individual = current_individual + perturbation
+        return new_individual
 
     def get_params(self):
         """
@@ -252,7 +234,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
         :return: Dictionary containing recorder parameters
         """
 
-        param_dict = self.recorder_parameters._asdict()
+        param_dict = self.parameters._asdict()
         return param_dict
 
     # @profile
@@ -264,14 +246,11 @@ class EvolutionStrategiesOptimizer(Optimizer):
         n_iteration, stop_criterion, learning_rate, noise_std, fitness_shaping_enabled = \
             traj.n_iteration, traj.stop_criterion, traj.learning_rate, traj.noise_std, traj.fitness_shaping_enabled
 
-        weighted_fitness_list = []
-
-        # Sort fitness results by run number. This is very important for this to work!
-        fitnesses_results = sorted(fitnesses_results, key=lambda x: x[0])
         #**************************************************************************************************************
         # Storing run-information in the trajectory
         # Reading fitnesses and performing distribution update
         #**************************************************************************************************************
+        fitness_idx_pairs = []
         for run_index, fitness in fitnesses_results:
             # We need to convert the current run index into an ind_idx
             # (index of individual within one generation)
@@ -281,8 +260,13 @@ class EvolutionStrategiesOptimizer(Optimizer):
             traj.f_add_result('$set.$.individual', self.eval_pop[ind_index])
             traj.f_add_result('$set.$.fitness', fitness)
 
-            weighted_fitness_list.append(np.dot(fitness, self.optimizee_fitness_weights))
+            fitness_idx_pairs.append((ind_index, fitness))
+
         traj.v_idx = -1  # set trajectory back to default
+
+        # Sort fitnesses by individual index. This is very important
+        fitness_idx_pairs_sorted = sorted(fitness_idx_pairs, key=lambda x: x[0])
+        weighted_fitness_list = [np.dot(f[1], self.optimizee_fitness_weights) for f in fitness_idx_pairs_sorted]
 
         weighted_fitness_list = np.array(weighted_fitness_list).ravel()
         # NOTE: It is necessary to clear the finesses_results to clear the data in the reference, and del
@@ -291,18 +275,14 @@ class EvolutionStrategiesOptimizer(Optimizer):
         del fitnesses_results
 
         # Last fitness is for the previous `current_individual_arr`
-        weighted_fitness_list = weighted_fitness_list[:-1]
-        current_individual_fitness = weighted_fitness_list[-1]
+        # weighted_fitness_list = weighted_fitness_list[:-1]
+        # current_individual_fitness = weighted_fitness_list[-1]
 
         # Performs descending arg-sort of weighted fitness
         fitness_sorting_indices = list(reversed(np.argsort(weighted_fitness_list)))
-
         # Sorting the data according to fitness
-        sorted_population = self.eval_pop_arr[fitness_sorting_indices]
         sorted_fitness = np.asarray(weighted_fitness_list)[fitness_sorting_indices]
-        sorted_perturbations = self.current_perturbations[fitness_sorting_indices]
 
-        self.best_individual_in_run = sorted_population[0]
         self.best_fitness_in_run = sorted_fitness[0]
 
         logger.info("-- End of generation %d --", self.g)
@@ -324,7 +304,6 @@ class EvolutionStrategiesOptimizer(Optimizer):
         generation_result_dict = {
             'generation': self.g,
             'best_fitness_in_run': self.best_fitness_in_run,
-            'current_individual_fitness': current_individual_fitness,
             'average_fitness_in_run': np.mean(sorted_fitness),
             'pop_size': self.pop_size
         }
@@ -339,26 +318,6 @@ class EvolutionStrategiesOptimizer(Optimizer):
                     "for comments documenting these parameters"
         )
 
-        if fitness_shaping_enabled:
-            sorted_utilities = []
-            n_individuals = len(sorted_fitness)
-            for i in range(n_individuals):
-                u = max(0., np.log((n_individuals / 2) + 1) - np.log(i + 1))
-                sorted_utilities.append(u)
-            sorted_utilities = np.array(sorted_utilities)
-            sorted_utilities /= np.sum(sorted_utilities)
-            sorted_utilities -= (1. / n_individuals)
-            # assert np.sum(sorted_utilities) == 0., "Sum of utilities is not 0, but %.4f" % np.sum(sorted_utilities)
-            fitnesses_to_fit = sorted_utilities
-        else:
-            fitnesses_to_fit = sorted_fitness
-
-        assert len(fitnesses_to_fit) == len(sorted_perturbations)
-
-        self.current_individual_arr += learning_rate \
-                                       * np.sum([f * e for f, e in zip(fitnesses_to_fit, sorted_perturbations)], axis=0) \
-                                       / (len(fitnesses_to_fit) * noise_std ** 2)
-
         #**************************************************************************************************************
         # Create the next generation by sampling the inferred distribution
         #**************************************************************************************************************
@@ -367,17 +326,8 @@ class EvolutionStrategiesOptimizer(Optimizer):
 
         # check if to stop
         if self.g < n_iteration - 1 and self.best_fitness_in_run < stop_criterion:
-            self.current_perturbations = self._get_perturbations(traj)
-            current_eval_pop_arr = (self.current_individual_arr + self.current_perturbations).tolist()
-
-            self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec) for ind in current_eval_pop_arr]
-            self.eval_pop.append(list_to_dict(self.current_individual_arr, self.optimizee_individual_dict_spec))
-
-            # Bounding function has to be applied AFTER the individual has been converted to a dict
-            if self.optimizee_bounding_func is not None:
-                self.eval_pop = [self.optimizee_bounding_func(ind) for ind in self.eval_pop]
-
-            self.eval_pop_arr = np.array([dict_to_list(ind) for ind in self.eval_pop])
+            self.eval_pop = [list_to_dict(weighted_fitness_list, self.optimizee_individual_dict_spec) for _ in
+                             range(len(self.current_individual_arr))]
 
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
@@ -386,9 +336,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
-        best_last_indiv_dict = list_to_dict(self.best_individual_in_run.tolist(), self.optimizee_individual_dict_spec)
 
-        traj.f_add_result('final_individual', best_last_indiv_dict)
         traj.f_add_result('final_fitness', self.best_fitness_in_run)
         traj.f_add_result('n_iteration', self.g + 1)
 

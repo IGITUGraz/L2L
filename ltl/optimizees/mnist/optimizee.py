@@ -1,18 +1,22 @@
-from collections import namedtuple
 import logging
+from collections import namedtuple
 
 import numpy as np
 from sklearn.datasets import load_digits, fetch_mldata
 
 from ltl.logging_tools import configure_loggers
+from ltl.optimizees.mnist.perworkerstorage import PerWorkerStorage
 from ltl.optimizees.optimizee import Optimizee
+from ltl.optimizers.evolutionstrategies import EvolutionStrategiesOptimizer
 from .nn import NeuralNetworkClassifier
 
 logger = logging.getLogger("optimizees.mnist")
 
 MNISTOptimizeeParameters = namedtuple('MNISTOptimizeeParameters',
                                       ['n_hidden', 'seed', 'use_small_mnist', 'activation_function', 'batch_size',
-                                       'n_optimizer_iterations', 'use_weight_decay', 'weight_decay_parameter'])
+                                       'use_weight_decay', 'weight_decay_parameter'])
+
+per_worker_storage = PerWorkerStorage()
 
 
 class MNISTOptimizee(Optimizee):
@@ -24,14 +28,14 @@ class MNISTOptimizee(Optimizee):
     :param .MNISTOptimizeeParameters parameters:
     """
 
-    def __init__(self, traj, parameters):
+    def __init__(self, traj, optimizee_parameters, es_parameters):
         super().__init__(traj)
 
-        seed = parameters.seed
+        seed = optimizee_parameters.seed
         seed = np.uint32(seed)
         self.random_state = np.random.RandomState(seed=seed)
 
-        if parameters.use_small_mnist:
+        if optimizee_parameters.use_small_mnist:
             # 8 x 8 images
             mnist_digits = load_digits()
             n_input = np.prod(mnist_digits.images.shape[1:])
@@ -47,25 +51,32 @@ class MNISTOptimizee(Optimizee):
             data_targets = mnist_digits.target
 
         n_training = int(n_images * 0.85)
-        n_batches = parameters.n_optimizer_iterations
-        batch_size = parameters.batch_size
         train_data_images, train_data_targets = data_images[n_training:, ...], data_targets[n_training:, ...]
         self.test_data_images, self.test_data_targets = data_images[:n_training, ...], data_targets[:n_training, ...]
 
+        self.pop_size = es_parameters.pop_size
+        self.es_parameters = es_parameters
+
+        n_optimizer_iterations = es_parameters.n_iteration
+        batch_size = optimizee_parameters.batch_size
         self.training_batches = []
-        for i in range(n_batches):
-            train_batch = next_batch(batch_size, train_data_images, train_data_targets, self.random_state)
+        for i in range(n_optimizer_iterations):
+            train_batch = _next_batch(batch_size, train_data_images, train_data_targets, self.random_state)
             self.training_batches.append(train_batch)
 
-        self.recorder_parameters = parameters._asdict()
+        self.recorder_parameters = optimizee_parameters._asdict()
 
-        n_hidden = parameters.n_hidden
+        n_hidden = optimizee_parameters.n_hidden
         n_output = 10  # This is always true for mnist
-        activation_function = parameters.activation_function
+        activation_function = optimizee_parameters.activation_function
         self.nn = NeuralNetworkClassifier(n_input, n_hidden, n_output, activation_function)
 
-        self.use_weight_decay = parameters.use_weight_decay
-        self.weight_decay_parameter = parameters.weight_decay_parameter
+        # global per_worker_storage
+        flattened_weights = self.get_weights()
+
+        self.parameter_size = len(flattened_weights)
+        self.use_weight_decay = optimizee_parameters.use_weight_decay
+        self.weight_decay_parameter = optimizee_parameters.weight_decay_parameter
 
         ## Store things in trajectories
 
@@ -76,7 +87,7 @@ class MNISTOptimizee(Optimizee):
 
         traj.f_add_parameter_group('individual.network', 'Contains parameters of the optimizee')
 
-        for key, val in parameters._asdict().items():
+        for key, val in optimizee_parameters._asdict().items():
             if key == 'activation_function':
                 val = str(val)
             traj.individual.network.f_add_parameter(key, val)
@@ -95,6 +106,9 @@ class MNISTOptimizee(Optimizee):
         return self.recorder_parameters
 
     def create_individual(self):
+        return dict(all_fitnesses=np.zeros(self.pop_size))
+
+    def get_weights(self):
         """
         Creates a random value of parameter within given bounds
         """
@@ -111,7 +125,7 @@ class MNISTOptimizee(Optimizee):
                 flattened_weights[cumulative_num_weights_per_layer[i - 1]:cumulative_num_weights_per_layer[i]] = \
                     self.random_state.randn(np.prod(weight_shape)) / np.sqrt(weight_shape[1])
 
-        return dict(weights=flattened_weights)
+        return flattened_weights
 
     def bounding_func(self, individual):
         """
@@ -131,7 +145,33 @@ class MNISTOptimizee(Optimizee):
         # logger configuration is here since this function is paralellised
         configure_loggers(exactly_once=True)
 
-        flattened_weights = traj.individual.weights
+        g = traj.generation
+        prev_g = g - 1
+        ind_idx = traj.ind_idx
+
+        weighted_fitness_list = traj.individual.all_fitnesses
+        global per_worker_storage
+
+        if per_worker_storage.current_generation_number == -1:
+            flattened_weights = self.get_weights()
+            per_worker_storage.store_current_individual(generation=-1, current_individual=flattened_weights)
+
+        # NOTE: Current individual is always for the previous generation for which all fitnesses are known.
+        #^ For the case of the first generation, the "current indiv" is the initial value
+        current_individual = per_worker_storage.get_current_individual(prev_g)
+        if current_individual is None:
+            prev_indiv = per_worker_storage.get_previous_individual()
+            current_individual = EvolutionStrategiesOptimizer.update_current_individual(prev_indiv,
+                                                                                        weighted_fitness_list,
+                                                                                        prev_g,
+                                                                                        self.parameter_size,
+                                                                                        self.es_parameters)
+            per_worker_storage.store_current_individual(generation=0, current_individual=current_individual)
+
+        ## Then we calculate the new individual for this idx for the current generation
+        flattened_weights = EvolutionStrategiesOptimizer.get_new_individual(ind_idx, current_individual, g,
+                                                                            self.parameter_size, self.es_parameters)
+
         weight_shapes = self.nn.get_weights_shapes()
 
         cumulative_num_weights_per_layer = np.cumsum([np.prod(weight_shape) for weight_shape in weight_shapes])
@@ -149,8 +189,6 @@ class MNISTOptimizee(Optimizee):
 
         test_score = self.nn.score(self.test_data_images, self.test_data_targets)
 
-        g = traj.generation
-
         train_score = self.nn.score(*self.training_batches[g])
 
         if self.use_weight_decay:
@@ -159,12 +197,10 @@ class MNISTOptimizee(Optimizee):
         traj.f_add_result('$set.$.test_score', test_score)
         traj.f_add_result('$set.$.train_score', train_score)
 
-        print(traj.ind_idx)
-
         return train_score
 
 
-def next_batch(num, data, labels, random_state):
+def _next_batch(num, data, labels, random_state):
     """
     Return a total of `num` random samples and labels.
     """
