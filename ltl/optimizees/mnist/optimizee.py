@@ -5,7 +5,6 @@ import numpy as np
 from sklearn.datasets import load_digits, fetch_mldata
 
 from ltl.logging_tools import configure_loggers
-from ltl.optimizees.mnist.perworkerstorage import PerWorkerStorage
 from ltl.optimizees.optimizee import Optimizee
 from ltl.optimizers.evolutionstrategies import EvolutionStrategiesOptimizer
 from .nn import NeuralNetworkClassifier
@@ -15,8 +14,6 @@ logger = logging.getLogger("optimizees.mnist")
 MNISTOptimizeeParameters = namedtuple('MNISTOptimizeeParameters',
                                       ['n_hidden', 'seed', 'use_small_mnist', 'activation_function', 'batch_size',
                                        'use_weight_decay', 'weight_decay_parameter'])
-
-per_worker_storage = PerWorkerStorage()
 
 
 class MNISTOptimizee(Optimizee):
@@ -28,8 +25,9 @@ class MNISTOptimizee(Optimizee):
     :param .MNISTOptimizeeParameters parameters:
     """
 
-    def __init__(self, traj, optimizee_parameters, es_parameters):
+    def __init__(self, traj, optimizee_parameters, es_parameters, per_worker_storage):
         super().__init__(traj)
+        self.per_worker_storage = per_worker_storage
 
         seed = optimizee_parameters.seed
         seed = np.uint32(seed)
@@ -73,6 +71,7 @@ class MNISTOptimizee(Optimizee):
 
         # global per_worker_storage
         flattened_weights = self.get_weights()
+        self.per_worker_storage.store_current_individual(generation=-1, current_individual=flattened_weights)
 
         self.parameter_size = len(flattened_weights)
         self.use_weight_decay = optimizee_parameters.use_weight_decay
@@ -150,23 +149,18 @@ class MNISTOptimizee(Optimizee):
         ind_idx = traj.ind_idx
 
         weighted_fitness_list = traj.individual.all_fitnesses
-        global per_worker_storage
-
-        if per_worker_storage.current_generation_number == -1:
-            flattened_weights = self.get_weights()
-            per_worker_storage.store_current_individual(generation=-1, current_individual=flattened_weights)
 
         # NOTE: Current individual is always for the previous generation for which all fitnesses are known.
         #^ For the case of the first generation, the "current indiv" is the initial value
-        current_individual = per_worker_storage.get_current_individual(prev_g)
+        current_individual = self.per_worker_storage.get_current_individual(prev_g)
         if current_individual is None:
-            prev_indiv = per_worker_storage.get_previous_individual()
+            prev_indiv = self.per_worker_storage.get_previous_individual()
             current_individual = EvolutionStrategiesOptimizer.update_current_individual(prev_indiv,
                                                                                         weighted_fitness_list,
                                                                                         prev_g,
                                                                                         self.parameter_size,
                                                                                         self.es_parameters)
-            per_worker_storage.store_current_individual(generation=0, current_individual=current_individual)
+            self.per_worker_storage.store_current_individual(generation=prev_g, current_individual=current_individual)
 
         ## Then we calculate the new individual for this idx for the current generation
         flattened_weights = EvolutionStrategiesOptimizer.get_new_individual(ind_idx, current_individual, g,

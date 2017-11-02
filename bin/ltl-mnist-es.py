@@ -8,11 +8,14 @@ from ltl.dataprocessing import get_skeleton_traj, get_var_from_runs, get_var_fro
 from ltl.logging_tools import create_shared_logger_data, configure_loggers
 from ltl.optimizees.mnist.nn import ActivationFunction
 from ltl.optimizees.mnist.optimizee import MNISTOptimizeeParameters, MNISTOptimizee
+from ltl.optimizees.mnist.perworkerstorage import PerWorkerStorage
 from ltl.optimizers.evolutionstrategies import EvolutionStrategiesParameters, EvolutionStrategiesOptimizer
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
 logger = logging.getLogger('bin.ltl-mnist-es')
+
+per_worker_storage = PerWorkerStorage()
 
 
 def run_experiment():
@@ -59,7 +62,7 @@ def run_experiment():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    n_optimizer_iterations = 2
+    n_optimizer_iterations = 3
 
     ## Outerloop optimizer initialization
     optimizer_seed = 1234
@@ -81,7 +84,8 @@ def run_experiment():
                                                     activation_function=ActivationFunction.RELU, batch_size=100,
                                                     use_weight_decay=True, weight_decay_parameter=0.001)
     ## Innerloop simulator
-    optimizee = MNISTOptimizee(traj, optimizee_parameters, optimizer_parameters)
+    global per_worker_storage
+    optimizee = MNISTOptimizee(traj, optimizee_parameters, optimizer_parameters, per_worker_storage)
 
     logger.info("Optimizee parameters: %s", optimizee_parameters)
 
