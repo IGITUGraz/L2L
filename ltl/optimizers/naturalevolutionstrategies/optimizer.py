@@ -277,6 +277,11 @@ class NaturalEvolutionStrategiesOptimizer(Optimizer):
                     "for comments documenting these parameters"
         )
 
+        traj.results.generation_params.f_add_result(
+            generation_name + '.distribution_params', {'mu': self.mu.copy(), 'sigma': self.sigma.copy()},
+            comment="These are the parameters of the distribution that underlies the"
+                    " currently evaluated generation")
+
         if fitness_shaping_enabled:
             fitnesses_to_fit = self._compute_utility(sorted_fitness)
         else:
