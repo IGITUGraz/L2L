@@ -118,12 +118,28 @@ class NaturalEvolutionStrategiesOptimizer(Optimizer):
         self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func
 
-        if parameters.pop_size < 1:
-            raise Exception("pop_size needs to be greater than 0")
+        # If a parameter is set to `None`, use default value as described in Wierstra et al. (2014)
+        if parameters.learning_rate_mu is None:
+            learning_rate_mu = 1.
+        else:
+            learning_rate_mu = parameters.learning_rate_mu
+
+        if parameters.learning_rate_sigma is None:
+            learning_rate_sigma = (3 + np.log(len(parameters.mu))) / (5. * np.sqrt(len(parameters.mu)))
+        else:
+            learning_rate_sigma = parameters.learning_rate_sigma
+
+        if parameters.pop_size is None:
+            pop_size = 4 + int(np.floor(3 * np.log(len(parameters.mu))))
+        else:
+            pop_size = parameters.pop_size
+
+        if pop_size < 1:
+            raise ValueError("pop_size needs to be greater than 0")
 
         # The following parameters are recorded
-        traj.f_add_parameter('learning_rate_mu', parameters.learning_rate_mu, comment='Learning rate mu')
-        traj.f_add_parameter('learning_rate_sigma', parameters.learning_rate_sigma, comment='Learning rate mu')
+        traj.f_add_parameter('learning_rate_mu', learning_rate_mu, comment='Learning rate mu')
+        traj.f_add_parameter('learning_rate_sigma', learning_rate_sigma, comment='Learning rate mu')
         traj.f_add_parameter('mu', parameters.mu, comment='Initial mean of search distribution')
         traj.f_add_parameter('sigma', parameters.sigma, comment='Initial standard deviation of search distribution')
         traj.f_add_parameter(
@@ -133,7 +149,7 @@ class NaturalEvolutionStrategiesOptimizer(Optimizer):
         traj.f_add_parameter(
             'fitness_shaping_enabled', parameters.fitness_shaping_enabled, comment='Flag to enable fitness shaping')
         traj.f_add_parameter(
-            'pop_size', parameters.pop_size, comment='Number of minimal individuals simulated in each run')
+            'pop_size', pop_size, comment='Number of minimal individuals simulated in each run')
         traj.f_add_parameter('n_iteration', parameters.n_iteration, comment='Number of iterations to run')
         traj.f_add_parameter(
             'stop_criterion', parameters.stop_criterion, comment='Stop if best individual reaches this fitness')
@@ -158,7 +174,7 @@ class NaturalEvolutionStrategiesOptimizer(Optimizer):
 
         # The following parameters are recorded as generation parameters i.e. once per generation
         self.g = 0  # the current generation
-        self.pop_size = parameters.pop_size  # Population size is dynamic in FACE
+        self.pop_size = pop_size  # Population size is dynamic in FACE
         self.best_fitness_in_run = -np.inf
         self.best_individual_in_run = None
 
