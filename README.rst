@@ -4,6 +4,11 @@
 Learning To Learn (LTL)
 +++++++++++++++++++++++
 
+About
+*****
+
+The LTL package contains well documented and tested implementations of various gradient free optimization algorithms and defines an API that makes it usable with any optimizee that requires such optimization. All the implementations in this package are parallelilize and can run across different nodes and cores (but equally well on a single core). This package also provides a standard way to store and process the data produced during simulations.
+
 Getting Started
 ***************
 
