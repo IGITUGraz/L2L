@@ -1,5 +1,5 @@
-LTL package (Optimizers, Optimizees, and API reference)
-=======================================================
+API Reference
+=============
 
 .. toctree::
 

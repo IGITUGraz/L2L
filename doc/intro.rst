@@ -1,9 +1,5 @@
-===============================
-Welcome to LTL's documentation!
-===============================
-
-LTL
-===
+Overview
+========
 
 Introduction
 ************
@@ -129,54 +125,54 @@ Details for implementing the `Optimizer`, `Optimizee` and experiment follow.
 Important Data Structures
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Trajectory
+----------
 
-Trajectory:
+The Trajectory is a container that is central to the pypet simulation library. To quote from the PyPet website:
 
-  The Trajectory is a container that is central to the pypet simulation library. To quote from the PyPet website:
+    The whole project evolves around a novel container object called trajectory. A trajectory is a container for parameters
+    and results of numerical simulations in python. In fact a trajectory instantiates a tree and the tree structure will be
+    mapped one to one in the HDF5 file when you store data to disk. ...
 
-      The whole project evolves around a novel container object called trajectory. A trajectory is a container for parameters
-      and results of numerical simulations in python. In fact a trajectory instantiates a tree and the tree structure will be
-      mapped one to one in the HDF5 file when you store data to disk. ...
+    ... a trajectory contains parameters, the basic building blocks that completely define the initial
+    conditions of your numerical simulations. Usually, these are very basic data types, like integers, floats or maybe a
+    bit more complex numpy arrays.
 
-      ... a trajectory contains parameters, the basic building blocks that completely define the initial
-      conditions of your numerical simulations. Usually, these are very basic data types, like integers, floats or maybe a
-      bit more complex numpy arrays.
-  
-  In the simulations using the LTL Framework, there is a single :class:`~pypet.trajectory.Trajectory` object (called
-  :obj:`traj`). This object forms the backbone of communication between the optimizer, optimizee, and the
-  PyPet framework. In short, it is used to acheive the following:
+In the simulations using the LTL Framework, there is a single :class:`~pypet.trajectory.Trajectory` object (called
+:obj:`traj`). This object forms the backbone of communication between the optimizer, optimizee, and the
+PyPet framework. In short, it is used to acheive the following:
 
-  1.  Storage of the parameters of the optimizer, optimizee, and individuals_ of the optimizee
-  2.  Storage of the results of our simulation
-  3.  Adaptive exploration of parameters via trajectory expansion.
+1.  Storage of the parameters of the optimizer, optimizee, and individuals_ of the optimizee
+2.  Storage of the results of our simulation
+3.  Adaptive exploration of parameters via trajectory expansion.
 
-  :obj:`traj` object is passed as a mandatory argument to the constructors of both the Optimizee and Optimizer.
-  Additionally, PyPet automatically passes this object as an argument to the functions
-  :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` and :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
+:obj:`traj` object is passed as a mandatory argument to the constructors of both the Optimizee and Optimizer.
+Additionally, PyPet automatically passes this object as an argument to the functions
+:meth:`~ltl.optimizees.optimizee.Optimizee.simulate` and :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
 
 .. _Individual-Dict:
 .. _Individual-Dicts:
 
-Individual-Dict:
+Individual-Dict
+---------------
   
-  This is the data structure used to represent individuals_. This is basically a :class:`dict` that has the parameter
-  names as keys, and parameter values as values. The following need to be noted about the parameters stored in an
-  *Individual-Dict*.
+This is the data structure used to represent individuals_. This is basically a :class:`dict` that has the parameter
+names as keys, and parameter values as values. The following need to be noted about the parameters stored in an
+*Individual-Dict*.
 
-  1.  The parameter names must be the dot-separated full-name (e.g. ``'sim_control.seed'``) of the parameter. 
-      This name must be the name by which it is stored in the `individual` parameter group of the :obj:`traj`.
-      To understand this, look at :ref:`constructor of Optimizee<optimizee-constructor>`.
+1.  The parameter names must be the dot-separated full-name (e.g. ``'sim_control.seed'``) of the parameter. 
+    This name must be the name by which it is stored in the `individual` parameter group of the :obj:`traj`.
+    To understand this, look at :ref:`constructor of Optimizee<optimizee-constructor>`.
 
-  2.  The dictionary must contain **exactly** those parameters that are going to be explored by the `Optimizer`.
-      This is because this dictionary is used to expand the trajectory in the :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
-      function. See the note about expanding trajectories in ref:`op`imizer-constructor`
+2.  The dictionary must contain **exactly** those parameters that are going to be explored by the `Optimizer`.
+    This is because this dictionary is used to expand the trajectory in the :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` function. See the note about expanding trajectories in ref:`op`imizer-constructor`
 
-  In the documentation above, whenever the term individual_ is used, it is assumed that the object referred to is 
-  an `Individual-Dict`. Also note that the Individual-Dict is not a separate class but merely a specification for
-  specifying individuals of an optimizee via a dict.
+In the documentation above, whenever the term individual_ is used, it is assumed that the object referred to is 
+an `Individual-Dict`. Also note that the Individual-Dict is not a separate class but merely a specification for
+specifying individuals of an optimizee via a dict.
 
-  In other places in the documentation, the Individual-Dict may also be referred to as a parameter dict, due to the
-  fact that its keys represent parameter names.
+In other places in the documentation, the Individual-Dict may also be referred to as a parameter dict, due to the
+fact that its keys represent parameter names.
 
 .. _traj-interaction:
 
@@ -389,16 +385,17 @@ Bounding Function:
 Examples
 ********
 
-* See :class:`~ltl.optimizees.functions.optimizee.FunctionOptimizee` for an example of an `Optimizee` (based on simple
+* See :class:`~ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee` for an example of an `Optimizee` (based on simple
   function minimization).
 * See :class:`~ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer` for an example of an
   implementation of simulated annealing `Optimizer`.
+* See :ref:`ltl-experiments` for an example implementation of an LTL experiment with an arbitrary `Optimizee` and `Optimizer`.
 
 
 .. _data-postprocessing:
 
 Data postprocessing
-===================
+*******************
 
 Having run the simulation, the next superpower required is the ability to make sense of all the data that we've dumped
 into the trajectory and (consequently) the HDF file. Of course you could use the functions that pypet provides for this
@@ -410,7 +407,7 @@ functions. Look up the documentation of the module for further details.
 .. _logging:
 
 Logging
-=======
+*******
 
 1.  Always use the `logger` object obtained from::
 
@@ -452,16 +449,3 @@ To run experiments with scoop, you shoud start your instance of python with `pyt
 `scoop documentation <https://scoop.readthedocs.io/en/0.7/usage.html#how-to-launch-scoop-programs>`_ for more details.
 
 
-Code documentation
-==================
-.. toctree::
-
-    ltl
-    ltl-bin
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

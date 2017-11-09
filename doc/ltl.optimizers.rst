@@ -23,4 +23,5 @@ Implemented Examples
     ltl.optimizers.evolution
     ltl.optimizers.simulatedannealing
     ltl.optimizers.evolutionstrategies
+    ltl.optimizers.naturalevolutionstrategies
 
