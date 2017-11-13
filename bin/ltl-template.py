@@ -4,20 +4,17 @@ explanations
 """
 
 import logging.config
-import os
 
 from pypet import Environment
 from pypet import pypetconstants
 
+from ltl.logging_tools import create_shared_logger_data, configure_loggers
 from ltl.optimizees.optimizee import Optimizee
 from ltl.optimizers.optimizer import Optimizer, OptimizerParameters
 from ltl.paths import Paths
+
 # We first setup the logger and read the logging config which controls the verbosity and destination of the logs from
 # various parts of the code.
-from ltl.recorder import Recorder
-
-from ltl.logging_tools import create_shared_logger_data, configure_loggers
-
 logger = logging.getLogger('bin.ltl-optimizee-optimizer')
 
 
@@ -79,19 +76,11 @@ def main():
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
 
-    # Add Recorder
-    # TODO: Change the names, ids and parameters passed in
-    recorder = Recorder(trajectory=traj, optimizee_name='optimizee', optimizee_parameters=dict(),
-                        optimizer_name=optimizer.__class__.__name__, optimizer_parameters=dict())
-    recorder.start()
-
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
     ## Outerloop optimizer end
     optimizer.end(traj)
-
-    recorder.end()
 
     # Finally disable logging and close all log-files
     env.disable_logging()

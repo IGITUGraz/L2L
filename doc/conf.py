@@ -376,6 +376,7 @@ def setup(app):
         no_namedtuple_attrib_docstring,
     )
 
+
 nitpicky = True
 nitpick_ignore = [('py:obj', 'traj'), ('py:obj', 'traj.individual'), ('py:class', 'ltl.recorder'), ('py:mod', 'pypet'),
                   ('py:obj', 'fitnesses_results'), ('py:meth', 'ltl.optimizers.optimizer.Optimizer.__init__')]
