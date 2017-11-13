@@ -21,7 +21,7 @@ GridSearchParameters.__doc__ = """
     `n_steps + 1` points for the grid.
     
     Note that there must be as many keys as there are in the `Individual-Dict` returned by the function
-    :func:`optimizee_create_individual`. Also, if any of the parameters of the individuals is an array, then the above
+    :meth:`.Optimizee.create_individual`. Also, if any of the parameters of the individuals is an array, then the above
     grid specification applies to each element of the array.
 """
 

@@ -1,16 +1,16 @@
 Optimizer using Evolutionary Algorithm
 ======================================
 
-GeneticAlgorithmOptimizer class
--------------------------------
+GeneticAlgorithmOptimizer
+-------------------------
 
 .. autoclass:: ltl.optimizers.evolution.optimizer.GeneticAlgorithmOptimizer
     :members:
     :undoc-members:
     :show-inheritance:
 
-GeneticAlgorithmParameters namedtuple
--------------------------------------
+GeneticAlgorithmParameters
+--------------------------
 .. autoclass:: ltl.optimizers.evolution.optimizer.GeneticAlgorithmParameters
     :members:
     :undoc-members:

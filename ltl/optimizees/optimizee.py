@@ -25,7 +25,7 @@ class Optimizee:
     def create_individual(self):
         """
         Create one individual i.e. one instance of parameters. This instance must be a dictionary with dot-separated
-        parameter names as keys and parameter values as values. This is used by the :class:`ltl.optimizers.*` via the
+        parameter names as keys and parameter values as values. This is used by the optimizers via the
         function create_individual() to initialize the individual/parameters. After that, the change in parameters is
         model specific e.g. In simulated annealing, it is perturbed on specific criteria
 

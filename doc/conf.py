@@ -44,8 +44,10 @@ extensions = [
 ]
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
-    'pypet': ('http://pythonhosted.org/pypet', None),
-    'sklearn': ('http://scikit-learn.org/stable', None)
+    'pypet': ('https://pypet.readthedocs.io/en/latest/', None),
+    'sklearn': ('http://scikit-learn.org/stable', None),
+    'numpy': ('http://docs.scipy.org/doc/numpy/', None)
+
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -171,7 +173,7 @@ html_theme = 'basicstrap'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -373,3 +375,7 @@ def setup(app):
         'autodoc-process-docstring',
         no_namedtuple_attrib_docstring,
     )
+
+nitpicky = True
+nitpick_ignore = [('py:obj', 'traj'), ('py:obj', 'traj.individual'), ('py:class', 'ltl.recorder'), ('py:mod', 'pypet'),
+                  ('py:obj', 'fitnesses_results'), ('py:meth', 'ltl.optimizers.optimizer.Optimizer.__init__')]

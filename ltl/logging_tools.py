@@ -14,7 +14,7 @@ def create_shared_logger_data(logger_names, log_levels, log_to_consoles,
     required to setup logging across processes. This must be run exactly once in the
     root process.
 
-    :param logger_names: This is a list of names of the logggers whose output you're
+    :param logger_names: This is a list of names of the loggers whose output you're
         interested in.
 
     :param log_levels: This is the list of the same size of `logger_names` containing
@@ -59,14 +59,14 @@ def create_shared_logger_data(logger_names, log_levels, log_to_consoles,
 def configure_loggers(exactly_once=False):
     """
     This function configures the loggers using the shared information that was set by
-    :meth:`.create_shared_logger_data`. This function must be run at the beginning
+    :func:`.create_shared_logger_data`. This function must be run at the beginning
     of every function that is parallelized in order to be able to reliably
     configure the loggers. As an example look at its usage in the method
-    :meth:`~ltl.optimizees.functions.FunctionGeneratorOptimizee.simulate()` from the
-    class :class:`~ltl.optimizees.functions.FunctionGeneratorOptimizee`
+    :meth:`~.FunctionGeneratorOptimizee.simulate()` from the
+    class :class:`~.FunctionGeneratorOptimizee`
 
     You may also wish to call this function in your main simulation (after calling
-    :meth:`.create_shared_logger_data`) to configure the logging for the root process
+    :func:`.create_shared_logger_data`) to configure the logging for the root process
     before any of the parallelized functions are run.
 
     :param exactly_once: If the configuration of logging is causing a significant

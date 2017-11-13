@@ -11,6 +11,7 @@ NaturalEvolutionStrategiesOptimizer
 
 NaturalEvolutionStrategiesParameters
 ------------------------------------
+
 .. autoclass:: ltl.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters
     :members:
     :undoc-members:

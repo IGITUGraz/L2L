@@ -58,8 +58,8 @@ class Optimizer:
     def post_process(self, traj, fitnesses_results):
         """
         This is the key function of this class. Given a set of :obj:`fitnesses_results`,  and the :obj:`traj`, it uses
-        the fitness to decide on the next set of parameters to be evaluated. Then it fills the :attr:`Optimizer.eval_pop` with the
-        list of parameters it wants evaluated at the next simulation cycle, increments :attr:`Optimizer.g` and calls
+        the fitness to decide on the next set of parameters to be evaluated. Then it fills the :attr:`.Optimizer.eval_pop` with the
+        list of parameters it wants evaluated at the next simulation cycle, increments :attr:`.Optimizer.g` and calls
         :meth:`._expand_trajectory`
 
         :param  ~pypet.trajectory.Trajectory traj: The :mod:`pypet` trajectory that contains the parameters and the

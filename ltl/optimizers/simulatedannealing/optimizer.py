@@ -110,7 +110,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
     :param optimizee_create_individual: Function that creates a new individual
     :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each
       element of the fitness vector)
-    :param parameters: Instance of :func:`~collections.namedtuple` :class:`SimulatedAnnealingParameters` containing the
+    :param parameters: Instance of :func:`~collections.namedtuple` :class:`.SimulatedAnnealingParameters` containing the
       parameters needed by the Optimizer
     :param optimizee_bounding_func: This is a function that takes an individual as argument and returns another individual that is
       within bounds (The bounds are defined by the function itself). If not provided, the individuals

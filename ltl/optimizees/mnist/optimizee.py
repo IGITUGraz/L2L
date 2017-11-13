@@ -15,8 +15,12 @@ class MNISTOptimizee(Optimizee):
     Implements a simple function optimizee. Functions are generated using the FunctionGenerator.
     NOTE: Make sure the optimizee_fitness_weights is set to (-1,) to minimize the value of the function
 
-    :param traj: The trajectory used to conduct the optimization.
-    :param .MNISTOptimizeeParameters parameters:
+    :param traj:
+        The trajectory used to conduct the optimization.
+
+    :param parameters:
+        Instance of :func:`~collections.namedtuple` :class:`.MNISTOptimizeeParameters`
+
     """
 
     def __init__(self, traj, parameters):

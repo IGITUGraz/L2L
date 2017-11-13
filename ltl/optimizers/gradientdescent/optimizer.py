@@ -22,7 +22,7 @@ ClassicGDParameters.__doc__ = """
 """
 
 StochasticGDParameters = namedtuple(
-    'StochGDParameters',
+    'StochasticGDParameters',
     ['learning_rate', 'stochastic_deviation', 'stochastic_decay', 'exploration_step_size', 'n_random_steps', 'n_iteration',
      'stop_criterion', 'seed'])
 StochasticGDParameters.__doc__ = """
@@ -90,10 +90,10 @@ class GradientDescentOptimizer(Optimizer):
       element of the fitness vector)
     
     :param parameters: 
-      Instance of :func:`~collections.namedtuple` :class:`ClassicGDParameters`,
-      :func:`~collections.namedtuple` :class:`StochGDParameters`, 
-      :func:`~collections.namedtuple` :class:`RMSPropParameters` or 
-      :func:`~collections.namedtuple` :class:`AdamParameters` containing the
+      Instance of :func:`~collections.namedtuple` :class:`.ClassicGDParameters`,
+      :func:`~collections.namedtuple` :class:`.StochasticGDParameters`,
+      :func:`~collections.namedtuple` :class:`.RMSPropParameters` or
+      :func:`~collections.namedtuple` :class:`.AdamParameters` containing the
       parameters needed by the Optimizer. The type of this parameter is used to select one of the GD variants.
     
     :param optimizee_bounding_func:

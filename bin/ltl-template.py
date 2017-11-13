@@ -41,16 +41,14 @@ def main():
 
     print("All output logs can be found in directory ", paths.logs_path)
 
-    traj_file = os.path.join(paths.output_dir_path, 'data.h5')
-
     # Create an environment that handles running our simulation
     # This initializes a PyPet environment. See Pypet documentation for more details on environment and trajectory.
     # Uncomment 'freeze_input', 'multipproc', 'use_scoop' and 'wrap_mode' lines to disable running the experiment
     # across cores and nodes.
-    env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
+    env = Environment(trajectory=name, filename=paths.output_dir_path, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      freeze_input=True,
+                      freeze_input=False,
                       multiproc=True,
                       use_scoop=True,
                       wrap_mode=pypetconstants.WRAP_MODE_LOCAL,

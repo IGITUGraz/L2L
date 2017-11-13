@@ -35,7 +35,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
     :param optimizee_create_individual: Function that creates a new individual
     :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these
       values (one for each element of the fitness vector)
-    :param parameters: Instance of :class:`namedtuple` :class:`GeneticAlgorithmParameters` containing the parameters
+    :param parameters: Instance of :func:`~collections.namedtuple` :class:`.GeneticAlgorithmOptimizer` containing the parameters
       needed by the Optimizer
     """
 

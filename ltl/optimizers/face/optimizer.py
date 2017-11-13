@@ -23,7 +23,7 @@ FACEParameters.__doc__ = """
     new_params = smoothing*old_params + (1-smoothing)*optimal_new_params
     
 :param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
-  generation. To see the use of temperature, look at the documentation of :class:`FACEOptimizer`
+  generation. To see the use of temperature, look at the documentation of :class:`.FACEOptimizer`
 :param n_iteration: Number of iterations to perform
 :param distribution: Distribution class to use. Has to implement a fit and sample function.
 :param stop_criterion: (Optional) Stop if this fitness is reached.
@@ -65,7 +65,7 @@ class FACEOptimizer(Optimizer):
       returned should be of numpy.float64 type
     :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these
       values (one for each element of the fitness vector)
-    :param parameters: Instance of :func:`~collections.namedtuple` :class:`CrossEntropyParameters` containing the
+    :param parameters: Instance of :func:`~collections.namedtuple` :class:`.FACEParameters` containing the
       parameters needed by the Optimizer
     :param optimizee_bounding_func: This is a function that takes an individual as argument and returns another 
       individual that is within bounds (The bounds are defined by the function itself). If not provided, the

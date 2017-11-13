@@ -1,37 +1,37 @@
 Optimizer using Gradient Descent
 ================================
 
-GradientDescentOptimizer class
-------------------------------
+GradientDescentOptimizer
+------------------------
 
 .. autoclass:: ltl.optimizers.gradientdescent.optimizer.GradientDescentOptimizer
     :members:
     :undoc-members:
     :show-inheritance:
 
-ClassicGDParameters namedtuple
-------------------------------
+ClassicGDParameters
+-------------------
 .. autoclass:: ltl.optimizers.gradientdescent.optimizer.ClassicGDParameters
     :members:
     :undoc-members:
     :show-inheritance:
 
-StochasticGDParameters namedtuple
----------------------------------
+StochasticGDParameters
+----------------------
 .. autoclass:: ltl.optimizers.gradientdescent.optimizer.StochasticGDParameters
     :members:
     :undoc-members:
     :show-inheritance:
 
-AdamParameters namedtuple
--------------------------
+AdamParameters
+--------------
 .. autoclass:: ltl.optimizers.gradientdescent.optimizer.AdamParameters
     :members:
     :undoc-members:
     :show-inheritance:
 
-RMSPropParameters namedtuple
-----------------------------
+RMSPropParameters
+-----------------
 .. autoclass:: ltl.optimizers.gradientdescent.optimizer.RMSPropParameters
     :members:
     :undoc-members:

@@ -6,6 +6,7 @@ API Reference
     ltl.optimizees
     ltl.optimizers
     ltl.dataprocessing
+    ltl.logging_tools
 
 
 Other module functions
