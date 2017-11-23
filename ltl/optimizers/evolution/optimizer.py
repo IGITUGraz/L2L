@@ -33,7 +33,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
     Implements evolutionary algorithm.
 
     When using the binary operators, real numbers are encoded as integers that discretise the input real interval
-    [-10, 10]; this range can be modified. This is done for better exploration performance.
+    as determined by the parameter_spec. This is done for better exploration performance on a restriced domain.
 
     :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs.
       The parameters should be initialized based on the values in `parameters`
@@ -48,31 +48,33 @@ class GeneticAlgorithmOptimizer(Optimizer):
                  optimizee_create_individual,
                  optimizee_fitness_weights,
                  parameters,
-                 optimizee_bounding_func=None):
+                 optimizee_bounding_func=None,
+                 optimizee_parameter_spec=None):
 
         super().__init__(traj,
                          optimizee_create_individual=optimizee_create_individual,
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters, optimizee_bounding_func=optimizee_bounding_func)
+
         self.optimizee_bounding_func = optimizee_bounding_func
-        __, self.optimizee_individual_dict_spec = dict_to_list(optimizee_create_individual(), get_dict_spec=True)
+        self.optimizee_parameter_spec = optimizee_parameter_spec
+        _, self.optimizee_individual_dict_spec = dict_to_list(optimizee_create_individual(), get_dict_spec=True)
 
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
         traj.f_add_parameter('popsize', parameters.popsize, comment='Population size')  # 185
         traj.f_add_parameter('CXPB', parameters.CXPB, comment='Crossover term')
         traj.f_add_parameter('MUTPB', parameters.MUTPB, comment='Mutation probability')
         traj.f_add_parameter('NGEN', parameters.NGEN, comment='Number of generations')
-
         traj.f_add_parameter('indpb', parameters.indpb, comment='Mutation parameter')
         traj.f_add_parameter('tournsize', parameters.tournsize, comment='Selection parameter')
+        traj.f_add_parameter('matepar', parameters.matepar, comment='Blending parameter')
+        traj.f_add_parameter('remutate', parameters.remutate, comment='Remutate offspring that reappear?')
 
         # ------- Create and register functions with DEAP ------- #
-        # delay_rate, slope, std_err, max_fraction_active
         creator.create("FitnessMax", base.Fitness, weights=self.optimizee_fitness_weights)
         creator.create("Individual", list, fitness=creator.FitnessMax)
 
         toolbox = base.Toolbox()
-        # Structure initializers
         toolbox.register("individual", tools.initIterate, creator.Individual,
                          lambda: dict_to_list(optimizee_create_individual()))
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
@@ -97,9 +99,9 @@ class GeneticAlgorithmOptimizer(Optimizer):
 
             return bounding_wrapper
 
-        toolbox.register("mate", bits_two_point_crossover)
+        toolbox.register("mate", bits_two_point_crossover, bounds_spec=self.optimizee_parameter_spec())
         toolbox.decorate("mate", bounding_decorator)
-        toolbox.register("mutate", bits_random_bitflip_mutation, flip_prob=traj.indpb)
+        toolbox.register("mutate", bits_random_bitflip_mutation, flip_prob=traj.indpb, bounds_spec=self.optimizee_parameter_spec())
         toolbox.decorate("mutate", bounding_decorator)
         toolbox.register("select", tools.selTournament, tournsize=traj.tournsize)
 
@@ -115,6 +117,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         self.hall_of_fame = HallOfFame(20)
 
         self._expand_trajectory(traj)
+
 
     def post_process(self, traj, fitnesses_results):
         """
