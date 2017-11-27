@@ -18,7 +18,7 @@ logger = logging.getLogger('ltl-fun-ce')
 
 def main():
     name = 'LTL-FUN-CE'
-    root_dir_path = '/wang/users/s2ext_scherr/cluster_home/simulations'  # CHANGE THIS to the directory where your simulation results are contained
+    root_dir_path = '/wang/users/s2ext_bohnstingl/cluster_home/MasterIGI/Code/src/LTL/simRes'  # CHANGE THIS to the directory where your simulation results are contained
     
     assert root_dir_path is not None, \
            "You have not set the root path to store your results." \

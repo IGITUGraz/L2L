@@ -10,7 +10,7 @@ logger = logging.getLogger("ltl-ce")
 
 class CrossEntropyParameters(namedtuple('CrossEntropyParameters',
                                         ['pop_size', 'rho', 'smoothing', 'temp_decay',
-                                         'n_iteration', 'distribution', 'stop_criterion'])):
+                                         'n_iteration', 'distribution', 'stop_criterion', 'seed'])):
     """CrossEntropyParameters
     
     :param pop_size: Minimal number of individuals per simulation.
@@ -32,7 +32,7 @@ class CrossEntropyParameters(namedtuple('CrossEntropyParameters',
     pass
 
 
-CrossEntropyParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0, 10, None, np.inf)
+CrossEntropyParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0, 10, None, np.inf, np.random.randint(2**32))
 
 
 class CrossEntropyOptimizer(Optimizer):
@@ -97,8 +97,6 @@ class CrossEntropyOptimizer(Optimizer):
             raise Exception("smoothing has to be in interval [0, 1)")
 
         # The following parameters are recorded
-        traj.f_add_parameter('distribution', str(parameters.distribution.__class__),
-                             comment='Used distribution family')
         traj.f_add_parameter('pop_size', parameters.pop_size,
                              comment='Number of minimal individuals simulated in each run')
         traj.f_add_parameter('rho', parameters.rho,
@@ -316,3 +314,4 @@ class CrossEntropyOptimizer(Optimizer):
         logger.info("-- Final distribution parameters --")
         for parameter_key, parameter_value in sorted(self.distribution_results.items()):
             logger.info('  %s: %s', parameter_key, parameter_value)
+
