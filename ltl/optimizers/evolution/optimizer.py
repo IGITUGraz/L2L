@@ -24,6 +24,24 @@ GeneticAlgorithmParameters.__doc__ = """
 :param matepar: Paramter used for blending two values during mating
 """
 
+class GeneticAlgorithmParameters(namedtuple('GeneticAlgorithmParameters',
+                                        ['seed', 'popsize', 'CXPB', 'MUTPB', 'NGEN', 'indpb', 'tournsize', 'matepar',
+                                         'mutpar'])):
+    """CrossEntropyParameters
+    
+    :param seed: Random seed
+    :param popsize: Size of the population
+    :param CXPB: Crossover probability
+    :param MUTPB: Mutation probability
+    :param NGEN: Number of generations simulation should run for
+    :param indpb: Probability of mutation of each element in individual
+    :param tournsize: Size of the tournamaent used for fitness evaluation and selection
+    :param matepar: Paramter used for blending two values during mating
+    """
+    pass
+
+
+GeneticAlgorithmParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0, 10, None, np.inf, np.random.randint(2**32))
 
 class GeneticAlgorithmOptimizer(Optimizer):
     """
