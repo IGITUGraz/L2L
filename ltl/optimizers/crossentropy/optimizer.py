@@ -8,31 +8,30 @@ from ltl import dict_to_list, list_to_dict
 logger = logging.getLogger("ltl-ce")
 
 
-class CrossEntropyParameters(namedtuple('CrossEntropyParameters',
-                                        ['pop_size', 'rho', 'smoothing', 'temp_decay',
-                                         'n_iteration', 'distribution', 'stop_criterion'])):
-    """CrossEntropyParameters
+CrossEntropyParameters = namedtuple('CrossEntropyParameters',
+                                    ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distribution',
+                                     'stop_criterion', 'seed'])
+
+CrossEntropyParameters.__doc__ = """
+:param pop_size: Minimal number of individuals per simulation.
+:param rho: Fraction of solutions to be considered elite in each iteration.
+
+:param smoothing: This is a factor between 0 and 1 that determines the weight assigned to the previous distribution
+  parameters while calculating the new distribution parameters. The smoothing is done as a linear combination of the 
+  optimal parameters for the current data, and the previous distribution as follows:
     
-    :param pop_size: Minimal number of individuals per simulation.
-    :param rho: Fraction of solutions to be considered elite in each iteration.
+    new_params = smoothing * old_params + (1 - smoothing) * optimal_new_params
 
-    :param smoothing: This is a factor between 0 and 1 that determines the weight assigned to the previous distribution
-      parameters while calculating the new distribution parameters. The smoothing is done as a linear combination of the 
-      optimal parameters for the current data, and the previous distribution as follows:
-        
-        new_params = smoothing*old_params + (1-smoothing)*optimal_new_params
+:param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
+  generation. To see the use of temperature, look at the documentation of :class:`.CrossEntropyOptimizer`
 
-    :param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
-      generation. To see the use of temperature, look at the documentation of :class:`CrossEntropyOptimizer`
-
-    :param n_iteration: Number of iterations to perform
-    :param distribution: Distribution object to use. Has to implement a fit and sample function.
-    :param stop_criterion: (Optional) Stop if this fitness is reached.
-    """
-    pass
-
-
-CrossEntropyParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0, 10, None, np.inf)
+:param n_iteration: Number of iterations to perform
+:param distribution: Distribution object to use. Has to implement a fit and sample function. Should be one of 
+  :class:`~.Gaussian`, :class:`~.NoisyGaussian`, :class:`~.BayesianGaussianMixture`, :class:`~.NoisyBayesianGaussianMixture`
+:param stop_criterion: (Optional) Stop if this fitness is reached.
+:param seed: The random seed used to sample and fit the distribution. :class:`.CrossEntropyOptimizer`
+    uses a random generator seeded with this seed.
+"""
 
 
 class CrossEntropyOptimizer(Optimizer):
@@ -201,6 +200,7 @@ class CrossEntropyOptimizer(Optimizer):
             weighted_fitness_list.append(weighted_fitness)
             
             traj.f_add_result('$set.$', fitness=fitness, weighted_fitness=weighted_fitness)
+            traj.f_add_result('$set.$.individual', self.eval_pop[ind_index])
         traj.v_idx = -1  # set trajectory back to default
 
         weighted_fitness_list = np.array(weighted_fitness_list).ravel()
