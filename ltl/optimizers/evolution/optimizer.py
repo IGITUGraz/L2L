@@ -10,21 +10,19 @@ from ltl import dict_to_list, list_to_dict
 
 logger = logging.getLogger("ltl-ga")
 
-
-class GeneticAlgorithmParameters(namedtuple('GeneticAlgorithmParameters',
-                                            ['seed', 'popsize', 'CXPB', 'MUTPB', 'NGEN', 'indpb',
-                                             'tournsize', 'matepar', 'mutpar'])):
-    """
-    :param seed: Random seed
-    :param popsize: Size of the population
-    :param CXPB: Crossover probability
-    :param MUTPB: Mutation probability
-    :param NGEN: Number of generations simulation should run for
-    :param indpb: Probability of mutation of each element in individual
-    :param tournsize: Size of the tournamaent used for fitness evaluation and selection
-    :param matepar: Paramter used for blending two values during mating
-    """
-    pass
+GeneticAlgorithmParameters = namedtuple('GeneticAlgorithmParameters',
+                                        ['seed', 'popsize', 'CXPB', 'MUTPB', 'NGEN', 'indpb', 'tournsize', 'matepar',
+                                         'mutpar'])
+GeneticAlgorithmParameters.__doc__ = """
+:param seed: Random seed
+:param popsize: Size of the population
+:param CXPB: Crossover probability
+:param MUTPB: Mutation probability
+:param NGEN: Number of generations simulation should run for
+:param indpb: Probability of mutation of each element in individual
+:param tournsize: Size of the tournamaent used for fitness evaluation and selection
+:param matepar: Paramter used for blending two values during mating
+"""
 
 
 class GeneticAlgorithmOptimizer(Optimizer):
