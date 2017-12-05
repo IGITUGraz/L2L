@@ -1,3 +1,5 @@
+from __future__ import division
+from __future__ import absolute_import
 import logging
 import copy
 from collections import namedtuple
@@ -7,14 +9,15 @@ import numpy as np
 from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list
 from ltl import list_to_dict
+from itertools import izip
 
-logger = logging.getLogger("ltl-gd")
+logger = logging.getLogger(u"ltl-gd")
 
 
-class ClassicGDParameters(namedtuple('ClassicGDParameters',
-                                     ['learning_rate', 'exploration_rate', 'n_random_steps', 'n_iteration',
-                                      'stop_criterion'])):
-    """
+class ClassicGDParameters(namedtuple(u'ClassicGDParameters',
+                                     [u'learning_rate', u'exploration_rate', u'n_random_steps', u'n_iteration',
+                                      u'stop_criterion'])):
+    u"""
     :param learning_rate: The rate of learning per step of gradient descent
     :param exploration_rate: The standard deviation of random steps used for finite difference gradient
     :param n_random_steps: The amount of random steps used to estimate gradient
@@ -23,10 +26,10 @@ class ClassicGDParameters(namedtuple('ClassicGDParameters',
     """
 
 
-class StochasticGDParameters(namedtuple('StochGDParameters', ['learning_rate', 'stochastic_deviation',
-                                                              'stochastic_decay', 'exploration_rate', 'n_random_steps',
-                                                              'n_iteration', 'stop_criterion'])):
-    """
+class StochasticGDParameters(namedtuple(u'StochGDParameters', [u'learning_rate', u'stochastic_deviation',
+                                                              u'stochastic_decay', u'exploration_rate', u'n_random_steps',
+                                                              u'n_iteration', u'stop_criterion'])):
+    u"""
     :param learning_rate: The rate of learning per step of gradient descent
     :param stochastic_deviation: The standard deviation of the random vector used to perturbate the gradient
     :param stochastic_decay: The decay of the influence of the random vector that is added to the gradient 
@@ -38,10 +41,10 @@ class StochasticGDParameters(namedtuple('StochGDParameters', ['learning_rate', '
     """
 
 
-class AdamParameters(namedtuple('AdamParameters', ['learning_rate', 'exploration_rate', 'n_random_steps',
-                                                   'first_order_decay', 'second_order_decay', 'n_iteration',
-                                                   'stop_criterion'])):
-    """
+class AdamParameters(namedtuple(u'AdamParameters', [u'learning_rate', u'exploration_rate', u'n_random_steps',
+                                                   u'first_order_decay', u'second_order_decay', u'n_iteration',
+                                                   u'stop_criterion'])):
+    u"""
     :param learning_rate: The rate of learning per step of gradient descent
     :param exploration_rate: The standard deviation of random steps used for finite difference gradient
     :param n_random_steps: The amount of random steps used to estimate gradient
@@ -53,9 +56,9 @@ class AdamParameters(namedtuple('AdamParameters', ['learning_rate', 'exploration
     """
 
 
-class RMSPropParameters(namedtuple('RMSPropParameters', ['learning_rate', 'exploration_rate', 'n_random_steps',
-                                                         'momentum_decay', 'n_iteration', 'stop_criterion'])):
-    """
+class RMSPropParameters(namedtuple(u'RMSPropParameters', [u'learning_rate', u'exploration_rate', u'n_random_steps',
+                                                         u'momentum_decay', u'n_iteration', u'stop_criterion'])):
+    u"""
     :param learning_rate: The rate of learning per step of gradient descent
     :param exploration_rate: The standard deviation of random steps used for finite difference gradient
     :param n_random_steps: The amount of random steps used to estimate gradient
@@ -66,7 +69,7 @@ class RMSPropParameters(namedtuple('RMSPropParameters', ['learning_rate', 'explo
 
 
 class GradientDescentOptimizer(Optimizer):
-    """
+    u"""
     Class for a generic gradient descent solver.
     In the pseudo code the algorithm does:
 
@@ -113,13 +116,13 @@ class GradientDescentOptimizer(Optimizer):
                                                        parameters=parameters)
         self.optimizee_bounding_func = optimizee_bounding_func
 
-        traj.f_add_parameter('learning_rate', parameters.learning_rate, comment='Value of learning rate')
-        traj.f_add_parameter('exploration_rate', parameters.exploration_rate,
-                             comment='Standard deviation of the random steps')
-        traj.f_add_parameter('n_random_steps', parameters.n_random_steps,
-                             comment='Amount of random steps taken for calculating the gradient')
-        traj.f_add_parameter('n_iteration', parameters.n_iteration, comment='Number of iteration to perform')
-        traj.f_add_parameter('stop_criterion', parameters.stop_criterion, comment='Stopping criterion parameter')
+        traj.f_add_parameter(u'learning_rate', parameters.learning_rate, comment=u'Value of learning rate')
+        traj.f_add_parameter(u'exploration_rate', parameters.exploration_rate,
+                             comment=u'Standard deviation of the random steps')
+        traj.f_add_parameter(u'n_random_steps', parameters.n_random_steps,
+                             comment=u'Amount of random steps taken for calculating the gradient')
+        traj.f_add_parameter(u'n_iteration', parameters.n_iteration, comment=u'Number of iteration to perform')
+        traj.f_add_parameter(u'stop_criterion', parameters.stop_criterion, comment=u'Stopping criterion parameter')
 
         _, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(), get_dict_spec=True)
 
@@ -139,16 +142,16 @@ class GradientDescentOptimizer(Optimizer):
         elif type(parameters) is RMSPropParameters:
             self.init_rmsprop(parameters, traj)
         else:
-            raise Exception('Class of the provided "parameters" argument is not among the supported types')
+            raise Exception(u'Class of the provided "parameters" argument is not among the supported types')
 
-        traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
+        traj.f_add_result(u'fitnesses', [], comment=u'Fitnesses of all individuals')
 
         # Explore the neighbourhood in the parameter space of current individual
         new_individual_list = [
             list_to_dict(self.current_individual +
                          np.random.normal(0.0, parameters.exploration_rate, self.current_individual.size),
                          self.optimizee_individual_dict_spec)
-            for i in range(parameters.n_random_steps)
+            for i in xrange(parameters.n_random_steps)
         ]
 
         # Also add the current individual to determine it's fitness
@@ -165,13 +168,13 @@ class GradientDescentOptimizer(Optimizer):
         self._expand_trajectory(traj)
 
     def post_process(self, traj, fitnesses_results):
-        """
+        u"""
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
         old_eval_pop = copy.copy(self.eval_pop)
         self.eval_pop[:] = []
 
-        logger.info("  Evaluating %i individuals" % len(fitnesses_results))
+        logger.info(u"  Evaluating %i individuals" % len(fitnesses_results))
 
         assert len(fitnesses_results) - 1 == traj.n_random_steps
 
@@ -180,7 +183,7 @@ class GradientDescentOptimizer(Optimizer):
         dx = np.zeros((traj.n_random_steps, len(self.current_individual)))
 
         for i, (run_index, fitness) in enumerate(fitnesses_results):
-            ind_fitness = sum(f * w for f, w in zip(fitness, self.optimizee_fitness_weights))
+            ind_fitness = sum(f * w for f, w in izip(fitness, self.optimizee_fitness_weights))
 
             # The last element of the list is the evaluation of the individual obtained via gradient descent
             if i == len(fitnesses_results) - 1:
@@ -196,10 +199,10 @@ class GradientDescentOptimizer(Optimizer):
 
                 dx[i] = np.array(dict_to_list(individual)) - self.current_individual
 
-        logger.debug("Current fitness is %.2f", self.current_fitness)
+        logger.debug(u"Current fitness is %.2f", self.current_fitness)
 
         traj.v_idx = -1  # set the trajectory back to default
-        logger.info("-- End of iteration {}, current fitness is {} --".format(self.g, self.current_fitness))
+        logger.info(u"-- End of iteration {}, current fitness is {} --".format(self.g, self.current_fitness))
 
         if self.g < traj.n_iteration - 1 and traj.stop_criterion > self.current_fitness:
             # Create new individual using the appropriate gradient descent
@@ -210,7 +213,7 @@ class GradientDescentOptimizer(Optimizer):
                 list_to_dict(self.current_individual +
                              np.random.normal(0.0, traj.exploration_rate, self.current_individual.size),
                              self.optimizee_individual_dict_spec)
-                for i in range(traj.n_random_steps)
+                for i in xrange(traj.n_random_steps)
             ]
             new_individual_list.append(list_to_dict(self.current_individual, self.optimizee_individual_dict_spec))
             if self.optimizee_bounding_func is not None:
@@ -221,14 +224,14 @@ class GradientDescentOptimizer(Optimizer):
             self._expand_trajectory(traj)
 
     def end(self):
-        """
+        u"""
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
-        logger.info("The last individual was %s with fitness %s", self.current_individual, self.current_fitness)
-        logger.info("-- End of (successful) gradient descent --")
+        logger.info(u"The last individual was %s with fitness %s", self.current_individual, self.current_fitness)
+        logger.info(u"-- End of (successful) gradient descent --")
 
     def init_classic_gd(self, parameters, traj):
-        """
+        u"""
         Classic Gradient Descent specific initializiation.
 
         :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory on which the parameters should get stored.
@@ -238,7 +241,7 @@ class GradientDescentOptimizer(Optimizer):
         self.update_function = self.classic_gd_update
 
     def init_rmsprop(self, parameters, traj):
-        """
+        u"""
         RMSProp specific initializiation.
 
         :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory on which the parameters should get stored.
@@ -248,14 +251,14 @@ class GradientDescentOptimizer(Optimizer):
 
         self.update_function = self.rmsprop_update
 
-        traj.f_add_parameter('momentum_decay', parameters.momentum_decay,
-                             comment='Decay of the historic momentum at each gradient descent step')
+        traj.f_add_parameter(u'momentum_decay', parameters.momentum_decay,
+                             comment=u'Decay of the historic momentum at each gradient descent step')
 
         self.delta = 10 ** (-6)  # used to for numerical stabilization
         self.so_moment = np.zeros(len(self.current_individual))  # second order moment
 
     def init_adam(self, parameters, traj):
-        """
+        u"""
         ADAM specific initializiation.
 
         :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory on which the parameters should get stored.
@@ -265,17 +268,17 @@ class GradientDescentOptimizer(Optimizer):
 
         self.update_function = self.adam_update
 
-        traj.f_add_parameter('first_order_decay', parameters.first_order_decay,
-                             comment='Decay of the first order momentum')
-        traj.f_add_parameter('second_order_decay', parameters.second_order_decay,
-                             comment='Decay of the second order momentum')
+        traj.f_add_parameter(u'first_order_decay', parameters.first_order_decay,
+                             comment=u'Decay of the first order momentum')
+        traj.f_add_parameter(u'second_order_decay', parameters.second_order_decay,
+                             comment=u'Decay of the second order momentum')
 
         self.delta = 10 ** (-8)  # used for numerical stablization
         self.fo_moment = np.zeros(len(self.current_individual))  # first order moment
         self.so_moment = np.zeros(len(self.current_individual))  # second order moment
 
     def init_stochastic_gd(self, parameters, traj):
-        """
+        u"""
         Stochastic Gradient Descent specific initializiation.
 
         :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory on which the parameters should get stored.
@@ -285,12 +288,12 @@ class GradientDescentOptimizer(Optimizer):
 
         self.update_function = self.stochastic_gd_update
 
-        traj.f_add_parameter('stochastic_deviation', parameters.stochastic_deviation,
-                             comment='Standard deviation of the random vector added to the gradient')
-        traj.f_add_parameter('stochastic_decay', parameters.stochastic_decay, comment='Decay of the random vector')
+        traj.f_add_parameter(u'stochastic_deviation', parameters.stochastic_deviation,
+                             comment=u'Standard deviation of the random vector added to the gradient')
+        traj.f_add_parameter(u'stochastic_decay', parameters.stochastic_decay, comment=u'Decay of the random vector')
 
     def classic_gd_update(self, traj, gradient):
-        """
+        u"""
         Updates the current individual using the classic Gradient Descent algorithm.
 
         :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory which contains the parameters 
@@ -303,7 +306,7 @@ class GradientDescentOptimizer(Optimizer):
         self.current_individual += traj.learning_rate * gradient
 
     def rmsprop_update(self, traj, gradient):
-        """
+        u"""
         Updates the current individual using the RMSProp algorithm.
 
         :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory which contains the parameters 
@@ -320,7 +323,7 @@ class GradientDescentOptimizer(Optimizer):
                                                gradient)
 
     def adam_update(self, traj, gradient):
-        """
+        u"""
         Updates the current individual using the ADAM algorithm.
 
         :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory which contains the parameters 
@@ -342,7 +345,7 @@ class GradientDescentOptimizer(Optimizer):
                                                (np.sqrt(so_moment_corrected) + self.delta), gradient)
 
     def stochastic_gd_update(self, traj, gradient):
-        """
+        u"""
         Updates the current individual using a stochastic version of the gradient descent algorithm.
 
         :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory which contains the parameters 

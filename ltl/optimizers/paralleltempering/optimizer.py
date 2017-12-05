@@ -9,12 +9,13 @@ from enum import Enum
 from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list
 from ltl import list_to_dict
+from itertools import izip
 
-logger = logging.getLogger("optimizers.paralleltempering")
+logger = logging.getLogger(u"optimizers.paralleltempering")
 
-ParallelTemperingParameters = namedtuple('ParallelTemperingParameters',
-                                          ['n_parallel_runs', 'noisy_step', 'n_iteration', 'stop_criterion', 'seed', 'cooling_schedules', 'temperature_bounds', 'decay_parameters'])
-ParallelTemperingParameters.__doc__ = """
+ParallelTemperingParameters = namedtuple(u'ParallelTemperingParameters',
+                                          [u'n_parallel_runs', u'noisy_step', u'n_iteration', u'stop_criterion', u'seed', u'cooling_schedules', u'temperature_bounds', u'decay_parameters'])
+ParallelTemperingParameters.__doc__ = u"""
 :param n_parallel_runs: Number of parallel Simulated Annealing runs
 :param noisy_step: Size of the random step
 :param decay_parameters: List of decay parameter for each cooling schedule
@@ -27,9 +28,9 @@ ParallelTemperingParameters.__doc__ = """
     and the second entry is the ending temperature
 """
 
-AvailableCoolingSchedules = Enum('Schedule', 'DEFAULT LOGARITHMIC EXPONENTIAL LINEAR_MULTIPLICATIVE QUADRATIC_MULTIPLICATIVE LINEAR_ADDAPTIVE QUADRATIC_ADDAPTIVE EXPONENTIAL_ADDAPTIVE TRIGONOMETRIC_ADDAPTIVE')
+AvailableCoolingSchedules = Enum(u'Schedule', u'DEFAULT LOGARITHMIC EXPONENTIAL LINEAR_MULTIPLICATIVE QUADRATIC_MULTIPLICATIVE LINEAR_ADDAPTIVE QUADRATIC_ADDAPTIVE EXPONENTIAL_ADDAPTIVE TRIGONOMETRIC_ADDAPTIVE')
 
-"""
+u"""
 
 Multiplicative Monotonic Cooling
 This schedule type multiplies the starting temperature by a factor that 
@@ -98,8 +99,10 @@ T_k = T_n + (T_0 - T_n)/2 * (1+cos(k*pi/n))
 """
 
 
+from __future__ import division
+from __future__ import absolute_import
 class ParallelTemperingOptimizer(Optimizer):
-    """
+    u"""
     Class for a parallel tempering solver.
     
     Parallel Tempering is a search algorithm, that uses multiple simulated 
@@ -157,43 +160,42 @@ class ParallelTemperingOptimizer(Optimizer):
                  optimizee_fitness_weights,
                  parameters,
                  optimizee_bounding_func=None):
+        super(ParallelTemperingOptimizer, self).__init__(traj,
+                         optimizee_create_individual=optimizee_create_individual,
+                         optimizee_fitness_weights=optimizee_fitness_weights,
+                         parameters=parameters, optimizee_bounding_func=optimizee_bounding_func)
 
-	super(ParallelTemperingOptimizer, 
-                self).__init__(traj, optimizee_create_individual=optimizee_create_individual,
-                                 optimizee_fitness_weights=optimizee_fitness_weights,
-                                 parameters=parameters)
-        
         self.optimizee_bounding_func = optimizee_bounding_func
         
         # The following parameters are recorded
-        traj.f_add_parameter('n_parallel_runs', parameters.n_parallel_runs,
-                             comment='Number of parallel simulated annealing runs / Size of Population')
-        traj.f_add_parameter('noisy_step', parameters.noisy_step, comment='Size of the random step')
-        traj.f_add_parameter('n_iteration', parameters.n_iteration, comment='Number of iteration to perform')
-        traj.f_add_parameter('stop_criterion', parameters.stop_criterion, comment='Stopping criterion parameter')
-        traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
+        traj.f_add_parameter(u'n_parallel_runs', parameters.n_parallel_runs,
+                             comment=u'Number of parallel simulated annealing runs / Size of Population')
+        traj.f_add_parameter(u'noisy_step', parameters.noisy_step, comment=u'Size of the random step')
+        traj.f_add_parameter(u'n_iteration', parameters.n_iteration, comment=u'Number of iteration to perform')
+        traj.f_add_parameter(u'stop_criterion', parameters.stop_criterion, comment=u'Stopping criterion parameter')
+        traj.f_add_parameter(u'seed', parameters.seed, comment=u'Seed for RNG')
         
-        cooling_schedules_string = ''
+        cooling_schedules_string = u''
         bounds_list = []
         decay_list = []
         schedules_list = []
-        for i in range(0,traj.n_parallel_runs):
-            bounds_list.append(str(parameters.temperature_bounds[i,:]))
-            bounds_list.append(' ')
-            decay_list.append(str(parameters.decay_parameters[i]))
-            decay_list.append(' ')
-            schedules_list.append(str(parameters.cooling_schedules[i]))
-            schedules_list.append(' ')
-        temperature_bounds_string = ''.join(bounds_list)
-        decay_parameters_string = ''.join(decay_list)
-        cooling_schedules_string = ''.join(schedules_list)
+        for i in xrange(0,traj.n_parallel_runs):
+            bounds_list.append(unicode(parameters.temperature_bounds[i,:]))
+            bounds_list.append(u' ')
+            decay_list.append(unicode(parameters.decay_parameters[i]))
+            decay_list.append(u' ')
+            schedules_list.append(unicode(parameters.cooling_schedules[i]))
+            schedules_list.append(u' ')
+        temperature_bounds_string = u''.join(bounds_list)
+        decay_parameters_string = u''.join(decay_list)
+        cooling_schedules_string = u''.join(schedules_list)
         
-        traj.f_add_parameter('temperature_bounds', temperature_bounds_string,
-                             comment='The max and min temperature of the respective schedule')
-        traj.f_add_parameter('decay_parameters', decay_parameters_string,
-                             comment='The one parameter, most schedules need')
-        traj.f_add_parameter('cooling_schedules', cooling_schedules_string,
-                             comment='The used cooling schedule')
+        traj.f_add_parameter(u'temperature_bounds', temperature_bounds_string,
+                             comment=u'The max and min temperature of the respective schedule')
+        traj.f_add_parameter(u'decay_parameters', decay_parameters_string,
+                             comment=u'The one parameter, most schedules need')
+        traj.f_add_parameter(u'cooling_schedules', cooling_schedules_string,
+                             comment=u'The used cooling schedule')
 
         _, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(), get_dict_spec=True)
 
@@ -201,9 +203,9 @@ class ParallelTemperingOptimizer(Optimizer):
         # This is because this array is used within the context of the simulated annealing algorithm and
         # Thus needs to handle the optimizee individuals as vectors
         self.current_individual_list = [np.array(dict_to_list(self.optimizee_create_individual()))
-                                        for _ in range(parameters.n_parallel_runs)]
+                                        for _ in xrange(parameters.n_parallel_runs)]
 
-        traj.f_add_result('fitnesses', [], comment='Fitnesses of all individuals')
+        traj.f_add_result(u'fitnesses', [], comment=u'Fitnesses of all individuals')
 
         self.T_all = parameters.temperature_bounds[:,0]  # Initialize temperature
         self.T = 1
@@ -227,17 +229,17 @@ class ParallelTemperingOptimizer(Optimizer):
         
         #initialize container for the indices of the parallel runs
         self.parallel_indices = []
-        for i in range(0,traj.n_parallel_runs):
+        for i in xrange(0,traj.n_parallel_runs):
             self.parallel_indices.append(i)
         
         self.available_cooling_schedules = AvailableCoolingSchedules
         
         # assert if all cooling schedules are among the known cooling schedules
         schedule_known = True  # start off as True - if any schdule is unknown gets False
-        for i in range(np.size(self.cooling_schedules)):
+        for i in xrange(np.size(self.cooling_schedules)):
             schedule_known = schedule_known and self.cooling_schedules[i] in AvailableCoolingSchedules
         
-        assert schedule_known, print("Warning: Unknown cooling schedule")
+        assert schedule_known, print u"Warning: Unknown cooling schedule"
         
         self.recorder_parameters = ParallelTemperingParameters(n_parallel_runs=parameters.n_parallel_runs, noisy_step=parameters.noisy_step, n_iteration=parameters.n_iteration, stop_criterion=parameters.stop_criterion,
                                                                seed=parameters.seed, cooling_schedules=cooling_schedules_string, 
@@ -289,7 +291,7 @@ class ParallelTemperingOptimizer(Optimizer):
         return 1
         
     def get_params(self):
-        """
+        u"""
         Get parameters used for recorder
         :return: Dictionary containing recorder parameters
         """
@@ -297,7 +299,7 @@ class ParallelTemperingOptimizer(Optimizer):
         return param_dict
            
     def post_process(self, traj, fitnesses_results):
-        """
+        u"""
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
         noisy_step, n_iteration, stop_criterion = \
@@ -308,9 +310,9 @@ class ParallelTemperingOptimizer(Optimizer):
         old_eval_pop = self.eval_pop.copy()
         self.eval_pop.clear()
         temperature = self.T_all
-        for i in range(0,traj.n_parallel_runs):
+        for i in xrange(0,traj.n_parallel_runs):
             self.T_all[self.parallel_indices[i]] = self.cooling(temperature[self.parallel_indices[i]], cooling_schedules[self.parallel_indices[i]], decay_parameters[self.parallel_indices[i]], temperature_bounds[self.parallel_indices[i],:], n_iteration)
-        logger.info("  Evaluating %i individuals" % len(fitnesses_results))
+        logger.info(u"  Evaluating %i individuals" % len(fitnesses_results))
   
         assert len(fitnesses_results) == traj.n_parallel_runs
         weighted_fitness_list = []
@@ -318,7 +320,7 @@ class ParallelTemperingOptimizer(Optimizer):
             
             self.T = self.T_all[self.parallel_indices[i]]
 
-            weighted_fitness = sum(f * w for f, w in zip(fitness, self.optimizee_fitness_weights))
+            weighted_fitness = sum(f * w for f, w in izip(fitness, self.optimizee_fitness_weights))
             weighted_fitness_list.append(weighted_fitness)
 
             # We need to convert the current run index into an ind_idx
@@ -337,9 +339,9 @@ class ParallelTemperingOptimizer(Optimizer):
                 self.current_fitness_value_list[i] = weighted_fitness
                 self.current_individual_list[i] = np.array(dict_to_list(individual))
 
-            traj.f_add_result('$set.$.individual', individual)
+            traj.f_add_result(u'$set.$.individual', individual)
             # Watchout! if weighted fitness is a tuple/np array it should be converted to a list first here
-            traj.f_add_result('$set.$.fitness', weighted_fitness)
+            traj.f_add_result(u'$set.$.fitness', weighted_fitness)
 
             current_individual = self.current_individual_list[i]
             new_individual = list_to_dict(current_individual + np.random.randn(current_individual.size) * noisy_step * self.T,
@@ -347,16 +349,16 @@ class ParallelTemperingOptimizer(Optimizer):
             if self.optimizee_bounding_func is not None:
                 new_individual = self.optimizee_bounding_func(new_individual)
 
-            logger.debug("Current best fitness for individual %d is %.2f. New individual is %s", 
+            logger.debug(u"Current best fitness for individual %d is %.2f. New individual is %s", 
                          i, self.current_fitness_value_list[i], new_individual)
             self.eval_pop.append(new_individual)
             
         # the parallel tempering swapping starts here
-        for i in range(0,traj.n_parallel_runs):
+        for i in xrange(0,traj.n_parallel_runs):
             
             #make a random choice from all the other parallel runs
             compare_indices = []
-            for j in range(0,traj.n_parallel_runs):
+            for j in xrange(0,traj.n_parallel_runs):
                 compare_indices.append(i)
             compare_indices.remove(i)
             random_choice = random.choice(compare_indices)
@@ -370,10 +372,10 @@ class ParallelTemperingOptimizer(Optimizer):
                 self.parallel_indices[i] = self.parallel_indices[random_choice]
                 self.parallel_indices[random_choice] = temp
                 
-        logger.debug("Current best fitness within population is %.2f", max(self.current_fitness_value_list))
+        logger.debug(u"Current best fitness within population is %.2f", max(self.current_fitness_value_list))
 
         traj.v_idx = -1  # set the trajectory back to default
-        logger.info("-- End of generation {} --".format(self.g))
+        logger.info(u"-- End of generation {} --".format(self.g))
 
         # ------- Create the next generation by crossover and mutation -------- #
         # not necessary for the last generation
@@ -383,7 +385,7 @@ class ParallelTemperingOptimizer(Optimizer):
             self._expand_trajectory(traj)
         
     def end(self, traj):
-        """
+        u"""
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
         # ------------ Finished all runs and print result --------------- #
@@ -392,9 +394,9 @@ class ParallelTemperingOptimizer(Optimizer):
         best_last_fitness = self.current_fitness_value_list[best_last_indiv_index]
 
         best_last_indiv_dict = list_to_dict(best_last_indiv.tolist(), self.optimizee_individual_dict_spec)
-        traj.f_add_result('final_individual', best_last_indiv_dict)
-        traj.f_add_result('final_fitness', best_last_fitness)
-        traj.f_add_result('n_iteration', self.g + 1)
+        traj.f_add_result(u'final_individual', best_last_indiv_dict)
+        traj.f_add_result(u'final_fitness', best_last_fitness)
+        traj.f_add_result(u'n_iteration', self.g + 1)
 
-        logger.info("The best last individual was %s with fitness %s", best_last_indiv, best_last_fitness)
-        logger.info("-- End of (successful) parallel tempering --")
+        logger.info(u"The best last individual was %s with fitness %s", best_last_indiv, best_last_fitness)
+        logger.info(u"-- End of (successful) parallel tempering --")

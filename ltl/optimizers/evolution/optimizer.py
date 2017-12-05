@@ -1,19 +1,23 @@
+from __future__ import absolute_import
 import logging
 import random
+
 from collections import namedtuple
 
 from deap import base, creator, tools
 from deap.tools import HallOfFame
 
-from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list, list_to_dict
+from ltl.optimizers.optimizer import Optimizer
+from itertools import imap
+from itertools import izip
 
-logger = logging.getLogger("ltl-ga")
+logger = logging.getLogger(u"ltl-ga")
 
-GeneticAlgorithmParameters = namedtuple('GeneticAlgorithmParameters',
-                                        ['seed', 'popsize', 'CXPB', 'MUTPB', 'NGEN', 'indpb', 'tournsize', 'matepar',
-                                         'mutpar'])
-GeneticAlgorithmParameters.__doc__ = """
+GeneticAlgorithmParameters = namedtuple(u'GeneticAlgorithmParameters',
+                                        [u'seed', u'popsize', u'CXPB', u'MUTPB', u'NGEN', u'indpb', u'tournsize', u'matepar',
+                                         u'mutpar'])
+GeneticAlgorithmParameters.__doc__ = u"""
 :param seed: Random seed
 :param popsize: Size of the population
 :param CXPB: Crossover probability
@@ -24,33 +28,18 @@ GeneticAlgorithmParameters.__doc__ = """
 :param matepar: Paramter used for blending two values during mating
 """
 
-class GeneticAlgorithmParameters(namedtuple('GeneticAlgorithmParameters',
-                                        ['seed', 'popsize', 'CXPB', 'MUTPB', 'NGEN', 'indpb', 'tournsize', 'matepar',
-                                         'mutpar'])):
-    """CrossEntropyParameters
-    
-    :param seed: Random seed
-    :param popsize: Size of the population
-    :param CXPB: Crossover probability
-    :param MUTPB: Mutation probability
-    :param NGEN: Number of generations simulation should run for
-    :param indpb: Probability of mutation of each element in individual
-    :param tournsize: Size of the tournamaent used for fitness evaluation and selection
-    :param matepar: Paramter used for blending two values during mating
-    """
-    pass
-
-
-GeneticAlgorithmParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0, 10, None, np.inf, np.random.randint(2**32))
 
 class GeneticAlgorithmOptimizer(Optimizer):
-    """
+    u"""
     Implements evolutionary algorithm
 
-    :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs.  The parameters should be initialized based on the values in `parameters`
+    :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs.
+      The parameters should be initialized based on the values in `parameters`
     :param optimizee_create_individual: Function that creates a new individual
-    :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each element of the fitness vector)
-    :param parameters: Instance of :class:`namedtuple` :class:`GeneticAlgorithmParameters` containing the parameters needed by the Optimizer
+    :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these
+      values (one for each element of the fitness vector)
+    :param parameters: Instance of :func:`~collections.namedtuple` :class:`.GeneticAlgorithmOptimizer` containing the parameters
+      needed by the Optimizer
     """
 
     def __init__(self, traj,
@@ -59,35 +48,35 @@ class GeneticAlgorithmOptimizer(Optimizer):
                  parameters,
                  optimizee_bounding_func=None):
 
-        super(GeneticAlgorithmOptimizer, 
-                self).__init__(traj, optimizee_create_individual=optimizee_create_individual,
-                                optimizee_fitness_weights=optimizee_fitness_weights,
-                                parameters=parameters)
+        super(GeneticAlgorithmOptimizer, self).__init__(traj,
+                         optimizee_create_individual=optimizee_create_individual,
+                         optimizee_fitness_weights=optimizee_fitness_weights,
+                         parameters=parameters, optimizee_bounding_func=optimizee_bounding_func)
         self.optimizee_bounding_func = optimizee_bounding_func
         __, self.optimizee_individual_dict_spec = dict_to_list(optimizee_create_individual(), get_dict_spec=True)
 
-        traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
-        traj.f_add_parameter('popsize', parameters.popsize, comment='Population size')  # 185
-        traj.f_add_parameter('CXPB', parameters.CXPB, comment='Crossover term')
-        traj.f_add_parameter('MUTPB', parameters.MUTPB, comment='Mutation probability')
-        traj.f_add_parameter('NGEN', parameters.NGEN, comment='Number of generations')
+        traj.f_add_parameter(u'seed', parameters.seed, comment=u'Seed for RNG')
+        traj.f_add_parameter(u'popsize', parameters.popsize, comment=u'Population size')  # 185
+        traj.f_add_parameter(u'CXPB', parameters.CXPB, comment=u'Crossover term')
+        traj.f_add_parameter(u'MUTPB', parameters.MUTPB, comment=u'Mutation probability')
+        traj.f_add_parameter(u'NGEN', parameters.NGEN, comment=u'Number of generations')
 
-        traj.f_add_parameter('indpb', parameters.indpb, comment='Mutation parameter')
-        traj.f_add_parameter('tournsize', parameters.tournsize, comment='Selection parameter')
+        traj.f_add_parameter(u'indpb', parameters.indpb, comment=u'Mutation parameter')
+        traj.f_add_parameter(u'tournsize', parameters.tournsize, comment=u'Selection parameter')
 
         # ------- Create and register functions with DEAP ------- #
         # delay_rate, slope, std_err, max_fraction_active
-        creator.create("FitnessMax", base.Fitness, weights=self.optimizee_fitness_weights)
-        creator.create("Individual", list, fitness=creator.FitnessMax)
+        creator.create(u"FitnessMax", base.Fitness, weights=self.optimizee_fitness_weights)
+        creator.create(u"Individual", list, fitness=creator.FitnessMax)
 
         toolbox = base.Toolbox()
         # Structure initializers
-        toolbox.register("individual", tools.initIterate, creator.Individual,
+        toolbox.register(u"individual", tools.initIterate, creator.Individual,
                          lambda: dict_to_list(optimizee_create_individual()))
-        toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+        toolbox.register(u"population", tools.initRepeat, list, toolbox.individual)
 
         # Operator registering
-        # This complex piece of code isonly necessary because we're using the
+        # This complex piece of code is only necessary because we're using the
         # DEAP framework and would like to decorate the DEAP mutation operator
         def bounding_decorator(func):
             def bounding_wrapper(*args, **kwargs):
@@ -101,16 +90,16 @@ class GeneticAlgorithmOptimizer(Optimizer):
                     bounded_individuals = [self.optimizee_bounding_func(x) for x in result_individuals]
                     for i, deap_indiv in enumerate(result_individuals_deap):
                         deap_indiv[:] = dict_to_list(bounded_individuals[i])
-                    print("Bounded Individual: {}".format(bounded_individuals))
+                    print u"Bounded Individual: {}".format(bounded_individuals)
                     return result_individuals_deap
 
             return bounding_wrapper
 
-        toolbox.register("mate", tools.cxBlend, alpha=parameters.matepar)
-        toolbox.decorate("mate", bounding_decorator)
-        toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=parameters.mutpar, indpb=traj.indpb)
-        toolbox.decorate("mutate", bounding_decorator)
-        toolbox.register("select", tools.selTournament, tournsize=traj.tournsize)
+        toolbox.register(u"mate", tools.cxBlend, alpha=parameters.matepar)
+        toolbox.decorate(u"mate", bounding_decorator)
+        toolbox.register(u"mutate", tools.mutGaussian, mu=0, sigma=parameters.mutpar, indpb=traj.indpb)
+        toolbox.decorate(u"mutate", bounding_decorator)
+        toolbox.register(u"select", tools.selTournament, tournsize=traj.tournsize)
 
         # ------- Initialize Population and Trajectory -------- #
         # NOTE: The Individual object implements the list interface.
@@ -118,7 +107,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness.valid]
         self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec)
                          for ind in self.eval_pop_inds]
-        
+
         self.g = 0  # the current generation
         self.toolbox = toolbox  # the DEAP toolbox
         self.hall_of_fame = HallOfFame(20)
@@ -126,12 +115,12 @@ class GeneticAlgorithmOptimizer(Optimizer):
         self._expand_trajectory(traj)
 
     def post_process(self, traj, fitnesses_results):
-        """
+        u"""
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
         CXPB, MUTPB, NGEN = traj.CXPB, traj.MUTPB, traj.NGEN
 
-        logger.info("  Evaluating %i individuals" % len(fitnesses_results))
+        logger.info(u"  Evaluating %i individuals" % len(fitnesses_results))
         while fitnesses_results:
             result = fitnesses_results.pop()
             # Update fitness
@@ -145,22 +134,22 @@ class GeneticAlgorithmOptimizer(Optimizer):
             individual.fitness.values = fitness
 
             # Record
-            traj.f_add_result('$set.$.individual', self.eval_pop[ind_index])
-            traj.f_add_result('$set.$.fitness', individual.fitness.values)
+            traj.f_add_result(u'$set.$.individual', self.eval_pop[ind_index])
+            traj.f_add_result(u'$set.$.fitness', individual.fitness.values)
 
         traj.v_idx = -1  # set the trajectory back to default
 
-        logger.info("-- End of generation {} --".format(self.g))
+        logger.info(u"-- End of generation {} --".format(self.g))
         best_inds = tools.selBest(self.eval_pop_inds, 2)
         for best_ind in best_inds:
-            print("Best individual is %s, %s" % (list_to_dict(best_ind, self.optimizee_individual_dict_spec), 
-                                                 best_ind.fitness.values))
+            print u"Best individual is %s, %s" % (list_to_dict(best_ind, self.optimizee_individual_dict_spec),
+                                                 best_ind.fitness.values)
 
         self.hall_of_fame.update(self.eval_pop_inds)
 
-        logger.info("-- Hall of fame --")
+        logger.info(u"-- Hall of fame --")
         for hof_ind in tools.selBest(self.hall_of_fame, 2):
-            logger.info("HOF individual is %s, %s" % (list_to_dict(hof_ind, self.optimizee_individual_dict_spec),
+            logger.info(u"HOF individual is %s, %s" % (list_to_dict(hof_ind, self.optimizee_individual_dict_spec),
                                                       hof_ind.fitness.values))
 
         # ------- Create the next generation by crossover and mutation -------- #
@@ -168,10 +157,10 @@ class GeneticAlgorithmOptimizer(Optimizer):
             # Select the next generation individuals
             offspring = self.toolbox.select(self.pop, len(self.pop))
             # Clone the selected individuals
-            offspring = list(map(self.toolbox.clone, offspring))
+            offspring = list(imap(self.toolbox.clone, offspring))
 
             # Apply crossover and mutation on the offspring
-            for child1, child2 in zip(offspring[::2], offspring[1::2]):
+            for child1, child2 in izip(offspring[::2], offspring[1::2]):
                 if random.random() < CXPB:
                     self.toolbox.mate(child1, child2)
                     del child1.fitness.values
@@ -182,8 +171,8 @@ class GeneticAlgorithmOptimizer(Optimizer):
                     self.toolbox.mutate(mutant)
                     del mutant.fitness.values
 
-            if len(set(map(tuple, offspring))) < len(offspring):
-                logger.info("Mutating more")
+            if len(set(imap(tuple, offspring))) < len(offspring):
+                logger.info(u"Mutating more")
                 for i, o1 in enumerate(offspring):
                     for o2 in offspring[i:]:
                         if tuple(o1) == tuple(o2):
@@ -196,20 +185,20 @@ class GeneticAlgorithmOptimizer(Optimizer):
             self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness.valid]
             self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec)
                              for ind in self.eval_pop_inds]
-            
+
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 
     def end(self):
-        """
+        u"""
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
         # ------------ Finished all runs and print result --------------- #
-        logger.info("-- End of (successful) evolution --")
+        logger.info(u"-- End of (successful) evolution --")
         best_inds = tools.selBest(self.pop, 10)
         for best_ind in best_inds:
-            logger.info("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
+            logger.info(u"Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
 
-        logger.info("-- Hall of fame --")
+        logger.info(u"-- Hall of fame --")
         for hof_ind in self.hall_of_fame:
-            logger.info("HOF individual is %s, %s" % (hof_ind, hof_ind.fitness.values))
+            logger.info(u"HOF individual is %s, %s" % (hof_ind, hof_ind.fitness.values))

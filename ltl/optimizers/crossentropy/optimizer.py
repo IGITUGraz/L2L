@@ -1,44 +1,43 @@
+from __future__ import division
+from __future__ import absolute_import
 import logging
 from collections import namedtuple
 
 import numpy as np
 
-from ltl.optimizers.optimizer import Optimizer
 from ltl import dict_to_list, list_to_dict
-logger = logging.getLogger("ltl-ce")
+from ltl.optimizers.optimizer import Optimizer
 
-class CrossEntropyParameters(namedtuple('CrossEntropyParameters',
-                                        ['pop_size', 'rho', 'smoothing', 'temp_decay', 'n_iteration', 'distribution',
-                                     'stop_criterion', 'seed'])):
-    """CrossEntropyParameters
+logger = logging.getLogger(u"optimizers.crossentropy")
+
+CrossEntropyParameters = namedtuple(u'CrossEntropyParameters',
+                                    [u'pop_size', u'rho', u'smoothing', u'temp_decay', u'n_iteration', u'distribution',
+                                     u'stop_criterion', u'seed'])
+
+#CrossEntropyParameters.__doc__ = u"""
+#:param pop_size: Minimal number of individuals per simulation.
+#:param rho: Fraction of solutions to be considered elite in each iteration.
+
+#:param smoothing: This is a factor between 0 and 1 that determines the weight assigned to the previous distribution
+#  parameters while calculating the new distribution parameters. The smoothing is done as a linear combination of the 
+#  optimal parameters for the current data, and the previous distribution as follows:
     
-    :param pop_size: Minimal number of individuals per simulation.
-	:param rho: Fraction of solutions to be considered elite in each iteration.
+#    new_params = smoothing * old_params + (1 - smoothing) * optimal_new_params
 
-	:param smoothing: This is a factor between 0 and 1 that determines the weight assigned to the previous distribution
-	  parameters while calculating the new distribution parameters. The smoothing is done as a linear combination of the 
-	  optimal parameters for the current data, and the previous distribution as follows:
-	    
-	    new_params = smoothing * old_params + (1 - smoothing) * optimal_new_params
+#:param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
+#  generation. To see the use of temperature, look at the documentation of :class:`.CrossEntropyOptimizer`
 
-	:param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
-	  generation. To see the use of temperature, look at the documentation of :class:`.CrossEntropyOptimizer`
-
-	:param n_iteration: Number of iterations to perform
-	:param distribution: Distribution object to use. Has to implement a fit and sample function. Should be one of 
-	  :class:`~.Gaussian`, :class:`~.NoisyGaussian`, :class:`~.BayesianGaussianMixture`, :class:`~.NoisyBayesianGaussianMixture`
-	:param stop_criterion: (Optional) Stop if this fitness is reached.
-	:param seed: The random seed used to sample and fit the distribution. :class:`.CrossEntropyOptimizer`
-    uses a random generator seeded with this seed.
-    """
-    pass
-
-
-CrossEntropyParameters.__new__.__defaults__ = (30, 0.1, 0.2, 0, 10, None, np.inf, np.random.randint(2**32))
+#:param n_iteration: Number of iterations to perform
+#:param distribution: Distribution object to use. Has to implement a fit and sample function. Should be one of 
+#  :class:`~.Gaussian`, :class:`~.NoisyGaussian`, :class:`~.BayesianGaussianMixture`, :class:`~.NoisyBayesianGaussianMixture`
+#:param stop_criterion: (Optional) Stop if this fitness is reached.
+#:param seed: The random seed used to sample and fit the distribution. :class:`.CrossEntropyOptimizer`
+#    uses a random generator seeded with this seed.
+#"""
 
 
 class CrossEntropyOptimizer(Optimizer):
-    """
+    u"""
     Class for a generic cross entropy optimizer.
     In the pseudo code the algorithm does:
 
@@ -85,48 +84,48 @@ class CrossEntropyOptimizer(Optimizer):
 
     def __init__(self, traj, optimizee_create_individual, optimizee_fitness_weights, parameters,
                  optimizee_bounding_func=None):
-        
-        super(CrossEntropyOptimizer, 
-                self).__init__(traj, optimizee_create_individual=optimizee_create_individual,
-                                 optimizee_fitness_weights=optimizee_fitness_weights,
-                                 parameters=parameters)
+
+        super(CrossEntropyOptimizer, self).__init__(traj, optimizee_create_individual=optimizee_create_individual,
+                         optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters,
+                         optimizee_bounding_func=optimizee_bounding_func)
+
         self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func
 
         if parameters.pop_size < 1:
-            raise Exception("pop_size needs to be greater than 0")
+            raise Exception(u"pop_size needs to be greater than 0")
         if parameters.smoothing >= 1 or parameters.smoothing < 0:
-            raise Exception("smoothing has to be in interval [0, 1)")
+            raise Exception(u"smoothing has to be in interval [0, 1)")
 
         # The following parameters are recorded
-        traj.f_add_parameter('pop_size', parameters.pop_size,
-                             comment='Number of minimal individuals simulated in each run')
-        traj.f_add_parameter('rho', parameters.rho,
-                             comment='Fraction of individuals considered elite in each generation')
-        traj.f_add_parameter('n_iteration', parameters.n_iteration,
-                             comment='Number of iterations to run')
-        traj.f_add_parameter('stop_criterion', parameters.stop_criterion,
-                             comment='Stop if best individual reaches this fitness')
-        traj.f_add_parameter('smoothing', parameters.smoothing,
-                             comment='Weight of old parameters in smoothing')
-        traj.f_add_parameter('temp_decay', parameters.temp_decay,
-                             comment='Decay factor for temperature')
-        traj.f_add_parameter('seed', np.uint32(parameters.seed),
-                             comment='Seed used for random number generation in optimizer')
+        traj.f_add_parameter(u'pop_size', parameters.pop_size,
+                             comment=u'Number of minimal individuals simulated in each run')
+        traj.f_add_parameter(u'rho', parameters.rho,
+                             comment=u'Fraction of individuals considered elite in each generation')
+        traj.f_add_parameter(u'n_iteration', parameters.n_iteration,
+                             comment=u'Number of iterations to run')
+        traj.f_add_parameter(u'stop_criterion', parameters.stop_criterion,
+                             comment=u'Stop if best individual reaches this fitness')
+        traj.f_add_parameter(u'smoothing', parameters.smoothing,
+                             comment=u'Weight of old parameters in smoothing')
+        traj.f_add_parameter(u'temp_decay', parameters.temp_decay,
+                             comment=u'Decay factor for temperature')
+        traj.f_add_parameter(u'seed', np.uint32(parameters.seed),
+                             comment=u'Seed used for random number generation in optimizer')
 
         self.random_state = np.random.RandomState(traj.parameters.seed)
 
         temp_indiv, self.optimizee_individual_dict_spec = dict_to_list(self.optimizee_create_individual(),
                                                                        get_dict_spec=True)
-        traj.f_add_derived_parameter('dimension', len(temp_indiv),
-                                     comment='The dimension of the parameter space of the optimizee')
-        traj.f_add_derived_parameter('n_elite', int(parameters.rho * parameters.pop_size),
-                                     comment='Number of samples to be considered as elite')
+        traj.f_add_derived_parameter(u'dimension', len(temp_indiv),
+                                     comment=u'The dimension of the parameter space of the optimizee')
+        traj.f_add_derived_parameter(u'n_elite', int(parameters.rho * parameters.pop_size),
+                                     comment=u'Number of samples to be considered as elite')
 
         # Added a generation-wise parameter logging
-        traj.results.f_add_result_group('generation_params',
-                                        comment='This contains the optimizer parameters that are'
-                                                ' common across a generation')
+        traj.results.f_add_result_group(u'generation_params',
+                                        comment=u'This contains the optimizer parameters that are'
+                                                u' common across a generation')
 
         # The following parameters are recorded as generation parameters i.e. once per generation
         self.g = 0  # the current generation
@@ -144,7 +143,7 @@ class CrossEntropyOptimizer(Optimizer):
         # Note that this array stores individuals as an np.array of floats as opposed to Individual-Dicts
         # This is because this array is used within the context of the cross entropy algorithm and
         # Thus needs to handle the optimizee individuals as vectors
-        current_eval_pop = [self.optimizee_create_individual() for _ in range(parameters.pop_size)]
+        current_eval_pop = [self.optimizee_create_individual() for _ in xrange(parameters.pop_size)]
 
         if optimizee_bounding_func is not None:
             current_eval_pop = [self.optimizee_bounding_func(ind) for ind in current_eval_pop]
@@ -155,7 +154,7 @@ class CrossEntropyOptimizer(Optimizer):
         # Max Likelihood
         self.current_distribution = parameters.distribution
         # Adding the distribution parameters
-        traj.f_add_parameter_group('distribution', comment="Parameters for the distribution class")
+        traj.f_add_parameter_group(u'distribution', comment=u"Parameters for the distribution class")
         distribution_params = self.current_distribution.get_params()
         for param_name, param_value in distribution_params.items():
             traj.parameters.distribution.f_add_parameter(param_name, param_value)
@@ -166,26 +165,24 @@ class CrossEntropyOptimizer(Optimizer):
         self._expand_trajectory(traj)
 
     def get_params(self):
-        """
+        u"""
         Get parameters used for recorder
         :return: Dictionary containing recorder parameters
         """
 
         param_dict = self.recorder_parameters._asdict()
-        param_dict['distribution'] = self.recorder_parameters.distribution.get_params()
+        param_dict[u'distribution'] = self.recorder_parameters.distribution.get_params()
         return param_dict
 
     def post_process(self, traj, fitnesses_results):
-        """
+        u"""
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
 
         n_iteration, smoothing, temp_decay = \
             traj.n_iteration, traj.smoothing, traj.temp_decay
         stop_criterion, n_elite = traj.stop_criterion, traj.n_elite
-        
-        fitnesses_results = fitnesses_results[-self.pop_size:]
-            
+
         weighted_fitness_list = []
         #**************************************************************************************************************
         # Storing run-information in the trajectory
@@ -197,10 +194,10 @@ class CrossEntropyOptimizer(Optimizer):
             traj.v_idx = run_index
             ind_index = traj.par.ind_idx
 
-            weighted_fitness = np.dot(fitness, self.optimizee_fitness_weights)
-            weighted_fitness_list.append(weighted_fitness)
-            
-            traj.f_add_result('$set.$', fitness=fitness, weighted_fitness=weighted_fitness)
+            traj.f_add_result(u'$set.$.individual', self.eval_pop[ind_index])
+            traj.f_add_result(u'$set.$.fitness', fitness)
+
+            weighted_fitness_list.append(np.dot(fitness, self.optimizee_fitness_weights))
         traj.v_idx = -1  # set trajectory back to default
 
         weighted_fitness_list = np.array(weighted_fitness_list).ravel()
@@ -220,11 +217,11 @@ class CrossEntropyOptimizer(Optimizer):
         self.best_fitness_in_run = sorted_fitness[0]
         self.gamma = sorted_fitness[n_elite - 1]
 
-        logger.info("-- End of generation %d --", self.g)
-        logger.info("  Evaluated %d individuals", len(fitnesses_results))
-        logger.info('  Best Fitness: %.4f', self.best_fitness_in_run)
-        logger.info('  Average Fitness: %.4f', np.mean(sorted_fitness))
-        logger.debug('  Calculated gamma: %.4f', self.gamma)
+        logger.info(u"-- End of generation %d --", self.g)
+        logger.info(u"  Evaluated %d individuals", len(fitnesses_results))
+        logger.info(u'  Best Fitness: %.4f', self.best_fitness_in_run)
+        logger.info(u'  Average Fitness: %.4f', np.mean(sorted_fitness))
+        logger.debug(u'  Calculated gamma: %.4f', self.gamma)
 
         #**************************************************************************************************************
         # Storing Generation Parameters / Results in the trajectory
@@ -242,21 +239,21 @@ class CrossEntropyOptimizer(Optimizer):
         #                       evaluated generation
         # pop_size            - Population size
         generation_result_dict = {
-            'generation': self.g,
-            'gamma': self.gamma,
-            'T': self.T,
-            'best_fitness_in_run': self.best_fitness_in_run,
-            'average_fitness_in_run': np.mean(sorted_fitness),
-            'pop_size': self.pop_size
+            u'generation': self.g,
+            u'gamma': self.gamma,
+            u'T': self.T,
+            u'best_fitness_in_run': self.best_fitness_in_run,
+            u'average_fitness_in_run': np.mean(sorted_fitness),
+            u'pop_size': self.pop_size
         }
 
-        generation_name = 'generation_{}'.format(self.g)
+        generation_name = u'generation_{}'.format(self.g)
         traj.results.generation_params.f_add_result_group(generation_name)
         traj.results.generation_params.f_add_result(
-            generation_name + '.algorithm_params', generation_result_dict,
-            comment="These are the parameters that correspond to the algorithm, look at the source code"
-                    " for `CrossEntropyOptimizer::post_process()` for comments documenting these"
-                    " parameters")
+            generation_name + u'.algorithm_params', generation_result_dict,
+            comment=u"These are the parameters that correspond to the algorithm, look at the source code"
+                    u" for `CrossEntropyOptimizer::post_process()` for comments documenting these"
+                    u" parameters")
 
         # new distribution fit
         individuals_to_be_fitted = elite_individuals
@@ -275,16 +272,16 @@ class CrossEntropyOptimizer(Optimizer):
 
         #Add the results of the distribution fitting to the trajectory
         traj.results.generation_params.f_add_result(
-            generation_name + '.distribution_params', self.distribution_results,
-            comment="These are the parameters of the distribution inferred from the currently evaluated"
-                    " generation")
+            generation_name + u'.distribution_params', self.distribution_results,
+            comment=u"These are the parameters of the distribution inferred from the currently evaluated"
+                    u" generation")
 
         #**************************************************************************************************************
         # Create the next generation by sampling the inferred distribution
         #**************************************************************************************************************
         # Note that this is only done in case the evaluated run is not the last run
-        fitnesses_results = []
-        self.eval_pop = []
+        fitnesses_results.clear()
+        self.eval_pop.clear()
 
         # check if to stop
         if self.g < n_iteration - 1 and self.best_fitness_in_run < stop_criterion:
@@ -301,19 +298,18 @@ class CrossEntropyOptimizer(Optimizer):
             self._expand_trajectory(traj)
 
     def end(self, traj):
-        """
+        u"""
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`
         """
         best_last_indiv_dict = list_to_dict(self.best_individual_in_run.tolist(),
                                             self.optimizee_individual_dict_spec)
 
-        traj.f_add_result('final_individual', best_last_indiv_dict)
-        traj.f_add_result('final_fitness', self.best_fitness_in_run)
-        traj.f_add_result('n_iteration', self.g + 1)
+        traj.f_add_result(u'final_individual', best_last_indiv_dict)
+        traj.f_add_result(u'final_fitness', self.best_fitness_in_run)
+        traj.f_add_result(u'n_iteration', self.g + 1)
 
         # ------------ Finished all runs and print result --------------- #
-        logger.info("-- End of (successful) CE optimization --")
-        logger.info("-- Final distribution parameters --")
+        logger.info(u"-- End of (successful) CE optimization --")
+        logger.info(u"-- Final distribution parameters --")
         for parameter_key, parameter_value in sorted(self.distribution_results.items()):
-            logger.info('  %s: %s', parameter_key, parameter_value)
-
+            logger.info(u'  %s: %s', parameter_key, parameter_value)

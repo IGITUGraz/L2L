@@ -1,11 +1,13 @@
-from collections import namedtuple
-from six import with_metaclass
+from __future__ import division
+from __future__ import absolute_import
 from abc import ABCMeta, abstractmethod
+from collections import namedtuple, OrderedDict
+
 import numpy as np
 
 
-class FunctionGenerator:
-    """
+class FunctionGenerator(object):
+    u"""
     Implements a function generator that generates parametrized test functions from the given set of parameters.
     Given the list of function descriptions in the constructor, the cost_function represents the sum of all those
     functions.
@@ -18,11 +20,13 @@ class FunctionGenerator:
     :param mu: Scalar indicating the mean of the Gaussian noise.
     :param sigma: Scalar indicating the standard deviation of the Gaussian noise.
     """
+
     def __init__(self, fg_params, dims=2, bound=None, noise=False, mu=0., sigma=0.01):
         self.dims = dims
         self.noise = noise
         self.mu = mu
         self.sigma = sigma
+        self.actual_optima = None
         cost_functions = dict(GaussianParameters=Gaussian,
                               PermutationParameters=Permutation,
                               EasomParameters=Easom,
@@ -51,40 +55,63 @@ class FunctionGenerator:
             bound_max = np.max(bounds_max)
             self.bound = [bound_min, bound_max]
 
-    def cost_function(self, x):
+    def cost_function(self, x, random_state=None):
+        u"""It gets the value of the function. If the function includes noise, the `random_state`
+        parameter must be specified
+
+        :param ~numpy.random.RandomState random_state: The random generator used to generate the
+            noise for the function.
+        """
         res = 0.
         for f in self.gen_functions:
             res += f(x)
 
         if self.noise:
-            res += np.random.normal(self.mu, self.sigma)
+            assert isinstance(random_state, np.random.RandomState)
+            res += random_state.normal(self.mu, self.sigma)
 
         return res
 
+    def get_params(self):
+        fg_params = []
+        for param in self.function_parameters:
+            fg_params.append({type(param).__name__: dict(param._asdict())})
 
-class Function(with_metaclass(ABCMeta, object)):
-    """
+        if self.noise:
+            params_dict_items = [(u"dims", self.dims),
+                                 (u"mu", self.mu),
+                                 (u"sigma", self.sigma)]
+        else:
+            params_dict_items = [(u"dims", self.dims)]
+        params_dict_items += [(u"functions", fg_params)]
+        return OrderedDict(params_dict_items)
+
+
+class Function():
+    u"""
     Base class for all test functions.
     """
+
+    __metaclass__ = ABCMeta
+
     @abstractmethod
     def __call__(self, x):
-        """
+        u"""
         :param x: input data vector with length equal to the function dimensionality
         :return: the resulting scalar output of the function
         """
         pass
 
 
-class ShekelParameters(namedtuple('ShekelParameters', ['A', 'c'])):
-    """
-    :param A: matrix m*n of coordinates of all minima (m equals length of c, and n equals dims)
-    :param c: list of inverse intensities of minima
-    """
-    pass
+ShekelParameters = namedtuple(u'ShekelParameters', [u'A', u'c'])
+#ShekelParameters.__doc__ = u"""
+#:param A: matrix m*n of coordinates of all minima (m equals length of c, and n equals dims)
+#:param c: list of inverse intensities of minima
+#"""
 
 
 class Shekel(Function):
-    """
+    u"""
     The Shekels (foxholes) function has variable number of local minima (length of c or A).
     It can be customized by defining the coordinates of minima in matrix A,
     and inverse of their intensities in c.
@@ -93,8 +120,9 @@ class Shekel(Function):
     :param params: Instance of :func:`~collections.namedtuple` :class:`ShekelParameters`
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
-        if params.A == 'default' and params.c == 'default' and dims == 2:
+        if params.A == u'default' and params.c == u'default' and dims == 2:
             self.c = (1. / 10.) * np.array([1, 2, 5, 2, 3, 1, 1])
             self.A = np.array([[3, 5],
                                [5, 2],
@@ -107,9 +135,9 @@ class Shekel(Function):
             self.c = np.array(params.c)
             self.A = np.array(params.A)
             if self.c.size != self.A.shape[0]:
-                raise Exception("Parameters A and c do not match.")
+                raise Exception(u"Parameters A and c do not match.")
             if self.A.shape[1] != dims:
-                raise Exception("Shape of parameter A does not match the dimensionality.")
+                raise Exception(u"Shape of parameter A does not match the dimensionality.")
 
         self.dims = dims
         self.bound = [0, 10]
@@ -117,21 +145,20 @@ class Shekel(Function):
     def __call__(self, x):
         x = np.array(x)
         value = 0
-        for i in range(self.A.shape[0]):
-            sum_diff_sq = np.sum((x - self.A[i])**2 + self.c[i]) ** -1
+        for i in xrange(self.A.shape[0]):
+            sum_diff_sq = np.sum((x - self.A[i]) ** 2 + self.c[i]) ** -1
             value += sum_diff_sq
         return -value
 
 
-class MichalewiczParameters(namedtuple('MichalewiczParameters', ['m'])):
-    """
-    :param m: steepness factor
-    """
-    pass
+MichalewiczParameters = namedtuple(u'MichalewiczParameters', [u'm'])
+#MichalewiczParameters.__doc__ = u"""
+#:param m: steepness factor
+#"""
 
 
 class Michalewicz(Function):
-    """
+    u"""
     The Michalewicz function is multimodal with number of local minima equal to factoriel of the number of dimensions.
     It accepts only a parameter m which defines the steepness of the valleys and ridges. Larger m leads to a more
     difficult function to minimize. The recommended value for m is 10 which is defined if no parameters are given.
@@ -140,8 +167,9 @@ class Michalewicz(Function):
     :param params: Instance of :func:`~collections.namedtuple` :class:`MichalewiczParameters`
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
-        if params.m == 'default':
+        if params.m == u'default':
             self.m = 10
         else:
             self.m = params.m
@@ -152,22 +180,21 @@ class Michalewicz(Function):
     def __call__(self, x):
         x = np.array(x)
         i = np.arange(1, self.dims + 1)
-        a = (i * x**2) / np.pi
-        b = np.sin(a)**(2 * self.m)
+        a = (i * x ** 2) / np.pi
+        b = np.sin(a) ** (2 * self.m)
         value = -np.sum(np.sin(x) * b)
         return value
 
 
-class LangermannParameters(namedtuple('LangermannParameters', ['A', 'c'])):
-    """
-    :param A: matrix m*n of coordinates of all minima, (m equals length of c, and n equals dims)
-    :param c: list of intensities of minima
-    """
-    pass
+LangermannParameters = namedtuple(u'LangermannParameters', [u'A', u'c'])
+#LangermannParameters.__doc__ = u"""
+#:param A: matrix m*n of coordinates of all minima, (m equals length of c, and n equals dims)
+#:param c: list of intensities of minima
+#"""
 
 
 class Langermann(Function):
-    """
+    u"""
     The Langermann function is multimodal, with many unevenly distributed local minima.
     It can be customized by defining the coordinates of centers of sub-functions in matrix A,
     and their intensities in c.
@@ -176,8 +203,9 @@ class Langermann(Function):
     :param params: Instance of :func:`~collections.namedtuple` :class:`LangermannParameters`
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
-        if params.A == 'default' and params.c == 'default' and dims == 2:
+        if params.A == u'default' and params.c == u'default' and dims == 2:
             self.c = np.array([1, 2, 5, 2, 3])
             self.A = np.array([[3, 5],
                                [5, 2],
@@ -188,9 +216,9 @@ class Langermann(Function):
             self.c = np.array(params.c)
             self.A = np.array(params.A)
             if self.c.size != self.A.shape[0]:
-                raise Exception("Parameters A and c do not match.")
+                raise Exception(u"Parameters A and c do not match.")
             if self.A.shape[1] != dims:
-                raise Exception("Shape of parameter A does not match the dimensionality.")
+                raise Exception(u"Shape of parameter A does not match the dimensionality.")
 
         self.dims = dims
         self.bound = [0, 10]
@@ -198,23 +226,24 @@ class Langermann(Function):
     def __call__(self, x):
         x = np.array(x)
         value = 0
-        for i in range(self.A.shape[0]):
-            sum_diff_sq = np.sum((x - self.A[i])**2)
+        for i in xrange(self.A.shape[0]):
+            sum_diff_sq = np.sum((x - self.A[i]) ** 2)
             value += self.c[i] * np.exp((-1 / np.pi) * sum_diff_sq) * np.cos(np.pi * sum_diff_sq)
         return value
 
 
-EasomParameters = namedtuple('EasomParameters', [])
+EasomParameters = namedtuple(u'EasomParameters', [])
 
 
 class Easom(Function):
-    """
+    u"""
     The Easom function has several local minima. It is unimodal,
     and the global minimum has a small area relative to the search space.
     reference: https://www.sfu.ca/~ssurjano/easom.html
 
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         self.dims = dims
         self.bound = [-10, 10]
@@ -222,20 +251,19 @@ class Easom(Function):
     def __call__(self, x):
         x = np.array(x)
         cos_x = np.cos(x)
-        x_min_pi = (x - np.pi)**2
+        x_min_pi = (x - np.pi) ** 2
         value = -cos_x.prod() * np.exp(-np.sum(x_min_pi))
         return value
 
 
-class PermutationParameters(namedtuple('PermutationParameters', ['beta'])):
-    """
-    :param beta: non-negative, difference between global and local minima (smaller means harder)
-    """
-    pass
+PermutationParameters = namedtuple(u'PermutationParameters', [u'beta'])
+#PermutationParameters.__doc__ = u"""
+#:param beta: non-negative, difference between global and local minima (smaller means harder)
+#"""
 
 
 class Permutation(Function):
-    """
+    u"""
     beta is a non-negative parameter. The smaller beta, the more difficult problem becomes since the global minimum
     is difficult to distinguish from local minima near permuted solutions. For beta=0, every permuted solution is a
     global minimum, too.
@@ -246,50 +274,51 @@ class Permutation(Function):
     :param params: Instance of :func:`~collections.namedtuple` :class:`PermutationParameters`
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         if not len(params) == 1:
-            raise Exception("Number of parameters does not equal 1.")
+            raise Exception(u"Number of parameters does not equal 1.")
         beta = np.array(params.beta)
 
         if np.isscalar(beta):
-            raise Exception("Beta paramater must always be a scalar value.")
+            raise Exception(u"Beta paramater must always be a scalar value.")
         self.dims = dims
         self.beta = beta
         self.bound = [-dims, dims]
 
     def __call__(self, x):
         x = np.array(x)
-        ks = np.array(range(1, self.dims + 1))
-        i = np.array(range(1, self.dims + 1))
-        value = np.array([np.sum((i**k + self.beta) * ((x / i)**k - 1), axis=0) for k in ks])
-        value = np.sum(value**2)
+        ks = np.array(xrange(1, self.dims + 1))
+        i = np.array(xrange(1, self.dims + 1))
+        value = np.array([np.sum((i ** k + self.beta) * ((x / i) ** k - 1), axis=0) for k in ks])
+        value = np.sum(value ** 2)
         return value
 
 
-class GaussianParameters(namedtuple('GaussianParameters', ['sigma', 'mean'])):
-    """
-    :param sigma: covariance matrix
-    :param mean: list containing coordinates of the peak (mean, median, mode)
-    """
-    pass
+GaussianParameters = namedtuple(u'GaussianParameters', [u'sigma', u'mean'])
+#GaussianParameters.__doc__ = u"""
+#:param sigma: covariance matrix
+#:param mean: list containing coordinates of the peak (mean, median, mode)
+#"""
 
 
 class Gaussian(Function):
-    """
+    u"""
     The multi-dimensional Gaussian (normal) distribution function.
 
     :param params: Instance of :func:`~collections.namedtuple` :class:`GaussianParameters`
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         if not len(params) == 2:
-            raise Exception("Number of parameters does not equal 2.")
+            raise Exception(u"Number of parameters does not equal 2.")
         sigma = np.array(params.sigma)
         mean = np.array(params.mean)
 
         if (dims > 1 and (not sigma.shape[0] == sigma.shape[1] == mean.shape[0] == dims)) or \
                 (dims == 1 and (not sigma.shape == mean.shape == tuple())):
-            raise Exception("Shapes do not match the given dimensionality.")
+            raise Exception(u"Shapes do not match the given dimensionality.")
         self.dims = dims
         self.sigma = sigma
         self.mean = mean
@@ -297,21 +326,22 @@ class Gaussian(Function):
 
     def __call__(self, x):
         x = np.array(x)
-        value = 1 / np.sqrt((2 * np.pi)**self.dims * np.linalg.det(self.sigma))
+        value = 1 / np.sqrt((2 * np.pi) ** self.dims * np.linalg.det(self.sigma))
         value = value * np.exp(-0.5 * (np.transpose(x - self.mean).dot(np.linalg.inv(self.sigma))).dot((x - self.mean)))
         return -value
 
 
-RastriginParameters = namedtuple('RastriginParameters', [])
+RastriginParameters = namedtuple(u'RastriginParameters', [])
 
 
 class Rastrigin(Function):
-    """
+    u"""
     Rastrigin function is a multimodal function with a large number of local minima.
     reference: https://www.sfu.ca/%7Essurjano/rastr.html
 
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         self.dims = dims
         self.bound = [-5, 5]
@@ -321,16 +351,17 @@ class Rastrigin(Function):
         return np.sum(x ** 2 + 10 - 10 * np.cos(2 * np.pi * x))
 
 
-RosenbrockParameters = namedtuple('RosenbrockParameters', [])
+RosenbrockParameters = namedtuple(u'RosenbrockParameters', [])
 
 
 class Rosenbrock(Function):
-    """
+    u"""
     Rosenbrock function is a unimodal valley-shaped function.
     reference: https://www.sfu.ca/~ssurjano/rosen.html
 
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         self.dims = dims
         self.bound = [-2, 2]
@@ -339,46 +370,47 @@ class Rosenbrock(Function):
         x = np.array(x)
         x_1 = x[1:self.dims]
         x_0 = x[0:self.dims - 1]
-        value = (x_1 - x_0 ** 2)**2 + (x_0 - 1)
-        # add the same term as in the original framework functions
-        value = sum(value) / 2 + 2 * np.sum(np.abs(x - 1.5))
+        value = 100 * (x_1 - x_0 ** 2) ** 2 + (1 - x_0) ** 2
+        value = sum(value)
         return value
 
 
-AckleyParameters = namedtuple('AckleyParameters', [])
+AckleyParameters = namedtuple(u'AckleyParameters', [])
 
 
 class Ackley(Function):
-    """
+    u"""
     Ackley function has a large hole in at the centre surrounded by small hill like regions. Algorithms can get
     trapped in one of its many local minima.
     reference: https://www.sfu.ca/~ssurjano/ackley.html
 
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         self.dims = dims
         self.bound = [-2, 2]
 
     def __call__(self, x):
         x = np.array(x)
-        return np.exp(1) + 20 - 20 * np.exp(-0.2 * np.sqrt(1 / 2 * np.sum(x ** 2))) - np.exp(
-            0.5 * np.sum(np.cos(2 * np.pi * x)))
+        return np.exp(1) + 20 - 20 * np.exp(-0.2 * np.sqrt(np.sum(x ** 2) / self.dims)) \
+            - np.exp(np.sum(np.cos(2 * np.pi * x)) / self.dims)
 
 
-ChasmParameters = namedtuple('ChasmParameters', [])
+ChasmParameters = namedtuple(u'ChasmParameters', [])
 
 
 class Chasm(Function):
-    """
+    u"""
     Chasm is characterized by a large flat area with a very large slope that halves the two parts of the
     function.
 
     :param dims: dimensionality of the function
     """
+
     def __init__(self, params, dims):
         if dims != 2:
-            raise Exception("Dimensionality of the function must equal 2.")
+            raise Exception(u"Dimensionality of the function must equal 2.")
 
         self.dims = dims
         self.bound = [-2, 2]

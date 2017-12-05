@@ -1,14 +1,15 @@
+from __future__ import absolute_import
 from collections import namedtuple
 
 from pypet import cartesian_product
 
 from ltl import get_grouped_dict
 
-OptimizerParameters = namedtuple('OptimizerParamters', [])
+OptimizerParameters = namedtuple(u'OptimizerParamters', [])
 
 
 class Optimizer(object):
-    """
+    u"""
     This is the base class for the Optimizers i.e. the outer loop algorithms. These algorithms generate parameters, \
     give them to the inner loop to be evaluated, and with the resulting fitness modify the parameters in some way.
 
@@ -29,27 +30,37 @@ class Optimizer(object):
     def __init__(self, traj,
                  optimizee_create_individual,
                  optimizee_fitness_weights,
+                 optimizee_bounding_func,
                  parameters):
-
         # Creating Placeholders for individuals and results that are about to be explored
-        traj.f_add_parameter('generation', 0, comment='Current generation')
-        traj.f_add_parameter('ind_idx', 0, comment='Index of individual')
-        traj.f_add_parameter('fitness_weights', optimizee_fitness_weights, comment='Fitness weights')
-        
+        traj.f_add_parameter(u'generation', 0, comment=u'Current generation')
+        traj.f_add_parameter(u'ind_idx', 0, comment=u'Index of individual')
+
         # Initializing basic variables
         self.optimizee_create_individual = optimizee_create_individual
         self.optimizee_fitness_weights = optimizee_fitness_weights
-        
+        self.optimizee_bounding_func = optimizee_bounding_func
+        self.parameters = parameters
+
         #: The current generation number
         self.g = None
         #: The population (i.e. list of individuals) to be evaluated at the next iteration
         self.eval_pop = None
 
-    def post_process(self, traj, fitnesses_results):
+    def get_params(self):
+        u"""
+        Get the important parameters of the optimizer. This is used by :class:`ltl.recorder`
+        for recording the optimizee parameters.
+
+        :return: a :class:`dict`
         """
+        pass
+
+    def post_process(self, traj, fitnesses_results):
+        u"""
         This is the key function of this class. Given a set of :obj:`fitnesses_results`,  and the :obj:`traj`, it uses
-        the fitness to decide on the next set of parameters to be evaluated. Then it fills the :attr:`.eval_pop` with the
-        list of parameters it wants evaluated at the next simulation cycle, increments :attr:`.g` and calls
+        the fitness to decide on the next set of parameters to be evaluated. Then it fills the :attr:`.Optimizer.eval_pop` with the
+        list of parameters it wants evaluated at the next simulation cycle, increments :attr:`.Optimizer.g` and calls
         :meth:`._expand_trajectory`
 
         :param  ~pypet.trajectory.Trajectory traj: The :mod:`pypet` trajectory that contains the parameters and the
@@ -66,13 +77,19 @@ class Optimizer(object):
         self.g += 1
         self._expand_trajectory(traj)
 
-    def end(self):
-        """
+    def end(self, traj):
+        u"""
         Run any code required to clean-up, print final individuals etc.
+        
+        :param  ~pypet.trajectory.Trajectory traj: The :mod:`pypet` trajectory that contains the parameters and the
+            individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.
+            param1 is accessible using `traj.param1`
+            
         """
+        pass
 
     def _expand_trajectory(self, traj):
-        """
+        u"""
         Add as many explored runs as individuals that need to be evaluated. Furthermore, add the individuals as explored
         parameters.
 
@@ -84,10 +101,10 @@ class Optimizer(object):
         """
 
         grouped_params_dict = get_grouped_dict(self.eval_pop)
-        grouped_params_dict = {'individual.' + key: val for key, val in grouped_params_dict.items()}
+        grouped_params_dict = dict((u'individual.' + key, val) for key, val in grouped_params_dict.items())
 
-        final_params_dict = {'generation': [self.g],
-                             'ind_idx': range(len(self.eval_pop))}
+        final_params_dict = {u'generation': [self.g],
+                             u'ind_idx': xrange(len(self.eval_pop))}
         final_params_dict.update(grouped_params_dict)
 
         # We need to convert them to lists or write our own custom IndividualParameter ;-)
@@ -95,4 +112,4 @@ class Optimizer(object):
         # between ``generation x (ind_idx AND individual)``, so that every individual has just one
         # unique index within a generation.
         traj.f_expand(cartesian_product(final_params_dict,
-                                        [('ind_idx',) + tuple(grouped_params_dict.keys()), 'generation']))
+                                        [(u'ind_idx',) + tuple(grouped_params_dict.keys()), u'generation']))

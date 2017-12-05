@@ -1,16 +1,16 @@
 Optimizer using Simulated Annealing
 ===================================
 
-SimulatedAnnealingOptimizer class
----------------------------------
+SimulatedAnnealingOptimizer
+---------------------------
 
 .. autoclass:: ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer
     :members:
     :undoc-members:
     :show-inheritance:
 
-SimulatedAnnealingParameters namedtuple
----------------------------------------
+SimulatedAnnealingParameters
+----------------------------
 .. autoclass:: ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingParameters
     :members:
     :undoc-members:

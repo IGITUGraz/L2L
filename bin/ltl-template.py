@@ -1,74 +1,75 @@
-"""
+u"""
 This file is a typical example of a script used to run a LTL experiment. Read the comments in the file for more
 explanations
 """
 
-import os
-
+from __future__ import with_statement
+from __future__ import absolute_import
 import logging.config
-import yaml
 
 from pypet import Environment
 from pypet import pypetconstants
 
-from ltl.paths import Paths
+from ltl.logging_tools import create_shared_logger_data, configure_loggers
 from ltl.optimizees.optimizee import Optimizee
 from ltl.optimizers.optimizer import Optimizer, OptimizerParameters
+from ltl.paths import Paths
+from io import open
 
 # We first setup the logger and read the logging config which controls the verbosity and destination of the logs from
 # various parts of the code.
-logger = logging.getLogger('ltl-optimizee-optimizer')
+logger = logging.getLogger(u'bin.ltl-optimizee-optimizer')
 
 
 def main():
     # TODO when using the template: Give some *meaningful* name here
-    name = 'LTL'
+    name = u'LTL'
 
-    # TODO when using the template: Change the `root_dir_path` here
-    root_dir_path = None
-    assert root_dir_path is not None, \
-           "You have not set the root path to store your results." \
-           " Set it manually in the code (by setting the variable 'root_dir_path')" \
-           " before running the simulation"
-    paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
+    # TODO when using the template: make a path.conf file and write the root path there
+    try:
+        with open(u'bin/path.conf') as f:
+            root_dir_path = f.read().strip()
+    except FileNotFoundError:
+        raise FileNotFoundError(
+            u"You have not set the root path to store your results."
+            u" Write the path to a path.conf text file in the bin directory"
+            u" before running the simulation"
+        )
+    paths = Paths(name, dict(run_no=u'test'), root_dir_path=root_dir_path)
 
     # Load the logging config which tells us where and what to log (loglevel, destination)
-    with open("bin/logging.yaml") as f:
-        l_dict = yaml.load(f)
-        log_output_file = os.path.join(paths.results_path, l_dict['handlers']['file']['filename'])
-        l_dict['handlers']['file']['filename'] = log_output_file
-        logging.config.dictConfig(l_dict)
 
-    print("All output can be found in file ", log_output_file)
-    print("Change the values in logging.yaml to control log level and destination")
-    print("e.g. change the handler to console for the loggers you're interesting in to get output to stdout")
-
-    traj_file = os.path.join(paths.output_dir_path, 'data.h5')
+    print u"All output logs can be found in directory ", paths.logs_path
 
     # Create an environment that handles running our simulation
     # This initializes a PyPet environment. See Pypet documentation for more details on environment and trajectory.
     # Uncomment 'freeze_input', 'multipproc', 'use_scoop' and 'wrap_mode' lines to disable running the experiment
     # across cores and nodes.
-    env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
-                      comment='{} data'.format(name),
+    env = Environment(trajectory=name, filename=paths.output_dir_path, file_title=u'{} data'.format(name),
+                      comment=u'{} data'.format(name),
                       add_time=True,
-                      freeze_input=True,
+                      freeze_input=False,
                       multiproc=True,
                       use_scoop=True,
                       wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
-                      log_stdout=True,  # Sends stdout to logs
-                      log_folder=os.path.join(paths.output_dir_path, 'logs')
+                      log_stdout=False,  # Sends stdout to logs
                       )
+    create_shared_logger_data(logger_names=[u'bin', u'optimizers'],
+                              log_levels=[u'INFO', u'INFO'],
+                              log_to_consoles=[True, True],
+                              sim_name=name,
+                              log_directory=paths.logs_path)
+    configure_loggers()
 
     # Get the trajectory from the environment.
     traj = env.trajectory
 
-    # NOTE: Innerloop simulator
+    ## Innerloop simulator
     # TODO when using the template: Change the optimizee to the appropriate Optimizee class
-    optimizee = Optimizee()
+    optimizee = Optimizee(traj)
 
-    # NOTE: Outerloop optimizer initialization
+    ## Outerloop optimizer initialization
     # TODO when using the template: Change the optimizer to the appropriate Optimizer class
     # and use the right value for optimizee_fitness_weights. Length is the number of dimensions of fitness, and
     # negative value implies minimization and vice versa
@@ -81,14 +82,12 @@ def main():
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
-    # NOTE: Innerloop optimizee end
-    optimizee.end()
-    # NOTE: Outerloop optimizer end
-    optimizer.end()
+    ## Outerloop optimizer end
+    optimizer.end(traj)
 
     # Finally disable logging and close all log-files
     env.disable_logging()
 
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
     main()
