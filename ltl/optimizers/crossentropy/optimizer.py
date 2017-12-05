@@ -280,8 +280,8 @@ class CrossEntropyOptimizer(Optimizer):
         # Create the next generation by sampling the inferred distribution
         #**************************************************************************************************************
         # Note that this is only done in case the evaluated run is not the last run
-        fitnesses_results.clear()
-        self.eval_pop.clear()
+        fitnesses_results = []
+        self.eval_pop = []
 
         # check if to stop
         if self.g < n_iteration - 1 and self.best_fitness_in_run < stop_criterion:

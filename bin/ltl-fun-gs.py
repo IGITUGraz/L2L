@@ -1,5 +1,3 @@
-from __future__ import with_statement
-from __future__ import absolute_import
 import logging.config
 import os
 
@@ -14,38 +12,37 @@ from ltl.paths import Paths
 from ltl.recorder import Recorder
 
 from ltl.logging_tools import create_shared_logger_data, configure_loggers
-from io import open
 
-logger = logging.getLogger(u'bin.ltl-fun-gs')
+logger = logging.getLogger('bin.ltl-fun-gs')
 
 
 def main():
-    name = u'LTL-FUN-GS'
+    name = 'LTL-FUN-GS'
     try:
-        with open(u'bin/path.conf') as f:
+        with open('bin/path.conf') as f:
             root_dir_path = f.read().strip()
     except FileNotFoundError:
         raise FileNotFoundError(
-            u"You have not set the root path to store your results."
-            u" Write the path to a path.conf text file in the bin directory"
-            u" before running the simulation"
+            "You have not set the root path to store your results."
+            " Write the path to a path.conf text file in the bin directory"
+            " before running the simulation"
         )
-    paths = Paths(name, dict(run_no=u'test'), root_dir_path=root_dir_path)
+    paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
 
-    print u"All output logs can be found in directory ", paths.logs_path
+    print("All output logs can be found in directory ", paths.logs_path)
 
-    traj_file = os.path.join(paths.output_dir_path, u'data.h5')
+    traj_file = os.path.join(paths.output_dir_path, 'data.h5')
 
     # Create an environment that handles running our simulation
     # This initializes a PyPet environment
-    env = Environment(trajectory=name, filename=traj_file, file_title=u'{} data'.format(name),
-                      comment=u'{} data'.format(name),
+    env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
+                      comment='{} data'.format(name),
                       add_time=True,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
                       )
-    create_shared_logger_data(logger_names=[u'bin', u'optimizers'],
-                              log_levels=[u'INFO', u'INFO'],
+    create_shared_logger_data(logger_names=['bin', 'optimizers'],
+                              log_levels=['INFO', 'INFO'],
                               log_to_consoles=[True, True],
                               sim_name=name,
                               log_directory=paths.logs_path)
@@ -70,7 +67,7 @@ def main():
     ## Outerloop optimizer initialization
     n_grid_divs_per_axis = 30
     parameters = GridSearchParameters(param_grid={
-        u'coords': (optimizee.bound[0], optimizee.bound[1], n_grid_divs_per_axis)
+        'coords': (optimizee.bound[0], optimizee.bound[1], n_grid_divs_per_axis)
     })
     optimizer = GridSearchOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                     optimizee_fitness_weights=(-0.1,),
@@ -97,5 +94,5 @@ def main():
     env.disable_logging()
 
 
-if __name__ == u'__main__':
+if __name__ == '__main__':
     main()

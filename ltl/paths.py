@@ -52,7 +52,10 @@ class Paths(object):
         :return:
         """
         path = os.path.join(self.output_dir_path, u"results")
-        os.makedirs(path, exist_ok=True)
+        try:        
+            os.makedirs(path)#, exist_ok=True)
+        except OSError:
+            pass
         return path
 
     @property
@@ -62,7 +65,10 @@ class Paths(object):
         :return:
         """
         path = os.path.join(self.output_dir_path, u"simulation")
-        os.makedirs(path, exist_ok=True)
+        try:        
+            os.makedirs(path)#, exist_ok=True)
+        except OSError:
+            pass
         return path
 
     @property
@@ -72,7 +78,10 @@ class Paths(object):
         :return:
         """
         path = os.path.join(self.output_dir_path, u"data")
-        os.makedirs(path, exist_ok=True)
+        try:        
+            os.makedirs(path)#, exist_ok=True)
+        except OSError:
+            pass
         return path
 
     @property
@@ -82,7 +91,10 @@ class Paths(object):
         :return:
         """
         path = os.path.join(self.output_dir_path, u"logs")
-        os.makedirs(path, exist_ok=True)
+        try:        
+            os.makedirs(path)#, exist_ok=True)
+        except OSError:
+            pass
         return path
 
     # General function to generate paths

@@ -22,17 +22,17 @@ EvolutionStrategiesParameters = namedtuple(u'EvolutionStrategiesParameters', [
     u'seed',
 ])
 
-EvolutionStrategiesParameters.__doc__ = u"""
-:param learning_rate: Learning rate
-:param noise_std: Standard deviation of the step size (The step has 0 mean)
-:param mirrored_sampling_enabled: Should we turn on mirrored sampling i.e. sampling both e and -e
-:param fitness_shaping_enabled: Should we turn on fitness shaping i.e. using only top `fitness_shaping_ratio` to update
-       current individual?
-:param pop_size: Number of individuals per simulation.
-:param n_iteration: Number of iterations to perform
-:param stop_criterion: (Optional) Stop if this fitness is reached.
-:param seed: The random seed used for generating new individuals
-"""
+#EvolutionStrategiesParameters.__doc__ = u"""
+#:param learning_rate: Learning rate
+#:param noise_std: Standard deviation of the step size (The step has 0 mean)
+#:param mirrored_sampling_enabled: Should we turn on mirrored sampling i.e. sampling both e and -e
+#:param fitness_shaping_enabled: Should we turn on fitness shaping i.e. using only top `fitness_shaping_ratio` to update
+#       current individual?
+#:param pop_size: Number of individuals per simulation.
+#:param n_iteration: Number of iterations to perform
+#:param stop_criterion: (Optional) Stop if this fitness is reached.
+#:param seed: The random seed used for generating new individuals
+#"""
 
 
 class EvolutionStrategiesOptimizer(Optimizer):
@@ -57,10 +57,6 @@ class EvolutionStrategiesOptimizer(Optimizer):
       - If fitness shaping is enabled, F_i is replaced with the utility u_i in the previous step, which is calculated as:
 
             u_i = max(0, log(n/2 + 1) - log(k)) / sum_{k=1}^{n}{max(0, log(n/2 + 1) - log(k))} - 1 / n
-
-        As in the paper: Wierstra, D. et al. Natural Evolution Strategies. Journal of Machine Learning Research 15,
-         949–980 (2014).
-
         where k and i are the indices of the individuals in descending order of fitness F_i
 
 
@@ -222,7 +218,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
         weighted_fitness_list = np.array(weighted_fitness_list).ravel()
         # NOTE: It is necessary to clear the finesses_results to clear the data in the reference, and del
         #^ is used to make sure it's not used in the rest of this function
-        fitnesses_results.clear()
+        fitnesses_results = []
         del fitnesses_results
 
         # Last fitness is for the previous `current_individual_arr`
@@ -298,7 +294,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
         # Create the next generation by sampling the inferred distribution
         #**************************************************************************************************************
         # Note that this is only done in case the evaluated run is not the last run
-        self.eval_pop.clear()
+        self.eval_pop = []
 
         # check if to stop
         if self.g < n_iteration - 1 and self.best_fitness_in_run < stop_criterion:

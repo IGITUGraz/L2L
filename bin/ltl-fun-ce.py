@@ -6,7 +6,7 @@ import os
 from pypet import Environment
 import sys
 from io import open
-sys.path.append(u'.')
+sys.path.append('.')
 
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
@@ -51,8 +51,8 @@ def main():
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
                       )
-    create_shared_logger_data(logger_names=[u'bin', u'optimizers'],
-                              log_levels=[u'INFO', u'INFO'],
+    create_shared_logger_data(logger_names=['bin', 'optimizers'],
+                              log_levels=['INFO', 'INFO'],
                               log_to_consoles=[True, True],
                               sim_name=name,
                               log_directory=paths.logs_path)

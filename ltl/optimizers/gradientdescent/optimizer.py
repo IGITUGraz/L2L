@@ -15,56 +15,55 @@ logger = logging.getLogger(u"optimizers.gradientdescent")
 ClassicGDParameters = namedtuple(
     u'ClassicGDParameters',
     [u'learning_rate', u'exploration_step_size', u'n_random_steps', u'n_iteration', u'stop_criterion', u'seed'])
-ClassicGDParameters.__doc__ = u"""
-:param learning_rate: The rate of learning per step of gradient descent
-:param exploration_step_size: The standard deviation of random steps used for finite difference gradient
-:param n_random_steps: The amount of random steps used to estimate gradient
-:param n_iteration: number of iteration to perform
-:param stop_criterion: Stop if change in fitness is below this value
-"""
+#ClassicGDParameters.__doc__ = u"""
+#:param learning_rate: The rate of learning per step of gradient descent
+#:param exploration_step_size: The standard deviation of random steps used for finite difference gradient
+#:param n_random_steps: The amount of random steps used to estimate gradient
+#:param n_iteration: number of iteration to perform
+#:param stop_criterion: Stop if change in fitness is below this value
+#"""
 
 StochasticGDParameters = namedtuple(
     u'StochasticGDParameters',
     [u'learning_rate', u'stochastic_deviation', u'stochastic_decay', u'exploration_step_size', u'n_random_steps', u'n_iteration',
      u'stop_criterion', u'seed'])
-StochasticGDParameters.__doc__ = u"""
-:param learning_rate: The rate of learning per step of gradient descent
-:param stochastic_deviation: The standard deviation of the random vector used to perturbate the gradient
-:param stochastic_decay: The decay of the influence of the random vector that is added to the gradient 
-    (set to 0 to disable stochastic perturbation)
-:param exploration_step_size: The standard deviation of random steps used for finite difference gradient
-:param n_random_steps: The amount of random steps used to estimate gradient
-:param n_iteration: number of iteration to perform
-:param stop_criterion: Stop if change in fitness is below this value
-"""
+#StochasticGDParameters.__doc__ = u"""
+#:param learning_rate: The rate of learning per step of gradient descent
+#:param stochastic_deviation: The standard deviation of the random vector used to perturbate the gradient
+#:param stochastic_decay: The decay of the influence of the random vector that is added to the gradient 
+#    (set to 0 to disable stochastic perturbation)
+#:param exploration_step_size: The standard deviation of random steps used for finite difference gradient
+#:param n_random_steps: The amount of random steps used to estimate gradient
+#:param n_iteration: number of iteration to perform
+#:param stop_criterion: Stop if change in fitness is below this value
+#"""
 
 AdamParameters = namedtuple(
     u'AdamParameters',
     [u'learning_rate', u'exploration_step_size', u'n_random_steps', u'first_order_decay', u'second_order_decay', u'n_iteration',
      u'stop_criterion', u'seed'])
-AdamParameters.__doc__ = u"""
-:param learning_rate: The rate of learning per step of gradient descent
-:param exploration_step_size: The standard deviation of random steps used for finite difference gradient
-:param n_random_steps: The amount of random steps used to estimate gradient
-:param first_order_decay: Specifies the amount of decay of the historic first order momentum per gradient descent step
-:param second_order_decay: Specifies the amount of decay of the historic second order momentum per gradient descent step
-:param n_iteration: number of iteration to perform
-:param stop_criterion: Stop if change in fitness is below this value
-
-"""
+#AdamParameters.__doc__ = u"""
+#:param learning_rate: The rate of learning per step of gradient descent
+#:param exploration_step_size: The standard deviation of random steps used for finite difference gradient
+#:param n_random_steps: The amount of random steps used to estimate gradient
+#:param first_order_decay: Specifies the amount of decay of the historic first order momentum per gradient descent step
+#:param second_order_decay: Specifies the amount of decay of the historic second order momentum per gradient descent step
+#:param n_iteration: number of iteration to perform
+#:param stop_criterion: Stop if change in fitness is below this value
+#"""
 
 RMSPropParameters = namedtuple(
     u'RMSPropParameters',
     [u'learning_rate', u'exploration_step_size', u'n_random_steps', u'momentum_decay', u'n_iteration', u'stop_criterion', u'seed'])
-RMSPropParameters.__doc__ = u"""
-:param learning_rate: The rate of learning per step of gradient descent
-:param exploration_step_size: The standard deviation of random steps used for finite difference gradient
-:param n_random_steps: The amount of random steps used to estimate gradient
-:param momentum_decay: Specifies the decay of the historic momentum at each gradient descent step
-:param n_iteration: number of iteration to perform
-:param stop_criterion: Stop if change in fitness is below this value
-:param seed: The random seed used for random number generation in the optimizer
-"""
+#RMSPropParameters.__doc__ = u"""
+#:param learning_rate: The rate of learning per step of gradient descent
+#:param exploration_step_size: The standard deviation of random steps used for finite difference gradient
+#:param n_random_steps: The amount of random steps used to estimate gradient
+#:param momentum_decay: Specifies the decay of the historic momentum at each gradient descent step
+#:param n_iteration: number of iteration to perform
+#:param stop_criterion: Stop if change in fitness is below this value
+#:param seed: The random seed used for random number generation in the optimizer
+#"""
 
 
 class GradientDescentOptimizer(Optimizer):
@@ -183,8 +182,8 @@ class GradientDescentOptimizer(Optimizer):
         u"""
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
-        old_eval_pop = self.eval_pop.copy()
-        self.eval_pop.clear()
+        old_eval_pop = self.eval_pop = []
+        self.eval_pop = []
 
         logger.info(u"  Evaluating %i individuals" % len(fitnesses_results))
         
@@ -265,7 +264,7 @@ class GradientDescentOptimizer(Optimizer):
                 new_individual_list = [self.optimizee_bounding_func(ind) for ind in new_individual_list]
             new_individual_list.append(current_individual_dict)
 
-            fitnesses_results.clear()
+            fitnesses_results = []
             self.eval_pop = new_individual_list
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
