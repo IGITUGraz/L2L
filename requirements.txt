@@ -2,9 +2,13 @@ numpy
 scipy
 pyyaml
 matplotlib
-pypet==0.3.0
-scoop==0.7.1.1
+git+https://github.com/IGITUGraz/scoop.git@4da1abb#egg=scoop-0.7.2.0-dev8
+git+https://github.com/IGITUGraz/pypet.git@15104ce#egg=pypet-0.4.1-r1
 sphinx
-six
+sphinxjp.themes.basicstrap
+sklearn
 jinja2
 gitpython
+scikit-learn
+flake8
+deap

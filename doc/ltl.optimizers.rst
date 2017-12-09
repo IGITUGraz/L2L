@@ -16,5 +16,12 @@ Implemented Examples
 .. toctree::
     :maxdepth: 1
 
+    ltl.optimizers.crossentropy
+    ltl.optimizers.face
+    ltl.optimizers.gradientdescent
+    ltl.optimizers.gridsearch
     ltl.optimizers.evolution
     ltl.optimizers.simulatedannealing
+    ltl.optimizers.evolutionstrategies
+    ltl.optimizers.naturalevolutionstrategies
+

@@ -1,7 +1,6 @@
+import logging.config
 import os
 import warnings
-
-import logging.config
 
 import yaml
 
@@ -12,16 +11,20 @@ from ltl.paths import Paths
 
 warnings.filterwarnings("ignore")
 
-logger = logging.getLogger('plot-function-generator')
+logger = logging.getLogger('bin.plot-function-generator')
 
 
 def main():
     name = 'plot-function-generator'
-    root_dir_path = None  # CHANGE THIS to the directory where your simulation results are contained
-    assert root_dir_path is not None, \
-           "You have not set the root path to store your results." \
-           " Set it manually in the code (by setting the variable 'root_dir_path')" \
-           " before running the simulation"
+    try:
+        with open('bin/path.conf') as f:
+            root_dir_path = f.read().strip()
+    except FileNotFoundError:
+        raise FileNotFoundError(
+            "You have not set the root path to store your results."
+            " Write the path to a path.conf text file in the bin directory"
+            " before running the simulation"
+        )
     paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
 
     with open("bin/logging.yaml") as f:

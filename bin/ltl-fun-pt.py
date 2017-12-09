@@ -4,23 +4,24 @@ import os
 from pypet import Environment
 from pypet import pypetconstants
 import sys
+from io import open
 sys.path.append('.')
 
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
-from ltl.optimizers.gridsearch import GridSearchOptimizer, GridSearchParameters
+from ltl.optimizers.paralleltempering.optimizer import ParallelTemperingParameters, ParallelTemperingOptimizer, AvailableCoolingSchedules
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
 import numpy as np
 from ltl.logging_tools import create_shared_logger_data, configure_loggers
 
-logger = logging.getLogger('bin.ltl-fun-gs')
+logger = logging.getLogger('bin.ltl-fun-pt')
 
 
 def main():
-    name = 'LTL-FUN-GS'
+    name = 'LTL-FunctionGenerator-PT'
     try:
         with open('bin/path.conf') as f:
             root_dir_path = f.read().strip()
@@ -38,8 +39,8 @@ def main():
 
     # Create an environment that handles running our simulation
     # This initializes a PyPet environment
-    env = Environment(trajectory=name, filename=traj_file, file_title=u'{} data'.format(name),
-                      comment=u'{} data'.format(name),
+    env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
+                      comment='{} data'.format(name),
                       add_time=True,
                       # freeze_input=True,
                       # multiproc=True,
@@ -72,14 +73,56 @@ def main():
     ## Innerloop simulator
     optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
 
+    #--------------------------------------------------------------------------
+    # configure settings for parallel tempering:
+    # for each of the parallel runs chose
+    # a cooling schedule
+    # an upper and lower temperature bound
+    # a decay parameter
+    #--------------------------------------------------------------------------
+    
+    # specify the number of parallel running schedules. Each following container
+    # has to have an entry for each parallel run 
+    n_parallel_runs = 5
+
+    # for detailed information on the cooling schedules see either the wiki or
+    # the documentaition in ltl.optimizers.paralleltempering.optimizer 
+    cooling_schedules = [AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE,
+                         AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE,
+                         AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE,
+                         AvailableCoolingSchedules.LINEAR_ADDAPTIVE,
+                         AvailableCoolingSchedules.LINEAR_ADDAPTIVE]
+
+    # has to be from 1 to 0, first entry hast to be larger than second
+    # represents the starting temperature and the ending temperature
+    temperature_bounds = np.array([
+        [0.8, 0],
+        [0.7, 0],
+        [0.6, 0],
+        [1, 0.1],
+        [0.9, 0.2]])
+
+    # decay parameter for each schedule. If needed can be different for each
+    # schedule
+    decay_parameters = np.full(n_parallel_runs, 0.99)
+    #--------------------------------------------------------------------------
+    # end of configuration
+    #--------------------------------------------------------------------------
+
+    # Check, if the temperature bounds and decay parameters are reasonable.
+    if (temperature_bounds.all() <= 1) and (temperature_bounds.all() >= 0) and (temperature_bounds[:, 0].all() > temperature_bounds[:, 1].all()):
+        print "Warning: Temperature bounds are not within specifications." 
+    if ((decay_parameters.all() <= 1) and (decay_parameters.all() >= 0)):
+        print "Warning: Decay parameter not within specifications."
+
     ## Outerloop optimizer initialization
-    n_grid_divs_per_axis = 30
-    parameters = GridSearchParameters(param_grid={
-        'coords': (optimizee.bound[0], optimizee.bound[1], n_grid_divs_per_axis)
-    })
-    optimizer = GridSearchOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                    optimizee_fitness_weights=(-0.1,),
-                                    parameters=parameters)
+    parameters = ParallelTemperingParameters(n_parallel_runs=n_parallel_runs, noisy_step=.03, n_iteration=1000, stop_criterion=np.Inf,
+                                             seed=np.random.randint(1e5), cooling_schedules=cooling_schedules,
+                                             temperature_bounds=temperature_bounds, decay_parameters=decay_parameters)
+    optimizer = ParallelTemperingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
+                                           optimizee_fitness_weights=(-0.1,),
+                                           parameters=parameters,
+                                           optimizee_bounding_func=optimizee.bounding_func)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)

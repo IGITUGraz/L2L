@@ -1,30 +1,18 @@
+from __future__ import absolute_import
 import os
-import copy
 from collections import OrderedDict
 
 import re
 
 import itertools
+from itertools import izip
 
-__author__ = 'anand'
-
-
-def create_if_not_exists(path):
-    """
-    Creates a directory if it not exists yet (Python2 compatible)
-
-    :param path: The path to create
-    """
-    try:
-        os.makedirs(path)
-    except OSError as exception:
-        if exception.errno != os.errno.EEXIST:
-            raise
+__author__ = u'anand'
 
 
-class Paths:
-    def __init__(self, root_dir_name, param_dict, suffix="", root_dir_path='./results'):
-        """
+class Paths(object):
+    def __init__(self, root_dir_name, param_dict, suffix=u"", root_dir_path=u'./results'):
+        u"""
         Manages generating paths for various cases
 
         :param root_dir_name: Root dir name where all the subdirectories are created
@@ -35,13 +23,13 @@ class Paths:
         self._root_dir_name = root_dir_name
         self._root_dir_path = root_dir_path
         if not os.path.exists(root_dir_path):
-            raise RuntimeError("{} does not exit. Please create it.".format(root_dir_path))
+            raise RuntimeError(u"{} does not exit. Please create it.".format(root_dir_path))
         self._suffix = suffix
         self._param_combo = order_dict_alphabetically(param_dict)
 
     @property
     def root_dir_path(self):
-        """
+        u"""
         Get the full path of the root directory
         :return:
         """
@@ -49,7 +37,7 @@ class Paths:
 
     @property
     def output_dir_path(self):
-        """
+        u"""
         Get the path of the "output" directory of the form /root_dir_path/root_dir_name/param1name-param1val-param2name-param2val.
          The parameter names are sorted in alphabetical order in the leaf directory name.
         :return:
@@ -59,68 +47,90 @@ class Paths:
     # The functions that should actually be used are below
     @property
     def results_path(self):
-        """
+        u"""
         Get the path of the results directory of the form /root_dir_path/root_dir_name/param1name-param1val-param2name-param2val/results
         :return:
         """
-        path = os.path.join(self.output_dir_path, "results")
-        create_if_not_exists(path)
+        path = os.path.join(self.output_dir_path, u"results")
+        try:        
+            os.makedirs(path)#, exist_ok=True)
+        except OSError:
+            pass
         return path
 
     @property
     def simulation_path(self):
-        """
+        u"""
         Get the path of the simulation directory of the form /root_dir_path/root_dir_name/param1name-param1val-param2name-param2val/simulation
         :return:
         """
-        path = os.path.join(self.output_dir_path, "simulation")
-        create_if_not_exists(path)
+        path = os.path.join(self.output_dir_path, u"simulation")
+        try:        
+            os.makedirs(path)#, exist_ok=True)
+        except OSError:
+            pass
         return path
 
     @property
     def data_path(self):
-        """
+        u"""
         Get the path of the data directory of the form /root_dir_path/root_dir_name/param1name-param1val-param2name-param2val/data
         :return:
         """
-        path = os.path.join(self.output_dir_path, "data")
-        create_if_not_exists(path)
+        path = os.path.join(self.output_dir_path, u"data")
+        try:        
+            os.makedirs(path)#, exist_ok=True)
+        except OSError:
+            pass
+        return path
+
+    @property
+    def logs_path(self):
+        u"""
+        Get the path of the logs directory of the form /root_dir_path/root_dir_name/param1name-param1val-param2name-param2val/logs
+        :return:
+        """
+        path = os.path.join(self.output_dir_path, u"logs")
+        try:        
+            os.makedirs(path)#, exist_ok=True)
+        except OSError:
+            pass
         return path
 
     # General function to generate paths
     def get_fpath(self, name, ext, **kwargs):
-        """
+        u"""
         Get the path of an arbitrary file of the form /root_dir_path/root_dir_name/param1name-param1val-param2name-param2val/results/{name}-{param-paramval*}-{kwarg-kwargval*}.ext
         :return:
         """
-        d = copy.copy(self._param_combo)
+        d = self._param_combo.copy()
         d.update(kwargs)
-        return os.path.join(self.results_path, "{}-{}{}.{}".format(name, make_param_string(**d), self._suffix, ext))
+        return os.path.join(self.results_path, u"{}-{}{}.{}".format(name, make_param_string(**d), self._suffix, ext))
 
 
-def make_param_string(delimiter='-', **kwargs):
-    """
+def make_param_string(delimiter=u'-', **kwargs):
+    u"""
     Takes a dictionary and constructs a string of the form key1-val1-key2-val2-... (denoted here as {key-val*})
     The keys are alphabetically sorted
     :param str delimiter: Delimiter to use (default is '-')
     :param dict kwargs: A python dictionary
     :return:
     """
-    param_string = ""
+    param_string = u""
     for key in sorted(kwargs):
         param_string += delimiter
-        param_string += key.replace('_', delimiter)
+        param_string += key.replace(u'_', delimiter)
         val = kwargs[key]
         if isinstance(val, float):
-            param_string += "{}{:.2f}".format(delimiter, val)
+            param_string += u"{}{:.2f}".format(delimiter, val)
         else:
-            param_string += "{}{}".format(delimiter, val)
-    param_string = re.sub("^-", "", param_string)
+            param_string += u"{}{}".format(delimiter, val)
+    param_string = re.sub(u"^-", u"", param_string)
     return param_string
 
 
 def order_dict_alphabetically(d):
-    """
+    u"""
     Sort a given dictionary alphabetically
     :param dict d:
     :return:
@@ -133,12 +143,12 @@ def order_dict_alphabetically(d):
 
 
 def dict_product(dicts):
-    return (dict(zip(dicts, x)) for x in itertools.product(*dicts.values()))
+    return (dict(izip(dicts, x)) for x in itertools.product(*dicts.values()))
 
 
-class PathsMap:
-    def __init__(self, param_lists, args_name, n_networks, suffix, root_dir_path='./results'):
-        """
+class PathsMap(object):
+    def __init__(self, param_lists, args_name, n_networks, suffix, root_dir_path=u'./results'):
+        u"""
         This class manages groups of paths for larger simulations of different parameter combinations since each
         :class:`~ltl.paths.Path` above only manages one parameter combination.
         :param param_lists:
@@ -150,7 +160,7 @@ class PathsMap:
         self._root_dir_path = root_dir_path
         self._suffix = suffix
 
-        param_lists.update(dict(network_num=range(n_networks)))
+        param_lists.update(dict(network_num=xrange(n_networks)))
         self.param_lists = param_lists
 
         list_dict = dict_product(param_lists)
@@ -188,12 +198,12 @@ class PathsMap:
 
     @property
     def agg_results_path(self):
-        path = os.path.join(self.root_dir_path, "results")
-        create_if_not_exists(path)
+        path = os.path.join(self.root_dir_path, u"results")
+        os.makedirs(path, exist_ok=True)
         return path
 
     def get_agg_fpath(self, name, param_combo, ext, **kwargs):
-        d = copy.copy(param_combo)
+        d = param_combo.copy()
         d.update(kwargs)
-        return os.path.join(self.agg_results_path, "{}-{}{}.{}"
+        return os.path.join(self.agg_results_path, u"{}-{}{}.{}"
                             .format(name, make_param_string(**d), self._suffix, ext))

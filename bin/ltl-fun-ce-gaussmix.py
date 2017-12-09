@@ -1,26 +1,29 @@
-import logging.config
 import os
+import warnings
+import logging.config
+
+import numpy as np
 
 from pypet import Environment
 from pypet import pypetconstants
-import sys
-sys.path.append('.')
 
-from ltl.optimizees.functions import tools as function_tools
-from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
-from ltl.optimizers.gridsearch import GridSearchOptimizer, GridSearchParameters
+from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
+from ltl.optimizees.functions import tools as function_tools
+from ltl.optimizers.crossentropy.optimizer import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
+from ltl.optimizers.crossentropy.distribution import NoisyBayesianGaussianMixture
 from ltl.recorder import Recorder
 
-import numpy as np
 from ltl.logging_tools import create_shared_logger_data, configure_loggers
 
-logger = logging.getLogger('bin.ltl-fun-gs')
+warnings.filterwarnings("ignore")
+
+logger = logging.getLogger('bin.ltl-fun-ce')
 
 
 def main():
-    name = 'LTL-FUN-GS'
+    name = 'LTL-FUN-CE'
     try:
         with open('bin/path.conf') as f:
             root_dir_path = f.read().strip()
@@ -38,16 +41,15 @@ def main():
 
     # Create an environment that handles running our simulation
     # This initializes a PyPet environment
-    env = Environment(trajectory=name, filename=traj_file, file_title=u'{} data'.format(name),
-                      comment=u'{} data'.format(name),
+    env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
+                      comment='{} data'.format(name),
                       add_time=True,
-                      # freeze_input=True,
-                      # multiproc=True,
-                      # use_scoop=True,
-                      wrap_mode=pypetconstants.WRAP_MODE_LOCK,
+                      freeze_input=True,
+                      multiproc=True,
+                      use_scoop=True,
+                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
-                      log_folder=os.path.join(paths.output_dir_path, 'logs')
                       )
     create_shared_logger_data(logger_names=['bin', 'optimizers'],
                               log_levels=['INFO', 'INFO'],
@@ -59,11 +61,10 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
-    ## Benchmark function
-    function_id = 7
+    function_id = 14
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
-        bench_functs.get_function_by_index(function_id, noise=False)
+        bench_functs.get_function_by_index(function_id, noise=True)
 
     optimizee_seed = 100
     random_state = np.random.RandomState(seed=optimizee_seed)
@@ -73,13 +74,16 @@ def main():
     optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
 
     ## Outerloop optimizer initialization
-    n_grid_divs_per_axis = 30
-    parameters = GridSearchParameters(param_grid={
-        'coords': (optimizee.bound[0], optimizee.bound[1], n_grid_divs_per_axis)
-    })
-    optimizer = GridSearchOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                    optimizee_fitness_weights=(-0.1,),
-                                    parameters=parameters)
+    parameters = CrossEntropyParameters(pop_size=50, rho=0.9, smoothing=0.0, temp_decay=0, n_iteration=160,
+                                        distribution=NoisyBayesianGaussianMixture(n_components=3,
+                                                                                  noise_magnitude=1.,
+                                                                                  noise_decay=0.9,
+                                                                                  weight_concentration_prior=1.5),
+                                        stop_criterion=np.inf, seed=103)
+    optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
+                                            optimizee_fitness_weights=(-0.1,),
+                                            parameters=parameters,
+                                            optimizee_bounding_func=optimizee.bounding_func)
 
     # Add post processing
     env.add_postprocessing(optimizer.post_process)

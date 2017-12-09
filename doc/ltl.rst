@@ -1,10 +1,12 @@
-LTL package (Optimizers and Optimizees)
-=======================================
+API Reference
+=============
 
 .. toctree::
 
     ltl.optimizees
     ltl.optimizers
+    ltl.dataprocessing
+    ltl.logging_tools
 
 
 Other module functions
@@ -28,3 +30,9 @@ Other module functions
 .. autofunction:: ltl.list_to_dict
 
 .. autofunction:: ltl.dict_to_list
+
+.. autofunction:: ltl.stdout_redirected
+
+.. autofunction:: ltl.stdout_discarded
+
+.. autofunction:: ltl.convert_dict_to_numpy

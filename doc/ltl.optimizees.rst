@@ -18,4 +18,4 @@ Implemented examples
     :maxdepth: 1
 
     ltl.optimizees.functions
-    ltl.optimizees.lsm
+    ltl.optimizees.mnist

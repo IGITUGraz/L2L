@@ -12,58 +12,18 @@ handlers:
     formatter: simple
     filename: output.log
 loggers:
-  ltl-lsm:
+  optimizers:
     level: INFO
-    handlers: [file]
+    handlers: [console, file]
     propagate: no
-  ltl-ga:
+  bin:
     level: INFO
-    handlers: [file]
-    propagate: no
-  ltl-sa:
-    level: DEBUG
-    handlers: [file]
-    propagate: no
-  ltl-ce:
-    level: DEBUG
-    handlers: [file]
-    propagate: no
-  ltl-gs:
-    level: DEBUG
-    handlers: [file]
-    propagate: no
-  ltl-face:
-    level: DEBUG
-    handlers: [file]
-    propagate: no
-  ltl-noisy-ce:
-    level: DEBUG
-    handlers: [file]
-    propagate: no
-  ltl-distribution:
-    level: DEBUG
-    handlers: [file]
-    propagate: no
-  ltl-lsm-ga:
-    level: INFO
-    handlers: [file]
-    propagate: no
-  ltl-lsm-sa:
-    level: INFO
-    handlers: [file]
-    propagate: no
-  ltl-fun-ce:
-    level: INFO
-    handlers: [file]
-    propagate: no
-  ltl-fun-gs:
-    level: INFO
-    handlers: [file]
+    handlers: [console, file]
     propagate: no
   pypet:
     level: ERROR
-    handlers: [console]
+    handlers: [console, file]
     propagate: no
 root:
   level: INFO
-  handlers: [console]
+  handlers: [console, file]

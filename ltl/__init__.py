@@ -1,35 +1,26 @@
-from __future__ import print_function
-
-import functools
-
+from __future__ import with_statement
+from __future__ import absolute_import
+import os
 import sys
-import copy
-import time
+import logging
 from collections import OrderedDict
 from contextlib import contextmanager
 from warnings import warn
 from enum import Enum
-from collections import Iterable
+from collections import Iterable, Mapping
+from numbers import Integral, Real
+from timeit import default_timer as timer
 
-__author__ = 'anand'
+import numpy as np
+from io import open
 
+__author__ = u'anand'
 
-# This is used as a workaround for pickling instancemethods
-if sys.version_info[0] == 2:
-    import copy_reg
-    import types
-
-    def _pickle_method(m):
-        if m.im_self is None:
-            return getattr, (m.im_class, m.im_func.func_name)
-        else:
-            return getattr, (m.im_self, m.im_func.func_name)
-
-    copy_reg.pickle(types.MethodType, _pickle_method)
+logger = logging.getLogger(u'ltl')
 
 
 def static_vars(**kwargs):
-    """
+    u"""
     Provides functionality similar to static in C/C++ for functions that use this decorator
     :param kwargs:
     :return:
@@ -44,11 +35,11 @@ def static_vars(**kwargs):
 
 
 class sdictm(object):
-    """
+    u"""
     A dictionary which allows accessing it's values using a dot notation. i.e. `d['a']` can be accessed as `d.a`
     Mutable version
     """
-    _INSTANCE_VAR_LIST = ['_data']
+    _INSTANCE_VAR_LIST = [u'_data']
 
     def __init__(self, obj):
         self._data = OrderedDict()
@@ -67,17 +58,17 @@ class sdictm(object):
                 else:
                     self._data[key] = val
         else:
-            raise RuntimeError("should be initialized with a dictionary only")
+            raise RuntimeError(u"should be initialized with a dictionary only")
         assert isinstance(self._data, dict)
 
     def __getattr__(self, attr):
-        if attr == '__getstate__':
+        if attr == u'__getstate__':
             raise AttributeError()
         if attr in self._INSTANCE_VAR_LIST:
             return object.__getattribute__(self, attr)
         ret = self._data.get(attr)
         if ret is None:
-            warn("Returning None value for {}".format(attr), stacklevel=2)
+            warn(u"Returning None value for {}".format(attr), stacklevel=2)
         return ret
 
     def __getitem__(self, key):
@@ -122,37 +113,35 @@ class sdictm(object):
         return dic_data
 
     def copy(self):
-        """
+        u"""
         Return a copy of the class. The copy is deep.
         :return:
         """
         return self.__class__(self.todict())
 
-    def update(self, quiet=False, **kwargs):
-        """
+    def update(self, **kwargs):
+        u"""
         Update the dictionary with the values given in the function (only goes one level down)
         :param kwargs:
         :return:
         """
 
-        print = functools.partial(printq, quiet=quiet)
-
         for key, value in kwargs.items():
             if key in self._data:
-                print("Replacing {} with {} for key {}".format(self._data[key], value, key))
+                logger.debug(u"Replacing {} with {} for key {}".format(self._data[key], value, key))
             else:
-                print("Adding new key {} with value {}".format(key, value))
+                logger.debug(u"Adding new key {} with value {}".format(key, value))
             self._data[key] = value
 
         return self
 
     def apply(self, fn):
-        """
+        u"""
         Recursively apply fn on all leaf key, value pairs
         :param fn:
         :return:
         """
-        for key, value in copy.copy(self._data).items():
+        for key, value in self._data.copy().items():
             if isinstance(value, sdictm):
                 value.apply(fn)
             elif isinstance(value, list):
@@ -171,24 +160,24 @@ class sdictm(object):
 
 
 class sdict(sdictm):
-    """
+    u"""
     Immutable version of :class:`~ltl.sdictm`
     """
 
     def __set__(self, attr, value):
-        raise RuntimeError("Immutable dictionary")
+        raise RuntimeError(u"Immutable dictionary")
 
     def __setattr__(self, attr, value):
         if attr in self._INSTANCE_VAR_LIST:
             object.__setattr__(self, attr, value)
         else:
-            raise RuntimeError("Immutable dictionary")
+            raise RuntimeError(u"Immutable dictionary")
 
     def update(self, **kwargs):
-        raise RuntimeError("Immutable dictionary")
+        raise RuntimeError(u"Immutable dictionary")
 
     def apply(self, fn):
-        raise RuntimeError("Immutable dictionary")
+        raise RuntimeError(u"Immutable dictionary")
 
 
 class DictEntryType(Enum):
@@ -197,11 +186,11 @@ class DictEntryType(Enum):
 
 
 def dict_to_list(input_dict, get_dict_spec=False):
-    """
-    This function converts the given dictionary into a list. 
+    u"""
+    This function converts the given dictionary into a list.
 
     :param dict input_dict: The dictionary to be converted into a list. It is assumed that each key
-      in the dicionary is a string and each value is either a scalar numerical value or an
+      in the dictionary is a string and each value is either a scalar numerical value or an
       iterable.
 
     :param bool get_dict_spec: This is a flag that indicates whether one wants the dictionary
@@ -236,13 +225,13 @@ def dict_to_list(input_dict, get_dict_spec=False):
             dict_spec.append((key, DictEntryType.Scalar, 1))
 
     if get_dict_spec:
-        return return_list, dict_spec
+        return np.array(return_list), dict_spec
     else:
-        return return_list
+        return np.array(return_list)
 
 
 def list_to_dict(input_list, dict_spec):
-    """
+    u"""
     This function converts a list back into a dict.
 
     :param list input_list: This is the list to be converted into a dict.
@@ -253,7 +242,7 @@ def list_to_dict(input_list, dict_spec):
     :returns: A Dictionary representing the list. Note that for valid behaviour, the list should have been generated by
         :func:`.dict_to_list`. Moreover, This operation is not a perfect inverse of :func:`.list_to_dict`. While the types
         of individual elements are preserved, the types of the iterables inside which they reside are not.
-        :func:`.list_to_dict` creates all iterables as python lists
+        :func:`.list_to_dict` creates all iterables as numpy arrays.
     """
     cursor = 0
     return_dict = {}
@@ -262,16 +251,16 @@ def list_to_dict(input_list, dict_spec):
         value_type = dict_entry[1]
         value_len = dict_entry[2]
         if value_type == DictEntryType.Sequence:
-            return_dict[key] = input_list[cursor:cursor + value_len]
+            return_dict[key] = np.array(input_list[cursor:cursor + value_len])
         elif value_type == DictEntryType.Scalar:
             return_dict[key] = input_list[cursor]
         cursor += value_len
-    assert cursor == len(input_list), "Incorrect Parameter List length, Somethings not right"
+    assert cursor == len(input_list), u"Incorrect Parameter List length, Somethings not right"
     return return_dict
 
 
 def get_grouped_dict(dict_iter):
-    """
+    u"""
     This function takes an iterator of :class:`dict` objects and returns a grouped dict. It
     assumes that each dict has the same keys. It then returns a dict with the same keys as
     these dicts but with the values as being the list of values across the dicts in dict_iter
@@ -296,9 +285,46 @@ def get_grouped_dict(dict_iter):
     return return_dict
 
 
+def convert_dict_to_numpy(input_dict):
+    u"""
+    This function takes a dictionary as input and converts the values to
+    numpy data types. This is useful when importing parameters from config
+    files.
+
+    NOTE: Only the following data types are converted:
+
+    1.  Scalars integer or float. They are converted to `np.int64` and
+        `numpy.float64` respectively
+
+    2.  Iterables. All elements of the iterable are converted to a numpy array
+        via ``np.array(...)``
+
+    3.  Dictionaries. Dictionaries are recursively converted
+
+    :param input_dict: This is the dictionary to convert
+
+    :returns: The converted output dictionary
+    """
+    output_dict = {}
+    for key, value in input_dict.items():
+        if isinstance(value, Iterable) and not isinstance(value, unicode):
+            new_value = np.array(value)
+        elif isinstance(value, Integral) and not isinstance(value, bool):
+            new_value = np.int64(value)
+        elif isinstance(value, Real) and not isinstance(value, bool):
+            new_value = np.float64(value)
+        elif isinstance(value, Mapping):
+            new_value = convert_dict_to_numpy(value)
+        else:
+            new_value = value
+        output_dict[key] = new_value
+
+    return output_dict
+
+
 def printq(s, quiet):
     if not quiet:
-        print(s)
+        print s
 
 
 def static_var(varname, value):
@@ -312,11 +338,77 @@ def static_var(varname, value):
 def get(obj, key, default_value):
     try:
         return obj[key]
-    except:
+    except Exception:
         return default_value
 
 
-class DummyTrajectory:
+@contextmanager
+def stdout_redirected(filename):
+    u"""
+    This context manager causes all writes to stdout (whether within python or its
+    subprocesses) to be redirected to the filename specified. For usage, look at
+    example below::
+
+        import os
+
+        with stdout_redirected(filename):
+            print("from Python")
+            os.system("echo non-Python applications are also supported")
+
+    inspired from the article
+    http://eli.thegreenplace.net/2015/redirecting-all-kinds-of-stdout-in-python/
+    
+    :param filename: The filename (NOT file stream object, this is to ensure that
+        the stream is always a valid file object) to which the stdout is to be
+        redirected
+    """
+
+    os_stdout_fd = sys.stdout.fileno()
+    assert os_stdout_fd == 1, u"Doesn't work if stdout is not the actual __stdout__"
+
+    sys.stdout.flush()
+    old_stdout = sys.stdout
+    old_stdout_fd_dup = os.dup(sys.__stdout__.fileno())
+
+    # # assert that Python and C stdio write using the same file descriptor
+    # assert libc.fileno(ctypes.c_void_p.in_dll(libc, "stdout")) == os_stdout_fd == 1
+
+    def _redirect_stdout(filestream):
+        os.dup2(filestream.fileno(), os_stdout_fd)  # os_stdout_fd writes to 'to' file
+        sys.stdout = os.fdopen(os_stdout_fd, u'w')  # Python writes to os_stdout_fd
+
+    def _revert_stdout():
+        sys.stdout.close()
+        os.dup2(old_stdout_fd_dup, os_stdout_fd)
+        os.close(old_stdout_fd_dup)
+        sys.stdout = old_stdout
+
+    with open(filename, u'w') as file:
+        _redirect_stdout(filestream=file)
+        try:
+            yield  # allow code to be run with the redirected stdout
+        finally:
+            _revert_stdout()
+
+
+@contextmanager
+def stdout_discarded():
+    u"""
+    This context manager causes all writes to stdout (whether within python or its
+    subprocesses) to be redirected to `os.devnull`, thereby effectively discarding the
+    output. For usage look at example below::
+
+        import os
+
+        with stdout_discarded():
+            print("from Python")
+            os.system("echo non-Python applications are also supported")
+    """
+    with stdout_redirected(os.devnull):
+        yield
+
+
+class DummyTrajectory(object):
     def __init__(self):
         self.individual = lambda: None
 
@@ -330,8 +422,8 @@ class DummyTrajectory:
 
 
 @contextmanager
-def timed(logger):
-    start = time.time()
+def timed(logger, section_name=u'Run'):
+    start = timer()
     yield
-    end = time.time()
-    logger.info("Run took {:.2f} seconds".format(end - start))
+    end = timer()
+    logger.info(u"{} took {:.3f} seconds".format(section_name, end - start))
