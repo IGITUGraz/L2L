@@ -1,4 +1,6 @@
 
+from __future__ import division
+from __future__ import absolute_import
 import logging
 import random
 from collections import namedtuple
@@ -15,18 +17,18 @@ logger = logging.getLogger(u"optimizers.paralleltempering")
 
 ParallelTemperingParameters = namedtuple(u'ParallelTemperingParameters',
                                           [u'n_parallel_runs', u'noisy_step', u'n_iteration', u'stop_criterion', u'seed', u'cooling_schedules', u'temperature_bounds', u'decay_parameters'])
-ParallelTemperingParameters.__doc__ = u"""
-:param n_parallel_runs: Number of parallel Simulated Annealing runs
-:param noisy_step: Size of the random step
-:param decay_parameters: List of decay parameter for each cooling schedule
-:param n_iteration: number of iteration to perform
-:param stop_criterion: Stop if change in fitness is below this value
-:param seed: Random seed
-:param cooling_schedules: List with cooling schedules to use.
-:param temperature_bounds: List of upper and lower bound of the temperature for
-    each schedule. The first entry is the upper bound (starting temperature) 
-    and the second entry is the ending temperature
-"""
+#ParallelTemperingParameters.__doc__ = u"""
+#:param n_parallel_runs: Number of parallel Simulated Annealing runs
+#:param noisy_step: Size of the random step
+#:param decay_parameters: List of decay parameter for each cooling schedule
+#:param n_iteration: number of iteration to perform
+#:param stop_criterion: Stop if change in fitness is below this value
+#:param seed: Random seed
+#:param cooling_schedules: List with cooling schedules to use.
+#:param temperature_bounds: List of upper and lower bound of the temperature for
+#    each schedule. The first entry is the upper bound (starting temperature) 
+#    and the second entry is the ending temperature
+#"""
 
 AvailableCoolingSchedules = Enum(u'Schedule', u'DEFAULT LOGARITHMIC EXPONENTIAL LINEAR_MULTIPLICATIVE QUADRATIC_MULTIPLICATIVE LINEAR_ADDAPTIVE QUADRATIC_ADDAPTIVE EXPONENTIAL_ADDAPTIVE TRIGONOMETRIC_ADDAPTIVE')
 
@@ -98,9 +100,6 @@ T_k = T_n + (T_0 - T_n)/2 * (1+cos(k*pi/n))
 
 """
 
-
-from __future__ import division
-from __future__ import absolute_import
 class ParallelTemperingOptimizer(Optimizer):
     u"""
     Class for a parallel tempering solver.
@@ -239,7 +238,8 @@ class ParallelTemperingOptimizer(Optimizer):
         for i in xrange(np.size(self.cooling_schedules)):
             schedule_known = schedule_known and self.cooling_schedules[i] in AvailableCoolingSchedules
         
-        assert schedule_known, print u"Warning: Unknown cooling schedule"
+        if schedule_known:
+            print u"Warning: Unknown cooling schedule"
         
         self.recorder_parameters = ParallelTemperingParameters(n_parallel_runs=parameters.n_parallel_runs, noisy_step=parameters.noisy_step, n_iteration=parameters.n_iteration, stop_criterion=parameters.stop_criterion,
                                                                seed=parameters.seed, cooling_schedules=cooling_schedules_string, 
@@ -307,14 +307,20 @@ class ParallelTemperingOptimizer(Optimizer):
         cooling_schedules = self.cooling_schedules
         decay_parameters = self.decay_parameters
         temperature_bounds = self.temperature_bounds
-        old_eval_pop = self.eval_pop.copy()
-        self.eval_pop.clear()
+        old_eval_pop = self.eval_pop[:]
+        self.eval_pop = []
         temperature = self.T_all
+
+        fitnesses_results = fitnesses_results[-traj.n_parallel_runs:]
+
         for i in xrange(0,traj.n_parallel_runs):
             self.T_all[self.parallel_indices[i]] = self.cooling(temperature[self.parallel_indices[i]], cooling_schedules[self.parallel_indices[i]], decay_parameters[self.parallel_indices[i]], temperature_bounds[self.parallel_indices[i],:], n_iteration)
         logger.info(u"  Evaluating %i individuals" % len(fitnesses_results))
   
         assert len(fitnesses_results) == traj.n_parallel_runs
+
+        #fitnesses_results = fitnesses_results[-self.pop_size:]
+
         weighted_fitness_list = []
         for i, (run_index, fitness) in enumerate(fitnesses_results):
             
@@ -380,7 +386,7 @@ class ParallelTemperingOptimizer(Optimizer):
         # ------- Create the next generation by crossover and mutation -------- #
         # not necessary for the last generation
         if self.g < n_iteration - 1 and stop_criterion > max(self.current_fitness_value_list):
-            fitnesses_results.clear()
+            fitnesses_results = []
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
         

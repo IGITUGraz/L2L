@@ -63,10 +63,10 @@ def main():
     traj = env.trajectory
 
     ## Benchmark function
-    function_id = 4
+    function_id = 7
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
-        bench_functs.get_function_by_index(function_id, noise=True)
+        bench_functs.get_function_by_index(function_id, noise=False)
 
     optimizee_seed = 100
     random_state = np.random.RandomState(seed=optimizee_seed)
@@ -84,12 +84,12 @@ def main():
     # parameters = StochasticGDParameters(learning_rate=0.01, stochastic_deviation=1, stochastic_decay=0.99,
     #                                     exploration_step_size=0.01, n_random_steps=5, n_iteration=100,
     #                                     stop_criterion=np.Inf)
-    parameters = RMSPropParameters(learning_rate=0.01, exploration_step_size=0.01,
-                                   n_random_steps=5, momentum_decay=0.5,
-                                   n_iteration=100, stop_criterion=np.Inf, seed=99)
+    parameters = RMSPropParameters(learning_rate=0.01, exploration_step_size=0.5,
+                                   n_random_steps=20, momentum_decay=0.3,
+                                   n_iteration=200, stop_criterion=np.Inf, seed=np.random.randint(1, 2**32))
 
     optimizer = GradientDescentOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                         optimizee_fitness_weights=(0.1,),
+                                         optimizee_fitness_weights=(-0.1,),
                                          parameters=parameters,
                                          optimizee_bounding_func=optimizee.bounding_func)
 

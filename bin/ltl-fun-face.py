@@ -5,6 +5,8 @@ import numpy as np
 
 from pypet import Environment
 from pypet import pypetconstants
+import sys
+sys.path.append('.')
 
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
@@ -41,12 +43,13 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      freeze_input=True,
-                      multiproc=True,
-                      use_scoop=True,
-                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                      # freeze_input=True,
+                      # multiproc=True,
+                      # use_scoop=True,
+                      wrap_mode=pypetconstants.WRAP_MODE_LOCK,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
+                      log_folder=os.path.join(paths.output_dir_path, 'logs')
                       )
     create_shared_logger_data(logger_names=['bin', 'optimizers'],
                               log_levels=['INFO', 'INFO'],
@@ -59,10 +62,10 @@ def main():
     traj = env.trajectory
 
     ## Benchmark function
-    function_id = 4
+    function_id = 7
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
-        bench_functs.get_function_by_index(function_id, noise=True)
+        bench_functs.get_function_by_index(function_id, noise=False)
 
     optimizee_seed = 100
     random_state = np.random.RandomState(seed=optimizee_seed)

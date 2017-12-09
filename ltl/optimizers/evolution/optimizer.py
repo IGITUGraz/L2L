@@ -17,16 +17,16 @@ logger = logging.getLogger(u"ltl-ga")
 GeneticAlgorithmParameters = namedtuple(u'GeneticAlgorithmParameters',
                                         [u'seed', u'popsize', u'CXPB', u'MUTPB', u'NGEN', u'indpb', u'tournsize', u'matepar',
                                          u'mutpar'])
-GeneticAlgorithmParameters.__doc__ = u"""
-:param seed: Random seed
-:param popsize: Size of the population
-:param CXPB: Crossover probability
-:param MUTPB: Mutation probability
-:param NGEN: Number of generations simulation should run for
-:param indpb: Probability of mutation of each element in individual
-:param tournsize: Size of the tournamaent used for fitness evaluation and selection
-:param matepar: Paramter used for blending two values during mating
-"""
+#GeneticAlgorithmParameters.__doc__ = u"""
+#:param seed: Random seed
+#:param popsize: Size of the population
+#:param CXPB: Crossover probability
+#:param MUTPB: Mutation probability
+#:param NGEN: Number of generations simulation should run for
+#:param indpb: Probability of mutation of each element in individual
+#:param tournsize: Size of the tournamaent used for fitness evaluation and selection
+#:param matepar: Paramter used for blending two values during mating
+#"""
 
 
 class GeneticAlgorithmOptimizer(Optimizer):

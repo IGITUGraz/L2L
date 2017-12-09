@@ -57,10 +57,10 @@ def run_experiment():
     traj = env.trajectory
 
     ## Benchmark function
-    function_id = 14
+    function_id = 7
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
-        bench_functs.get_function_by_index(function_id, noise=True)
+        bench_functs.get_function_by_index(function_id, noise=False)
 
     optimizee_seed = 200
     random_state = np.random.RandomState(seed=optimizee_seed)
@@ -77,7 +77,7 @@ def run_experiment():
         mirrored_sampling_enabled=True,
         fitness_shaping_enabled=True,
         pop_size=20,
-        n_iteration=1000,
+        n_iteration=10,
         stop_criterion=np.Inf,
         seed=optimizer_seed)
 
@@ -166,8 +166,8 @@ def process_results(filename, trajname, paths):
 
 def main():
     filename, trajname, paths = run_experiment()
-    logger.info("Plotting now")
-    process_results(filename, trajname, paths)
+    #logger.info("Plotting now")
+    #process_results(filename, trajname, paths)
 
 
 if __name__ == '__main__':

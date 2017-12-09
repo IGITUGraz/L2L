@@ -1,8 +1,11 @@
 import logging.config
 import os
 
-import numpy as np
 from pypet import Environment
+from pypet import pypetconstants
+import sys
+from io import open
+sys.path.append('.')
 
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
@@ -11,6 +14,7 @@ from ltl.optimizers.paralleltempering.optimizer import ParallelTemperingParamete
 from ltl.paths import Paths
 from ltl.recorder import Recorder
 
+import numpy as np
 from ltl.logging_tools import create_shared_logger_data, configure_loggers
 
 logger = logging.getLogger('bin.ltl-fun-pt')
@@ -41,9 +45,10 @@ def main():
                       # freeze_input=True,
                       # multiproc=True,
                       # use_scoop=True,
-                      # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                      wrap_mode=pypetconstants.WRAP_MODE_LOCK,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
+                      log_folder=os.path.join(paths.output_dir_path, 'logs')
                       )
     create_shared_logger_data(logger_names=['bin', 'optimizers'],
                               log_levels=['INFO', 'INFO'],
@@ -56,10 +61,10 @@ def main():
     traj = env.trajectory
 
     ## Benchmark function
-    function_id = 14
+    function_id = 7
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
-        bench_functs.get_function_by_index(function_id, noise=True)
+        bench_functs.get_function_by_index(function_id, noise=False)
 
     optimizee_seed = 100
     random_state = np.random.RandomState(seed=optimizee_seed)
@@ -90,12 +95,12 @@ def main():
 
     # has to be from 1 to 0, first entry hast to be larger than second
     # represents the starting temperature and the ending temperature
-    temperature_bounds = [
+    temperature_bounds = np.array([
         [0.8, 0],
         [0.7, 0],
         [0.6, 0],
         [1, 0.1],
-        [0.9, 0.2]]
+        [0.9, 0.2]])
 
     # decay parameter for each schedule. If needed can be different for each
     # schedule
@@ -105,17 +110,17 @@ def main():
     #--------------------------------------------------------------------------
 
     # Check, if the temperature bounds and decay parameters are reasonable.
-    assert (((temperature_bounds.all() <= 1) and (temperature_bounds.all() >= 0)) and (temperature_bounds[:, 0].all(
-    ) > temperature_bounds[:, 1].all())), print("Warning: Temperature bounds are not within specifications.")
-    assert ((decay_parameters.all() <= 1) and (decay_parameters.all() >= 0)), print(
-        "Warning: Decay parameter not within specifications.")
+    if (temperature_bounds.all() <= 1) and (temperature_bounds.all() >= 0) and (temperature_bounds[:, 0].all() > temperature_bounds[:, 1].all()):
+        print "Warning: Temperature bounds are not within specifications." 
+    if ((decay_parameters.all() <= 1) and (decay_parameters.all() >= 0)):
+        print "Warning: Decay parameter not within specifications."
 
     ## Outerloop optimizer initialization
     parameters = ParallelTemperingParameters(n_parallel_runs=n_parallel_runs, noisy_step=.03, n_iteration=1000, stop_criterion=np.Inf,
                                              seed=np.random.randint(1e5), cooling_schedules=cooling_schedules,
                                              temperature_bounds=temperature_bounds, decay_parameters=decay_parameters)
     optimizer = ParallelTemperingOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
-                                           optimizee_fitness_weights=(-1,),
+                                           optimizee_fitness_weights=(-0.1,),
                                            parameters=parameters,
                                            optimizee_bounding_func=optimizee.bounding_func)
 

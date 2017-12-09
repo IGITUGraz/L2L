@@ -1,3 +1,5 @@
+from __future__ import division
+from __future__ import absolute_import
 import logging
 from collections import namedtuple
 
@@ -13,16 +15,15 @@ logger = logging.getLogger(u"optimizers.simulatedannealing")
 
 SimulatedAnnealingParameters = namedtuple(u'SimulatedAnnealingParameters',
                                           [u'n_parallel_runs', u'noisy_step', u'temp_decay', u'n_iteration', u'stop_criterion', u'seed', u'cooling_schedule'])
-SimulatedAnnealingParameters.__doc__ = u"""
-:param n_parallel_runs: Number of individuals per simulation / Number of parallel Simulated Annealing runs
-:param noisy_step: Size of the random step
-:param temp_decay: A function of the form f(t) = temperature at time t
-:param n_iteration: number of iteration to perform
-:param stop_criterion: Stop if change in fitness is below this value
-:param seed: Random seed
-:param cooling_schedule: Which of the available schedules to use
-
-"""
+#SimulatedAnnealingParameters.__doc__ = u"""
+#:param n_parallel_runs: Number of individuals per simulation / Number of parallel Simulated Annealing runs
+#:param noisy_step: Size of the random step
+#:param temp_decay: A function of the form f(t) = temperature at time t
+#:param n_iteration: number of iteration to perform
+#:param stop_criterion: Stop if change in fitness is below this value
+#:param seed: Random seed
+#:param cooling_schedule: Which of the available schedules to use
+#"""
 
 AvailableCoolingSchedules = Enum(u'Schedule', u'DEFAULT LOGARITHMIC EXPONENTIAL LINEAR_MULTIPLICATIVE QUADRATIC_MULTIPLICATIVE LINEAR_ADDAPTIVE QUADRATIC_ADDAPTIVE EXPONENTIAL_ADDAPTIVE TRIGONOMETRIC_ADDAPTIVE')
 
@@ -93,9 +94,6 @@ T_k = T_n + (T_0 - T_n)/2 * (1+cos(k*pi/n))
 
 """
 
-
-from __future__ import division
-from __future__ import absolute_import
 class SimulatedAnnealingOptimizer(Optimizer):
     u"""
     Class for a generic simulate annealing solver.
@@ -223,14 +221,17 @@ class SimulatedAnnealingOptimizer(Optimizer):
         """
         noisy_step, temp_decay, n_iteration, stop_criterion = \
             traj.noisy_step, traj.temp_decay, traj.n_iteration, traj.stop_criterion
-        old_eval_pop = self.eval_pop.copy()
-        self.eval_pop.clear()
+        old_eval_pop = self.eval_pop[:]
+        self.eval_pop = []
         temperature = self.T
         temperature_end = 0
+        fitnesses_results = fitnesses_results[-traj.n_parallel_runs:]
+
         self.T = self.cooling(temperature, self.cooling_schedule, temp_decay, temperature_end, n_iteration)
         logger.info(u"  Evaluating %i individuals" % len(fitnesses_results))
 
         assert len(fitnesses_results) == traj.n_parallel_runs
+
         weighted_fitness_list = []
         for i, (run_index, fitness) in enumerate(fitnesses_results):
 
@@ -276,7 +277,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
         # ------- Create the next generation by crossover and mutation -------- #
         # not necessary for the last generation
         if self.g < n_iteration - 1 and stop_criterion > max(self.current_fitness_value_list):
-            fitnesses_results.clear()
+            fitnesses_results = []
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 

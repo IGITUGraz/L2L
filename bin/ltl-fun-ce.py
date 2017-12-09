@@ -4,6 +4,7 @@ import logging.config
 import os
 
 from pypet import Environment
+from pypet import pypetconstants
 import sys
 from io import open
 sys.path.append('.')
@@ -11,7 +12,7 @@ sys.path.append('.')
 from ltl.optimizees.functions import tools as function_tools
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
-from ltl.optimizers.crossentropy.distribution import NoisyGaussian
+from ltl.optimizers.crossentropy.distribution import NoisyGaussian, Gaussian
 from ltl.optimizers.crossentropy import CrossEntropyOptimizer, CrossEntropyParameters
 from ltl.paths import Paths
 from ltl.recorder import Recorder
@@ -35,7 +36,7 @@ def main():
         )
     paths = Paths(name, dict(run_no=u'test'), root_dir_path=root_dir_path)
 
-    print u"All output logs can be found in directory ", paths.logs_path
+    print("All output logs can be found in directory " + str(paths.logs_path))
 
     traj_file = os.path.join(paths.output_dir_path, u'data.h5')
 
@@ -47,9 +48,10 @@ def main():
                       # freeze_input=True,
                       # multiproc=True,
                       # use_scoop=True,
-                      # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                      wrap_mode=pypetconstants.WRAP_MODE_LOCK,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
+                      log_folder=os.path.join(paths.output_dir_path, 'logs')
                       )
     create_shared_logger_data(logger_names=['bin', 'optimizers'],
                               log_levels=['INFO', 'INFO'],
@@ -62,10 +64,10 @@ def main():
     traj = env.trajectory
 
     ## Benchmark function
-    function_id = 14
+    function_id = 7
     bench_functs = BenchmarkedFunctions()
     (benchmark_name, benchmark_function), benchmark_parameters = \
-        bench_functs.get_function_by_index(function_id, noise=True)
+        bench_functs.get_function_by_index(function_id, noise=False)
 
     optimizee_seed = 100
     random_state = np.random.RandomState(seed=optimizee_seed)
@@ -75,8 +77,8 @@ def main():
     optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=101)
 
     ## Outerloop optimizer initialization
-    parameters = CrossEntropyParameters(pop_size=10, rho=0.9, smoothing=0.0, temp_decay=0, n_iteration=1000,
-                                        distribution=NoisyGaussian(noise_magnitude=1., noise_decay=0.99),
+    parameters = CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0, n_iteration=30,
+                                        distribution=Gaussian(),#NoisyGaussian(noise_magnitude=1., noise_decay=0.99),
                                         stop_criterion=np.inf, seed=102)
     optimizer = CrossEntropyOptimizer(traj, optimizee_create_individual=optimizee.create_individual,
                                       optimizee_fitness_weights=(-0.1,),

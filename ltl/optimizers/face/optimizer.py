@@ -2,7 +2,6 @@ from __future__ import division
 from __future__ import absolute_import
 import logging
 from collections import namedtuple
-
 import numpy as np
 
 from ltl import dict_to_list, list_to_dict
@@ -14,23 +13,23 @@ FACEParameters = namedtuple(u'FACEParameters',
                             [u'min_pop_size', u'max_pop_size', u'n_elite', u'smoothing', u'temp_decay', u'n_iteration',
                              u'distribution', u'stop_criterion', u'n_expand', u'seed'])
 
-FACEParameters.__doc__ = u"""
-:param min_pop_size: Minimal number of individuals per simulation.
-:param max_pop_size: This is the minimum amount of samples taken into account for the FACE algorithm
-:param n_elite: Number of individuals to be considered as elite
-:param smoothing: This is a factor between 0 and 1 that determines the weight assigned to the previous distribution
-  parameters while calculating the new distribution parameters. The smoothing is done as a linear combination of the 
-  optimal parameters for the current data, and the previous distribution as follows:
+#FACEParameters.__doc__ = u"""
+#:param min_pop_size: Minimal number of individuals per simulation.
+#:param max_pop_size: This is the minimum amount of samples taken into account for the FACE algorithm
+#:param n_elite: Number of individuals to be considered as elite
+#:param smoothing: This is a factor between 0 and 1 that determines the weight assigned to the previous distribution
+#  parameters while calculating the new distribution parameters. The smoothing is done as a linear combination of the 
+#  optimal parameters for the current data, and the previous distribution as follows:
     
-    new_params = smoothing*old_params + (1-smoothing)*optimal_new_params
+#    new_params = smoothing*old_params + (1-smoothing)*optimal_new_params
     
-:param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
-  generation. To see the use of temperature, look at the documentation of :class:`.FACEOptimizer`
-:param n_iteration: Number of iterations to perform
-:param distribution: Distribution class to use. Has to implement a fit and sample function.
-:param stop_criterion: (Optional) Stop if this fitness is reached.
-:param n_expand: (Optional) This is the amount by which the sample size is increased if FACE becomes active
-"""
+#:param temp_decay: This parameter is the factor (necessarily between 0 and 1) by which the temperature decays each
+#  generation. To see the use of temperature, look at the documentation of :class:`.FACEOptimizer`
+#:param n_iteration: Number of iterations to perform
+#:param distribution: Distribution class to use. Has to implement a fit and sample function.
+#:param stop_criterion: (Optional) Stop if this fitness is reached.
+#:param n_expand: (Optional) This is the amount by which the sample size is increased if FACE becomes active
+#"""
 
 
 class FACEOptimizer(Optimizer):
@@ -176,6 +175,8 @@ class FACEOptimizer(Optimizer):
             traj.n_elite, traj.n_iteration, traj.smoothing, traj.temp_decay, traj.min_pop_size, traj.max_pop_size
         stop_criterion, n_expand = traj.stop_criterion, traj.n_expand
 
+        fitnesses_results = fitnesses_results[-self.pop_size:]
+
         weighted_fitness_list = []
         # **************************************************************************************************************
         # Storing run-information in the trajectory
@@ -275,8 +276,8 @@ class FACEOptimizer(Optimizer):
         # Create the next generation by sampling the inferred distribution
         # **************************************************************************************************************
         # Note that this is only done in case the evaluated run is not the last run
-        fitnesses_results.clear()
-        self.eval_pop.clear()
+        fitnesses_results = []
+        self.eval_pop = []
         if expand:
             # Sample from the constructed distribution
             self.eval_pop_asarray = self.current_distribution.sample(self.pop_size)

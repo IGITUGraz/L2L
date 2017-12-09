@@ -177,7 +177,7 @@ def get_skeleton_traj(filename, name_or_index=-1):
         u'load_derived_parameters':pypetconstants.LOAD_SKELETON,
         u'force':True
     }
-    if isinstance(name_or_index, unicode):
+    if isinstance(name_or_index, str):
         load_params_dict[u'name'] = name_or_index
     else:
         index = int(name_or_index)

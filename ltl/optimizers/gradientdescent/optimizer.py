@@ -182,8 +182,10 @@ class GradientDescentOptimizer(Optimizer):
         u"""
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
-        old_eval_pop = self.eval_pop = []
+        old_eval_pop = self.eval_pop
         self.eval_pop = []
+
+        fitnesses_results = fitnesses_results[-(traj.n_random_steps + 1):]
 
         logger.info(u"  Evaluating %i individuals" % len(fitnesses_results))
         
@@ -192,6 +194,9 @@ class GradientDescentOptimizer(Optimizer):
         # We need to collect the directions of the random steps along with the fitness evaluated there
         fitnesses = np.zeros((traj.n_random_steps))
         dx = np.zeros((traj.n_random_steps, len(self.current_individual)))
+
+        #fitnesses_results = fitnesses_results[-self.pop_size:]
+
         weighted_fitness_list = []
 
         for i, (run_index, fitness) in enumerate(fitnesses_results):

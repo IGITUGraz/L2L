@@ -198,6 +198,8 @@ class EvolutionStrategiesOptimizer(Optimizer):
         n_iteration, stop_criterion, learning_rate, noise_std, fitness_shaping_enabled = \
             traj.n_iteration, traj.stop_criterion, traj.learning_rate, traj.noise_std, traj.fitness_shaping_enabled
 
+        fitnesses_results = fitnesses_results[-self.pop_size:]
+
         weighted_fitness_list = []
         #**************************************************************************************************************
         # Storing run-information in the trajectory

@@ -13,19 +13,19 @@ from itertools import izip
 logger = logging.getLogger(u"optimizers.gridsearch")
 
 GridSearchParameters = namedtuple(u'GridSearchParameters', [u'param_grid'])
-GridSearchParameters.__doc__ = u"""
-:param param_grid dict: This is the data structure specifying the grid over which to search. This should be a
-    dictionary as follows::
-    
-        optimizee_param_grid['param_name'] = (lower_bound, higher_bound, n_steps)
-    
-    Where the interval `[lower_bound, upper_bound]` is divided into `n_steps` intervals thereby providing
-    `n_steps + 1` points for the grid.
-    
-    Note that there must be as many keys as there are in the `Individual-Dict` returned by the function
-    :meth:`.Optimizee.create_individual`. Also, if any of the parameters of the individuals is an array, then the above
-    grid specification applies to each element of the array.
-"""
+#GridSearchParameters.__doc__ = u"""
+#:param param_grid dict: This is the data structure specifying the grid over which to search. This should be a
+#    dictionary as follows::
+#    
+#        optimizee_param_grid['param_name'] = (lower_bound, higher_bound, n_steps)
+#    
+#    Where the interval `[lower_bound, upper_bound]` is divided into `n_steps` intervals thereby providing
+#    `n_steps + 1` points for the grid.
+#    
+#    Note that there must be as many keys as there are in the `Individual-Dict` returned by the function
+#    :meth:`.Optimizee.create_individual`. Also, if any of the parameters of the individuals is an array, then the above
+#    grid specification applies to each element of the array.
+#"""
 
 
 class GridSearchOptimizer(Optimizer):
