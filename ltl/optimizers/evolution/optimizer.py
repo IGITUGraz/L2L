@@ -115,6 +115,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         self.g = 0  # the current generation
         self.toolbox = toolbox  # the DEAP toolbox
         self.hall_of_fame = HallOfFame(20)
+        self.gen_fitnesses = []
 
         self._expand_trajectory(traj)
 
@@ -126,6 +127,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         CXPB, MUTPB, NGEN = traj.CXPB, traj.MUTPB, traj.NGEN
 
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
+        mean_fitness = 0
         while fitnesses_results:
             result = fitnesses_results.pop()
             # Update fitness
@@ -137,10 +139,12 @@ class GeneticAlgorithmOptimizer(Optimizer):
             # Use the ind_idx to update the fitness
             individual = self.eval_pop_inds[ind_index]
             individual.fitness.values = fitness
+            mean_fitness += fitness[0] / traj.popsize
 
             # Record
             traj.f_add_result('$set.$.individual', self.eval_pop[ind_index])
             traj.f_add_result('$set.$.fitness', individual.fitness.values)
+        self.gen_fitnesses.append(mean_fitness)
 
         traj.v_idx = -1  # set the trajectory back to default
 
