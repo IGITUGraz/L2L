@@ -16,6 +16,10 @@ loggers:
     level: INFO
     handlers: [console, file]
     propagate: no
+  optimizees:
+    level: INFO
+    handlers: [console, file]
+    propagate: no
   bin:
     level: INFO
     handlers: [console, file]

@@ -142,7 +142,7 @@ configure_loggers.basic_config_dict = {
         'console': {
             'class': 'logging.StreamHandler',
             'stream': 'ext://sys.stdout',
-            'formatter': 'stream',
+            'formatter': 'file',
         },
         'file_log': {
             'class': 'logging.FileHandler',
