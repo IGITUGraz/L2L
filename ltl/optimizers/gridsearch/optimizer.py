@@ -103,7 +103,12 @@ class GridSearchOptimizer(Optimizer):
         # Adding the bounds information to the trajectory
         traj.parameters.f_add_parameter_group(u'grid_spec')
         for param_name, param_grid_spec in optimizee_param_grid.items():
-            traj.parameters.grid_spec.f_add_parameter(param_name + u'.lower_bound', )
+            traj.parameters.grid_spec.f_add_parameter(param_name + u'.lower_bound', param_grid_spec[0],
+                                                      comment='lower bound of grid')
+            traj.parameters.grid_spec.f_add_parameter(param_name + u'.upper_bound', param_grid_spec[1],
+                                                      comment='upper bound of grid')
+            traj.parameters.grid_spec.f_add_parameter(param_name + u'.n_grid_points', param_grid_spec[2],
+                                                      comment='number of grid points')
 
         # Expanding the trajectory
         self.param_list = dict(((u'individual.' + key), value) for key, value in self.param_list.items())
