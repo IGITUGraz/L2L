@@ -326,4 +326,5 @@ class EvolutionStrategiesOptimizer(Optimizer):
         traj.f_add_result(u'n_iteration', self.g + 1)
 
         # ------------ Finished all runs and print result --------------- #
+        logger.info(u"Best last individual was %s with fitness %s", self.best_individual_in_run.tolist(), self.best_fitness_in_run)
         logger.info(u"-- End of (successful) ES optimization --")
