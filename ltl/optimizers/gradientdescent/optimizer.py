@@ -285,7 +285,10 @@ class GradientDescentOptimizer(Optimizer):
         traj.f_add_result(u'final_fitness', self.current_fitness)
         traj.f_add_result(u'n_iteration', self.g + 1)
 
-        logger.info(u"The last individual was %s with fitness %s", self.current_individual, self.current_fitness)
+        for parameter_key, parameter_value in sorted(best_last_indiv_dict.items()):
+            logger.info(u'%s: %s', parameter_key, parameter_value)
+        logger.info(u"With fitness %s   ", self.current_fitness)
+
         logger.info(u"-- End of (successful) gradient descent --")
 
     def init_classic_gd(self, parameters, traj):

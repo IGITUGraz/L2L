@@ -404,5 +404,7 @@ class ParallelTemperingOptimizer(Optimizer):
         traj.f_add_result(u'final_fitness', best_last_fitness)
         traj.f_add_result(u'n_iteration', self.g + 1)
 
-        logger.info(u"The best last individual was %s with fitness %s", best_last_indiv, best_last_fitness)
+        for parameter_key, parameter_value in sorted(best_last_indiv_dict.items()):
+            logger.info(u'%s: %s', parameter_key, parameter_value)
+        logger.info(u"With fitness %s   ", best_last_fitness)
         logger.info(u"-- End of (successful) parallel tempering --")

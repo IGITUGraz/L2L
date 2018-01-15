@@ -355,5 +355,9 @@ class NaturalEvolutionStrategiesOptimizer(Optimizer):
         traj.f_add_result(u'final_fitness', self.best_fitness_in_run)
         traj.f_add_result(u'n_iteration', self.g + 1)
 
+        for parameter_key, parameter_value in sorted(best_last_indiv_dict.items()):
+            logger.info(u'%s: %s', parameter_key, parameter_value)
+        logger.info(u"With fitness %s   ", self.best_fitness_in_run)
+
         # ------------ Finished all runs and print result --------------- #
         logger.info(u"-- End of (successful) ES optimization --")
