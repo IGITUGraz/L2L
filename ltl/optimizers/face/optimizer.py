@@ -194,6 +194,8 @@ class FACEOptimizer(Optimizer):
             weighted_fitness_list.append(np.dot(fitness, self.optimizee_fitness_weights))
         traj.v_idx = -1  # set trajectory back to default
 
+        weighted_fitness_list = np.array(weighted_fitness_list).ravel()
+
         # Performs descending arg-sort of weighted fitness
         fitness_sorting_indices = list(reversed(np.argsort(weighted_fitness_list)))
 

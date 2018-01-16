@@ -256,7 +256,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
 
             traj.f_add_result(u'$set.$.individual', individual)
             # Watchout! if weighted fitness is a tuple/np array it should be converted to a list first here
-            traj.f_add_result(u'$set.$.fitness', weighted_fitness)
+            traj.f_add_result(u'$set.$.fitness', fitness)
 
             current_individual = self.current_individual_list[i]
             new_individual = list_to_dict(
