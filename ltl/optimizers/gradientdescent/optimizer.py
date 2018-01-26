@@ -393,8 +393,8 @@ class GradientDescentOptimizer(Optimizer):
         fo_moment_corrected = self.fo_moment / (1 - traj.first_order_decay ** (self.g + 1))
         so_moment_corrected = self.so_moment / (1 - traj.second_order_decay ** (self.g + 1))
 
-        self.current_individual += np.multiply(traj.learning_rate * fo_moment_corrected / 
-                                               (np.sqrt(so_moment_corrected) + self.delta), gradient)
+        self.current_individual += traj.learning_rate * fo_moment_corrected / \
+                                    (np.sqrt(so_moment_corrected) + self.delta)
 
     def stochastic_gd_update(self, traj, gradient):
         """
