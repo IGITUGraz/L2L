@@ -187,7 +187,7 @@ class GradientDescentOptimizer(Optimizer):
         old_eval_pop = self.eval_pop
         self.eval_pop = []
 
-        fitnesses_results = fitnesses_results[-(traj.n_random_steps + 1):]
+        fitnesses_results = fitnesses_results[-(traj.n_random_steps + self.num_eval):]
 
         logger.info(u"  Evaluating %i individuals" % len(fitnesses_results))
 
@@ -237,8 +237,8 @@ class GradientDescentOptimizer(Optimizer):
         logger.info(u"  Evaluated %d individuals", len(fitnesses_results))
         logger.info(u'  Average Fitness: %.4f', np.mean(sorted_fitness))
         logger.info(u"  Current fitness is %.2f", self.current_fitness)
-        logger.info(u'  Best Fitness: %.4f', sorted_fitness[0])
-        logger.info(u"  Best individual is %s", sorted_population[0])
+        # logger.info(u'  Best Fitness: %.4f', sorted_fitness[0])
+        # logger.info(u"  Best individual is %s", sorted_population[0])
 
         generation_result_dict = {
             u'generation': self.g,
@@ -257,7 +257,9 @@ class GradientDescentOptimizer(Optimizer):
         if self.g < traj.n_iteration - 1 and traj.stop_criterion > self.current_fitness:
             # Create new individual using the appropriate gradient descent
             gradient = np.linalg.lstsq(dx, fitnesses - self.current_fitness)[0]
+            t = np.copy(self.current_individual)
             self.update_function(traj, gradient)
+            logger.info(u"  Maximum parameter update: %.4f", np.max(self.current_individual - t))
             current_individual_dict = list_to_dict(self.current_individual, self.optimizee_individual_dict_spec)
             if self.optimizee_bounding_func is not None:
                 current_individual_dict = self.optimizee_bounding_func(current_individual_dict)
@@ -272,7 +274,8 @@ class GradientDescentOptimizer(Optimizer):
             ]
             if self.optimizee_bounding_func is not None:
                 new_individual_list = [self.optimizee_bounding_func(ind) for ind in new_individual_list]
-            new_individual_list.append(current_individual_dict)
+            for _ in range(traj.n_random_steps):
+                new_individual_list.append(current_individual_dict)
 
             fitnesses_results = []
             self.eval_pop = new_individual_list
