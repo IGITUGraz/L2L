@@ -315,3 +315,6 @@ class CrossEntropyOptimizer(Optimizer):
         logger.info(u"-- Final distribution parameters --")
         for parameter_key, parameter_value in sorted(self.distribution_results.items()):
             logger.info(u'  %s: %s', parameter_key, parameter_value)
+
+        for parameter_key, parameter_value in sorted(best_last_indiv_dict.items()):
+            logger.info(u'%s: %s', parameter_key, parameter_value)
