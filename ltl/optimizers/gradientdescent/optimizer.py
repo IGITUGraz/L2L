@@ -107,7 +107,7 @@ class GradientDescentOptimizer(Optimizer):
                  optimizee_create_individual,
                  optimizee_fitness_weights,
                  parameters,
-                 optimizee_bounding_func=None):
+                 optimizee_bounding_func=None, base_point_evaluations=5):
         super(GradientDescentOptimizer, self).__init__(traj,
                          optimizee_create_individual=optimizee_create_individual,
                          optimizee_fitness_weights=optimizee_fitness_weights,
@@ -151,6 +151,7 @@ class GradientDescentOptimizer(Optimizer):
                                                 u' common across a generation')
 
         # Explore the neighbourhood in the parameter space of current individual
+        self.num_eval = base_point_evaluations
         new_individual_list = [
             list_to_dict(self.current_individual + 
                          self.random_state.normal(0.0, parameters.exploration_step_size, self.current_individual.size),
@@ -159,7 +160,8 @@ class GradientDescentOptimizer(Optimizer):
         ]
 
         # Also add the current individual to determine it's fitness
-        new_individual_list.append(list_to_dict(self.current_individual, self.optimizee_individual_dict_spec))
+        for _ in xrange(self.num_eval):
+            new_individual_list.append(list_to_dict(self.current_individual, self.optimizee_individual_dict_spec))
             
         if optimizee_bounding_func is not None:
             new_individual_list = [self.optimizee_bounding_func(ind) for ind in new_individual_list]
@@ -188,8 +190,9 @@ class GradientDescentOptimizer(Optimizer):
         fitnesses_results = fitnesses_results[-(traj.n_random_steps + 1):]
 
         logger.info(u"  Evaluating %i individuals" % len(fitnesses_results))
-        
-        assert len(fitnesses_results) - 1 == traj.n_random_steps
+
+        cx = []
+        assert len(fitnesses_results) - self.num_eval == traj.n_random_steps
 
         # We need to collect the directions of the random steps along with the fitness evaluated there
         fitnesses = np.zeros((traj.n_random_steps))
@@ -214,11 +217,12 @@ class GradientDescentOptimizer(Optimizer):
             weighted_fitness_list.append(weighted_fitness)
 
             # The last element of the list is the evaluation of the individual obtained via gradient descent
-            if i == len(fitnesses_results) - 1:
-                self.current_fitness = weighted_fitness
+            if i >= len(fitnesses_results) - self.num_eval:
+                cx.append(weighted_fitness)
             else:
                 fitnesses[i] = weighted_fitness
                 dx[i] = np.array(dict_to_list(individual)) - self.current_individual
+        self.current_fitness = np.mean(cx)
         traj.v_idx = -1  # set the trajectory back to default
 
         # Performs descending arg-sort of weighted fitness
@@ -252,7 +256,8 @@ class GradientDescentOptimizer(Optimizer):
 
         if self.g < traj.n_iteration - 1 and traj.stop_criterion > self.current_fitness:
             # Create new individual using the appropriate gradient descent
-            self.update_function(traj, np.dot(np.linalg.pinv(dx), fitnesses - self.current_fitness))
+            gradient = np.linalg.lstsq(dx, fitnesses - self.current_fitness)[0]
+            self.update_function(traj, gradient)
             current_individual_dict = list_to_dict(self.current_individual, self.optimizee_individual_dict_spec)
             if self.optimizee_bounding_func is not None:
                 current_individual_dict = self.optimizee_bounding_func(current_individual_dict)
@@ -402,8 +407,8 @@ class GradientDescentOptimizer(Optimizer):
         fo_moment_corrected = self.fo_moment / (1 - traj.first_order_decay ** (self.g + 1))
         so_moment_corrected = self.so_moment / (1 - traj.second_order_decay ** (self.g + 1))
 
-        self.current_individual += np.multiply(traj.learning_rate * fo_moment_corrected / 
-                                               (np.sqrt(so_moment_corrected) + self.delta), gradient)
+        self.current_individual += traj.learning_rate * fo_moment_corrected / \
+                                   (np.sqrt(so_moment_corrected) + self.delta)
 
     def stochastic_gd_update(self, traj, gradient):
         u"""

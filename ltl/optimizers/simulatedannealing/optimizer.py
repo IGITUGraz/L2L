@@ -270,6 +270,8 @@ class SimulatedAnnealingOptimizer(Optimizer):
             self.eval_pop.append(new_individual)
 
         logger.debug(u"Current best fitness within population is %.2f", max(self.current_fitness_value_list))
+        logger.info('  Average Fitness: %.4f', np.mean(weighted_fitness_list))
+        logger.info('  Best Fitness: %.4f', np.max(weighted_fitness_list))
 
         traj.v_idx = -1  # set the trajectory back to default
         logger.info(u"-- End of generation {} --".format(self.g))
