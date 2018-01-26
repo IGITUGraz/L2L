@@ -13,6 +13,7 @@ logger = logging.getLogger(u"optimizers.evolutionstrategies")
 
 EvolutionStrategiesParameters = namedtuple(u'EvolutionStrategiesParameters', [
     u'learning_rate',
+    u'learning_rate_decay',
     u'noise_std',
     u'mirrored_sampling_enabled',
     u'fitness_shaping_enabled',
@@ -114,6 +115,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
 
         # The following parameters are recorded
         traj.f_add_parameter(u'learning_rate', parameters.learning_rate, comment=u'Learning rate')
+        traj.f_add_parameter('learning_rate_decay', parameters.learning_rate_decay, comment='Learning rate decay')
         traj.f_add_parameter(u'noise_std', parameters.noise_std, comment=u'Standard deviation of noise')
         traj.f_add_parameter(
             u'mirrored_sampling_enabled',
@@ -130,6 +132,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
             u'seed', np.uint32(parameters.seed), comment=u'Seed used for random number generation in optimizer')
 
         self.random_state = np.random.RandomState(traj.parameters.seed)
+        self.learning_rate = parameters.learning_rate
 
         self.current_individual_arr, self.optimizee_individual_dict_spec = dict_to_list(
             self.optimizee_create_individual(), get_dict_spec=True)
@@ -197,6 +200,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
 
         n_iteration, stop_criterion, learning_rate, noise_std, fitness_shaping_enabled = \
             traj.n_iteration, traj.stop_criterion, traj.learning_rate, traj.noise_std, traj.fitness_shaping_enabled
+        learning_rate_decay = traj.learning_rate_decay
 
         fitnesses_results = fitnesses_results[-self.pop_size:]
 
@@ -288,9 +292,10 @@ class EvolutionStrategiesOptimizer(Optimizer):
 
         assert len(fitnesses_to_fit) == len(sorted_perturbations)
 
-        self.current_individual_arr += learning_rate \
+        self.current_individual_arr += self.learning_rate \
                                        * np.sum([f * e for f, e in izip(fitnesses_to_fit, sorted_perturbations)], axis=0) \
                                        / (len(fitnesses_to_fit) * noise_std ** 2)
+        self.learning_rate *= learning_rate_decay
 
         #**************************************************************************************************************
         # Create the next generation by sampling the inferred distribution
