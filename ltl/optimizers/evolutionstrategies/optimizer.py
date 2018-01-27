@@ -292,7 +292,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
 
         assert len(fitnesses_to_fit) == len(sorted_perturbations)
 
-        update += self.learning_rate * np.sum(
+        update = self.learning_rate * np.sum(
                 [f * e for f, e in izip(fitnesses_to_fit, sorted_perturbations)], axis=0) / (
                         len(fitnesses_to_fit) * noise_std ** 2)
         self.current_individual_arr += update
