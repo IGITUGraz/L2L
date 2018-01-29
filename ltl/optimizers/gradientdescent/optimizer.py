@@ -274,7 +274,7 @@ class GradientDescentOptimizer(Optimizer):
             ]
             if self.optimizee_bounding_func is not None:
                 new_individual_list = [self.optimizee_bounding_func(ind) for ind in new_individual_list]
-            for _ in range(traj.n_random_steps):
+            for _ in range(self.num_eval):
                 new_individual_list.append(current_individual_dict)
 
             fitnesses_results = []

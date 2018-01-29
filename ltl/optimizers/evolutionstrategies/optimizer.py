@@ -154,6 +154,8 @@ class EvolutionStrategiesOptimizer(Optimizer):
         # The following parameters are recorded as generation parameters i.e. once per generation
         self.g = 0  # the current generation
         self.pop_size = parameters.pop_size  # Population size is dynamic in FACE
+        if parameters.mirrored_sampling_enabled:
+            self.pop_size *= 2
         self.best_fitness_in_run = -np.inf
         self.best_individual_in_run = None
 

@@ -73,6 +73,7 @@ def run_experiment():
     optimizer_seed = 1234
     parameters = EvolutionStrategiesParameters(
         learning_rate=0.1,
+        learning_rate_decay=.9,
         noise_std=1.0,
         mirrored_sampling_enabled=True,
         fitness_shaping_enabled=True,
