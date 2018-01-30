@@ -204,7 +204,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
             traj.n_iteration, traj.stop_criterion, traj.learning_rate, traj.noise_std, traj.fitness_shaping_enabled
         learning_rate_decay = traj.learning_rate_decay
 
-        fitnesses_results = fitnesses_results[-self.pop_size:]
+        fitnesses_results = fitnesses_results[-self.pop_size - 1:]
 
         weighted_fitness_list = []
         #**************************************************************************************************************
