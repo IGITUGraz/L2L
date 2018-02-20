@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: python:3.5
+      - image: python:2.7
     working_directory: /home/ubuntu/cci-test
     steps:
       - checkout
