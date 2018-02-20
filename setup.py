@@ -26,6 +26,7 @@ def get_requirements(filename):
             dependency_links.append(req)
     return requirements, dependency_links
 
+
 requirements, dependency_links = get_requirements(u'requirements.txt')
 setup(
     name=u"Learning to Learn",
