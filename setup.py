@@ -21,7 +21,7 @@ def get_requirements(filename):
     for i, req in enumerate(requirements):
         if ':' in req:
             match_obj = re.match(r"git\+(?:https|ssh|http):.*#egg=(\w+)-(.*)", req)
-            assert match_obj, "Cannot make sence of url {}".format(req)
+            assert match_obj, "Cannot make sense of url {}".format(req)
             requirements[i] = "{req}=={ver}".format(req=match_obj.group(1), ver=match_obj.group(2))
             dependency_links.append(req)
     return requirements, dependency_links
