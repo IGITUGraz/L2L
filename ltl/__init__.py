@@ -9,7 +9,6 @@ from collections import Iterable, Mapping
 from numbers import Integral, Real
 from timeit import default_timer as timer
 
-import numpy as np
 
 __author__ = 'anand'
 
@@ -208,6 +207,8 @@ def dict_to_list(input_dict, get_dict_spec=False):
     :returns: The list representing the contents of the dict. If get_dict_spec is True, the dict
       specification is also returned. Note that the keys are always sorted ascendingly by name
     """
+    import numpy as np
+
     return_list = []
     dict_items = sorted(input_dict.items())
     dict_spec = []
@@ -241,6 +242,8 @@ def list_to_dict(input_list, dict_spec):
         of individual elements are preserved, the types of the iterables inside which they reside are not.
         :func:`.list_to_dict` creates all iterables as numpy arrays.
     """
+    import numpy as np
+
     cursor = 0
     return_dict = {}
     for dict_entry in dict_spec:
@@ -302,6 +305,8 @@ def convert_dict_to_numpy(input_dict):
 
     :returns: The converted output dictionary
     """
+    import numpy as np
+
     output_dict = {}
     for key, value in input_dict.items():
         if isinstance(value, Iterable) and not isinstance(value, str):
