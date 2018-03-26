@@ -69,3 +69,5 @@ bin/path.conf
 
 # Some files that are generated during testing
 /*.png
+
+tags
