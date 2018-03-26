@@ -23,7 +23,7 @@ class Optimizer:
         maximizing. By default, the `Optimizer` maximizes all fitness dimensions.
 
     :param parameters: A named tuple containing the parameters for the Optimizer class
-    
+
     """
 
     def __init__(self, traj,
@@ -45,15 +45,6 @@ class Optimizer:
         self.g = None
         #: The population (i.e. list of individuals) to be evaluated at the next iteration
         self.eval_pop = None
-
-    def get_params(self):
-        """
-        Get the important parameters of the optimizer. This is used by :class:`ltl.recorder`
-        for recording the optimizee parameters.
-
-        :return: a :class:`dict`
-        """
-        pass
 
     def post_process(self, traj, fitnesses_results):
         """
@@ -79,11 +70,11 @@ class Optimizer:
     def end(self, traj):
         """
         Run any code required to clean-up, print final individuals etc.
-        
+
         :param  ~pypet.trajectory.Trajectory traj: The :mod:`pypet` trajectory that contains the parameters and the
             individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.
             param1 is accessible using `traj.param1`
-            
+
         """
         pass
 

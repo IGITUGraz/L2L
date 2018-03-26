@@ -236,13 +236,16 @@ See the class documentation for more details: :class:`~ltl.optimizees.optimizee.
 Optimizer
 ~~~~~~~~~
 
-The optimizer subclasses :class:`~ltl.optimizers.optimizer.Optimizer` with a class that contains three mandatory methods:
+The optimizer subclasses :class:`~ltl.optimizers.optimizer.Optimizer` with a class that contains two mandatory methods:
 
 1. :meth:`~ltl.optimizers.optimizer.Optimizer.__init__`: This is the constructor which performs the duties of
    initializing the trajectory and the initial generation_ of the simulation.
 2. :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` : knowing the fitness for the current parameters, it
    generates a new set of parameters and runs the next batch of simulations.
-3. :meth:`~ltl.optimizers.optimizer.Optimizer.end` : Tertiary method to do cleanup, printing results etc.
+
+And one optional method:
+
+1. :meth:`~ltl.optimizers.optimizer.Optimizer.end` : Tertiary method to do cleanup, printing results etc.
 
 Note that in order to maintain a consistent framework for communication between the optimizer, optimizee, and
 :ref:`PyPet <Pypet-Section>`, we enforce a certain protocol for the above function. The details of this protocol
@@ -317,25 +320,6 @@ To run a LTL simulation, copy the file :file:`bin/ltl-template.py` (see :doc:`lt
 initialization of the appropriate `Optimizers` and `Optimizees`. The rest of the code should be left in place for
 logging, recording and PyPet. See the source of :file:`bin/ltl-template.py` for more details.
 
-.. .. _recording:
-.. Recording an LTL Simulation
-.. ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. Recorder enables user to record the results of the simulation in form of .md file which is then
-.. ready to publish.
-..
-.. To implement the ability for recording the results, the user creates an instance of
-.. :class:`~ltl.recorder.Recorder` and calls :meth:`~ltl.recorder.Recorder.start`.
-.. At the end of the simulation the user calls :meth:`~ltl.recorder.Recorder.end`
-.. method which is responsible for generating the details of the simulated session.
-..
-.. To enable the recorder functionality the simulation is run as following (for some arbitrary
-.. bin/ltl-example simulation)::
-..
-..   `python3 bin/ltl-example.py --record-experiment --username <username> --description <one_line_description>`
-..
-.. If the `bin/ltl-example.py` provides the recording functionality, you should be able to find a `result_details.md`
-.. file in the "results/<optimizer_name>-<benchmark_name>-<dd-mm-yyyy--hh-MM-ss>" together with .yaml files representing
-.. additional experiment info. The results should then be checked in to the master-branch.
 
 Parameter Bounding
 ~~~~~~~~~~~~~~~~~~
@@ -354,15 +338,13 @@ Bounding Function:
   of clipping or normalization. Both the :class:`~.FunctionGeneratorOptimizee` and the
   :class:`~.MNISTOptimizee` implement bounding functions in their classes which may be used in case a
   function is required for bounding.
-
+  NOTE: Remember to un-bound the value in the `Optimizee`'s `simulate` function before using it in your simulation.
 
 Examples
 ********
 
-* See :class:`~.FunctionGeneratorOptimizee` for an example of an `Optimizee` (based on simple
-  function minimization).
-* See :class:`~.SimulatedAnnealingOptimizer` for an example of an
-  implementation of simulated annealing `Optimizer`.
+* See :class:`~.FunctionGeneratorOptimizee` for an example of an `Optimizee` (based on simple function minimization).
+* See :class:`~.SimulatedAnnealingOptimizer` for an example of an implementation of simulated annealing `Optimizer`.
 * See :ref:`ltl-experiments` for an example implementation of an LTL experiment with an arbitrary `Optimizee` and `Optimizer`.
 
 
@@ -372,7 +354,7 @@ Data postprocessing
 *******************
 
 Having run the simulation, the next superpower required is the ability to make sense of all the data that we've dumped
-into the trajectory and (consequently) the HDF file. Of course you could use the functions that pypet provides for this
+into the trajectory and (consequently) the HDF5 file. Of course you could use the functions that pypet provides for this
 purpose but the complexity of the interface is rather discouraging. Therefore to cover the most common cases (In fact, I
 really haven't YET come across any other cases), We have created the :mod:`~ltl.dataprocessing` with the relevant
 functions. Look up the documentation of the module for further details.
@@ -418,7 +400,7 @@ Logging
     logging. See the module documentation for more details.
 
 3.  As far as using loggers is concerned, the convention is one logger per file. The name of the logger should reflect
-    module heirarcy. For example, the logger used in the file `optimizers/crossentropy/optimizer.py` is named
+    module hierarchy. For example, the logger used in the file `optimizers/crossentropy/optimizer.py` is named
     ``'optimizers.crossentropy'``
 
 4.  A logger is uniquely identified by its name throughout the python process (i.e. it's kinda like a global variable).

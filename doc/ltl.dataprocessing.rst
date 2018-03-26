@@ -4,7 +4,7 @@ Data Processing Utility Functions
 The following Utility functions make the following assumptions regarding the storage
 of data in the trajectory.
 
-1.  All the results for each run data is stored under ``'$set.$'``. To clarify, it 
+1.  All the results for each run data is stored under ``'$set.$'``. To clarify, it
     should not be stored under simply ``'$'``.
 
 2.  All generation wise parameters (i.e. parameters that correspond to a particular

@@ -14,14 +14,6 @@ class Optimizee:
         """
         traj.f_add_parameter_group('individual', 'Contains parameters of the optimizee')
 
-    def get_params(self):
-        """
-        Get the important parameters of the optimizee. This is used by :class:`ltl.recorder` for recording the optimizee
-        parameters.
-
-        :return: a :class:`dict`
-        """
-
     def create_individual(self):
         """
         Create one individual i.e. one instance of parameters. This instance must be a dictionary with dot-separated
