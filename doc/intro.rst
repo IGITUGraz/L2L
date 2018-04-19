@@ -209,6 +209,8 @@ following is a contract that must be obeyed by this constructor.
 As an example, if one wanted a parameter named ``sim_control.seed`` to be a part of the trajectory, one would do
 the following.
 
+.. code:: python
+
     traj.individual.f_add_parameter('sim_control.seed', 1010)
 
 If one intends ``sim_control.seed`` to be a parameter over which to explore, the Individual-Dict_ describing an
@@ -332,13 +334,22 @@ accept a bounding-function_ as an argument.
 .. _bounding-function:
 
 Bounding Function:
-
   This is a function that takes as an argument an individual_ of the Optimizee (an Individual-Dict_) and returns an
   individual_ that is a 'bounded' version of the said individual. This bounding may for instance be implemented by means
   of clipping or normalization. Both the :class:`~.FunctionGeneratorOptimizee` and the
   :class:`~.MNISTOptimizee` implement bounding functions in their classes which may be used in case a
   function is required for bounding.
-  NOTE: Remember to un-bound the value in the `Optimizee`'s `simulate` function before using it in your simulation.
+
+Important Notes about Bounding
+------------------------------
+
+* If you're scaling/normalizing the value in `bounding_func`, remember to un-scale the value in the `Optimizee`'s 
+  `simulate` function before using it in your simulation.
+* A useful strategy that allows for an easy choice of `Optimizer` hyper-parameters would be to have the `Optimizer`
+  see *only* values within a certain range e.g. [0, 1].
+  For this, in the `create_individual` would scale the parameters and return values between [0, 1] which are used by
+  the `Optimizer`. The `simulate` function  would un-scale the value the `Optimizer` provides to the original range 
+  of the parameters. And the `bounding_func` would only clip the values to be between [0, 1] and do NO scaling.
 
 Examples
 ********
