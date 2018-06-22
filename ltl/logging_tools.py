@@ -1,8 +1,6 @@
 import os
 import logging
 import logging.config
-import scoop
-import scoop.shared
 import socket
 import copy
 
@@ -41,19 +39,14 @@ def create_shared_logger_data(logger_names, log_levels, log_to_consoles,
 
     log_to_consoles = [bool(x) for x in log_to_consoles]
 
-    if scoop.IS_RUNNING:
-        assert scoop.IS_ORIGIN, \
-            "create_shared_logger_data must be called only on the origin worker"
-        scoop.shared.setConst(logger_names=logger_names, log_levels=log_levels,
-                              sim_name=sim_name, log_directory=log_directory, log_to_consoles=log_to_consoles)
-    else:
-        global logger_names_global, log_levels_global, log_to_consoles_global
-        global sim_name_global, log_directory_global
-        logger_names_global = logger_names
-        log_levels_global = log_levels
-        log_to_consoles_global = log_to_consoles
-        sim_name_global = sim_name
-        log_directory_global = log_directory
+
+    global logger_names_global, log_levels_global, log_to_consoles_global
+    global sim_name_global, log_directory_global
+    logger_names_global = logger_names
+    log_levels_global = log_levels
+    log_to_consoles_global = log_to_consoles
+    sim_name_global = sim_name
+    log_directory_global = log_directory
 
 
 def configure_loggers(exactly_once=False):
@@ -78,27 +71,16 @@ def configure_loggers(exactly_once=False):
     if exactly_once and configure_loggers._already_configured:
         return
 
-    if scoop.IS_RUNNING:
-        # Get shared data from scoop and perform the relevant configuration
-        logger_names = scoop.shared.getConst('logger_names', timeout=1.0)
-        log_levels = scoop.shared.getConst('log_levels', timeout=1.0)
-        log_to_consoles = scoop.shared.getConst('log_to_consoles', timeout=1.0)
-        sim_name = scoop.shared.getConst('sim_name', timeout=1.0)
-        log_directory = scoop.shared.getConst('log_directory', timeout=1.0)
-        if logger_names is None:
-            return
-    else:
-        # Get logger data from global variables and perform the relevant thing
-        logger_names = logger_names_global
-        log_levels = log_levels_global
-        log_to_consoles = log_to_consoles_global
-        sim_name = sim_name_global
-        log_directory = log_directory_global
+    # Scoop logging has been removed, as JUBE takes care of the logging of each iteration
+    # Get logger data from global variables and perform the relevant thing
+    logger_names = logger_names_global
+    log_levels = log_levels_global
+    log_to_consoles = log_to_consoles_global
+    sim_name = sim_name_global
+    log_directory = log_directory_global
 
-    if scoop.IS_RUNNING and not scoop.IS_ORIGIN:
-        file_name_prefix = '%s_%s_%s_' % (sim_name, socket.gethostname(), os.getpid())
-    else:
-        file_name_prefix = '%s_' % (sim_name,)
+
+    file_name_prefix = '%s_' % (sim_name,)
 
     config_dict_copy = copy.deepcopy(configure_loggers.basic_config_dict)
 
