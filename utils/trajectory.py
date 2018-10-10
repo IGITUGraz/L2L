@@ -10,6 +10,7 @@ class Trajectory:
     """
     The trajectory is a class which holds the history of the parameter space exploration, defines the current
     parameters to be explored and holds the results from each execution.
+    Based on the pypet trajectory concept: https://github.com/SmokinCaterpillar/pypet
     """
 
     def __init__(self, **keyword_args):
@@ -22,12 +23,6 @@ class Trajectory:
         self._timestamp = time.time()
         self._parameters = ParameterDict(self)  # Contains all parameters
         self._results = {}  # Contains all results
-        # self._derived_parameters = {}  # Contains all derived parameters
-        # self._explored_parameters = {}  # Contains all explored parameters, even when they are not
-        #  self._config = {}  # Contains all config parameters
-        # self._run_information = {}
-        # self._id = 0
-        # self._run_started = False  # For manually using a trajectory
         self.individual = Individual()
         self.results = ResultGroup()
         self.results.f_add_result_group('all_results', "Contains all the results")
@@ -37,7 +32,7 @@ class Trajectory:
         self.individuals = {}
         self.v_idx = 0
 
-    def f_add_parameter_group(self, name, comment):
+    def f_add_parameter_group(self, name, comment=""):
         """
         Adds a new parameter group
         :param name: name of the new parameter group
@@ -61,7 +56,7 @@ class Trajectory:
             # LOG("Key not found when adding to result group")
             raise Exception("Group name not found when adding value to result group")
 
-    def f_add_result(self,key, val):
+    def f_add_result(self,key, val, comment=""):
         """
         Adds a result to the trajectory
         :param key: it identifies either a generation params result group or another result
@@ -78,10 +73,18 @@ class Trajectory:
         Adds a parameter to the trajectory
         :param key: Name of the parameter
         :param val: Value of the parameter
-        :param comment:
-        :return:
+        :param comment
         """
         self._parameters[key] = val
+
+    def f_add_derived_parameter(self, key, val, comment=""):
+        """
+        Adds a derived parameter to the trajectory. Match the previous pypet interface.
+        :param key: Name of the parameter
+        :param val: Value of the parameter
+        :param comment:
+        """
+        self.f_add_parameter(key,val,comment)
 
     def f_expand(self, build_dict, fail_safe=True):
         """

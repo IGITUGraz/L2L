@@ -2,8 +2,6 @@ numpy
 scipy
 pyyaml
 matplotlib
-git+https://github.com/IGITUGraz/scoop.git@v0.7.2.0-dev8#egg=scoop-0.7.2.0-dev8
-git+https://github.com/IGITUGraz/pypet.git@v0.4.1-r1#egg=pypet-0.4.1-r1
 sphinx
 sphinxjp.themes.basicstrap
 sklearn

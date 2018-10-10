@@ -9,7 +9,8 @@ class Environment:
     """
     The Environment class takes the place of the pypet Environment and provides the required functionality
     to execute the inner loop. This means it uses either JUBE or sequential calls in order to execute all
-    individuals in a generation.
+    individuals in a generation. 
+    Based on the pypet environment concept: https://github.com/SmokinCaterpillar/pypet
     """
 
     def __init__(self, *args, **keyword_args):
