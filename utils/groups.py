@@ -48,7 +48,7 @@ class ResultGroup(sdictm):
         """
         self._data[name] = ResultGroup()
 
-    def f_add_result(self,key, val):
+    def f_add_result(self,key, val, comment = ""):
         """
         Adds a result in a result group. The name of the result group precedes the name of the result name and
         they are split by a . (dot)
@@ -68,7 +68,7 @@ class ResultGroup(sdictm):
         else:
             self._data[key] = val
 
-    def f_add_result_to_group(self, group_name, key, val):
+    def f_add_result_to_group(self, group_name, key, val, comment = ""):
         """
         Adds a result in a group.
         :param group_name: name of the group

@@ -40,10 +40,7 @@ def main():
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,
-                      # freeze_input=True,
-                      # multiproc=True,
-                      # use_scoop=True,
-                      # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
+                      multiproc=True,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
                       )

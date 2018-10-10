@@ -2,9 +2,7 @@ import logging.config
 import os
 
 import numpy as np
-#from pypet import Environment
 from utils.environment import Environment
-from pypet import pypetconstants
 
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
@@ -47,8 +45,6 @@ def main():
                       add_time=True,
                       freeze_input=True,
                       multiproc=True,
-                      use_scoop=True,
-                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
                       )

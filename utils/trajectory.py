@@ -130,7 +130,7 @@ class Trajectory:
             ret = self._parameters.get(attrs[0])
             for at in attrs[1:]:
                 ret = ret[at]
-        elif attr == 'par':
+        elif attr == 'par' or attr == 'parameters':
             ret = self._parameters
         else:
             ret = self._parameters.get(attr,default_value=None)
