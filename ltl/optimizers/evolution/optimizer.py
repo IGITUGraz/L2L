@@ -56,7 +56,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         traj.f_add_parameter('popsize', parameters.popsize, comment='Population size')  # 185
         traj.f_add_parameter('CXPB', parameters.CXPB, comment='Crossover term')
         traj.f_add_parameter('MUTPB', parameters.MUTPB, comment='Mutation probability')
-        traj.f_add_parameter('NGEN', parameters.NGEN, comment='Number of generations')
+        traj.f_add_parameter('n_iteration', parameters.NGEN, comment='Number of generations')
 
         traj.f_add_parameter('indpb', parameters.indpb, comment='Mutation parameter')
         traj.f_add_parameter('tournsize', parameters.tournsize, comment='Selection parameter')
@@ -115,24 +115,27 @@ class GeneticAlgorithmOptimizer(Optimizer):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
         """
-        CXPB, MUTPB, NGEN = traj.CXPB, traj.MUTPB, traj.NGEN
+        CXPB, MUTPB, NGEN = traj.CXPB, traj.MUTPB, traj.n_iteration
 
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
-        while fitnesses_results:
-            result = fitnesses_results.pop()
-            # Update fitness
-            run_index, fitness = result  # The environment returns tuples: [(run_idx, run), ...]
+
+        #**************************************************************************************************************
+        # Storing run-information in the trajectory
+        # Reading fitnesses and performing distribution update
+        #**************************************************************************************************************
+        for run_index, fitness in fitnesses_results:
             # We need to convert the current run index into an ind_idx
             # (index of individual within one generation)
             traj.v_idx = run_index
             ind_index = traj.par.ind_idx
+
+            traj.f_add_result('$set.$.individual', self.eval_pop[ind_index])
+            traj.f_add_result('$set.$.fitness', fitness)
+
             # Use the ind_idx to update the fitness
             individual = self.eval_pop_inds[ind_index]
             individual.fitness.values = fitness
 
-            # Record
-            traj.f_add_result('$set.$.individual', self.eval_pop[ind_index])
-            traj.f_add_result('$set.$.fitness', individual.fitness.values)
 
         traj.v_idx = -1  # set the trajectory back to default
 
@@ -185,6 +188,14 @@ class GeneticAlgorithmOptimizer(Optimizer):
 
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
+
+    def get_params(self):
+        """
+        Get parameters used for recorder
+        :return: Dictionary containing recorder parameters
+        """
+        param_dict = {}
+        return param_dict
 
     def end(self):
         """
