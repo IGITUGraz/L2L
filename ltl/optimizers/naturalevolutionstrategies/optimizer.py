@@ -73,13 +73,8 @@ class NaturalEvolutionStrategiesOptimizer(Optimizer):
 
         where k and i are the indices of the individuals in descending order of fitness F_i
 
-
-    NOTE: This expects all parameters of the system to be of numpy.float64. Note that this irritating
-    restriction on the kind of floating point type rewired is put in place due to PyPet's crankiness
-    regarding types.
-
-    :param  ~pypet.trajectory.Trajectory traj:
-      Use this pypet trajectory to store the parameters of the specific runs. The parameters should be
+    :param  ~utils.trajectory.Trajectory traj:
+      Use this trajectory to store the parameters of the specific runs. The parameters should be
       initialized based on the values in `parameters`
 
     :param optimizee_create_individual:

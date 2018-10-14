@@ -78,8 +78,8 @@ class GradientDescentOptimizer(Optimizer):
 
     NOTE: This expects all parameters of the system to be of floating point
 
-    :param  ~pypet.trajectory.Trajectory traj:
-      Use this pypet trajectory to store the parameters of the specific runs. The parameters should be
+    :param  ~utils.trajectory.Trajectory traj:
+      Use this trajectory to store the parameters of the specific runs. The parameters should be
       initialized based on the values in `parameters`
     
     :param optimizee_create_individual:
@@ -278,7 +278,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         Classic Gradient Descent specific initializiation.
 
-        :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory on which the parameters should get stored.
+        :param ~utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.
 
         :return:
         """
@@ -288,7 +288,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         RMSProp specific initializiation.
 
-        :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory on which the parameters should get stored.
+        :param ~utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.
 
         :return:
         """
@@ -305,7 +305,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         ADAM specific initializiation.
 
-        :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory on which the parameters should get stored.
+        :param ~utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.
 
         :return:
         """
@@ -325,7 +325,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         Stochastic Gradient Descent specific initializiation.
 
-        :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory on which the parameters should get stored.
+        :param ~utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.
 
         :return:
         """
@@ -340,7 +340,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         Updates the current individual using the classic Gradient Descent algorithm.
 
-        :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory which contains the parameters 
+        :param ~utils.trajectory.Trajectory traj: The  trajectory which contains the parameters 
             required by the update algorithm
 
         :param ~numpy.ndarray gradient: The gradient of the fitness curve, evaluated at the current individual
@@ -353,7 +353,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         Updates the current individual using the RMSProp algorithm.
 
-        :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory which contains the parameters 
+        :param ~utils.trajectory.Trajectory traj: The  trajectory which contains the parameters 
             required by the update algorithm
 
         :param ~numpy.ndarray gradient: The gradient of the fitness curve, evaluated at the current individual
@@ -370,7 +370,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         Updates the current individual using the ADAM algorithm.
 
-        :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory which contains the parameters 
+        :param ~utils.trajectory.Trajectory traj: The  trajectory which contains the parameters 
             required by the update algorithm
 
         :param ~numpy.ndarray gradient: The gradient of the fitness curve, evaluated at the current individual
@@ -392,7 +392,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         Updates the current individual using a stochastic version of the gradient descent algorithm.
 
-        :param ~pypet.trajectory.Trajectory traj: The :mod:'pypet' trajectory which contains the parameters 
+        :param ~utils.trajectory.Trajectory traj: The  trajectory which contains the parameters 
             required by the update algorithm
 
         :param ~numpy.ndarray gradient: The gradient of the fitness curve, evaluated at the current individual

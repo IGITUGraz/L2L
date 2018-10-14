@@ -44,7 +44,7 @@ class GridSearchOptimizer(Optimizer):
         combinations into 10000 small `Individual-Dict`s and storing into eval_pop only to join them and call
         `traj.f_expand()` in :meth:`.Optimizer._expand_trajectory()`)
 
-    :param  ~pypet.trajectory.Trajectory traj: Use this pypet trajectory to store the parameters of the specific runs.
+    :param  ~utils.trajectory.Trajectory traj: Use this trajectory to store the parameters of the specific runs.
         The parameters should be initialized based on the values in `parameters`
 
     :param optimizee_create_individual: A function which when called returns one instance of parameter (or "individual")

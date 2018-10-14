@@ -131,8 +131,8 @@ class ParallelTemperingOptimizer(Optimizer):
         
     NOTE: This expects all parameters of the system to be of floating point
 
-    :param  ~pypet.trajectory.Trajectory traj:
-      Use this pypet trajectory to store the parameters of the specific runs. The parameters should be
+    :param  ~utils.trajectory.Trajectory traj:
+      Use this trajectory to store the parameters of the specific runs. The parameters should be
       initialized based on the values in `parameters`
     
     :param optimizee_create_individual:

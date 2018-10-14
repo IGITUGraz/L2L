@@ -24,20 +24,11 @@ class Optimizee:
         :return dict: A dictionary containing the names of the parameters and their values
         """
 
-    def bounding_func(self, individual):
-        """
-        Bounds the individual within the required bounds via coordinate clipping
-
-        :param individual:
-
-        :return dict: A dictionary in the same format as :meth:`~.Optimizee.create_individual`, with the values clipped as needed.
-        """
-
     def simulate(self, traj):
         """
         This is the primary function that does the simulation for the given parameter given (within :obj:`traj`)
 
-        :param  ~pypet.trajectory.Trajectory traj: The :mod:`pypet` trajectory that contains the parameters and the
+        :param  ~utils.trajectory.Trajectory traj: The trajectory that contains the parameters and the
             individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.
             param1 is accessible using `traj.param1`
 
