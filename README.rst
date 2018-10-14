@@ -21,7 +21,7 @@ automatically installs all requirements). See the `wiki <https://github.com/IGIT
 Optimizees>`_ for more details on how to write a new optimizee.
 
 
-Documentation is available at `<https://igitugraz.github.io/ltl/>`_.
+Documentation is available at `<https://igitugraz.github.io/LTL/>`_.
 
 
 Installing the LTL Package
