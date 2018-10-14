@@ -41,6 +41,7 @@
     <script type="text/javascript" src="_static/js/jquery.min.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/bootstrap3.min.js"></script>
 <script type="text/javascript" src="_static/js/jquery.cookie.min.js"></script>
 <script type="text/javascript" src="_static/js/basicstrap.js"></script>
@@ -121,7 +122,7 @@
          
 <div class="col-md-3 hidden-xs" id="sidebar-wrapper">
   <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
-<h3><a href="index.html">Table Of Contents</a></h3>
+<h3><a href="index.html">Table of Contents</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Overview</a></li>
@@ -201,7 +202,7 @@
 <dl class="class">
 <dt id="ltl.optimizers.gridsearch.optimizer.GridSearchOptimizer">
 <em class="property">class </em><code class="descclassname">ltl.optimizers.gridsearch.optimizer.</code><code class="descname">GridSearchOptimizer</code><span class="sig-paren">(</span><em>traj</em>, <em>optimizee_create_individual</em>, <em>optimizee_fitness_weights</em>, <em>parameters</em>, <em>optimizee_bounding_func=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl/optimizers/gridsearch/optimizer.html#GridSearchOptimizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.optimizers.gridsearch.optimizer.GridSearchOptimizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer" title="ltl.optimizers.optimizer.Optimizer"><code class="xref py py-class docutils literal"><span class="pre">ltl.optimizers.optimizer.Optimizer</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer" title="ltl.optimizers.optimizer.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ltl.optimizers.optimizer.Optimizer</span></code></a></p>
 <p>This class implements a basic grid search optimizer. It runs the optimizee on a given grid of parameter values and
 returns the best fitness found. moreover, this can also simply be used to run a grid search and process the results
 stored in the traj in any manner desired.</p>
@@ -209,12 +210,12 @@ stored in the traj in any manner desired.</p>
 <ol class="arabic simple">
 <li>This algorithm does not do any kind of adaptive searching and thus the concept of generations does not apply
 per se. That said, it is currently implemented as a series of runs in a single generation. All of these runs
-are declared in the constructor itself. The <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal"><span class="pre">Optimizer.post_process()</span></code></a> function simply prints the
+are declared in the constructor itself. The <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Optimizer.post_process()</span></code></a> function simply prints the
 individual with the maximal fitness.</li>
-<li>This algorithm doesnt make use of self.eval_pop and <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer._expand_trajectory" title="ltl.optimizers.optimizer.Optimizer._expand_trajectory"><code class="xref py py-meth docutils literal"><span class="pre">Optimizer._expand_trajectory()</span></code></a> simply because the
+<li>This algorithm doesnt make use of self.eval_pop and <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer._expand_trajectory" title="ltl.optimizers.optimizer.Optimizer._expand_trajectory"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Optimizer._expand_trajectory()</span></code></a> simply because the
 cartesian product can be used more efficiently directly. (Imagine having to split a dict of 10000 parameter
 combinations into 10000 small <cite>Individual-Dict`s and storing into eval_pop only to join them and call
-`traj.f_expand()</cite> in <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer._expand_trajectory" title="ltl.optimizers.optimizer.Optimizer._expand_trajectory"><code class="xref py py-meth docutils literal"><span class="pre">Optimizer._expand_trajectory()</span></code></a>)</li>
+`traj.f_expand()</cite> in <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer._expand_trajectory" title="ltl.optimizers.optimizer.Optimizer._expand_trajectory"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Optimizer._expand_trajectory()</span></code></a>)</li>
 </ol>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -225,10 +226,10 @@ combinations into 10000 small <cite>Individual-Dict`s and storing into eval_pop 
 The parameters should be initialized based on the values in <cite>parameters</cite></li>
 <li><strong>optimizee_create_individual</strong> – A function which when called returns one instance of parameter (or “individual”)</li>
 <li><strong>optimizee_fitness_weights</strong> – The weights which should be multiplied with the fitness returned from the
-<a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee" title="ltl.optimizees.optimizee.Optimizee"><code class="xref py py-class docutils literal"><span class="pre">Optimizee</span></code></a> – one for each element of the fitness (fitness can be
+<a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee" title="ltl.optimizees.optimizee.Optimizee"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizee</span></code></a> – one for each element of the fitness (fitness can be
 multi-dimensional). If some element is negative, the Optimizer minimizes that element of fitness instead of
 maximizing. By default, the <cite>Optimizer</cite> maximizes all fitness dimensions.</li>
-<li><strong>parameters</strong> – An instance of <a class="reference internal" href="#ltl.optimizers.gridsearch.optimizer.GridSearchParameters" title="ltl.optimizers.gridsearch.optimizer.GridSearchParameters"><code class="xref py py-class docutils literal"><span class="pre">GridSearchParameters</span></code></a></li>
+<li><strong>parameters</strong> – An instance of <a class="reference internal" href="#ltl.optimizers.gridsearch.optimizer.GridSearchParameters" title="ltl.optimizers.gridsearch.optimizer.GridSearchParameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridSearchParameters</span></code></a></li>
 <li><strong>optimizee_bounding_func</strong> – A function that returns the bound (between some limits) value of an individual</li>
 </ul>
 </td>
@@ -275,20 +276,20 @@ does not expand the trajectory. It also stores any relevant results</p>
 <dl class="class">
 <dt id="ltl.optimizers.gridsearch.optimizer.GridSearchParameters">
 <em class="property">class </em><code class="descclassname">ltl.optimizers.gridsearch.optimizer.</code><code class="descname">GridSearchParameters</code><a class="headerlink" href="#ltl.optimizers.gridsearch.optimizer.GridSearchParameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dict</strong> (<a class="reference internal" href="#ltl.optimizers.gridsearch.optimizer.GridSearchParameters.param_grid" title="ltl.optimizers.gridsearch.optimizer.GridSearchParameters.param_grid"><em>param_grid</em></a>) – <p>This is the data structure specifying the grid over which to search. This should be a
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dict</strong> (<em>param_grid</em>) – <p>This is the data structure specifying the grid over which to search. This should be a
 dictionary as follows:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">optimizee_param_grid</span><span class="p">[</span><span class="s1">&#39;param_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">lower_bound</span><span class="p">,</span> <span class="n">higher_bound</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">optimizee_param_grid</span><span class="p">[</span><span class="s1">&#39;param_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">lower_bound</span><span class="p">,</span> <span class="n">higher_bound</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Where the interval <cite>[lower_bound, upper_bound]</cite> is divided into <cite>n_steps</cite> intervals thereby providing
 <cite>n_steps + 1</cite> points for the grid.</p>
 <p>Note that there must be as many keys as there are in the <cite>Individual-Dict</cite> returned by the function
-<a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.create_individual" title="ltl.optimizees.optimizee.Optimizee.create_individual"><code class="xref py py-meth docutils literal"><span class="pre">Optimizee.create_individual()</span></code></a>. Also, if any of the parameters of the individuals is an array, then the above
+<a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.create_individual" title="ltl.optimizees.optimizee.Optimizee.create_individual"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Optimizee.create_individual()</span></code></a>. Also, if any of the parameters of the individuals is an array, then the above
 grid specification applies to each element of the array.</p>
 </td>
 </tr>
@@ -339,7 +340,7 @@ grid specification applies to each element of the array.</p>
       <!-- footer -->
       <footer role="contentinfo">
           &copy; Copyright 2017, Anand Subramoney.
-        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.2.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1.
       </footer>
       <!-- /footer -->
 

@@ -41,6 +41,7 @@
     <script type="text/javascript" src="_static/js/jquery.min.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/bootstrap3.min.js"></script>
 <script type="text/javascript" src="_static/js/jquery.cookie.min.js"></script>
 <script type="text/javascript" src="_static/js/basicstrap.js"></script>
@@ -121,7 +122,7 @@
          
 <div class="col-md-3 hidden-xs" id="sidebar-wrapper">
   <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
-<h3><a href="index.html">Table Of Contents</a></h3>
+<h3><a href="index.html">Table of Contents</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Overview</a></li>
@@ -196,7 +197,7 @@
 <dl class="class">
 <dt id="ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee">
 <em class="property">class </em><code class="descclassname">ltl.optimizees.functions.optimizee.</code><code class="descname">FunctionGeneratorOptimizee</code><span class="sig-paren">(</span><em>traj</em>, <em>fg_instance</em>, <em>seed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl/optimizees/functions/optimizee.html#FunctionGeneratorOptimizee"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee" title="ltl.optimizees.optimizee.Optimizee"><code class="xref py py-class docutils literal"><span class="pre">ltl.optimizees.optimizee.Optimizee</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee" title="ltl.optimizees.optimizee.Optimizee"><code class="xref py py-class docutils literal notranslate"><span class="pre">ltl.optimizees.optimizee.Optimizee</span></code></a></p>
 <p>Implements a simple function optimizee. Functions are generated using the FunctionGenerator.
 NOTE: Make sure the optimizee_fitness_weights is set to (-1,) to minimize the value of the function</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -208,7 +209,7 @@ NOTE: Make sure the optimizee_fitness_weights is set to (-1,) to minimize the va
 <li><strong>fg_instance</strong> – Instance of the FunctionGenerator class.</li>
 <li><strong>seed</strong> – The random seed used for generation of optimizee individuals. It uses a copy of
 the fg_instance and overrides the random generator using one seeded by <cite>seed</cite>. Note that this
-random generator is also the one used by the <a class="reference internal" href="#ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee" title="ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee"><code class="xref py py-class docutils literal"><span class="pre">FunctionGeneratorOptimizee</span></code></a> itself.
+random generator is also the one used by the <a class="reference internal" href="#ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee" title="ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionGeneratorOptimizee</span></code></a> itself.
 NOTE that this seed is converted to an np.uint32.</li>
 </ul>
 </td>
@@ -218,13 +219,13 @@ NOTE that this seed is converted to an np.uint32.</li>
 <dl class="method">
 <dt id="ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee.get_params">
 <code class="descname">get_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl/optimizees/functions/optimizee.html#FunctionGeneratorOptimizee.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee.get_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the important parameters of the optimizee. This is used by <code class="xref py py-class docutils literal"><span class="pre">ltl.recorder</span></code>
+<dd><p>Get the important parameters of the optimizee. This is used by <code class="xref py py-class docutils literal notranslate"><span class="pre">ltl.recorder</span></code>
 for recording the optimizee parameters.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -252,7 +253,7 @@ for recording the optimizee parameters.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>traj</strong> (<a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory" title="(in pypet v0.4)"><em>Trajectory</em></a>) – Trajectory</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a single element <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-obj docutils literal"><span class="pre">tuple</span></code></a> containing the value of the chosen function</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a single element <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></a> containing the value of the chosen function</td>
 </tr>
 </tbody>
 </table>
@@ -309,7 +310,7 @@ for recording the optimizee parameters.</p>
       <!-- footer -->
       <footer role="contentinfo">
           &copy; Copyright 2017, Anand Subramoney.
-        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.2.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1.
       </footer>
       <!-- /footer -->
 

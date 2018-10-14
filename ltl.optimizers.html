@@ -41,6 +41,7 @@
     <script type="text/javascript" src="_static/js/jquery.min.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/bootstrap3.min.js"></script>
 <script type="text/javascript" src="_static/js/jquery.cookie.min.js"></script>
 <script type="text/javascript" src="_static/js/basicstrap.js"></script>
@@ -120,7 +121,7 @@
          
 <div class="col-md-3 hidden-xs" id="sidebar-wrapper">
   <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
-<h3><a href="index.html">Table Of Contents</a></h3>
+<h3><a href="index.html">Table of Contents</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Overview</a></li>
@@ -206,7 +207,7 @@
 The parameters should be initialized based on the values in :param parameters:</li>
 <li><strong>optimizee_create_individual</strong> – A function which when called returns one instance of parameter (or “individual”)</li>
 <li><strong>optimizee_fitness_weights</strong> – The weights which should be multiplied with the fitness returned from the
-<a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee" title="ltl.optimizees.optimizee.Optimizee"><code class="xref py py-class docutils literal"><span class="pre">Optimizee</span></code></a> – one for each element of the fitness (fitness can be
+<a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee" title="ltl.optimizees.optimizee.Optimizee"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizee</span></code></a> – one for each element of the fitness (fitness can be
 multi-dimensional). If some element is negative, the Optimizer minimizes that element of fitness instead of
 maximizing. By default, the <cite>Optimizer</cite> maximizes all fitness dimensions.</li>
 <li><strong>parameters</strong> – A named tuple containing the parameters for the Optimizer class</li>
@@ -230,20 +231,20 @@ maximizing. By default, the <cite>Optimizer</cite> maximizes all fitness dimensi
 <dl class="method">
 <dt id="ltl.optimizers.optimizer.Optimizer.post_process">
 <code class="descname">post_process</code><span class="sig-paren">(</span><em>traj</em>, <em>fitnesses_results</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl/optimizers/optimizer.html#Optimizer.post_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.optimizers.optimizer.Optimizer.post_process" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is the key function of this class. Given a set of <code class="xref py py-obj docutils literal"><span class="pre">fitnesses_results</span></code>,  and the <code class="xref py py-obj docutils literal"><span class="pre">traj</span></code>, it uses
-the fitness to decide on the next set of parameters to be evaluated. Then it fills the <a class="reference internal" href="#ltl.optimizers.optimizer.Optimizer.eval_pop" title="ltl.optimizers.optimizer.Optimizer.eval_pop"><code class="xref py py-attr docutils literal"><span class="pre">Optimizer.eval_pop</span></code></a> with the
-list of parameters it wants evaluated at the next simulation cycle, increments <a class="reference internal" href="#ltl.optimizers.optimizer.Optimizer.g" title="ltl.optimizers.optimizer.Optimizer.g"><code class="xref py py-attr docutils literal"><span class="pre">Optimizer.g</span></code></a> and calls
-<a class="reference internal" href="#ltl.optimizers.optimizer.Optimizer._expand_trajectory" title="ltl.optimizers.optimizer.Optimizer._expand_trajectory"><code class="xref py py-meth docutils literal"><span class="pre">_expand_trajectory()</span></code></a></p>
+<dd><p>This is the key function of this class. Given a set of <code class="xref py py-obj docutils literal notranslate"><span class="pre">fitnesses_results</span></code>,  and the <code class="xref py py-obj docutils literal notranslate"><span class="pre">traj</span></code>, it uses
+the fitness to decide on the next set of parameters to be evaluated. Then it fills the <a class="reference internal" href="#ltl.optimizers.optimizer.Optimizer.eval_pop" title="ltl.optimizers.optimizer.Optimizer.eval_pop"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Optimizer.eval_pop</span></code></a> with the
+list of parameters it wants evaluated at the next simulation cycle, increments <a class="reference internal" href="#ltl.optimizers.optimizer.Optimizer.g" title="ltl.optimizers.optimizer.Optimizer.g"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Optimizer.g</span></code></a> and calls
+<a class="reference internal" href="#ltl.optimizers.optimizer.Optimizer._expand_trajectory" title="ltl.optimizers.optimizer.Optimizer._expand_trajectory"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_expand_trajectory()</span></code></a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>traj</strong> (<a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory" title="(in pypet v0.4)"><em>Trajectory</em></a>) – The <code class="xref py py-mod docutils literal"><span class="pre">pypet</span></code> trajectory that contains the parameters and the
+<li><strong>traj</strong> (<a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory" title="(in pypet v0.4)"><em>Trajectory</em></a>) – The <code class="xref py py-mod docutils literal notranslate"><span class="pre">pypet</span></code> trajectory that contains the parameters and the
 individual that we want to simulate. The individual is accessible using <cite>traj.individual</cite> and parameter e.g.
 param1 is accessible using <cite>traj.param1</cite></li>
 <li><strong>fitnesses_results</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – This is a list of fitness results that contain tuples run index and the fitness.
-It is of the form <cite>[(run_idx, run), …]</cite> as constructed by <code class="xref py py-mod docutils literal"><span class="pre">pypet</span></code></li>
+It is of the form <cite>[(run_idx, run), …]</cite> as constructed by <code class="xref py py-mod docutils literal notranslate"><span class="pre">pypet</span></code></li>
 </ul>
 </td>
 </tr>
@@ -259,7 +260,7 @@ It is of the form <cite>[(run_idx, run), …]</cite> as constructed by <code cla
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>traj</strong> (<a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory" title="(in pypet v0.4)"><em>Trajectory</em></a>) – The <code class="xref py py-mod docutils literal"><span class="pre">pypet</span></code> trajectory that contains the parameters and the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>traj</strong> (<a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory" title="(in pypet v0.4)"><em>Trajectory</em></a>) – The <code class="xref py py-mod docutils literal notranslate"><span class="pre">pypet</span></code> trajectory that contains the parameters and the
 individual that we want to simulate. The individual is accessible using <cite>traj.individual</cite> and parameter e.g.
 param1 is accessible using <cite>traj.param1</cite></td>
 </tr>
@@ -276,7 +277,7 @@ parameters.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>traj</strong> (<a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory" title="(in pypet v0.4)"><em>Trajectory</em></a>) – The <code class="xref py py-mod docutils literal"><span class="pre">pypet</span></code> trajectory that contains the parameters and the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>traj</strong> (<a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory" title="(in pypet v0.4)"><em>Trajectory</em></a>) – The <code class="xref py py-mod docutils literal notranslate"><span class="pre">pypet</span></code> trajectory that contains the parameters and the
 individual that we want to simulate. The individual is accessible using <cite>traj.individual</cite> and parameter e.g.
 param1 is accessible using <cite>traj.param1</cite></td>
 </tr>
@@ -340,7 +341,7 @@ param1 is accessible using <cite>traj.param1</cite></td>
       <!-- footer -->
       <footer role="contentinfo">
           &copy; Copyright 2017, Anand Subramoney.
-        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.2.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1.
       </footer>
       <!-- /footer -->
 

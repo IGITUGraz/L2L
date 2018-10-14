@@ -41,6 +41,7 @@
     <script type="text/javascript" src="_static/js/jquery.min.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/bootstrap3.min.js"></script>
 <script type="text/javascript" src="_static/js/jquery.cookie.min.js"></script>
 <script type="text/javascript" src="_static/js/basicstrap.js"></script>
@@ -121,7 +122,7 @@
          
 <div class="col-md-3 hidden-xs" id="sidebar-wrapper">
   <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
-<h3><a href="index.html">Table Of Contents</a></h3>
+<h3><a href="index.html">Table of Contents</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Overview</a></li>
@@ -201,7 +202,7 @@
 <dl class="class">
 <dt id="ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer">
 <em class="property">class </em><code class="descclassname">ltl.optimizers.simulatedannealing.optimizer.</code><code class="descname">SimulatedAnnealingOptimizer</code><span class="sig-paren">(</span><em>traj</em>, <em>optimizee_create_individual</em>, <em>optimizee_fitness_weights</em>, <em>parameters</em>, <em>optimizee_bounding_func=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl/optimizers/simulatedannealing/optimizer.html#SimulatedAnnealingOptimizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer" title="ltl.optimizers.optimizer.Optimizer"><code class="xref py py-class docutils literal"><span class="pre">ltl.optimizers.optimizer.Optimizer</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer" title="ltl.optimizers.optimizer.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ltl.optimizers.optimizer.Optimizer</span></code></a></p>
 <p>Class for a generic simulate annealing solver.
 In the pseudo code the algorithm does:</p>
 <dl class="docutils">
@@ -224,7 +225,7 @@ initialized based on the values in <cite>parameters</cite></li>
 <li><strong>optimizee_create_individual</strong> – Function that creates a new individual</li>
 <li><strong>optimizee_fitness_weights</strong> – Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each
 element of the fitness vector)</li>
-<li><strong>parameters</strong> – Instance of <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.7)"><code class="xref py py-func docutils literal"><span class="pre">namedtuple()</span></code></a> <a class="reference internal" href="#ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingParameters" title="ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulatedAnnealingParameters</span></code></a> containing the
+<li><strong>parameters</strong> – Instance of <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.7)"><code class="xref py py-func docutils literal notranslate"><span class="pre">namedtuple()</span></code></a> <a class="reference internal" href="#ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingParameters" title="ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingParameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimulatedAnnealingParameters</span></code></a> containing the
 parameters needed by the Optimizer</li>
 <li><strong>optimizee_bounding_func</strong> – This is a function that takes an individual as argument and returns another individual that is
 within bounds (The bounds are defined by the function itself). If not provided, the individuals
@@ -249,13 +250,13 @@ are not bounded.</li>
 <dl class="method">
 <dt id="ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer.post_process">
 <code class="descname">post_process</code><span class="sig-paren">(</span><em>traj</em>, <em>fitnesses_results</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl/optimizers/simulatedannealing/optimizer.html#SimulatedAnnealingOptimizer.post_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer.post_process" title="Permalink to this definition">¶</a></dt>
-<dd><p>See <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal"><span class="pre">post_process()</span></code></a></p>
+<dd><p>See <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">post_process()</span></code></a></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer.end">
 <code class="descname">end</code><span class="sig-paren">(</span><em>traj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl/optimizers/simulatedannealing/optimizer.html#SimulatedAnnealingOptimizer.end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer.end" title="Permalink to this definition">¶</a></dt>
-<dd><p>See <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.end" title="ltl.optimizers.optimizer.Optimizer.end"><code class="xref py py-meth docutils literal"><span class="pre">end()</span></code></a></p>
+<dd><p>See <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.end" title="ltl.optimizers.optimizer.Optimizer.end"><code class="xref py py-meth docutils literal notranslate"><span class="pre">end()</span></code></a></p>
 </dd></dl>
 
 </dd></dl>
@@ -266,7 +267,7 @@ are not bounded.</li>
 <dl class="class">
 <dt id="ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingParameters">
 <em class="property">class </em><code class="descclassname">ltl.optimizers.simulatedannealing.optimizer.</code><code class="descname">SimulatedAnnealingParameters</code><a class="headerlink" href="#ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingParameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -359,7 +360,7 @@ are not bounded.</li>
       <!-- footer -->
       <footer role="contentinfo">
           &copy; Copyright 2017, Anand Subramoney.
-        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.2.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1.
       </footer>
       <!-- /footer -->
 

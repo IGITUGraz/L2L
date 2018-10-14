@@ -41,6 +41,7 @@
     <script type="text/javascript" src="_static/js/jquery.min.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/bootstrap3.min.js"></script>
 <script type="text/javascript" src="_static/js/jquery.cookie.min.js"></script>
 <script type="text/javascript" src="_static/js/basicstrap.js"></script>
@@ -117,7 +118,7 @@
          
 <div class="col-md-3 hidden-xs" id="sidebar-wrapper">
   <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
-<h3><a href="index.html">Table Of Contents</a></h3>
+<h3><a href="index.html">Table of Contents</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Overview</a></li>
@@ -259,24 +260,30 @@
 <dl class="class">
 <dt id="ltl.sdict">
 <em class="property">class </em><code class="descclassname">ltl.</code><code class="descname">sdict</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl.html#sdict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.sdict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#ltl.sdictm" title="ltl.sdictm"><code class="xref py py-class docutils literal"><span class="pre">ltl.sdictm</span></code></a></p>
-<p>Immutable version of <a class="reference internal" href="#ltl.sdictm" title="ltl.sdictm"><code class="xref py py-class docutils literal"><span class="pre">sdictm</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#ltl.sdictm" title="ltl.sdictm"><code class="xref py py-class docutils literal notranslate"><span class="pre">ltl.sdictm</span></code></a></p>
+<p>Immutable version of <a class="reference internal" href="#ltl.sdictm" title="ltl.sdictm"><code class="xref py py-class docutils literal notranslate"><span class="pre">sdictm</span></code></a></p>
 <dl class="method">
 <dt id="ltl.sdict.update">
 <code class="descname">update</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl.html#sdict.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.sdict.update" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Update the dictionary with the values given in the function (only goes one level down)
+:param kwargs:
+:return:</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ltl.sdict.apply">
 <code class="descname">apply</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl.html#sdict.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.sdict.apply" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Recursively apply fn on all leaf key, value pairs
+:param fn:
+:return:</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="ltl.sdictm">
 <em class="property">class </em><code class="descclassname">ltl.</code><code class="descname">sdictm</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl.html#sdictm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.sdictm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A dictionary which allows accessing it’s values using a dot notation. i.e. <cite>d[‘a’]</cite> can be accessed as <cite>d.a</cite>
 Mutable version</p>
 <dl class="method">
@@ -327,7 +334,7 @@ Mutable version</p>
 <dl class="class">
 <dt id="ltl.DictEntryType">
 <em class="property">class </em><code class="descclassname">ltl.</code><code class="descname">DictEntryType</code><a class="reference internal" href="_modules/ltl.html#DictEntryType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.DictEntryType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
 <p>An enumeration.</p>
 <dl class="attribute">
 <dt id="ltl.DictEntryType.Sequence">
@@ -352,14 +359,14 @@ Mutable version</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>input_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – This is the list to be converted into a dict.</li>
 <li><strong>dict_spec</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><em>tuple</em></a>) – This is the dict specification that conveys information regarding the dict
-to be converted to. See <a class="reference internal" href="#ltl.dict_to_list" title="ltl.dict_to_list"><code class="xref py py-func docutils literal"><span class="pre">dict_to_list()</span></code></a> for information about the dict specification.</li>
+to be converted to. See <a class="reference internal" href="#ltl.dict_to_list" title="ltl.dict_to_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">dict_to_list()</span></code></a> for information about the dict specification.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A Dictionary representing the list. Note that for valid behaviour, the list should have been generated by
-<a class="reference internal" href="#ltl.dict_to_list" title="ltl.dict_to_list"><code class="xref py py-func docutils literal"><span class="pre">dict_to_list()</span></code></a>. Moreover, This operation is not a perfect inverse of <a class="reference internal" href="#ltl.list_to_dict" title="ltl.list_to_dict"><code class="xref py py-func docutils literal"><span class="pre">list_to_dict()</span></code></a>. While the types
+<a class="reference internal" href="#ltl.dict_to_list" title="ltl.dict_to_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">dict_to_list()</span></code></a>. Moreover, This operation is not a perfect inverse of <a class="reference internal" href="#ltl.list_to_dict" title="ltl.list_to_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">list_to_dict()</span></code></a>. While the types
 of individual elements are preserved, the types of the iterables inside which they reside are not.
-<a class="reference internal" href="#ltl.list_to_dict" title="ltl.list_to_dict"><code class="xref py py-func docutils literal"><span class="pre">list_to_dict()</span></code></a> creates all iterables as numpy arrays.</p>
+<a class="reference internal" href="#ltl.list_to_dict" title="ltl.list_to_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">list_to_dict()</span></code></a> creates all iterables as numpy arrays.</p>
 </td>
 </tr>
 </tbody>
@@ -386,7 +393,7 @@ specification tuple to be returned. It is disabled by default</p>
 following form:</p>
 <blockquote>
 <div><em>(key_name, value_type, value_length)</em></div></blockquote>
-<p class="last">key_type may be one of <a class="reference internal" href="#ltl.DictEntryType.Sequence" title="ltl.DictEntryType.Sequence"><code class="xref py py-attr docutils literal"><span class="pre">DictEntryType.Sequence</span></code></a> or <a class="reference internal" href="#ltl.DictEntryType.Scalar" title="ltl.DictEntryType.Scalar"><code class="xref py py-attr docutils literal"><span class="pre">DictEntryType.Scalar</span></code></a>. In case the
+<p class="last">key_type may be one of <a class="reference internal" href="#ltl.DictEntryType.Sequence" title="ltl.DictEntryType.Sequence"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DictEntryType.Sequence</span></code></a> or <a class="reference internal" href="#ltl.DictEntryType.Scalar" title="ltl.DictEntryType.Scalar"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DictEntryType.Scalar</span></code></a>. In case the
 object is a scalar, value_length is 1.</p>
 </dd>
 </dl>
@@ -408,7 +415,7 @@ specification is also returned. Note that the keys are always sorted ascendingly
 <dd><p>This context manager causes all writes to stdout (whether within python or its
 subprocesses) to be redirected to the filename specified. For usage, look at
 example below:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 
 <span class="k">with</span> <span class="n">stdout_redirected</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;from Python&quot;</span><span class="p">)</span>
@@ -435,7 +442,7 @@ redirected</td>
 <dd><p>This context manager causes all writes to stdout (whether within python or its
 subprocesses) to be redirected to <cite>os.devnull</cite>, thereby effectively discarding the
 output. For usage look at example below:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 
 <span class="k">with</span> <span class="n">stdout_discarded</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;from Python&quot;</span><span class="p">)</span>
@@ -455,7 +462,7 @@ files.</p>
 <li>Scalars integer or float. They are converted to <cite>np.int64</cite> and
 <cite>numpy.float64</cite> respectively</li>
 <li>Iterables. All elements of the iterable are converted to a numpy array
-via <code class="docutils literal"><span class="pre">np.array(...)</span></code></li>
+via <code class="docutils literal notranslate"><span class="pre">np.array(...)</span></code></li>
 <li>Dictionaries. Dictionaries are recursively converted</li>
 </ol>
 <table class="docutils field-list" frame="void" rules="none">
@@ -506,7 +513,7 @@ via <code class="docutils literal"><span class="pre">np.array(...)</span></code>
       <!-- footer -->
       <footer role="contentinfo">
           &copy; Copyright 2017, Anand Subramoney.
-        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.2.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1.
       </footer>
       <!-- /footer -->
 

@@ -41,6 +41,7 @@
     <script type="text/javascript" src="_static/js/jquery.min.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/bootstrap3.min.js"></script>
 <script type="text/javascript" src="_static/js/jquery.cookie.min.js"></script>
 <script type="text/javascript" src="_static/js/basicstrap.js"></script>
@@ -120,7 +121,7 @@
          
 <div class="col-md-3 hidden-xs" id="sidebar-wrapper">
   <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
-<h3><a href="index.html">Table Of Contents</a></h3>
+<h3><a href="index.html">Table of Contents</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Overview</a></li>
@@ -220,7 +221,7 @@ model specific e.g. In simulated annealing, it is perturbed on specific criteria
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>individual</strong> – </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return dict:</th><td class="field-body">A dictionary in the same format as <a class="reference internal" href="#ltl.optimizees.optimizee.Optimizee.create_individual" title="ltl.optimizees.optimizee.Optimizee.create_individual"><code class="xref py py-meth docutils literal"><span class="pre">create_individual()</span></code></a>, with the values clipped as needed.</td>
+<tr class="field-even field"><th class="field-name">Return dict:</th><td class="field-body">A dictionary in the same format as <a class="reference internal" href="#ltl.optimizees.optimizee.Optimizee.create_individual" title="ltl.optimizees.optimizee.Optimizee.create_individual"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_individual()</span></code></a>, with the values clipped as needed.</td>
 </tr>
 </tbody>
 </table>
@@ -229,16 +230,16 @@ model specific e.g. In simulated annealing, it is perturbed on specific criteria
 <dl class="method">
 <dt id="ltl.optimizees.optimizee.Optimizee.simulate">
 <code class="descname">simulate</code><span class="sig-paren">(</span><em>traj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl/optimizees/optimizee.html#Optimizee.simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.optimizees.optimizee.Optimizee.simulate" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is the primary function that does the simulation for the given parameter given (within <code class="xref py py-obj docutils literal"><span class="pre">traj</span></code>)</p>
+<dd><p>This is the primary function that does the simulation for the given parameter given (within <code class="xref py py-obj docutils literal notranslate"><span class="pre">traj</span></code>)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>traj</strong> (<a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory" title="(in pypet v0.4)"><em>Trajectory</em></a>) – The <code class="xref py py-mod docutils literal"><span class="pre">pypet</span></code> trajectory that contains the parameters and the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>traj</strong> (<a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory" title="(in pypet v0.4)"><em>Trajectory</em></a>) – The <code class="xref py py-mod docutils literal notranslate"><span class="pre">pypet</span></code> trajectory that contains the parameters and the
 individual that we want to simulate. The individual is accessible using <cite>traj.individual</cite> and parameter e.g.
 param1 is accessible using <cite>traj.param1</cite></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></a> containing the fitness values of the current run. The <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></a> allows a
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> containing the fitness values of the current run. The <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> allows a
 multi-dimensional fitness function.</td>
 </tr>
 </tbody>
@@ -293,7 +294,7 @@ multi-dimensional fitness function.</td>
       <!-- footer -->
       <footer role="contentinfo">
           &copy; Copyright 2017, Anand Subramoney.
-        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.2.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1.
       </footer>
       <!-- /footer -->
 

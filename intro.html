@@ -41,6 +41,7 @@
     <script type="text/javascript" src="_static/js/jquery.min.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/bootstrap3.min.js"></script>
 <script type="text/javascript" src="_static/js/jquery.cookie.min.js"></script>
 <script type="text/javascript" src="_static/js/basicstrap.js"></script>
@@ -86,13 +87,13 @@
 </li>
 <li><a class="reference internal" href="#optimizee">Optimizee</a><ul>
 <li><a class="reference internal" href="#constructor-of-optimizee">Constructor of Optimizee</a></li>
-<li><a class="reference internal" href="#the-create-individual-function">The <code class="docutils literal"><span class="pre">create_individual()</span></code> function:</a></li>
-<li><a class="reference internal" href="#the-simulate-function">The <code class="docutils literal"><span class="pre">simulate()</span></code> function:</a></li>
+<li><a class="reference internal" href="#the-create-individual-function">The <code class="docutils literal notranslate"><span class="pre">create_individual()</span></code> function:</a></li>
+<li><a class="reference internal" href="#the-simulate-function">The <code class="docutils literal notranslate"><span class="pre">simulate()</span></code> function:</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#optimizer">Optimizer</a><ul>
 <li><a class="reference internal" href="#constructor-of-optimizer">Constructor of Optimizer</a></li>
-<li><a class="reference internal" href="#the-post-process-function">The <code class="docutils literal"><span class="pre">post_process()</span></code> function:</a></li>
+<li><a class="reference internal" href="#the-post-process-function">The <code class="docutils literal notranslate"><span class="pre">post_process()</span></code> function:</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#running-an-ltl-simulation">Running an LTL simulation</a></li>
@@ -156,7 +157,7 @@
          
 <div class="col-md-3 hidden-xs" id="sidebar-wrapper">
   <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
-<h3><a href="index.html">Table Of Contents</a></h3>
+<h3><a href="index.html">Table of Contents</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a><ul>
@@ -175,13 +176,13 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#optimizee">Optimizee</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#constructor-of-optimizee">Constructor of Optimizee</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#the-create-individual-function">The <code class="docutils literal"><span class="pre">create_individual()</span></code> function:</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#the-simulate-function">The <code class="docutils literal"><span class="pre">simulate()</span></code> function:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-create-individual-function">The <code class="docutils literal notranslate"><span class="pre">create_individual()</span></code> function:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-simulate-function">The <code class="docutils literal notranslate"><span class="pre">simulate()</span></code> function:</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#optimizer">Optimizer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#constructor-of-optimizer">Constructor of Optimizer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#the-post-process-function">The <code class="docutils literal"><span class="pre">post_process()</span></code> function:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-post-process-function">The <code class="docutils literal notranslate"><span class="pre">post_process()</span></code> function:</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#running-an-ltl-simulation">Running an LTL simulation</a></li>
@@ -291,35 +292,35 @@ the Top-Level iteration Description in the introduction to see exactly what is d
 <p>The progress of execution in the script shown in <a class="reference internal" href="ltl-bin.html"><span class="doc">LTL Experiments</span></a> goes as follows:</p>
 <ol class="arabic simple">
 <li>At the beginning, a <em>population</em> of <em>individuals</em>  is created by the <cite>Optimizer</cite> by calling the <cite>Optimizee</cite>’s
-<a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.create_individual" title="ltl.optimizees.optimizee.Optimizee.create_individual"><code class="xref py py-meth docutils literal"><span class="pre">create_individual()</span></code></a> method.</li>
-<li>The <cite>Optimizer</cite> then puts these <em>individuals</em> in its member variable <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.eval_pop" title="ltl.optimizers.optimizer.Optimizer.eval_pop"><code class="xref py py-attr docutils literal"><span class="pre">eval_pop</span></code></a>
-and calls its <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer._expand_trajectory" title="ltl.optimizers.optimizer.Optimizer._expand_trajectory"><code class="xref py py-meth docutils literal"><span class="pre">_expand_trajectory()</span></code></a> method. This is the *key* step to
+<a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.create_individual" title="ltl.optimizees.optimizee.Optimizee.create_individual"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_individual()</span></code></a> method.</li>
+<li>The <cite>Optimizer</cite> then puts these <em>individuals</em> in its member variable <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.eval_pop" title="ltl.optimizers.optimizer.Optimizer.eval_pop"><code class="xref py py-attr docutils literal notranslate"><span class="pre">eval_pop</span></code></a>
+and calls its <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer._expand_trajectory" title="ltl.optimizers.optimizer.Optimizer._expand_trajectory"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_expand_trajectory()</span></code></a> method. This is the *key* step to
 starting and continuing the loop and should be done in all new <cite>Optimizer</cite> s added.</li>
 <li id="third-step"><a class="reference internal" href="#pypet-section"><span class="std std-ref">Pypet</span></a>  creates one <cite>Optimizee</cite> run for each <em>individual</em> (parameter)
-in <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.eval_pop" title="ltl.optimizers.optimizer.Optimizer.eval_pop"><code class="xref py py-attr docutils literal"><span class="pre">eval_pop</span></code></a> by calling the <cite>Optimizee</cite>’s <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal"><span class="pre">simulate()</span></code></a>
+in <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.eval_pop" title="ltl.optimizers.optimizer.Optimizer.eval_pop"><code class="xref py py-attr docutils literal notranslate"><span class="pre">eval_pop</span></code></a> by calling the <cite>Optimizee</cite>’s <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">simulate()</span></code></a>
 method.  Each <cite>Optimizee</cite> run can happen in parallel across cores and even across nodes if enabled as described in
 <a class="reference internal" href="#parallelization"><span class="std std-ref">Parallelization</span></a>.</li>
-<li>the <cite>Optimizee</cite>’s <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal"><span class="pre">simulate()</span></code></a> method runs whatever simulation it has to run
-with the given <em>individual</em> (parameter) and returns a Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-obj docutils literal"><span class="pre">tuple</span></code></a> with one or more fitness values <a class="footnote-reference" href="#id4" id="id2">[1]</a>.</li>
+<li>the <cite>Optimizee</cite>’s <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">simulate()</span></code></a> method runs whatever simulation it has to run
+with the given <em>individual</em> (parameter) and returns a Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></a> with one or more fitness values <a class="footnote-reference" href="#id4" id="id2">[1]</a>.</li>
 <li>Once the runs are done, <a class="reference internal" href="#pypet-section"><span class="std std-ref">Pypet</span></a> calls the <cite>Optimizer</cite>’s
-<a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal"><span class="pre">post_process()</span></code></a> method <a class="footnote-reference" href="#id5" id="id3">[2]</a> with the list of <em>individuals</em> and their fitness
-values as returned by the <cite>Optimizee</cite>’s <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal"><span class="pre">simulate()</span></code></a> method.
+<a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">post_process()</span></code></a> method <a class="footnote-reference" href="#id5" id="id3">[2]</a> with the list of <em>individuals</em> and their fitness
+values as returned by the <cite>Optimizee</cite>’s <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">simulate()</span></code></a> method.
 The <cite>Optimizer</cite> can choose to do whatever it wants with the fitnesses, and use
-it to create a new set of <em>individuals</em> which it puts into its <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.eval_pop" title="ltl.optimizers.optimizer.Optimizer.eval_pop"><code class="xref py py-attr docutils literal"><span class="pre">eval_pop</span></code></a>
+it to create a new set of <em>individuals</em> which it puts into its <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.eval_pop" title="ltl.optimizers.optimizer.Optimizer.eval_pop"><code class="xref py py-attr docutils literal notranslate"><span class="pre">eval_pop</span></code></a>
 attribute (after clearing it of the old <em>population</em>).</li>
 <li>The loop continues from <a class="reference internal" href="#third-step"><span class="std std-ref">3.</span></a></li>
 </ol>
 <table class="docutils footnote" frame="void" id="id4" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td><strong>NOTE:</strong> Even if there is only one fitness value, this function should still return a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-obj docutils literal"><span class="pre">tuple</span></code></a></td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td><strong>NOTE:</strong> Even if there is only one fitness value, this function should still return a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></a></td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="id5" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>This is done using <a class="reference external" href="https://pythonhosted.org/pypet/">PyPet</a>’s postprocessing facility and its
-<a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory.f_expand" title="(in pypet v0.4)"><code class="xref py py-meth docutils literal"><span class="pre">f_expand()</span></code></a> function as documented <a class="reference external" href="http://pythonhosted.org/pypet/cookbook/environment.html#expanding-your-trajectory-via-post-processing">here</a>.</td></tr>
+<a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory.f_expand" title="(in pypet v0.4)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">f_expand()</span></code></a> function as documented <a class="reference external" href="http://pythonhosted.org/pypet/cookbook/environment.html#expanding-your-trajectory-via-post-processing">here</a>.</td></tr>
 </tbody>
 </table>
 </div>
@@ -334,8 +335,8 @@ of individuals to evaluate.</li>
 <li>Loop back to a) with the new set of parameters.</li>
 </ol>
 </li>
-<li>Manage the <a class="reference internal" href="#communication"><span class="std std-ref">Important Data Structures</span></a> between <cite>Optimizer</cite> and <cite>Optimizee</cite>.  This is done using the the <code class="xref py py-obj docutils literal"><span class="pre">traj</span></code> object of type
-<a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory" title="(in pypet v0.4)"><code class="xref py py-class docutils literal"><span class="pre">Trajectory</span></code></a>.</li>
+<li>Manage the <a class="reference internal" href="#communication"><span class="std std-ref">Important Data Structures</span></a> between <cite>Optimizer</cite> and <cite>Optimizee</cite>.  This is done using the the <code class="xref py py-obj docutils literal notranslate"><span class="pre">traj</span></code> object of type
+<a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory" title="(in pypet v0.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Trajectory</span></code></a>.</li>
 <li>Store the results of all the runs, both the parameters and their fitnesses along with any other arbitrary data
 included by the user, into a single hdf5 file.</li>
 </ol>
@@ -346,14 +347,14 @@ out. The user is therefore engouraged to familiarize himself with the working of
 <div class="section" id="writing-new-algorithms">
 <h2>Writing new algorithms<a class="headerlink" href="#writing-new-algorithms" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>For a new <strong>Optimizee</strong>: Create a copy of the class <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee" title="ltl.optimizees.optimizee.Optimizee"><code class="xref py py-class docutils literal"><span class="pre">Optimizee</span></code></a> into a new python
+<li>For a new <strong>Optimizee</strong>: Create a copy of the class <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee" title="ltl.optimizees.optimizee.Optimizee"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizee</span></code></a> into a new python
 module with an appropriate name and fill in the functions. E.g. for a DMS task optimizee, you would create
 a module (i.e. directory with a <cite>__init__.py</cite> file) as <cite>ltl/optimizees/dms/</cite> and copy the above class there.</li>
-<li>For a new <strong>Optimizer</strong>: Create a copy of the class <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer" title="ltl.optimizers.optimizer.Optimizer"><code class="xref py py-class docutils literal"><span class="pre">Optimizer</span></code></a> into a new python
+<li>For a new <strong>Optimizer</strong>: Create a copy of the class <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer" title="ltl.optimizers.optimizer.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> into a new python
 module with an appropriate name and fill in the functions. (same as above)</li>
-<li>For a new <strong>experiment</strong>: Create a copy of the file <code class="file docutils literal"><span class="pre">bin/ltl-template.py</span></code> with an appropriate name and fill in
+<li>For a new <strong>experiment</strong>: Create a copy of the file <code class="file docutils literal notranslate"><span class="pre">bin/ltl-template.py</span></code> with an appropriate name and fill in
 the <em>TODOs</em>.</li>
-<li>Add an entry in <code class="file docutils literal"><span class="pre">bin/logging.yaml</span></code> for the new class/file you created. See <a class="reference internal" href="#logging">logging</a>.</li>
+<li>Add an entry in <code class="file docutils literal notranslate"><span class="pre">bin/logging.yaml</span></code> for the new class/file you created. See <a class="reference internal" href="#logging">logging</a>.</li>
 </ul>
 <p>Details for implementing the <cite>Optimizer</cite>, <cite>Optimizee</cite> and experiment follow.</p>
 <div class="section" id="important-data-structures">
@@ -369,30 +370,30 @@ mapped one to one in the HDF5 file when you store data to disk. …</p>
 conditions of your numerical simulations. Usually, these are very basic data types, like integers, floats or maybe a
 bit more complex numpy arrays.</p>
 </div></blockquote>
-<p>In the simulations using the LTL Framework, there is a single <a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory" title="(in pypet v0.4)"><code class="xref py py-class docutils literal"><span class="pre">Trajectory</span></code></a> object (called
-<code class="xref py py-obj docutils literal"><span class="pre">traj</span></code>). This object forms the backbone of communication between the optimizer, optimizee, and the
+<p>In the simulations using the LTL Framework, there is a single <a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory" title="(in pypet v0.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Trajectory</span></code></a> object (called
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">traj</span></code>). This object forms the backbone of communication between the optimizer, optimizee, and the
 PyPet framework. In short, it is used to acheive the following:</p>
 <ol class="arabic simple">
 <li>Storage of the parameters of the optimizer, optimizee, and <a class="reference internal" href="#individuals">individuals</a> of the optimizee</li>
 <li>Storage of the results of our simulation</li>
 <li>Adaptive exploration of parameters via trajectory expansion.</li>
 </ol>
-<p><code class="xref py py-obj docutils literal"><span class="pre">traj</span></code> object is passed as a mandatory argument to the constructors of both the Optimizee and Optimizer.
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">traj</span></code> object is passed as a mandatory argument to the constructors of both the Optimizee and Optimizer.
 Additionally, PyPet automatically passes this object as an argument to the functions
-<a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal"><span class="pre">simulate()</span></code></a> and <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal"><span class="pre">post_process()</span></code></a></p>
+<a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">simulate()</span></code></a> and <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">post_process()</span></code></a></p>
 </div>
 <div class="section" id="individual-dicts">
 <span id="individual-dict"></span><span id="id7"></span><h4>Individual-Dict<a class="headerlink" href="#individual-dicts" title="Permalink to this headline">¶</a></h4>
-<p>This is the data structure used to represent <a class="reference internal" href="#individuals">individuals</a>. This is basically a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a> that has the parameter
+<p>This is the data structure used to represent <a class="reference internal" href="#individuals">individuals</a>. This is basically a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> that has the parameter
 names as keys, and parameter values as values. The following need to be noted about the parameters stored in an
 <em>Individual-Dict</em>.</p>
 <ol class="arabic simple">
-<li>The parameter names must be the dot-separated full-name (e.g. <code class="docutils literal"><span class="pre">'sim_control.seed'</span></code>) of the parameter.
-This name must be the name by which it is stored in the <cite>individual</cite> parameter group of the <code class="xref py py-obj docutils literal"><span class="pre">traj</span></code>.
+<li>The parameter names must be the dot-separated full-name (e.g. <code class="docutils literal notranslate"><span class="pre">'sim_control.seed'</span></code>) of the parameter.
+This name must be the name by which it is stored in the <cite>individual</cite> parameter group of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">traj</span></code>.
 To understand this, look at <a class="reference internal" href="#optimizee-constructor"><span class="std std-ref">constructor of Optimizee</span></a>.</li>
 <li>The dictionary must contain <strong>exactly</strong> those parameters that are going to be explored by the <cite>Optimizer</cite>.
 This is because this dictionary is used to expand the trajectory in the
-<a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal"><span class="pre">post_process()</span></code></a> function. See the note about expanding trajectories in
+<a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">post_process()</span></code></a> function. See the note about expanding trajectories in
 ref:<cite>optimizer-constructor</cite></li>
 </ol>
 <p>In the documentation above, whenever the term <a class="reference internal" href="#individual">individual</a> is used, it is assumed that the object referred to is
@@ -404,12 +405,12 @@ fact that its keys represent parameter names.</p>
 </div>
 <div class="section" id="optimizee">
 <span id="traj-interaction"></span><h3>Optimizee<a class="headerlink" href="#optimizee" title="Permalink to this headline">¶</a></h3>
-<p>The optimizee subclasses <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee" title="ltl.optimizees.optimizee.Optimizee"><code class="xref py py-class docutils literal"><span class="pre">Optimizee</span></code></a> with a class that contains four mandatory methods
+<p>The optimizee subclasses <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee" title="ltl.optimizees.optimizee.Optimizee"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizee</span></code></a> with a class that contains four mandatory methods
 (Documentation linked below):</p>
 <ol class="arabic simple">
-<li><a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.create_individual" title="ltl.optimizees.optimizee.Optimizee.create_individual"><code class="xref py py-meth docutils literal"><span class="pre">create_individual()</span></code></a> : Called to return a random <a class="reference internal" href="#individual">individual</a> (returns an <a class="reference internal" href="#individual-dict">Individual-Dict</a>)</li>
-<li><a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.bounding_func" title="ltl.optimizees.optimizee.Optimizee.bounding_func"><code class="xref py py-meth docutils literal"><span class="pre">bounding_func()</span></code></a> : Called to return a clipped version of <a class="reference internal" href="#individual">individual</a> (returns an <a class="reference internal" href="#individual-dict">Individual-Dict</a>)</li>
-<li><a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal"><span class="pre">simulate()</span></code></a> : Runs the actual simulation and returns a fitness vector</li>
+<li><a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.create_individual" title="ltl.optimizees.optimizee.Optimizee.create_individual"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_individual()</span></code></a> : Called to return a random <a class="reference internal" href="#individual">individual</a> (returns an <a class="reference internal" href="#individual-dict">Individual-Dict</a>)</li>
+<li><a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.bounding_func" title="ltl.optimizees.optimizee.Optimizee.bounding_func"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bounding_func()</span></code></a> : Called to return a clipped version of <a class="reference internal" href="#individual">individual</a> (returns an <a class="reference internal" href="#individual-dict">Individual-Dict</a>)</li>
+<li><a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">simulate()</span></code></a> : Runs the actual simulation and returns a fitness vector</li>
 </ol>
 <p>In order to maintain a consistent framework for communication between the optimizer, optimizee, and <a class="reference internal" href="#pypet-section"><span class="std std-ref">PyPet</span></a>
 it is required to enforce certain requirements on the behaviour of the above functions. The details of these requirements for the
@@ -418,49 +419,49 @@ it is required to enforce certain requirements on the behaviour of the above fun
 <span id="optimizee-constructor"></span><h4>Constructor of Optimizee<a class="headerlink" href="#constructor-of-optimizee" title="Permalink to this headline">¶</a></h4>
 <p>This function may perform any one-time initialization operations that are required for the particular optimizee.
 In addition to this, It <em>must perform</em> the job of initializing parameters in the trajectory. These parameters must
-be created in the parameter subgroup named <cite>individual</cite> (i.e. using <code class="docutils literal"><span class="pre">traj.parameter.individual.f_add_parameter()</span></code>). The
+be created in the parameter subgroup named <cite>individual</cite> (i.e. using <code class="docutils literal notranslate"><span class="pre">traj.parameter.individual.f_add_parameter()</span></code>). The
 following is a contract that must be obeyed by this constructor.</p>
 <blockquote>
 <div>All parameters that are explored for the optimizee must be created in the trajectory under the <cite>individual</cite>
 parameter group. Moreover, the names by which they are stored (excluding the <cite>individual</cite>) must be equal to the
 key of the Individual-Dict entry representing that parameter.</div></blockquote>
-<p>As an example, if one wanted a parameter named <code class="docutils literal"><span class="pre">sim_control.seed</span></code> to be a part of the trajectory, one would do
+<p>As an example, if one wanted a parameter named <code class="docutils literal notranslate"><span class="pre">sim_control.seed</span></code> to be a part of the trajectory, one would do
 the following.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">traj</span><span class="o">.</span><span class="n">individual</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;sim_control.seed&#39;</span><span class="p">,</span> <span class="mi">1010</span><span class="p">)</span>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">traj</span><span class="o">.</span><span class="n">individual</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;sim_control.seed&#39;</span><span class="p">,</span> <span class="mi">1010</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If one intends <code class="docutils literal"><span class="pre">sim_control.seed</span></code> to be a parameter over which to explore, the <a class="reference internal" href="#individual-dict">Individual-Dict</a> describing an
-individual of the optimizee must contain a key named <code class="docutils literal"><span class="pre">'sim_control.seed'</span></code></p>
+<p>If one intends <code class="docutils literal notranslate"><span class="pre">sim_control.seed</span></code> to be a parameter over which to explore, the <a class="reference internal" href="#individual-dict">Individual-Dict</a> describing an
+individual of the optimizee must contain a key named <code class="docutils literal notranslate"><span class="pre">'sim_control.seed'</span></code></p>
 <p><em>NOTE</em> that the parameter group named <cite>individual</cite> itself is created in the constructor of the base <cite>Optimizee</cite> class.
 Thus, the derived class need only implement the addition of parameters as shown above.</p>
 </div>
 <div class="section" id="the-create-individual-function">
-<h4>The <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.create_individual" title="ltl.optimizees.optimizee.Optimizee.create_individual"><code class="xref py py-meth docutils literal"><span class="pre">create_individual()</span></code></a> function:<a class="headerlink" href="#the-create-individual-function" title="Permalink to this headline">¶</a></h4>
+<h4>The <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.create_individual" title="ltl.optimizees.optimizee.Optimizee.create_individual"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_individual()</span></code></a> function:<a class="headerlink" href="#the-create-individual-function" title="Permalink to this headline">¶</a></h4>
 <p>This must return an <a class="reference internal" href="#individual">individual</a> of the optimizee, i.e. it must return an <a class="reference internal" href="#individual-dict">Individual-Dict</a> representing
 a valid random individual of the optimizee.</p>
 </div>
 <div class="section" id="the-simulate-function">
-<h4>The <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal"><span class="pre">simulate()</span></code></a> function:<a class="headerlink" href="#the-simulate-function" title="Permalink to this headline">¶</a></h4>
-<p>This function only receives as argument the trajectory <code class="xref py py-obj docutils literal"><span class="pre">traj</span></code> set to a particular run. Thus it must source all
-required parameters from the <code class="xref py py-obj docutils literal"><span class="pre">traj</span></code> and the member variables of the <cite>Optimizee</cite> class. It must run the inner loop
+<h4>The <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">simulate()</span></code></a> function:<a class="headerlink" href="#the-simulate-function" title="Permalink to this headline">¶</a></h4>
+<p>This function only receives as argument the trajectory <code class="xref py py-obj docutils literal notranslate"><span class="pre">traj</span></code> set to a particular run. Thus it must source all
+required parameters from the <code class="xref py py-obj docutils literal notranslate"><span class="pre">traj</span></code> and the member variables of the <cite>Optimizee</cite> class. It must run the inner loop
 with these parameters and always return a tuple (<em>even for 1-D fitness!!</em>) representing the fitness to be used for
 optimizing.
 _
-See the class documentation for more details: <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee" title="ltl.optimizees.optimizee.Optimizee"><code class="xref py py-class docutils literal"><span class="pre">Optimizee</span></code></a></p>
+See the class documentation for more details: <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee" title="ltl.optimizees.optimizee.Optimizee"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizee</span></code></a></p>
 </div>
 </div>
 <div class="section" id="optimizer">
 <h3>Optimizer<a class="headerlink" href="#optimizer" title="Permalink to this headline">¶</a></h3>
-<p>The optimizer subclasses <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer" title="ltl.optimizers.optimizer.Optimizer"><code class="xref py py-class docutils literal"><span class="pre">Optimizer</span></code></a> with a class that contains two mandatory methods:</p>
+<p>The optimizer subclasses <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer" title="ltl.optimizers.optimizer.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> with a class that contains two mandatory methods:</p>
 <ol class="arabic simple">
-<li><code class="xref py py-meth docutils literal"><span class="pre">__init__()</span></code>: This is the constructor which performs the duties of
+<li><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code>: This is the constructor which performs the duties of
 initializing the trajectory and the initial <a class="reference internal" href="#generation">generation</a> of the simulation.</li>
-<li><a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal"><span class="pre">post_process()</span></code></a> : knowing the fitness for the current parameters, it
+<li><a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">post_process()</span></code></a> : knowing the fitness for the current parameters, it
 generates a new set of parameters and runs the next batch of simulations.</li>
 </ol>
 <p>And one optional method:</p>
 <ol class="arabic simple">
-<li><a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.end" title="ltl.optimizers.optimizer.Optimizer.end"><code class="xref py py-meth docutils literal"><span class="pre">end()</span></code></a> : Tertiary method to do cleanup, printing results etc.</li>
+<li><a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.end" title="ltl.optimizers.optimizer.Optimizer.end"><code class="xref py py-meth docutils literal notranslate"><span class="pre">end()</span></code></a> : Tertiary method to do cleanup, printing results etc.</li>
 </ol>
 <p>Note that in order to maintain a consistent framework for communication between the optimizer, optimizee, and
 <a class="reference internal" href="#pypet-section"><span class="std std-ref">PyPet</span></a>, we enforce a certain protocol for the above function. The details of this protocol
@@ -468,22 +469,22 @@ are outlined below</p>
 <div class="section" id="constructor-of-optimizer">
 <span id="optimizer-constructor"></span><h4>Constructor of Optimizer<a class="headerlink" href="#constructor-of-optimizer" title="Permalink to this headline">¶</a></h4>
 <p>Perform any one-time initialization tasks including creating optimizer parameters in the trajectory. Note that
-optimizer parameters are created in the root parameter group of <code class="xref py py-obj docutils literal"><span class="pre">traj</span></code> (i.e. <cite>traj.par.f_add_parameter(…)</cite>).</p>
+optimizer parameters are created in the root parameter group of <code class="xref py py-obj docutils literal notranslate"><span class="pre">traj</span></code> (i.e. <cite>traj.par.f_add_parameter(…)</cite>).</p>
 <p>Create a list of <a class="reference internal" href="#individuals">individuals</a> by using the <cite>optimizee_create_individual</cite> function. These are the individuals that
 will be simulated in the first generation (i.e. generation index 0). Assign <cite>self.eval_pop</cite> to the list of above
 individuals, and call <cite>self._expand_trajectory()</cite> to expand the trajectory to include the parameters corresponding
 to these individuals.</p>
 <p><cite>self._expand_trajectory()</cite> relies on the fact that the <a class="reference internal" href="#individual">individual</a> objects are <a class="reference internal" href="#individual-dicts">Individual-Dicts</a> and uses the keys
-to access and assign the relevant optimizee parameters in the parameter group <code class="xref py py-obj docutils literal"><span class="pre">traj.individual</span></code>. This is
+to access and assign the relevant optimizee parameters in the parameter group <code class="xref py py-obj docutils literal notranslate"><span class="pre">traj.individual</span></code>. This is
 the reason for the contract enforced on the Optimizee constructor</p>
 <p>Note that all the (non-exploring) paramters to the <cite>Optimizer</cite> is passed in to its constructor through a
-<a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.7)"><code class="xref py py-func docutils literal"><span class="pre">namedtuple()</span></code></a> to keep the paramters documented. For examples see <a class="reference internal" href="ltl.optimizers.evolution.html#ltl.optimizers.evolution.optimizer.GeneticAlgorithmParameters" title="ltl.optimizers.evolution.optimizer.GeneticAlgorithmParameters"><code class="xref py py-class docutils literal"><span class="pre">GeneticAlgorithmParameters</span></code></a>
-or <a class="reference internal" href="ltl.optimizers.simulatedannealing.html#ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingParameters" title="ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulatedAnnealingParameters</span></code></a></p>
+<a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.7)"><code class="xref py py-func docutils literal notranslate"><span class="pre">namedtuple()</span></code></a> to keep the paramters documented. For examples see <a class="reference internal" href="ltl.optimizers.evolution.html#ltl.optimizers.evolution.optimizer.GeneticAlgorithmParameters" title="ltl.optimizers.evolution.optimizer.GeneticAlgorithmParameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeneticAlgorithmParameters</span></code></a>
+or <a class="reference internal" href="ltl.optimizers.simulatedannealing.html#ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingParameters" title="ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingParameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimulatedAnnealingParameters</span></code></a></p>
 </div>
 <div class="section" id="the-post-process-function">
-<h4>The <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal"><span class="pre">post_process()</span></code></a> function:<a class="headerlink" href="#the-post-process-function" title="Permalink to this headline">¶</a></h4>
-<p>This function receives, along with the trajectory <code class="xref py py-obj docutils literal"><span class="pre">traj</span></code>, a list of tuples. Each tuple has the structure
-<cite>(run_index, run_fitness_tuple)</cite>. The <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal"><span class="pre">post_process()</span></code></a> function also has
+<h4>The <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">post_process()</span></code></a> function:<a class="headerlink" href="#the-post-process-function" title="Permalink to this headline">¶</a></h4>
+<p>This function receives, along with the trajectory <code class="xref py py-obj docutils literal notranslate"><span class="pre">traj</span></code>, a list of tuples. Each tuple has the structure
+<cite>(run_index, run_fitness_tuple)</cite>. The <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">post_process()</span></code></a> function also has
 access to the individuals whose fitness was calculated (via the member <cite>self.eval_pop</cite>), and the generation index
 (<cite>self.g</cite>), along with any other user defined member variable.</p>
 <p>Using the above, the function must calculate a new <a class="reference internal" href="#population">population</a> of <a class="reference internal" href="#individuals">individuals</a> to explore (remember individuals
@@ -496,40 +497,40 @@ raise an error</p>
 <p>Some points to remember are the following:</p>
 <ol class="arabic simple">
 <li>The call to <cite>self._expand_trajectory</cite> not only causes the trajectory to store more parameter values to explore,
-bu, due to the mechanism underlying <a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory.f_expand" title="(in pypet v0.4)"><code class="xref py py-meth docutils literal"><span class="pre">f_expand()</span></code></a>, also causes the
-<a class="reference internal" href="#pypet-section"><span class="std std-ref">Pypet</span></a> framework to run the optimizee <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal"><span class="pre">simulate()</span></code></a>
+bu, due to the mechanism underlying <a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory.f_expand" title="(in pypet v0.4)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">f_expand()</span></code></a>, also causes the
+<a class="reference internal" href="#pypet-section"><span class="std std-ref">Pypet</span></a> framework to run the optimizee <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">simulate()</span></code></a>
 function on these parameters. Look at the documentation referenced in the footnote of <a class="reference internal" href="#iteration-loop">iteration-loop</a> for more
 details on this</li>
 <li><strong>Always</strong> build the optimizer to maximize fitness. The weights that are passed in to the optimizer constructor
 can be made negative if one wishes to perform minimization</li>
 </ol>
-<p>See the class documentation for more details: <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer" title="ltl.optimizers.optimizer.Optimizer"><code class="xref py py-class docutils literal"><span class="pre">Optimizer</span></code></a></p>
+<p>See the class documentation for more details: <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer" title="ltl.optimizers.optimizer.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a></p>
 </div>
 </div>
 <div class="section" id="running-an-ltl-simulation">
 <h3>Running an LTL simulation<a class="headerlink" href="#running-an-ltl-simulation" title="Permalink to this headline">¶</a></h3>
 <p>Before running a simulation for the first time, you need to specify the output directory for your results. To do so,
-create a new file <code class="file docutils literal"><span class="pre">bin/path.conf</span></code> with a single entry containing an absolute path or a path relative to the top-
-level LTL directory, e.g. <code class="file docutils literal"><span class="pre">./output_results/</span></code>, and create an empty folder at the path you specified. You also need
+create a new file <code class="file docutils literal notranslate"><span class="pre">bin/path.conf</span></code> with a single entry containing an absolute path or a path relative to the top-
+level LTL directory, e.g. <code class="file docutils literal notranslate"><span class="pre">./output_results/</span></code>, and create an empty folder at the path you specified. You also need
 to commit any staged files to your local repo. Failing to follow these instructions raises an error when trying to run
 any of the test simulations.</p>
-<p>To run a LTL simulation, copy the file <code class="file docutils literal"><span class="pre">bin/ltl-template.py</span></code> (see <a class="reference internal" href="ltl-bin.html"><span class="doc">LTL Experiments</span></a>) to
-<code class="file docutils literal"><span class="pre">bin/ltl-</span><em><span class="pre">optimizeeabbr</span></em><span class="pre">-</span><em><span class="pre">optimizerabbr</span></em><span class="pre">.py</span></code>. Then fill in all the <strong>TODOs</strong> . Especially the parts with the
+<p>To run a LTL simulation, copy the file <code class="file docutils literal notranslate"><span class="pre">bin/ltl-template.py</span></code> (see <a class="reference internal" href="ltl-bin.html"><span class="doc">LTL Experiments</span></a>) to
+<code class="file docutils literal notranslate"><span class="pre">bin/ltl-</span><em><span class="pre">optimizeeabbr</span></em><span class="pre">-</span><em><span class="pre">optimizerabbr</span></em><span class="pre">.py</span></code>. Then fill in all the <strong>TODOs</strong> . Especially the parts with the
 initialization of the appropriate <cite>Optimizers</cite> and <cite>Optimizees</cite>. The rest of the code should be left in place for
-logging, recording and PyPet. See the source of <code class="file docutils literal"><span class="pre">bin/ltl-template.py</span></code> for more details.</p>
+logging, recording and PyPet. See the source of <code class="file docutils literal notranslate"><span class="pre">bin/ltl-template.py</span></code> for more details.</p>
 </div>
 <div class="section" id="parameter-bounding">
 <h3>Parameter Bounding<a class="headerlink" href="#parameter-bounding" title="Permalink to this headline">¶</a></h3>
 <p>Most optimizees impose bounds on their parameters in some form. For example the
-<a class="reference internal" href="ltl.optimizees.functions.html#ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee" title="ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee"><code class="xref py py-class docutils literal"><span class="pre">FunctionGeneratorOptimizee</span></code></a> imposes a rectangular bound on the set of valid coordinates. Most Optimizers
+<a class="reference internal" href="ltl.optimizees.functions.html#ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee" title="ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionGeneratorOptimizee</span></code></a> imposes a rectangular bound on the set of valid coordinates. Most Optimizers
 on the other hand do not have direct access to these bounds. Hence, If the optimizer wishes to support bounding, it must
 accept a <a class="reference internal" href="#bounding-function">bounding-function</a> as an argument.</p>
 <dl class="docutils" id="bounding-function">
 <dt>Bounding Function:</dt>
 <dd>This is a function that takes as an argument an <a class="reference internal" href="#individual">individual</a> of the Optimizee (an <a class="reference internal" href="#individual-dict">Individual-Dict</a>) and returns an
 <a class="reference internal" href="#individual">individual</a> that is a ‘bounded’ version of the said individual. This bounding may for instance be implemented by means
-of clipping or normalization. Both the <a class="reference internal" href="ltl.optimizees.functions.html#ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee" title="ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee"><code class="xref py py-class docutils literal"><span class="pre">FunctionGeneratorOptimizee</span></code></a> and the
-<a class="reference internal" href="ltl.optimizees.mnist.html#ltl.optimizees.mnist.optimizee.MNISTOptimizee" title="ltl.optimizees.mnist.optimizee.MNISTOptimizee"><code class="xref py py-class docutils literal"><span class="pre">MNISTOptimizee</span></code></a> implement bounding functions in their classes which may be used in case a
+of clipping or normalization. Both the <a class="reference internal" href="ltl.optimizees.functions.html#ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee" title="ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionGeneratorOptimizee</span></code></a> and the
+<a class="reference internal" href="ltl.optimizees.mnist.html#ltl.optimizees.mnist.optimizee.MNISTOptimizee" title="ltl.optimizees.mnist.optimizee.MNISTOptimizee"><code class="xref py py-class docutils literal notranslate"><span class="pre">MNISTOptimizee</span></code></a> implement bounding functions in their classes which may be used in case a
 function is required for bounding.</dd>
 </dl>
 <div class="section" id="important-notes-about-bounding">
@@ -549,8 +550,8 @@ of the parameters. And the <cite>bounding_func</cite> would only clip the values
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>See <a class="reference internal" href="ltl.optimizees.functions.html#ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee" title="ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee"><code class="xref py py-class docutils literal"><span class="pre">FunctionGeneratorOptimizee</span></code></a> for an example of an <cite>Optimizee</cite> (based on simple function minimization).</li>
-<li>See <a class="reference internal" href="ltl.optimizers.simulatedannealing.html#ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer" title="ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer"><code class="xref py py-class docutils literal"><span class="pre">SimulatedAnnealingOptimizer</span></code></a> for an example of an implementation of simulated annealing <cite>Optimizer</cite>.</li>
+<li>See <a class="reference internal" href="ltl.optimizees.functions.html#ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee" title="ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionGeneratorOptimizee</span></code></a> for an example of an <cite>Optimizee</cite> (based on simple function minimization).</li>
+<li>See <a class="reference internal" href="ltl.optimizers.simulatedannealing.html#ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer" title="ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimulatedAnnealingOptimizer</span></code></a> for an example of an implementation of simulated annealing <cite>Optimizer</cite>.</li>
 <li>See <a class="reference internal" href="ltl-bin.html#ltl-experiments"><span class="std std-ref">LTL Experiments</span></a> for an example implementation of an LTL experiment with an arbitrary <cite>Optimizee</cite> and <cite>Optimizer</cite>.</li>
 </ul>
 </div>
@@ -559,7 +560,7 @@ of the parameters. And the <cite>bounding_func</cite> would only clip the values
 <p>Having run the simulation, the next superpower required is the ability to make sense of all the data that we’ve dumped
 into the trajectory and (consequently) the HDF5 file. Of course you could use the functions that pypet provides for this
 purpose but the complexity of the interface is rather discouraging. Therefore to cover the most common cases (In fact, I
-really haven’t YET come across any other cases), We have created the <a class="reference internal" href="ltl.dataprocessing.html#module-ltl.dataprocessing" title="ltl.dataprocessing"><code class="xref py py-mod docutils literal"><span class="pre">dataprocessing</span></code></a> with the relevant
+really haven’t YET come across any other cases), We have created the <a class="reference internal" href="ltl.dataprocessing.html#module-ltl.dataprocessing" title="ltl.dataprocessing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">dataprocessing</span></code></a> with the relevant
 functions. Look up the documentation of the module for further details.</p>
 </div>
 <div class="section" id="parallelization">
@@ -569,16 +570,16 @@ functions. Look up the documentation of the module for further details.</p>
 mode to use.</p>
 <ul class="simple">
 <li>For both single-node-multi-core parallelization (SNMCP) and multi-node-multi-core parallelization (MNMCP) pass in the following arguments
-when initializing the <a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/environmentdoc.html#pypet.environment.Environment" title="(in pypet v0.4)"><code class="xref py py-class docutils literal"><span class="pre">Environment</span></code></a> in the <cite>bin</cite> script.</li>
+when initializing the <a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/environmentdoc.html#pypet.environment.Environment" title="(in pypet v0.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Environment</span></code></a> in the <cite>bin</cite> script.</li>
 </ul>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">multiproc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">multiproc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="n">use_scoop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="n">wrap_mode</span><span class="o">=</span><span class="n">pypetconstants</span><span class="o">.</span><span class="n">WRAP_MODE_LOCAL</span><span class="p">,</span>
 </pre></div>
 </div>
 <ul class="simple">
-<li>For SNMCP, run the script with <code class="docutils literal"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">scoop</span> <span class="pre">&lt;script</span> <span class="pre">name&gt;</span></code></li>
-<li>For MNMCP, run the script with <code class="docutils literal"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">scoop</span> <span class="pre">--hostfile</span> <span class="pre">hosts.txt</span> <span class="pre">&lt;script</span> <span class="pre">name&gt;</span></code>, where <cite>hosts.txt</cite> contains a list
+<li>For SNMCP, run the script with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">scoop</span> <span class="pre">&lt;script</span> <span class="pre">name&gt;</span></code></li>
+<li>For MNMCP, run the script with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">scoop</span> <span class="pre">--hostfile</span> <span class="pre">hosts.txt</span> <span class="pre">&lt;script</span> <span class="pre">name&gt;</span></code>, where <cite>hosts.txt</cite> contains a list
 of hosts and the number of cores.</li>
 </ul>
 <p>See the <a class="reference external" href="https://scoop.readthedocs.io/en/0.7/usage.html#how-to-launch-scoop-programs">scoop documentation</a> for more details.</p>
@@ -587,24 +588,24 @@ of hosts and the number of cores.</li>
 <span id="id10"></span><h2>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
 <li><p class="first">Always use the <cite>logger</cite> object obtained from:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;heirarchical.logger.name&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;heirarchical.logger.name&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>to output messages to a console/file.</p>
 </li>
 <li><p class="first">Setting up logging in a multiprocessing environment is a mind-numbingly painful process. Therefore, to keep users
-sane, we have provided the module <a class="reference internal" href="ltl.logging_tools.html#module-ltl.logging_tools" title="ltl.logging_tools"><code class="xref py py-mod docutils literal"><span class="pre">logging_tools</span></code></a> with 2 functions which can be used to conveniently setup
+sane, we have provided the module <a class="reference internal" href="ltl.logging_tools.html#module-ltl.logging_tools" title="ltl.logging_tools"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging_tools</span></code></a> with 2 functions which can be used to conveniently setup
 logging. See the module documentation for more details.</p>
 </li>
 <li><p class="first">As far as using loggers is concerned, the convention is one logger per file. The name of the logger should reflect
 module hierarchy. For example, the logger used in the file <cite>optimizers/crossentropy/optimizer.py</cite> is named
-<code class="docutils literal"><span class="pre">'optimizers.crossentropy'</span></code></p>
+<code class="docutils literal notranslate"><span class="pre">'optimizers.crossentropy'</span></code></p>
 </li>
 <li><p class="first">A logger is uniquely identified by its name throughout the python process (i.e. it’s kinda like a global variable).
-Thus if two different files use <code class="docutils literal"><span class="pre">'optimizer.crossentropy'</span></code> then their logs will be redirect to the same logger.</p>
+Thus if two different files use <code class="docutils literal notranslate"><span class="pre">'optimizer.crossentropy'</span></code> then their logs will be redirect to the same logger.</p>
 </li>
 </ol>
-<p>You can modify the <code class="file docutils literal"><span class="pre">bin/logging.yaml</span></code> file to choose the output level and to redirect messages to console or
+<p>You can modify the <code class="file docutils literal notranslate"><span class="pre">bin/logging.yaml</span></code> file to choose the output level and to redirect messages to console or
 file.</p>
 <p>See the <a class="reference external" href="https://docs.python.org/3/howto/logging.html">Python logging tutorial</a> for more details.</p>
 </div>
@@ -621,8 +622,8 @@ different <a class="reference internal" href="#individual-dicts">Individual-Dict
 like they are optimizing a vector (in the case of python, a list). Thus, the Optimizer requires the ability to convert
 back and forth between a list and a dictionary. For this purpose, we have the following functions</p>
 <ol class="arabic simple">
-<li><a class="reference internal" href="ltl.html#ltl.dict_to_list" title="ltl.dict_to_list"><code class="xref py py-meth docutils literal"><span class="pre">dict_to_list()</span></code></a></li>
-<li><a class="reference internal" href="ltl.html#ltl.list_to_dict" title="ltl.list_to_dict"><code class="xref py py-meth docutils literal"><span class="pre">list_to_dict()</span></code></a></li>
+<li><a class="reference internal" href="ltl.html#ltl.dict_to_list" title="ltl.dict_to_list"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict_to_list()</span></code></a></li>
+<li><a class="reference internal" href="ltl.html#ltl.list_to_dict" title="ltl.list_to_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">list_to_dict()</span></code></a></li>
 </ol>
 <p>Check their documentation for more details.</p>
 </div>
@@ -671,7 +672,7 @@ simulations across multiple hosts in a cluster.</li>
       <!-- footer -->
       <footer role="contentinfo">
           &copy; Copyright 2017, Anand Subramoney.
-        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.2.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1.
       </footer>
       <!-- /footer -->
 

@@ -41,6 +41,7 @@
     <script type="text/javascript" src="_static/js/jquery.min.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/bootstrap3.min.js"></script>
 <script type="text/javascript" src="_static/js/jquery.cookie.min.js"></script>
 <script type="text/javascript" src="_static/js/basicstrap.js"></script>
@@ -119,7 +120,7 @@
          
 <div class="col-md-3 hidden-xs" id="sidebar-wrapper">
   <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
-<h3><a href="index.html">Table Of Contents</a></h3>
+<h3><a href="index.html">Table of Contents</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Overview</a></li>
@@ -215,13 +216,13 @@ be stored. This directory must be an existing directory.</li>
 <dt id="ltl.logging_tools.configure_loggers">
 <code class="descclassname">ltl.logging_tools.</code><code class="descname">configure_loggers</code><span class="sig-paren">(</span><em>exactly_once=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl/logging_tools.html#configure_loggers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.logging_tools.configure_loggers" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function configures the loggers using the shared information that was set by
-<a class="reference internal" href="#ltl.logging_tools.create_shared_logger_data" title="ltl.logging_tools.create_shared_logger_data"><code class="xref py py-func docutils literal"><span class="pre">create_shared_logger_data()</span></code></a>. This function must be run at the beginning
+<a class="reference internal" href="#ltl.logging_tools.create_shared_logger_data" title="ltl.logging_tools.create_shared_logger_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_shared_logger_data()</span></code></a>. This function must be run at the beginning
 of every function that is parallelized in order to be able to reliably
 configure the loggers. As an example look at its usage in the method
-<a class="reference internal" href="ltl.optimizees.functions.html#ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee.simulate" title="ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee.simulate"><code class="xref py py-meth docutils literal"><span class="pre">simulate()</span></code></a> from the
-class <a class="reference internal" href="ltl.optimizees.functions.html#ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee" title="ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee"><code class="xref py py-class docutils literal"><span class="pre">FunctionGeneratorOptimizee</span></code></a></p>
+<a class="reference internal" href="ltl.optimizees.functions.html#ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee.simulate" title="ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee.simulate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">simulate()</span></code></a> from the
+class <a class="reference internal" href="ltl.optimizees.functions.html#ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee" title="ltl.optimizees.functions.optimizee.FunctionGeneratorOptimizee"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionGeneratorOptimizee</span></code></a></p>
 <p>You may also wish to call this function in your main simulation (after calling
-<a class="reference internal" href="#ltl.logging_tools.create_shared_logger_data" title="ltl.logging_tools.create_shared_logger_data"><code class="xref py py-func docutils literal"><span class="pre">create_shared_logger_data()</span></code></a>) to configure the logging for the root process
+<a class="reference internal" href="#ltl.logging_tools.create_shared_logger_data" title="ltl.logging_tools.create_shared_logger_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_shared_logger_data()</span></code></a>) to configure the logging for the root process
 before any of the parallelized functions are run.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -273,7 +274,7 @@ exactly once per scoop worker.</td>
       <!-- footer -->
       <footer role="contentinfo">
           &copy; Copyright 2017, Anand Subramoney.
-        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.2.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1.
       </footer>
       <!-- /footer -->
 
