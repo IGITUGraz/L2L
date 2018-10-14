@@ -238,10 +238,6 @@ class ParallelTemperingOptimizer(Optimizer):
         
         assert schedule_known, print("Warning: Unknown cooling schedule")
         
-        self.recorder_parameters = ParallelTemperingParameters(n_parallel_runs=parameters.n_parallel_runs, noisy_step=parameters.noisy_step, n_iteration=parameters.n_iteration, stop_criterion=parameters.stop_criterion,
-                                                               seed=parameters.seed, cooling_schedules=cooling_schedules_string, 
-                                                               temperature_bounds=temperature_bounds_string, decay_parameters=decay_parameters_string)
-        
     def cooling(self,temperature, cooling_schedule, decay_parameter, temperature_bounds, steps_total):        
         
         T0, temperature_end = temperature_bounds
@@ -287,14 +283,6 @@ class ParallelTemperingOptimizer(Optimizer):
             
         return 1
         
-    def get_params(self):
-        """
-        Get parameters used for recorder
-        :return: Dictionary containing recorder parameters
-        """
-        param_dict = self.recorder_parameters._asdict()
-        return param_dict
-           
     def post_process(self, traj, fitnesses_results):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`

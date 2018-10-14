@@ -127,7 +127,6 @@ class SimulatedAnnealingOptimizer(Optimizer):
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters, optimizee_bounding_func=optimizee_bounding_func)
 
-        self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func
 
         # The following parameters are recorded
@@ -205,14 +204,6 @@ class SimulatedAnnealingOptimizer(Optimizer):
             return temperature_end + (T0 - temperature_end) * (1 + np.cos(k * 3.1415 / steps_total)) / 2
 
         return -1
-
-    def get_params(self):
-        """
-        Get parameters used for recorder
-        :return: Dictionary containing recorder parameters
-        """
-        param_dict = self.recorder_parameters._asdict()
-        return param_dict
 
     def post_process(self, traj, fitnesses_results):
         """

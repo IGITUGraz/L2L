@@ -10,7 +10,6 @@ from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from ltl.optimizers.evolution import GeneticAlgorithmOptimizer, GeneticAlgorithmParameters
 from ltl.paths import Paths
-from ltl.recorder import Recorder
 
 import utils.JUBE_runner as jube
 
@@ -124,19 +123,11 @@ def main():
     # Add post processing
     env.add_postprocessing(optimizer.post_process)
 
-    # Add Recorder
-    recorder = Recorder(trajectory=traj,
-                        optimizee_name=benchmark_name, optimizee_parameters=benchmark_parameters,
-                        optimizer_name=optimizer.__class__.__name__,
-                        optimizer_parameters=optimizer.get_params())
-    recorder.start()
-
     # Run the simulation with all parameter combinations
     env.run(optimizee.simulate)
 
     ## Outerloop optimizer end
     optimizer.end()
-    recorder.end()
 
     # Finally disable logging and close all log-files
     env.disable_logging()

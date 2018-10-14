@@ -111,7 +111,6 @@ class GradientDescentOptimizer(Optimizer):
                          optimizee_create_individual=optimizee_create_individual,
                          optimizee_fitness_weights=optimizee_fitness_weights,
                          parameters=parameters, optimizee_bounding_func=optimizee_bounding_func)
-        self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func
         
         traj.f_add_parameter('learning_rate', parameters.learning_rate, comment='Value of learning rate')
@@ -169,13 +168,6 @@ class GradientDescentOptimizer(Optimizer):
         
         self.eval_pop = new_individual_list
         self._expand_trajectory(traj)
-
-    def get_params(self):
-        """
-        Get parameters used for recorder
-        :return: Dictionary containing recorder parameters
-        """
-        return self.recorder_parameters._asdict()
 
     def post_process(self, traj, fitnesses_results):
         """

@@ -189,14 +189,6 @@ class GeneticAlgorithmOptimizer(Optimizer):
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 
-    def get_params(self):
-        """
-        Get parameters used for recorder
-        :return: Dictionary containing recorder parameters
-        """
-        param_dict = {}
-        return param_dict
-
     def end(self):
         """
         See :meth:`~ltl.optimizers.optimizer.Optimizer.end`

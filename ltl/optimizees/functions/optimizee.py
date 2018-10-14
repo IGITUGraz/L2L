@@ -36,15 +36,6 @@ class FunctionGeneratorOptimizee(Optimizee):
 
         self.random_state = np.random.RandomState(seed=seed)
 
-    def get_params(self):
-        """
-        Get the important parameters of the optimizee. This is used by :class:`ltl.recorder`
-        for recording the optimizee parameters.
-
-        :return: a :class:`dict`
-        """
-        return self.fg_instance.get_params()
-
     def create_individual(self):
         """
         Creates a random value of parameter within given bounds

@@ -69,7 +69,6 @@ class GridSearchOptimizer(Optimizer):
                          optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters,
                          optimizee_bounding_func=optimizee_bounding_func)
 
-        self.recorder_parameters = parameters
         self.best_individual = None
         self.best_fitness = None
 
@@ -110,13 +109,6 @@ class GridSearchOptimizer(Optimizer):
         self.g = 0
         #: The population (i.e. list of individuals) to be evaluated at the next iteration
         self.eval_pop = None
-
-    def get_params(self):
-        """
-        Get parameters used for recorder
-        :return: Dictionary containing recorder parameters
-        """
-        return self.recorder_parameters._asdict()
 
     def post_process(self, traj, fitnesses_results):
         """

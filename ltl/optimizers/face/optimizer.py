@@ -79,7 +79,6 @@ class FACEOptimizer(Optimizer):
                          optimizee_fitness_weights=optimizee_fitness_weights, parameters=parameters,
                          optimizee_bounding_func=optimizee_bounding_func)
 
-        self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func
 
         if parameters.min_pop_size < 1:
@@ -155,15 +154,6 @@ class FACEOptimizer(Optimizer):
         self.current_distribution.fit(self.eval_pop_asarray)
 
         self._expand_trajectory(traj)
-
-    def get_params(self):
-        """
-        Get parameters used for recorder
-        :return: Dictionary containing recorder parameters
-        """
-        param_dict = self.recorder_parameters._asdict()
-        param_dict['distribution'] = self.recorder_parameters.distribution.get_params()
-        return param_dict
 
     def post_process(self, traj, fitnesses_results):
         """

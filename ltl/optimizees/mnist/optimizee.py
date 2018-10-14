@@ -46,7 +46,6 @@ class MNISTOptimizee(Optimizee):
 
         seed = parameters.seed
         n_hidden = parameters.n_hidden
-        self.recorder_parameters = parameters._asdict()
 
         seed = np.uint32(seed)
         self.random_state = np.random.RandomState(seed=seed)
@@ -61,15 +60,6 @@ class MNISTOptimizee(Optimizee):
         for key, val in indiv_dict.items():
             traj.individual.f_add_parameter(key, val)
         traj.individual.f_add_parameter('seed', seed)
-
-    def get_params(self):
-        """
-        Get the important parameters of the optimizee. This is used by :class:`ltl.recorder`
-        for recording the optimizee parameters.
-
-        :return: a :class:`dict`
-        """
-        return self.recorder_parameters
 
     def create_individual(self):
         """

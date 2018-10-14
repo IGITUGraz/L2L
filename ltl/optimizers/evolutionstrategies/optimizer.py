@@ -107,7 +107,6 @@ class EvolutionStrategiesOptimizer(Optimizer):
             parameters=parameters,
             optimizee_bounding_func=optimizee_bounding_func)
 
-        self.recorder_parameters = parameters
         self.optimizee_bounding_func = optimizee_bounding_func
 
         if parameters.pop_size < 1:
@@ -181,15 +180,6 @@ class EvolutionStrategiesOptimizer(Optimizer):
         if mirrored_sampling_enabled:
             return np.vstack((perturbations, -perturbations))
         return perturbations
-
-    def get_params(self):
-        """
-        Get parameters used for recorder
-        :return: Dictionary containing recorder parameters
-        """
-
-        param_dict = self.recorder_parameters._asdict()
-        return param_dict
 
     def post_process(self, traj, fitnesses_results):
         """
