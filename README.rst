@@ -9,6 +9,8 @@ About
 
 The LTL (Learning-to-learn) gradient-free optimization framework contains well documented and tested implementations of various gradient free optimization algorithms. It also defines an API that makes it easy to optimize (hyper-)parameters for any task (optimizee). All the implementations in this package are parallel and can run across different cores and nodes (but equally well on a single core). 
 
+NOTE: The LTL framework is currently in **BETA**
+
 Getting Started
 ***************
 
