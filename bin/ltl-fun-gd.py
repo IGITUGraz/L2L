@@ -2,8 +2,7 @@ import logging.config
 import os
 
 import numpy as np
-from pypet import Environment
-from pypet import pypetconstants
+from utils.environment import Environment
 
 from ltl.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from ltl.optimizees.functions.optimizee import FunctionGeneratorOptimizee
@@ -17,6 +16,7 @@ from ltl.paths import Paths
 from ltl.recorder import Recorder
 
 from ltl.logging_tools import create_shared_logger_data, configure_loggers
+import utils.JUBE_runner as jube
 
 logger = logging.getLogger('bin.ltl-fun-gradientdescent')
 
@@ -45,11 +45,10 @@ def main():
                       add_time=True,
                       freeze_input=True,
                       multiproc=True,
-                      use_scoop=True,
-                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
                       )
+
     create_shared_logger_data(logger_names=['bin', 'optimizers'],
                               log_levels=['INFO', 'INFO'],
                               log_to_consoles=[True, True],
@@ -59,6 +58,45 @@ def main():
 
     # Get the trajectory from the environment
     traj = env.trajectory
+
+    # Set JUBE params
+    traj.f_add_parameter_group("JUBE_params", "Contains JUBE parameters")
+
+    # Scheduler parameters
+    # Name of the scheduler
+    # traj.f_add_parameter_to_group("JUBE_params", "scheduler", "Slurm")
+    # Command to submit jobs to the schedulers
+    traj.f_add_parameter_to_group("JUBE_params", "submit_cmd", "sbatch")
+    # Template file for the particular scheduler
+    traj.f_add_parameter_to_group("JUBE_params", "job_file", "job.run")
+    # Number of nodes to request for each run
+    traj.f_add_parameter_to_group("JUBE_params", "nodes", "1")
+    # Requested time for the compute resources
+    traj.f_add_parameter_to_group("JUBE_params", "walltime", "00:01:00")
+    # MPI Processes per node
+    traj.f_add_parameter_to_group("JUBE_params", "ppn", "1")
+    # CPU cores per MPI process
+    traj.f_add_parameter_to_group("JUBE_params", "cpu_pp", "1")
+    # Threads per process
+    traj.f_add_parameter_to_group("JUBE_params", "threads_pp", "1")
+    # Type of emails to be sent from the scheduler
+    traj.f_add_parameter_to_group("JUBE_params", "mail_mode", "ALL")
+    # Email to notify events from the scheduler
+    traj.f_add_parameter_to_group("JUBE_params", "mail_address", "s.diaz@fz-juelich.de")
+    # Error file for the job
+    traj.f_add_parameter_to_group("JUBE_params", "err_file", "stderr")
+    # Output file for the job
+    traj.f_add_parameter_to_group("JUBE_params", "out_file", "stdout")
+    # JUBE parameters for multiprocessing. Relevant even without scheduler.
+    # MPI Processes per job
+    traj.f_add_parameter_to_group("JUBE_params", "tasks_per_job", "1")
+    # The execution command
+    traj.f_add_parameter_to_group("JUBE_params", "exec", "mpirun python3 " + root_dir_path +
+                                  "/run_files/run_optimizee.py")
+    # Ready file for a generation
+    traj.f_add_parameter_to_group("JUBE_params", "ready_file", root_dir_path + "/readyfiles/ready_w_")
+    # Path where the job will be executed
+    traj.f_add_parameter_to_group("JUBE_params", "work_path",root_dir_path)
 
     ## Benchmark function
     function_id = 4
@@ -73,6 +111,9 @@ def main():
     ## Innerloop simulator
     optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
 
+    #Prepare optimizee for jube runs
+    jube.prepare_optimizee(optimizee, root_dir_path)
+    ##
     ## Outerloop optimizer initialization
     # parameters = ClassicGDParameters(learning_rate=0.01, exploration_step_size=0.01,
     #                                  n_random_steps=5, n_iteration=100,
