@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     
-    <title>Overview &mdash; LTL 0.4.2 documentation</title>
+    <title>Overview &mdash; LTL 1.0.0-beta documentation</title>
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -32,7 +32,7 @@
 <script type="text/javascript">
   var DOCUMENTATION_OPTIONS = {
             URL_ROOT:    './',
-            VERSION:     '0.4.2',
+            VERSION:     '1.0.0-beta',
             COLLAPSE_INDEX: false,
             FILE_SUFFIX: '.html',
             HAS_SOURCE:  true
@@ -48,7 +48,7 @@
 </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="LTL 0.4.2 documentation" href="index.html" />
+    <link rel="top" title="LTL 1.0.0-beta documentation" href="index.html" />
     <link rel="next" title="API Reference" href="ltl.html" />
     <link rel="prev" title="Quickstart" href="quickstart.html" /> 
   </head>
@@ -62,7 +62,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="index.html">LTL 0.4.2 documentation</a>
+          <a class="navbar-brand" href="index.html">LTL 1.0.0-beta documentation</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
@@ -300,7 +300,7 @@ in <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimi
 method.  Each <cite>Optimizee</cite> run can happen in parallel across cores and even across nodes if enabled as described in
 <a class="reference internal" href="#parallelization"><span class="std std-ref">Parallelization</span></a>.</li>
 <li>the <cite>Optimizee</cite>’s <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal"><span class="pre">simulate()</span></code></a> method runs whatever simulation it has to run
-with the given <em>individual</em> (parameter) and returns a Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)"><code class="xref py py-obj docutils literal"><span class="pre">tuple</span></code></a> with one or more fitness values <a class="footnote-reference" href="#id4" id="id2">[1]</a>.</li>
+with the given <em>individual</em> (parameter) and returns a Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-obj docutils literal"><span class="pre">tuple</span></code></a> with one or more fitness values <a class="footnote-reference" href="#id4" id="id2">[1]</a>.</li>
 <li>Once the runs are done, <a class="reference internal" href="#pypet-section"><span class="std std-ref">Pypet</span></a> calls the <cite>Optimizer</cite>’s
 <a class="reference internal" href="ltl.optimizers.html#ltl.optimizers.optimizer.Optimizer.post_process" title="ltl.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal"><span class="pre">post_process()</span></code></a> method <a class="footnote-reference" href="#id5" id="id3">[2]</a> with the list of <em>individuals</em> and their fitness
 values as returned by the <cite>Optimizee</cite>’s <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee.simulate" title="ltl.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal"><span class="pre">simulate()</span></code></a> method.
@@ -312,7 +312,7 @@ attribute (after clearing it of the old <em>population</em>).</li>
 <table class="docutils footnote" frame="void" id="id4" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td><strong>NOTE:</strong> Even if there is only one fitness value, this function should still return a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)"><code class="xref py py-obj docutils literal"><span class="pre">tuple</span></code></a></td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td><strong>NOTE:</strong> Even if there is only one fitness value, this function should still return a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-obj docutils literal"><span class="pre">tuple</span></code></a></td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="id5" rules="none">
@@ -383,7 +383,7 @@ Additionally, PyPet automatically passes this object as an argument to the funct
 </div>
 <div class="section" id="individual-dicts">
 <span id="individual-dict"></span><span id="id7"></span><h4>Individual-Dict<a class="headerlink" href="#individual-dicts" title="Permalink to this headline">¶</a></h4>
-<p>This is the data structure used to represent <a class="reference internal" href="#individuals">individuals</a>. This is basically a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a> that has the parameter
+<p>This is the data structure used to represent <a class="reference internal" href="#individuals">individuals</a>. This is basically a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a> that has the parameter
 names as keys, and parameter values as values. The following need to be noted about the parameters stored in an
 <em>Individual-Dict</em>.</p>
 <ol class="arabic simple">
@@ -477,7 +477,7 @@ to these individuals.</p>
 to access and assign the relevant optimizee parameters in the parameter group <code class="xref py py-obj docutils literal"><span class="pre">traj.individual</span></code>. This is
 the reason for the contract enforced on the Optimizee constructor</p>
 <p>Note that all the (non-exploring) paramters to the <cite>Optimizer</cite> is passed in to its constructor through a
-<a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.6)"><code class="xref py py-func docutils literal"><span class="pre">namedtuple()</span></code></a> to keep the paramters documented. For examples see <a class="reference internal" href="ltl.optimizers.evolution.html#ltl.optimizers.evolution.optimizer.GeneticAlgorithmParameters" title="ltl.optimizers.evolution.optimizer.GeneticAlgorithmParameters"><code class="xref py py-class docutils literal"><span class="pre">GeneticAlgorithmParameters</span></code></a>
+<a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.7)"><code class="xref py py-func docutils literal"><span class="pre">namedtuple()</span></code></a> to keep the paramters documented. For examples see <a class="reference internal" href="ltl.optimizers.evolution.html#ltl.optimizers.evolution.optimizer.GeneticAlgorithmParameters" title="ltl.optimizers.evolution.optimizer.GeneticAlgorithmParameters"><code class="xref py py-class docutils literal"><span class="pre">GeneticAlgorithmParameters</span></code></a>
 or <a class="reference internal" href="ltl.optimizers.simulatedannealing.html#ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingParameters" title="ltl.optimizers.simulatedannealing.optimizer.SimulatedAnnealingParameters"><code class="xref py py-class docutils literal"><span class="pre">SimulatedAnnealingParameters</span></code></a></p>
 </div>
 <div class="section" id="the-post-process-function">
@@ -653,7 +653,7 @@ simulations across multiple hosts in a cluster.</li>
 <div id="navbar-related" class=" related navbar navbar-default" role="navigation" aria-label="related navigation">
   <div class="navbar-inner">
     <ul class="nav navbar-nav ">
-        <li><a href="index.html">LTL 0.4.2 documentation</a></li>
+        <li><a href="index.html">LTL 1.0.0-beta documentation</a></li>
     </ul>
 <ul class="nav navbar-nav pull-right hidden-xs hidden-sm">
       
