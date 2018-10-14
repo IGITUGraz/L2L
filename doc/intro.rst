@@ -3,9 +3,9 @@ Overview
 
 Introduction
 ************
-This is the Learning to Learn framework for experimenting with many different algorithms. The basic idea behind "Learning to
-Learn" is to have an "outer loop" optimizer optimizing the parameters of an "inner loop" optimizee. This particular
-framework is written for the case where the cycle goes as follows:
+This is the Learning to Learn gradient-free optimization framework for experimenting with many different algorithms. The
+basic idea behind "Learning to Learn" is to have an "outer loop" optimizer optimizing the parameters of an "inner loop"
+optimizee. This particular framework is written for the case where the cycle goes as follows:
 
 1. The outer-loop optimizer generates an instance of a set of parameters and provides it to the inner-loop optimizee
 2. The inner-loop optimizee evaluates how well this set of parameters performs and returns a "fitness" vector for each
@@ -63,46 +63,22 @@ The progress of execution in the script shown in :doc:`ltl-bin` goes as follows:
 
    .. _third-step:
 
-3. :ref:`Pypet <Pypet-Section>`  creates one `Optimizee` run for each *individual* (parameter)
-   in :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop` by calling the `Optimizee`'s :meth:`~ltl.optimizees.optimizee.Optimizee.simulate`
-   method.  Each `Optimizee` run can happen in parallel across cores and even across nodes if enabled as described in
-   :ref:`parallelization`.
+3. One `Optimizee` run for each *individual* (parameter) is created in
+   :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop` by calling the `Optimizee`'s
+   :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` method.  Each `Optimizee` run can happen in parallel across
+   cores and even across nodes if enabled as described in :ref:`parallelization`.
 4. the `Optimizee`'s :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` method runs whatever simulation it has to run
    with the given *individual* (parameter) and returns a Python :obj:`tuple` with one or more fitness values [#]_.
-5. Once the runs are done, :ref:`Pypet <Pypet-Section>` calls the `Optimizer`'s
-   :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` method [#]_ with the list of *individuals* and their fitness
-   values as returned by the `Optimizee`'s :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` method.
-   The `Optimizer` can choose to do whatever it wants with the fitnesses, and use
-   it to create a new set of *individuals* which it puts into its :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop`
-   attribute (after clearing it of the old *population*).
+5. Once the runs are done, `Optimizer`'s :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` method is called 
+   with the list of *individuals* and their fitness values as returned by the `Optimizee`'s
+   :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` method.  The `Optimizer` can choose to do whatever it wants with
+   the fitnesses, and use it to create a new set of *individuals* which it puts into its
+   :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop` attribute (after clearing it of the old *population*).
 6. The loop continues from :ref:`3. <third-step>`
 
 
 .. [#] **NOTE:** Even if there is only one fitness value, this function should still return a :obj:`tuple`
-.. [#] This is done using `PyPet <https://pythonhosted.org/pypet/>`_'s postprocessing facility and its
-   :meth:`~pypet.trajectory.Trajectory.f_expand()` function as documented `here
-   <http://pythonhosted.org/pypet/cookbook/environment.html#expanding-your-trajectory-via-post-processing>`_.
 
-.. _Pypet-Section:
-
-Usage of PyPet
-~~~~~~~~~~~~~~
-
-`PyPet <https://pythonhosted.org/pypet/>`_'s interface is used extensively to:
-
-1. Run the :ref:`iteration-loop` that:
-
-   a) Runs `Optimizees` (potentially in parallel) to evaluate the fitness of each individual_ in a population_.
-   b) Feeds back the results of the fitness evaluation back to the `Optimizer` which generates a new population
-      of individuals to evaluate.
-   c) Loop back to a) with the new set of parameters.
-2. Manage the :ref:`communication` between `Optimizer` and `Optimizee`.  This is done using the the :obj:`traj` object of type
-   :class:`~pypet.trajectory.Trajectory`.
-3. Store the results of all the runs, both the parameters and their fitnesses along with any other arbitrary data
-   included by the user, into a single hdf5 file.
-
-Note that most of the pypet functionality, especially those regarding the usage of trajectories is NOT abstracted
-out. The user is therefore engouraged to familiarize himself with the working of pypet trajectories.
 
 
 Writing new algorithms
@@ -128,7 +104,8 @@ Important Data Structures
 Trajectory
 ----------
 
-The Trajectory is a container that is central to the pypet simulation library. To quote from the PyPet website:
+The Trajectory is a container that is central to the simulation library. This concept is borrowed from `PyPet
+<https://pythonhosted.org/pypet/>`_. To quote from the PyPet website:
 
     The whole project evolves around a novel container object called trajectory. A trajectory is a container for parameters
     and results of numerical simulations in python. In fact a trajectory instantiates a tree and the tree structure will be
@@ -138,16 +115,16 @@ The Trajectory is a container that is central to the pypet simulation library. T
     conditions of your numerical simulations. Usually, these are very basic data types, like integers, floats or maybe a
     bit more complex numpy arrays.
 
-In the simulations using the LTL Framework, there is a single :class:`~pypet.trajectory.Trajectory` object (called
-:obj:`traj`). This object forms the backbone of communication between the optimizer, optimizee, and the
-PyPet framework. In short, it is used to acheive the following:
+In the simulations using the LTL Framework, there is a single :class:`~utils.trajectory.Trajectory` object (called
+:obj:`traj`). This object forms the backbone of communication between the optimizer and the optimizee. In short, it is
+used to acheive the following:
 
 1.  Storage of the parameters of the optimizer, optimizee, and individuals_ of the optimizee
 2.  Storage of the results of our simulation
 3.  Adaptive exploration of parameters via trajectory expansion.
 
 :obj:`traj` object is passed as a mandatory argument to the constructors of both the Optimizee and Optimizer.
-Additionally, PyPet automatically passes this object as an argument to the functions
+Additionally, we automatically passes this object as an argument to the functions
 :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` and :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
 
 .. _Individual-Dict:
@@ -188,8 +165,8 @@ The optimizee subclasses :class:`~ltl.optimizees.optimizee.Optimizee` with a cla
 2. :meth:`~ltl.optimizees.optimizee.Optimizee.bounding_func` : Called to return a clipped version of individual_ (returns an Individual-Dict_)
 3. :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` : Runs the actual simulation and returns a fitness vector
 
-In order to maintain a consistent framework for communication between the optimizer, optimizee, and :ref:`PyPet <Pypet-Section>`
-it is required to enforce certain requirements on the behaviour of the above functions. The details of these requirements for the
+In order to maintain a consistent framework for communication between the optimizer and optimizee it is required to
+enforce certain requirements on the behaviour of the above functions. The details of these requirements for the
 `Optimizee` functions are given below
 
 .. _optimizee-constructor:
@@ -249,9 +226,8 @@ And one optional method:
 
 1. :meth:`~ltl.optimizers.optimizer.Optimizer.end` : Tertiary method to do cleanup, printing results etc.
 
-Note that in order to maintain a consistent framework for communication between the optimizer, optimizee, and
-:ref:`PyPet <Pypet-Section>`, we enforce a certain protocol for the above function. The details of this protocol
-are outlined below
+Note that in order to maintain a consistent framework for communication between the optimizer and optimizee, we enforce
+a certain protocol for the above function. The details of this protocol are outlined below
 
 .. _optimizer-constructor:
 
@@ -293,17 +269,13 @@ raise an error
 
 Some points to remember are the following:
 
-1.  The call to `self._expand_trajectory` not only causes the trajectory to store more parameter values to explore,
-    bu, due to the mechanism underlying :meth:`~pypet.trajectory.Trajectory.f_expand()`, also causes the
-    :ref:`Pypet <Pypet-Section>` framework to run the optimizee :meth:`~ltl.optimizees.optimizee.Optimizee.simulate`
-    function on these parameters. Look at the documentation referenced in the footnote of iteration-loop_ for more
-    details on this
+1.  The call to `self._expand_trajectory` not only causes the trajectory to store more parameter values to explore, but,
+    due to the mechanism underlying :meth:`~utils.trajectory.Trajectory.f_expand()`, also causes the framework to run
+    the optimizee :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` function on these parameters. Look at the
+    documentation referenced in the footnote of iteration-loop_ for more details on this
 
 2.  **Always** build the optimizer to maximize fitness. The weights that are passed in to the optimizer constructor
     can be made negative if one wishes to perform minimization
-
-.. See the `PyPet documentation <https://pythonhosted.org/pypet/manual/introduction.html#what-to-do-with-pypet>`_ for more
-.. documentation to understand how PyPet works.
 
 See the class documentation for more details: :class:`~ltl.optimizers.optimizer.Optimizer`
 
@@ -320,7 +292,7 @@ any of the test simulations.
 To run a LTL simulation, copy the file :file:`bin/ltl-template.py` (see :doc:`ltl-bin`) to
 :file:`bin/ltl-{optimizeeabbr}-{optimizerabbr}.py`. Then fill in all the **TODOs** . Especially the parts with the
 initialization of the appropriate `Optimizers` and `Optimizees`. The rest of the code should be left in place for
-logging, recording and PyPet. See the source of :file:`bin/ltl-template.py` for more details.
+logging and recording. See the source of :file:`bin/ltl-template.py` for more details.
 
 
 Parameter Bounding
@@ -365,35 +337,17 @@ Data postprocessing
 *******************
 
 Having run the simulation, the next superpower required is the ability to make sense of all the data that we've dumped
-into the trajectory and (consequently) the HDF5 file. Of course you could use the functions that pypet provides for this
-purpose but the complexity of the interface is rather discouraging. Therefore to cover the most common cases (In fact, I
-really haven't YET come across any other cases), We have created the :mod:`~ltl.dataprocessing` with the relevant
-functions. Look up the documentation of the module for further details.
+into the trajectory and (consequently) the HDF5 file.  Therefore to cover the most common cases (In fact, I really
+haven't YET come across any other cases), We have created the :mod:`~ltl.dataprocessing` with the relevant functions.
+Look up the documentation of the module for further details.
 
 .. _parallelization:
 
 Parallelization
 ***************
 
-PyPet also supports running different instances of the experiments on different cores and hosts (using the
-`SCOOP <https://scoop.readthedocs.io/en/0.7/>`_ library). The parameters passed to PyPet determine which Parallelization
-mode to use.
+We also support running different instances of the experiments on different cores and hosts using Jube.
 
-* For both single-node-multi-core parallelization (SNMCP) and multi-node-multi-core parallelization (MNMCP) pass in the following arguments
-  when initializing the :class:`~pypet.environment.Environment` in the `bin` script.
-
-.. code:: python
-
-    multiproc=True,
-    use_scoop=True,
-    wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
-
-* For SNMCP, run the script with ``python -m scoop <script name>``
-
-* For MNMCP, run the script with ``python -m scoop --hostfile hosts.txt <script name>``, where `hosts.txt` contains a list
-  of hosts and the number of cores.
-
-See the `scoop documentation <https://scoop.readthedocs.io/en/0.7/usage.html#how-to-launch-scoop-programs>`_ for more details.
 
 .. _logging:
 
@@ -425,9 +379,9 @@ See the `Python logging tutorial <https://docs.python.org/3/howto/logging.html>`
 Additional Utilities and Protocols
 **********************************
 
-While the essential interface between Optimizers, Optimizers, and :ref:`PyPet <Pypet-Section>` is completely defined
-above, The practical implementation of Optimizers and Optimizees demands certain frequently used data structures and
-functions. These are detailed here
+While the essential interface between Optimizers and Optimizers is completely defined above, The practical
+implementation of Optimizers and Optimizees demands certain frequently used data structures and functions. These are
+detailed here
 
 dict-to-list-to-dict Conversion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -442,12 +396,3 @@ back and forth between a list and a dictionary. For this purpose, we have the fo
 2.  :meth:`~ltl.list_to_dict`
 
 Check their documentation for more details.
-
-
-
-Other packages used
-*******************
-* `PyPet <https://pythonhosted.org/pypet/>`_: This is a parameter exploration toolkit that managers exploration
-  of parameter space *and* storing the results in a standard format (HDF5).
-* `SCOOP <https://scoop.readthedocs.io/en/0.7/>`_: This is optionally used for distributing individual Optimizee
-  simulations across multiple hosts in a cluster.
