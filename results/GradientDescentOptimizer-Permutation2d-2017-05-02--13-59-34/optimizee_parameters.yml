@@ -1,6 +1,0 @@
-benchmark_id: 11
-dims: 2
-functions:
-- PermutationParameters: {beta: 0.005}
-mu: 0.0
-sigma: 0.01

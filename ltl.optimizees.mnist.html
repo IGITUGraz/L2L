@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    
+    <title>Optimizee for MNIST &mdash; LTL 0.4.2 documentation</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    
+
+<link rel="stylesheet" href="_static/css/basicstrap-base.css" type="text/css" />
+<link rel="stylesheet" id="current-theme" href="_static/css/bootstrap3/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" id="current-adjust-theme" type="text/css" />
+
+<link rel="stylesheet" href="_static/css/font-awesome.min.css">
+
+<style type="text/css">
+  body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+</style>
+
+<link rel="stylesheet" href="_static/css/basicstrap.css" type="text/css" />
+<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+<script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    './',
+            VERSION:     '0.4.2',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+  };
+</script>
+    <script type="text/javascript" src="_static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/bootstrap3.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery.cookie.min.js"></script>
+<script type="text/javascript" src="_static/js/basicstrap.js"></script>
+<script type="text/javascript">
+</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="LTL 0.4.2 documentation" href="index.html" />
+    <link rel="up" title="Optimizees" href="ltl.optimizees.html" />
+    <link rel="next" title="Optimizers" href="ltl.optimizers.html" />
+    <link rel="prev" title="Optimizee for simple functions" href="ltl.optimizees.functions.html" /> 
+  </head>
+  <body role="document">
+    <div id="navbar-top" class="navbar navbar-fixed-top navbar-default" role="navigation" aria-label="top navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index.html">LTL 0.4.2 documentation</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown visible-xs">
+                <a role="button" id="localToc" data-toggle="dropdown" data-target="#" href="#">Table Of Contents <b class="caret"></b></a>
+                <ul class="dropdown-menu localtoc sp-localtoc" role="menu" aria-labelledby="localToc">
+                <ul>
+<li><a class="reference internal" href="#">Optimizee for MNIST</a><ul>
+<li><a class="reference internal" href="#mnistoptimizee">MNISTOptimizee</a></li>
+<li><a class="reference internal" href="#mnistoptimizeeparameters">MNISTOptimizeeParameters</a></li>
+</ul>
+</li>
+</ul>
+
+                </ul>
+              </li>
+
+            
+              <li><a href="ltl.optimizees.functions.html" title="Optimizee for simple functions" accesskey="P">previous </a></li>
+              <li><a href="ltl.optimizers.html" title="Optimizers" accesskey="N">next </a></li>
+              <li><a href="py-modindex.html" title="Python Module Index" >modules </a></li>
+              <li><a href="genindex.html" title="General Index" accesskey="I">index </a></li>
+              <li><a href="ltl.html" >API Reference</a></li>
+              <li><a href="ltl.optimizees.html" accesskey="U">Optimizees</a></li>
+            
+            <li class="visible-xs"><a href="_sources/ltl.optimizees.mnist.rst.txt" rel="nofollow">Show Source</a></li>
+
+            <li class="visible-xs">
+                <form class="search form-search form-inline navbar-form navbar-right sp-searchbox" action="search.html" method="get">
+                  <div class="input-append input-group">
+                    <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+                    <span class="input-group-btn">
+                    <input type="submit" class="btn" value="Go" />
+                    </span>
+                  </div>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </li>
+
+            
+
+          </ul>
+
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- container -->
+    <div class="container-fluid">
+
+      <!-- row -->
+      <div class="row">
+         
+<div class="col-md-3 hidden-xs" id="sidebar-wrapper">
+  <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
+<h3><a href="index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="ltl.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ltl.optimizees.html">Optimizees</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ltl.optimizees.html#optimizee-base-module">Optimizee Base Module</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="ltl.optimizees.html#implemented-examples">Implemented examples</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="ltl.optimizees.functions.html">Optimizee for simple functions</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Optimizee for MNIST</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#mnistoptimizee">MNISTOptimizee</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#mnistoptimizeeparameters">MNISTOptimizeeParameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ltl.optimizers.html">Optimizers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ltl.dataprocessing.html">Data Processing Utility Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ltl.logging_tools.html">Logging Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ltl.html#other-module-functions">Other module functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ltl-bin.html">LTL Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="indices.html">Indices and tables</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ltl.optimizees.functions.html"
+                        title="previous chapter">Optimizee for simple functions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ltl.optimizers.html"
+                        title="next chapter">Optimizers</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ltl.optimizees.mnist.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" role="search">
+  <h3>Quick search</h3>
+  <form class="search form-inline" action="search.html" method="get">
+      <div class="input-append input-group">
+        <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+        <span class="input-group-btn">
+        <input type="submit" class="btn" value="Go" />
+        </span>
+      </div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+  </div>
+</div> 
+        
+
+        <div class="col-md-9" id="content-wrapper">
+          <div class="document" role="main">
+            <div class="documentwrapper">
+              <div class="bodywrapper">
+                <div class="body">
+                  
+  <div class="section" id="optimizee-for-mnist">
+<h1>Optimizee for MNIST<a class="headerlink" href="#optimizee-for-mnist" title="Permalink to this headline">¶</a></h1>
+<p>The fitness function to optimize is the MNIST performance.</p>
+<div class="section" id="mnistoptimizee">
+<h2>MNISTOptimizee<a class="headerlink" href="#mnistoptimizee" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ltl.optimizees.mnist.optimizee.MNISTOptimizee">
+<em class="property">class </em><code class="descclassname">ltl.optimizees.mnist.optimizee.</code><code class="descname">MNISTOptimizee</code><span class="sig-paren">(</span><em>traj</em>, <em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl/optimizees/mnist/optimizee.html#MNISTOptimizee"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.optimizees.mnist.optimizee.MNISTOptimizee" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ltl.optimizees.html#ltl.optimizees.optimizee.Optimizee" title="ltl.optimizees.optimizee.Optimizee"><code class="xref py py-class docutils literal"><span class="pre">ltl.optimizees.optimizee.Optimizee</span></code></a></p>
+<p>Implements a simple function optimizee. Functions are generated using the FunctionGenerator.
+NOTE: Make sure the optimizee_fitness_weights is set to (-1,) to minimize the value of the function</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>traj</strong> – The trajectory used to conduct the optimization.</li>
+<li><strong>parameters</strong> – Instance of <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.7)"><code class="xref py py-func docutils literal"><span class="pre">namedtuple()</span></code></a> <a class="reference internal" href="#ltl.optimizees.mnist.optimizee.MNISTOptimizeeParameters" title="ltl.optimizees.mnist.optimizee.MNISTOptimizeeParameters"><code class="xref py py-class docutils literal"><span class="pre">MNISTOptimizeeParameters</span></code></a></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="ltl.optimizees.mnist.optimizee.MNISTOptimizee.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl/optimizees/mnist/optimizee.html#MNISTOptimizee.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.optimizees.mnist.optimizee.MNISTOptimizee.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the important parameters of the optimizee. This is used by <code class="xref py py-class docutils literal"><span class="pre">ltl.recorder</span></code>
+for recording the optimizee parameters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ltl.optimizees.mnist.optimizee.MNISTOptimizee.create_individual">
+<code class="descname">create_individual</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl/optimizees/mnist/optimizee.html#MNISTOptimizee.create_individual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.optimizees.mnist.optimizee.MNISTOptimizee.create_individual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a random value of parameter within given bounds</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ltl.optimizees.mnist.optimizee.MNISTOptimizee.bounding_func">
+<code class="descname">bounding_func</code><span class="sig-paren">(</span><em>individual</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl/optimizees/mnist/optimizee.html#MNISTOptimizee.bounding_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.optimizees.mnist.optimizee.MNISTOptimizee.bounding_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bounds the individual within the required bounds via coordinate clipping</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ltl.optimizees.mnist.optimizee.MNISTOptimizee.simulate">
+<code class="descname">simulate</code><span class="sig-paren">(</span><em>traj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ltl/optimizees/mnist/optimizee.html#MNISTOptimizee.simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ltl.optimizees.mnist.optimizee.MNISTOptimizee.simulate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the function chosen during initialization</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>traj</strong> (<a class="reference external" href="https://pypet.readthedocs.io/en/latest/pypetdoc/trajectorydoc.html#pypet.trajectory.Trajectory" title="(in pypet v0.4)"><em>Trajectory</em></a>) – Trajectory</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a single element <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-obj docutils literal"><span class="pre">tuple</span></code></a> containing the value of the chosen function</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="mnistoptimizeeparameters">
+<h2>MNISTOptimizeeParameters<a class="headerlink" href="#mnistoptimizeeparameters" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ltl.optimizees.mnist.optimizee.MNISTOptimizeeParameters">
+<em class="property">class </em><code class="descclassname">ltl.optimizees.mnist.optimizee.</code><code class="descname">MNISTOptimizeeParameters</code><span class="sig-paren">(</span><em>n_hidden</em>, <em>seed</em>, <em>use_small_mnist</em><span class="sig-paren">)</span><a class="headerlink" href="#ltl.optimizees.mnist.optimizee.MNISTOptimizeeParameters" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="ltl.optimizees.mnist.optimizee.MNISTOptimizeeParameters.n_hidden">
+<code class="descname">n_hidden</code><a class="headerlink" href="#ltl.optimizees.mnist.optimizee.MNISTOptimizeeParameters.n_hidden" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="ltl.optimizees.mnist.optimizee.MNISTOptimizeeParameters.seed">
+<code class="descname">seed</code><a class="headerlink" href="#ltl.optimizees.mnist.optimizee.MNISTOptimizeeParameters.seed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="ltl.optimizees.mnist.optimizee.MNISTOptimizeeParameters.use_small_mnist">
+<code class="descname">use_small_mnist</code><a class="headerlink" href="#ltl.optimizees.mnist.optimizee.MNISTOptimizeeParameters.use_small_mnist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+      </div><!-- /row -->
+
+      <!-- row -->
+      <div class="row footer-relbar">
+<div id="navbar-related" class=" related navbar navbar-default" role="navigation" aria-label="related navigation">
+  <div class="navbar-inner">
+    <ul class="nav navbar-nav ">
+        <li><a href="index.html">LTL 0.4.2 documentation</a></li>
+    </ul>
+<ul class="nav navbar-nav pull-right hidden-xs hidden-sm">
+      
+        <li><a href="ltl.optimizees.functions.html" title="Optimizee for simple functions" >previous</a></li>
+        <li><a href="ltl.optimizers.html" title="Optimizers" >next</a></li>
+        <li><a href="py-modindex.html" title="Python Module Index" >modules</a></li>
+        <li><a href="genindex.html" title="General Index" >index</a></li>
+        <li><a href="ltl.html" >API Reference</a></li>
+        <li><a href="ltl.optimizees.html" >Optimizees</a></li>
+        <li><a href="#">top</a></li> 
+      
+    </ul>
+  </div>
+</div>
+      </div><!-- /row -->
+
+      <!-- footer -->
+      <footer role="contentinfo">
+          &copy; Copyright 2017, Anand Subramoney.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.2.
+      </footer>
+      <!-- /footer -->
+
+    </div>
+    <!-- /container -->
+
+  </body>
+</html>

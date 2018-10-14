@@ -1,6 +1,0 @@
-benchmark_id: 3
-dims: 10
-functions:
-- RosenbrockParameters: {}
-mu: 0.0
-sigma: 0.01

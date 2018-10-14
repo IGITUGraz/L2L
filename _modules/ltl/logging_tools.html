@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    
+    <title>ltl.logging_tools &mdash; LTL 0.4.2 documentation</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    
+
+<link rel="stylesheet" href="../../_static/css/basicstrap-base.css" type="text/css" />
+<link rel="stylesheet" id="current-theme" href="../../_static/css/bootstrap3/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" id="current-adjust-theme" type="text/css" />
+
+<link rel="stylesheet" href="../../_static/css/font-awesome.min.css">
+
+<style type="text/css">
+  body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+</style>
+
+<link rel="stylesheet" href="../../_static/css/basicstrap.css" type="text/css" />
+<link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+<script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '0.4.2',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+  };
+</script>
+    <script type="text/javascript" src="../../_static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/bootstrap3.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery.cookie.min.js"></script>
+<script type="text/javascript" src="../../_static/js/basicstrap.js"></script>
+<script type="text/javascript">
+</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="LTL 0.4.2 documentation" href="../../index.html" />
+    <link rel="up" title="ltl" href="../ltl.html" /> 
+  </head>
+  <body role="document">
+    <div id="navbar-top" class="navbar navbar-fixed-top navbar-default" role="navigation" aria-label="top navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../index.html">LTL 0.4.2 documentation</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+              <li><a href="../../py-modindex.html" title="Python Module Index" >modules </a></li>
+              <li><a href="../../genindex.html" title="General Index" accesskey="I">index </a></li>
+              <li><a href="../index.html" >Module code</a></li>
+              <li><a href="../ltl.html" accesskey="U">ltl</a></li>
+            
+
+            <li class="visible-xs">
+                <form class="search form-search form-inline navbar-form navbar-right sp-searchbox" action="../../search.html" method="get">
+                  <div class="input-append input-group">
+                    <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+                    <span class="input-group-btn">
+                    <input type="submit" class="btn" value="Go" />
+                    </span>
+                  </div>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </li>
+
+            
+
+          </ul>
+
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- container -->
+    <div class="container-fluid">
+
+      <!-- row -->
+      <div class="row">
+         
+<div class="col-md-3 hidden-xs" id="sidebar-wrapper">
+  <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
+<h3><a href="../../index.html">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ltl.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ltl-bin.html">LTL Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../indices.html">Indices and tables</a></li>
+</ul>
+
+<div id="searchbox" role="search">
+  <h3>Quick search</h3>
+  <form class="search form-inline" action="../../search.html" method="get">
+      <div class="input-append input-group">
+        <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+        <span class="input-group-btn">
+        <input type="submit" class="btn" value="Go" />
+        </span>
+      </div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+  </div>
+</div> 
+        
+
+        <div class="col-md-9" id="content-wrapper">
+          <div class="document" role="main">
+            <div class="documentwrapper">
+              <div class="bodywrapper">
+                <div class="body">
+                  
+  <h1>Source code for ltl.logging_tools</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.config</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+
+<div class="viewcode-block" id="create_shared_logger_data"><a class="viewcode-back" href="../../ltl.logging_tools.html#ltl.logging_tools.create_shared_logger_data">[docs]</a><span class="k">def</span> <span class="nf">create_shared_logger_data</span><span class="p">(</span><span class="n">logger_names</span><span class="p">,</span> <span class="n">log_levels</span><span class="p">,</span> <span class="n">log_to_consoles</span><span class="p">,</span>
+                              <span class="n">sim_name</span><span class="p">,</span> <span class="n">log_directory</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function must be called to create a shared copy of information that will be</span>
+<span class="sd">    required to setup logging across processes. This must be run exactly once in the</span>
+<span class="sd">    root process.</span>
+
+<span class="sd">    :param logger_names: This is a list of names of the loggers whose output you&#39;re</span>
+<span class="sd">        interested in.</span>
+
+<span class="sd">    :param log_levels: This is the list of the same size of `logger_names` containing</span>
+<span class="sd">        the log levels specified as strings (e.g. &#39;INFO&#39;, &#39;DEBUG&#39;, &#39;WARNING&#39;, &#39;ERROR&#39;).</span>
+
+<span class="sd">    :param log_to_consoles: This is a list of the same size of `logger_names` containing</span>
+<span class="sd">        boolean values which indicate whether or not to redirect the output of the said</span>
+<span class="sd">        logger to stdout or not. Note that with scoop, and output to stdout on any</span>
+<span class="sd">        worker gets directed to the console of the main process.</span>
+
+<span class="sd">    :param sim_name: This is a string that is used when creating the log files.</span>
+<span class="sd">        Short for simulation name.</span>
+
+<span class="sd">    :param log_directory: This is the path of the directory in which the log files will</span>
+<span class="sd">        be stored. This directory must be an existing directory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># process / validate input</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">logger_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">log_levels</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">log_to_consoles</span><span class="p">),</span> \
+        <span class="s2">&quot;The sizes of logger_names, log_levels, log_to_consoles are inconsistent&quot;</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">logger_names</span> <span class="o">+</span> <span class="n">log_levels</span><span class="p">),</span> \
+        <span class="s2">&quot;&#39;logger_names&#39; and &#39;log_levels&#39; must be lists of strings&quot;</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">log_directory</span><span class="p">),</span> <span class="s2">&quot;The log_directory </span><span class="si">{}</span><span class="s2"> is not a vlid log directory&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">log_directory</span><span class="p">)</span>
+
+    <span class="n">log_to_consoles</span> <span class="o">=</span> <span class="p">[</span><span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">log_to_consoles</span><span class="p">]</span>
+
+
+    <span class="k">global</span> <span class="n">logger_names_global</span><span class="p">,</span> <span class="n">log_levels_global</span><span class="p">,</span> <span class="n">log_to_consoles_global</span>
+    <span class="k">global</span> <span class="n">sim_name_global</span><span class="p">,</span> <span class="n">log_directory_global</span>
+    <span class="n">logger_names_global</span> <span class="o">=</span> <span class="n">logger_names</span>
+    <span class="n">log_levels_global</span> <span class="o">=</span> <span class="n">log_levels</span>
+    <span class="n">log_to_consoles_global</span> <span class="o">=</span> <span class="n">log_to_consoles</span>
+    <span class="n">sim_name_global</span> <span class="o">=</span> <span class="n">sim_name</span>
+    <span class="n">log_directory_global</span> <span class="o">=</span> <span class="n">log_directory</span></div>
+
+
+<div class="viewcode-block" id="configure_loggers"><a class="viewcode-back" href="../../ltl.logging_tools.html#ltl.logging_tools.configure_loggers">[docs]</a><span class="k">def</span> <span class="nf">configure_loggers</span><span class="p">(</span><span class="n">exactly_once</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function configures the loggers using the shared information that was set by</span>
+<span class="sd">    :func:`.create_shared_logger_data`. This function must be run at the beginning</span>
+<span class="sd">    of every function that is parallelized in order to be able to reliably</span>
+<span class="sd">    configure the loggers. As an example look at its usage in the method</span>
+<span class="sd">    :meth:`~.FunctionGeneratorOptimizee.simulate()` from the</span>
+<span class="sd">    class :class:`~.FunctionGeneratorOptimizee`</span>
+
+<span class="sd">    You may also wish to call this function in your main simulation (after calling</span>
+<span class="sd">    :func:`.create_shared_logger_data`) to configure the logging for the root process</span>
+<span class="sd">    before any of the parallelized functions are run.</span>
+
+<span class="sd">    :param exactly_once: If the configuration of logging is causing a significant</span>
+<span class="sd">        overhead per parallelized run (This is a rather unlikely scenario), then this</span>
+<span class="sd">        value may be set to `True`. When True, the function will configure the loggers</span>
+<span class="sd">        exactly once per scoop worker.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">exactly_once</span> <span class="ow">and</span> <span class="n">configure_loggers</span><span class="o">.</span><span class="n">_already_configured</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Scoop logging has been removed, as JUBE takes care of the logging of each iteration</span>
+    <span class="c1"># Get logger data from global variables and perform the relevant thing</span>
+    <span class="n">logger_names</span> <span class="o">=</span> <span class="n">logger_names_global</span>
+    <span class="n">log_levels</span> <span class="o">=</span> <span class="n">log_levels_global</span>
+    <span class="n">log_to_consoles</span> <span class="o">=</span> <span class="n">log_to_consoles_global</span>
+    <span class="n">sim_name</span> <span class="o">=</span> <span class="n">sim_name_global</span>
+    <span class="n">log_directory</span> <span class="o">=</span> <span class="n">log_directory_global</span>
+
+
+    <span class="n">file_name_prefix</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sim_name</span><span class="p">,)</span>
+
+    <span class="n">config_dict_copy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">configure_loggers</span><span class="o">.</span><span class="n">basic_config_dict</span><span class="p">)</span>
+
+    <span class="n">config_dict_copy</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Configuring the output files</span>
+    <span class="n">log_fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">log_directory</span><span class="p">,</span>
+                             <span class="n">file_name_prefix</span> <span class="o">+</span> <span class="n">config_dict_copy</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">][</span><span class="s1">&#39;file_log&#39;</span><span class="p">][</span><span class="s1">&#39;filename&#39;</span><span class="p">])</span>
+    <span class="n">error_fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">log_directory</span><span class="p">,</span>
+                               <span class="n">file_name_prefix</span> <span class="o">+</span> <span class="n">config_dict_copy</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">][</span><span class="s1">&#39;file_error&#39;</span><span class="p">][</span><span class="s1">&#39;filename&#39;</span><span class="p">])</span>
+    <span class="n">config_dict_copy</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">][</span><span class="s1">&#39;file_log&#39;</span><span class="p">][</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">log_fname</span>
+    <span class="n">config_dict_copy</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">][</span><span class="s1">&#39;file_error&#39;</span><span class="p">][</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">error_fname</span>
+
+    <span class="c1"># Creating logger entries</span>
+    <span class="k">for</span> <span class="n">logger_name</span><span class="p">,</span> <span class="n">log_level</span><span class="p">,</span> <span class="n">log_to_console</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">logger_names</span><span class="p">,</span> <span class="n">log_levels</span><span class="p">,</span> <span class="n">log_to_consoles</span><span class="p">):</span>
+        <span class="n">config_dict_copy</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">][</span><span class="n">logger_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">logger_dict</span> <span class="o">=</span> <span class="n">config_dict_copy</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">][</span><span class="n">logger_name</span><span class="p">]</span>
+        <span class="n">logger_dict</span><span class="p">[</span><span class="s1">&#39;level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">log_level</span>
+        <span class="k">if</span> <span class="n">log_to_console</span><span class="p">:</span>
+            <span class="n">logger_dict</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;console&#39;</span><span class="p">,</span> <span class="s1">&#39;file_log&#39;</span><span class="p">,</span> <span class="s1">&#39;file_error&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger_dict</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;file_log&#39;</span><span class="p">,</span> <span class="s1">&#39;file_error&#39;</span><span class="p">]</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">config_dict_copy</span><span class="p">)</span>
+    <span class="n">configure_loggers</span><span class="o">.</span><span class="n">_already_configured</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<span class="n">configure_loggers</span><span class="o">.</span><span class="n">_already_configured</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">configure_loggers</span><span class="o">.</span><span class="n">basic_config_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;formatters&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(name)s</span><span class="s1"> </span><span class="si">{}</span><span class="s1"> </span><span class="si">%(process)d</span><span class="s1"> </span><span class="si">%(levelname)-8s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">())</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;stream&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%(processName)-10s</span><span class="s1"> </span><span class="si">%(name)s</span><span class="s1"> </span><span class="si">{}</span><span class="s1"> </span><span class="si">%(process)d</span><span class="s1"> </span><span class="si">%(levelname)-8s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">())</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;console&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;logging.StreamHandler&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;stream&#39;</span><span class="p">:</span> <span class="s1">&#39;ext://sys.stdout&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;formatter&#39;</span><span class="p">:</span> <span class="s1">&#39;stream&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;file_log&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;logging.FileHandler&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;formatter&#39;</span><span class="p">:</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;LOG.txt&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;file_error&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;logging.FileHandler&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;formatter&#39;</span><span class="p">:</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;ERROR.txt&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;ERROR&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;loggers&#39;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="s1">&#39;root&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1"># &#39;level&#39;: &#39;INFO&#39;,</span>
+        <span class="s1">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+      </div><!-- /row -->
+
+      <!-- row -->
+      <div class="row footer-relbar">
+<div id="navbar-related" class=" related navbar navbar-default" role="navigation" aria-label="related navigation">
+  <div class="navbar-inner">
+    <ul class="nav navbar-nav ">
+        <li><a href="../../index.html">LTL 0.4.2 documentation</a></li>
+    </ul>
+<ul class="nav navbar-nav pull-right hidden-xs hidden-sm">
+      
+        <li><a href="../../py-modindex.html" title="Python Module Index" >modules</a></li>
+        <li><a href="../../genindex.html" title="General Index" >index</a></li>
+        <li><a href="../index.html" >Module code</a></li>
+        <li><a href="../ltl.html" >ltl</a></li>
+        <li><a href="#">top</a></li> 
+      
+    </ul>
+  </div>
+</div>
+      </div><!-- /row -->
+
+      <!-- footer -->
+      <footer role="contentinfo">
+          &copy; Copyright 2017, Anand Subramoney.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.2.
+      </footer>
+      <!-- /footer -->
+
+    </div>
+    <!-- /container -->
+
+  </body>
+</html>

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    
+    <title>ltl.dataprocessing &mdash; LTL 0.4.2 documentation</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    
+
+<link rel="stylesheet" href="../../_static/css/basicstrap-base.css" type="text/css" />
+<link rel="stylesheet" id="current-theme" href="../../_static/css/bootstrap3/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" id="current-adjust-theme" type="text/css" />
+
+<link rel="stylesheet" href="../../_static/css/font-awesome.min.css">
+
+<style type="text/css">
+  body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+</style>
+
+<link rel="stylesheet" href="../../_static/css/basicstrap.css" type="text/css" />
+<link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+<script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '0.4.2',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+  };
+</script>
+    <script type="text/javascript" src="../../_static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/bootstrap3.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery.cookie.min.js"></script>
+<script type="text/javascript" src="../../_static/js/basicstrap.js"></script>
+<script type="text/javascript">
+</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="LTL 0.4.2 documentation" href="../../index.html" />
+    <link rel="up" title="ltl" href="../ltl.html" /> 
+  </head>
+  <body role="document">
+    <div id="navbar-top" class="navbar navbar-fixed-top navbar-default" role="navigation" aria-label="top navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../index.html">LTL 0.4.2 documentation</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+              <li><a href="../../py-modindex.html" title="Python Module Index" >modules </a></li>
+              <li><a href="../../genindex.html" title="General Index" accesskey="I">index </a></li>
+              <li><a href="../index.html" >Module code</a></li>
+              <li><a href="../ltl.html" accesskey="U">ltl</a></li>
+            
+
+            <li class="visible-xs">
+                <form class="search form-search form-inline navbar-form navbar-right sp-searchbox" action="../../search.html" method="get">
+                  <div class="input-append input-group">
+                    <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+                    <span class="input-group-btn">
+                    <input type="submit" class="btn" value="Go" />
+                    </span>
+                  </div>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </li>
+
+            
+
+          </ul>
+
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- container -->
+    <div class="container-fluid">
+
+      <!-- row -->
+      <div class="row">
+         
+<div class="col-md-3 hidden-xs" id="sidebar-wrapper">
+  <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
+<h3><a href="../../index.html">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ltl.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ltl-bin.html">LTL Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../indices.html">Indices and tables</a></li>
+</ul>
+
+<div id="searchbox" role="search">
+  <h3>Quick search</h3>
+  <form class="search form-inline" action="../../search.html" method="get">
+      <div class="input-append input-group">
+        <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+        <span class="input-group-btn">
+        <input type="submit" class="btn" value="Go" />
+        </span>
+      </div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+  </div>
+</div> 
+        
+
+        <div class="col-md-9" id="content-wrapper">
+          <div class="document" role="main">
+            <div class="documentwrapper">
+              <div class="bodywrapper">
+                <div class="body">
+                  
+  <h1>Source code for ltl.dataprocessing</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pypet</span> <span class="k">import</span> <span class="n">Trajectory</span><span class="p">,</span> <span class="n">pypetconstants</span><span class="p">,</span> <span class="n">ParameterGroup</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">timed</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;ltl.dataprocessing&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_var_from_generations"><a class="viewcode-back" href="../../ltl.dataprocessing.html#ltl.dataprocessing.get_var_from_generations">[docs]</a><span class="k">def</span> <span class="nf">get_var_from_generations</span><span class="p">(</span><span class="n">traj</span><span class="p">:</span> <span class="n">Trajectory</span><span class="p">,</span> <span class="n">variable_name_full</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">status_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function extracts the contents of the variable named as specified in</span>
+<span class="sd">    `variable_name_full`, from each generation and returns a list containing them.</span>
+
+<span class="sd">    NOTE: Unlike :func:`.get_var_from_runs`, we do not allow fetching partially from</span>
+<span class="sd">    selected generations and assume that the specified variable is stored for all</span>
+<span class="sd">    generations.</span>
+
+<span class="sd">    :param traj: This is the trajectory that contains the relevant information. note</span>
+<span class="sd">        that the trajectory need not have been fully loaded beforehand as the</span>
+<span class="sd">        loading can happen dynamically while loading specific variables</span>
+
+<span class="sd">    :param variable_name_full: This is the full variable name WITHOUT the prefix</span>
+<span class="sd">        &#39;results.generation_params&#39;, whose value you want to extract. This variable</span>
+<span class="sd">        must be a variable stored in a generation. See example</span>
+
+<span class="sd">    :param status_interval: Sometimes the loading takes too long and you&#39;d like a</span>
+<span class="sd">        status message, specify this value (an integer) to have the status displayed</span>
+<span class="sd">        every `status_interval` generations extracted</span>
+
+<span class="sd">    :return: A list with each entry containing the variable value. The index in the</span>
+<span class="sd">        list gives the generation value</span>
+
+<span class="sd">    :Example Usage: To get the distribution parameters from each generation of a run of cross-</span>
+<span class="sd">        entropy, the following works.</span>
+
+<span class="sd">        For example referring to the case of generation parameters stored by the</span>
+<span class="sd">        :meth:`~.CrossEntropyOptimizer.post_process` of the</span>
+<span class="sd">        :class:`~.CrossEntropyOptimizer`, we may extract the, the</span>
+<span class="sd">        variables `algorithm_params` and `distribution_params` as below:: </span>
+
+<span class="sd">            get_var_from_generations(traj, &#39;distribution_params&#39;)</span>
+<span class="sd">            get_var_from_generations(traj, &#39;algorithm_params&#39;)</span>
+
+<span class="sd">        Here, &#39;distribution_params&#39; is a variable stored once per generation in the</span>
+<span class="sd">        trajectory (see the `post_process` function of the</span>
+<span class="sd">        :class:`~ltl.optimizers.crossentropy.optimizer.CrossEntropyOptimizer` for</span>
+<span class="sd">        further details).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">status_interval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">status_interval</span><span class="p">)</span> <span class="k">if</span> <span class="n">status_interval</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="n">top_group</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">f_load_child</span><span class="p">(</span><span class="s1">&#39;results.generation_params&#39;</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">load_data</span><span class="o">=</span><span class="n">pypetconstants</span><span class="o">.</span><span class="n">LOAD_SKELETON</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_generation_id</span><span class="p">(</span><span class="n">gen_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">gen_name</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># generation_XXXX</span>
+
+    <span class="n">result_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">gen_counter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">gen_group</span> <span class="ow">in</span> <span class="n">top_group</span><span class="o">.</span><span class="n">f_iter_nodes</span><span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">gen_id</span> <span class="o">=</span> <span class="n">get_generation_id</span><span class="p">(</span><span class="n">gen_group</span><span class="o">.</span><span class="n">v_name</span><span class="p">)</span>
+        <span class="n">result_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">gen_id</span><span class="p">,</span> <span class="n">gen_group</span><span class="o">.</span><span class="n">f_get</span><span class="p">(</span><span class="n">variable_name_full</span><span class="p">,</span> <span class="n">auto_load</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fast_access</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">status_interval</span> <span class="ow">and</span> <span class="n">gen_counter</span> <span class="o">%</span> <span class="n">status_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Completed variable extraction of </span><span class="si">{}</span><span class="s2"> for </span><span class="si">{}</span><span class="s2"> generations&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable_name_full</span><span class="p">,</span> <span class="n">gen_counter</span><span class="p">))</span>
+        <span class="n">gen_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">result_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result_list</span><span class="p">)</span>
+    <span class="n">result_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result_list</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">result_list</span></div>
+
+
+<div class="viewcode-block" id="get_var_from_runs"><a class="viewcode-back" href="../../ltl.dataprocessing.html#ltl.dataprocessing.get_var_from_runs">[docs]</a><span class="k">def</span> <span class="nf">get_var_from_runs</span><span class="p">(</span><span class="n">traj</span><span class="p">:</span> <span class="n">Trajectory</span><span class="p">,</span> <span class="n">variable_name_full</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">run_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">with_ids</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">status_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function retrieves a variable with name specified by `variable_name_full`</span>
+<span class="sd">    from the trajectory `traj` from the specified runs and returns a dict containing</span>
+<span class="sd">    them</span>
+
+<span class="sd">    :param traj: This is the trajectory that contains the relevant information. note</span>
+<span class="sd">        that the trajectory need not have been fully loaded beforehand as the</span>
+<span class="sd">        loading can happen dynamically while loading specific variables</span>
+
+<span class="sd">    :param variable_name_full: This is the full variable name whose value you want to</span>
+<span class="sd">        extract. This variable must either be a parameter, result or derived_parameter</span>
+<span class="sd">        of a run. For example the following names are acceptable::</span>
+
+<span class="sd">            parameters.individual.coords</span>
+<span class="sd">            results.fitness</span>
+
+<span class="sd">        The first group in the name must be one of `{&#39;results&#39;, &#39;parameters&#39;,</span>
+<span class="sd">        &#39;derived_parameters&#39;}`. Note that whatever variable is extracted, must have</span>
+<span class="sd">        a value corresponding to each run therefore, variables stored per generation</span>
+<span class="sd">        cannot be accessed using this function</span>
+
+<span class="sd">    :param run_ids: This should be an iterator returning the `run_ids` from which you</span>
+<span class="sd">        want the variables. If `None` then the variable is extracted from all runs.</span>
+<span class="sd">        Note that if the variable is not found in a particular run, an exception is</span>
+<span class="sd">        raised.</span>
+
+<span class="sd">    :param with_ids: Boolean flag indicating whether the corresponding run indices</span>
+<span class="sd">        should be returned as well.</span>
+
+<span class="sd">    :param status_interval: Sometimes the loading takes too long and you&#39;d like a</span>
+<span class="sd">        status message, specify this value (an integer) to have the status displayed</span>
+<span class="sd">        every `status_interval` runs extracted</span>
+
+<span class="sd">    :return: A list containing variable value for each run. If `run_ids` are</span>
+<span class="sd">        specified, the entries are arranged in the same order as `run_ids`, else in</span>
+<span class="sd">        order of ascending run indices</span>
+
+<span class="sd">        if `with_ids` is True then a tuple is returned with the first element as</span>
+<span class="sd">        the above list and the second element containing the corresponding list</span>
+<span class="sd">        indices</span>
+
+<span class="sd">    :Example Usage: The following code snippet provides a sample call to this</span>
+<span class="sd">        function::</span>
+
+<span class="sd">            get_var_from_runs(traj, &#39;parameters.individual.coords&#39;)</span>
+<span class="sd">            get_var_from_runs(traj, &#39;results.fitness&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">status_interval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">status_interval</span><span class="p">)</span> <span class="k">if</span> <span class="n">status_interval</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">top_group_name</span><span class="p">,</span> <span class="n">variable_name</span> <span class="o">=</span> <span class="n">variable_name_full</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">allowed_top_group_names</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="s1">&#39;parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;derived_parameters&#39;</span><span class="p">}</span>
+    <span class="k">assert</span> <span class="n">top_group_name</span> <span class="ow">in</span> <span class="n">allowed_top_group_names</span><span class="p">,</span> \
+        <span class="s2">&quot;The name must be of the form &lt;top_level_group&gt;.&lt;variable_name&gt; where &quot;</span>\
+        <span class="s2">&quot;top_level_group is one of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">allowed_top_group_names</span><span class="p">)</span>
+    <span class="n">top_group</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">f_get</span><span class="p">(</span><span class="n">top_group_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">run_ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">run_names</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">f_get_run_names</span><span class="p">(</span><span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">run_ids</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">f_idx_to_run</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">run_names</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">run_ids</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">run_ids</span><span class="p">)</span>
+
+    <span class="n">result_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">run_id_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">old_vidx</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">v_idx</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">run_counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">run_id</span> <span class="ow">in</span> <span class="n">run_ids</span><span class="p">:</span>
+            <span class="n">run_id_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+            <span class="n">traj</span><span class="o">.</span><span class="n">v_idx</span> <span class="o">=</span> <span class="n">run_id</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">top_group</span><span class="p">,</span> <span class="n">ParameterGroup</span><span class="p">):</span>
+                <span class="n">result_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">top_group</span><span class="o">.</span><span class="n">f_get</span><span class="p">(</span><span class="s1">&#39;$set.$.&#39;</span> <span class="o">+</span> <span class="n">variable_name</span><span class="p">,</span>
+                                                   <span class="n">auto_load</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fast_access</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">top_group</span><span class="o">.</span><span class="n">f_get</span><span class="p">(</span><span class="n">variable_name</span><span class="p">,</span> <span class="n">fast_access</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">auto_load</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">status_interval</span> <span class="ow">and</span> <span class="n">run_id</span> <span class="o">%</span> <span class="n">status_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Completed extraction of variable </span><span class="si">{}</span><span class="s2"> from </span><span class="si">{}</span><span class="s2"> runs.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable_name_full</span><span class="p">,</span> <span class="n">run_counter</span><span class="p">))</span>
+            <span class="n">run_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">v_idx</span> <span class="o">=</span> <span class="n">old_vidx</span>
+    <span class="k">if</span> <span class="n">with_ids</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">result_list</span><span class="p">,</span> <span class="n">run_id_list</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">result_list</span></div>
+
+
+<div class="viewcode-block" id="get_skeleton_traj"><a class="viewcode-back" href="../../ltl.dataprocessing.html#ltl.dataprocessing.get_skeleton_traj">[docs]</a><span class="k">def</span> <span class="nf">get_skeleton_traj</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">name_or_index</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This takes an hdf5 filename (which should have been generated by pypet/LTL in</span>
+<span class="sd">    the first place) and returns a :class:`~pypet.trajectory.Trajectory` instance loaded from</span>
+<span class="sd">    the Trajectory referred to by the `name_or_index` parameter stored in the file.</span>
+<span class="sd">    In this function, only the tree structure aka skeleton is loaded for the results</span>
+<span class="sd">    and derived parameters, whereas the parameters are fully loaded</span>
+
+<span class="sd">    This is recommended for moderately sized files (&lt; 20 GB)</span>
+
+<span class="sd">    :param filename: filename of an HDF file created by LTL</span>
+<span class="sd">    :param name_or_index: The name or index of the trajectory to load from the file,</span>
+<span class="sd">        if unspecified, the LAST trajectory is loaded.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">traj</span> <span class="o">=</span> <span class="n">Trajectory</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">load_params_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;load_parameters&#39;</span><span class="p">:</span><span class="n">pypetconstants</span><span class="o">.</span><span class="n">LOAD_DATA</span><span class="p">,</span>
+        <span class="s1">&#39;load_results&#39;</span><span class="p">:</span><span class="n">pypetconstants</span><span class="o">.</span><span class="n">LOAD_SKELETON</span><span class="p">,</span>
+        <span class="s1">&#39;load_derived_parameters&#39;</span><span class="p">:</span><span class="n">pypetconstants</span><span class="o">.</span><span class="n">LOAD_SKELETON</span><span class="p">,</span>
+        <span class="s1">&#39;force&#39;</span><span class="p">:</span><span class="kc">True</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name_or_index</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">load_params_dict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name_or_index</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">name_or_index</span><span class="p">)</span>
+        <span class="n">load_params_dict</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
+
+    <span class="c1"># Loading Trajectory from file.</span>
+    <span class="k">with</span> <span class="n">timed</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;Primary Loading of The HDF File&quot;</span><span class="p">):</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_load</span><span class="p">(</span><span class="o">**</span><span class="n">load_params_dict</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished Primary Loading&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">traj</span></div>
+
+
+<div class="viewcode-block" id="get_empty_traj"><a class="viewcode-back" href="../../ltl.dataprocessing.html#ltl.dataprocessing.get_empty_traj">[docs]</a><span class="k">def</span> <span class="nf">get_empty_traj</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">name_or_index</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This takes an hdf5 filename (which should have been generated by pypet/LTL in</span>
+<span class="sd">    the first place) and returns a :class:`~pypet.trajectory.Trajectory` instance loaded from</span>
+<span class="sd">    the `index` th Trajectory stored in the file. In this function, nothing is loaded</span>
+<span class="sd">    for the results and derived parameters, whereas the parameters are fully loaded.</span>
+
+<span class="sd">    This is recommended when the file size is REALLY LARGE (e.g. &gt; 20GB)</span>
+
+<span class="sd">    :param filename: filename of an HDF file created by LTL</span>
+<span class="sd">    :param name_or_index: The name or index of the trajectory to load from the file,</span>
+<span class="sd">        if unspecified, the LAST trajectory is loaded.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">traj</span> <span class="o">=</span> <span class="n">Trajectory</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="n">load_params_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;load_parameters&#39;</span><span class="p">:</span><span class="n">pypetconstants</span><span class="o">.</span><span class="n">LOAD_DATA</span><span class="p">,</span>
+        <span class="s1">&#39;load_results&#39;</span><span class="p">:</span><span class="n">pypetconstants</span><span class="o">.</span><span class="n">LOAD_NOTHING</span><span class="p">,</span>
+        <span class="s1">&#39;load_derived_parameters&#39;</span><span class="p">:</span><span class="n">pypetconstants</span><span class="o">.</span><span class="n">LOAD_NOTHING</span><span class="p">,</span>
+        <span class="s1">&#39;force&#39;</span><span class="p">:</span><span class="kc">True</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name_or_index</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">load_params_dict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name_or_index</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">name_or_index</span><span class="p">)</span>
+        <span class="n">load_params_dict</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
+
+    <span class="c1"># Loading Trajectory from file.</span>
+    <span class="k">with</span> <span class="n">timed</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;Primary Loading of The HDF File&quot;</span><span class="p">):</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_load</span><span class="p">(</span><span class="o">**</span><span class="n">load_params_dict</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished Primary Loading&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">traj</span></div>
+</pre></div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+      </div><!-- /row -->
+
+      <!-- row -->
+      <div class="row footer-relbar">
+<div id="navbar-related" class=" related navbar navbar-default" role="navigation" aria-label="related navigation">
+  <div class="navbar-inner">
+    <ul class="nav navbar-nav ">
+        <li><a href="../../index.html">LTL 0.4.2 documentation</a></li>
+    </ul>
+<ul class="nav navbar-nav pull-right hidden-xs hidden-sm">
+      
+        <li><a href="../../py-modindex.html" title="Python Module Index" >modules</a></li>
+        <li><a href="../../genindex.html" title="General Index" >index</a></li>
+        <li><a href="../index.html" >Module code</a></li>
+        <li><a href="../ltl.html" >ltl</a></li>
+        <li><a href="#">top</a></li> 
+      
+    </ul>
+  </div>
+</div>
+      </div><!-- /row -->
+
+      <!-- footer -->
+      <footer role="contentinfo">
+          &copy; Copyright 2017, Anand Subramoney.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.2.
+      </footer>
+      <!-- /footer -->
+
+    </div>
+    <!-- /container -->
+
+  </body>
+</html>

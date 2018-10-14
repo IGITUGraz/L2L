@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    
+    <title>ltl.optimizers.crossentropy.distribution &mdash; LTL 0.4.2 documentation</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    
+
+<link rel="stylesheet" href="../../../../_static/css/basicstrap-base.css" type="text/css" />
+<link rel="stylesheet" id="current-theme" href="../../../../_static/css/bootstrap3/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" id="current-adjust-theme" type="text/css" />
+
+<link rel="stylesheet" href="../../../../_static/css/font-awesome.min.css">
+
+<style type="text/css">
+  body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+</style>
+
+<link rel="stylesheet" href="../../../../_static/css/basicstrap.css" type="text/css" />
+<link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+<script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../../../',
+            VERSION:     '0.4.2',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+  };
+</script>
+    <script type="text/javascript" src="../../../../_static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/bootstrap3.min.js"></script>
+<script type="text/javascript" src="../../../../_static/js/jquery.cookie.min.js"></script>
+<script type="text/javascript" src="../../../../_static/js/basicstrap.js"></script>
+<script type="text/javascript">
+</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="top" title="LTL 0.4.2 documentation" href="../../../../index.html" />
+    <link rel="up" title="ltl" href="../../../ltl.html" /> 
+  </head>
+  <body role="document">
+    <div id="navbar-top" class="navbar navbar-fixed-top navbar-default" role="navigation" aria-label="top navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../../../index.html">LTL 0.4.2 documentation</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+              <li><a href="../../../../py-modindex.html" title="Python Module Index" >modules </a></li>
+              <li><a href="../../../../genindex.html" title="General Index" accesskey="I">index </a></li>
+              <li><a href="../../../index.html" >Module code</a></li>
+              <li><a href="../../../ltl.html" accesskey="U">ltl</a></li>
+            
+
+            <li class="visible-xs">
+                <form class="search form-search form-inline navbar-form navbar-right sp-searchbox" action="../../../../search.html" method="get">
+                  <div class="input-append input-group">
+                    <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+                    <span class="input-group-btn">
+                    <input type="submit" class="btn" value="Go" />
+                    </span>
+                  </div>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </li>
+
+            
+
+          </ul>
+
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- container -->
+    <div class="container-fluid">
+
+      <!-- row -->
+      <div class="row">
+         
+<div class="col-md-3 hidden-xs" id="sidebar-wrapper">
+  <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
+<h3><a href="../../../../index.html">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ltl.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ltl-bin.html">LTL Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../indices.html">Indices and tables</a></li>
+</ul>
+
+<div id="searchbox" role="search">
+  <h3>Quick search</h3>
+  <form class="search form-inline" action="../../../../search.html" method="get">
+      <div class="input-append input-group">
+        <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+        <span class="input-group-btn">
+        <input type="submit" class="btn" value="Go" />
+        </span>
+      </div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+  </div>
+</div> 
+        
+
+        <div class="col-md-9" id="content-wrapper">
+          <div class="document" role="main">
+            <div class="documentwrapper">
+              <div class="bodywrapper">
+                <div class="body">
+                  
+  <h1>Source code for ltl.optimizers.crossentropy.distribution</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABCMeta</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sklearn.mixture</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;optimizers.crossentropy.distribution&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Distribution"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.Distribution">[docs]</a><span class="k">class</span> <span class="nc">Distribution</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generic base for a distribution. Needs to implement the functions fit and sample.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Distribution.init_random_state"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.Distribution.init_random_state">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">init_random_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">random_state</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Used to initialize the random number generator which is used to fit/sample data. Note</span>
+<span class="sd">        that if the random_state is already set, this raises an `AssertionError`. The reason</span>
+<span class="sd">        this is not a part of the constructor is that the distribution random state must be</span>
+<span class="sd">        initialized only by the optimizer and not in the main function (where it is</span>
+<span class="sd">        constructed). It is essential to call this function before using the distribution</span>
+
+<span class="sd">        :param random_state: An instance of class:`numpy.random.RandomState`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Distribution.fit"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.Distribution.fit">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This function fits the distributions parameters to the given samples</span>
+<span class="sd">        in maximum likelihood fashion.</span>
+
+<span class="sd">        :param data_list: A list or array of individuals to fit to.</span>
+<span class="sd">        :return dict: a dict describing the current parametrization</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Distribution.sample"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.Distribution.sample">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_individuals</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Samples n_individuals from the current parametrized distribution.</span>
+
+<span class="sd">        :param n_individuals: An integer specifying the amount of individuals to sample</span>
+
+<span class="sd">        :return: A list or array of n_individuals</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Distribution.get_params"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.Distribution.get_params">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: the parametrization of the distribution as a dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="Gaussian"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.Gaussian">[docs]</a><span class="k">class</span> <span class="nc">Gaussian</span><span class="p">(</span><span class="n">Distribution</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gaussian distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Gaussian.init_random_state"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.Gaussian.init_random_state">[docs]</a>    <span class="k">def</span> <span class="nf">init_random_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">random_state</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;The random_state has already been set for the distribution&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">random_state</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span></div>
+
+<div class="viewcode-block" id="Gaussian.get_params"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.Gaussian.get_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">params_dict_items</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;distribution_name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">params_dict_items</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Gaussian.fit"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.Gaussian.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_list</span><span class="p">,</span> <span class="n">smooth_update</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit a gaussian distribution to the given data</span>
+
+<span class="sd">        :param data_list: list or numpy array with individuals as rows</span>
+<span class="sd">        :param smooth_update: determines to which extent the new samples account for the new distribution.</span>
+<span class="sd">          default is 0 -&gt; old parameters are fully discarded</span>
+<span class="sd">        </span>
+<span class="sd">        :return dict: specifying current parametrization</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+            <span class="s2">&quot;The random_state for the distribution has not been set, call the&quot;</span> \
+            <span class="s2">&quot; &#39;init_random_state&#39; member function to set it&quot;</span>
+
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data_list</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">cov_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">data_list</span><span class="p">,</span> <span class="n">rowvar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="n">mean</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cov</span> <span class="o">=</span> <span class="n">cov_mat</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="n">smooth_update</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">smooth_update</span><span class="p">)</span> <span class="o">*</span> <span class="n">mean</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov</span> <span class="o">=</span> <span class="n">smooth_update</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">smooth_update</span><span class="p">)</span> <span class="o">*</span> <span class="n">cov_mat</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Gaussian center</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Gaussian cov</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="s1">&#39;covariance_matrix&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="Gaussian.sample"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.Gaussian.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_individuals</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sample n_individuals individuals under the current parametrization</span>
+<span class="sd"> </span>
+<span class="sd">        :param n_individuals: number of individuals to sample.</span>
+<span class="sd"> </span>
+<span class="sd">        :return: numpy array with n_individual rows of individuals</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+            <span class="s2">&quot;The random_state for the distribution has not been set, call the&quot;</span> \
+            <span class="s2">&quot; &#39;init_random_state&#39; member function to set it&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">,</span> <span class="n">n_individuals</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="BayesianGaussianMixture"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.BayesianGaussianMixture">[docs]</a><span class="k">class</span> <span class="nc">BayesianGaussianMixture</span><span class="p">(</span><span class="n">Distribution</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    BayesianGaussianMixture from sklearn</span>
+
+<span class="sd">    Unlike normal Gaussian mixture, the algorithm has tendency to set the weights of</span>
+<span class="sd">    non present modes close to zero. Meaning that it effectively inferences the</span>
+<span class="sd">    number of active modes present in the given data.</span>
+
+<span class="sd">    :param n_components: components of the mixture model</span>
+<span class="sd">    :param kwargs: Additional arguments that get passed on to :class:`sklearn.mixture.BayesianGaussianMixture`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bayesian_mixture</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">mixture</span><span class="o">.</span><span class="n">BayesianGaussianMixture</span><span class="p">(</span>
+            <span class="n">n_components</span><span class="p">,</span>
+            <span class="n">weight_concentration_prior_type</span><span class="o">=</span><span class="s1">&#39;dirichlet_distribution&#39;</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># taken from check_fitted function of BaysianGaussianMixture in the sklearn repository</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parametrization</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;covariances_&#39;</span><span class="p">,</span> <span class="s1">&#39;means_&#39;</span><span class="p">,</span> <span class="s1">&#39;weight_concentration_&#39;</span><span class="p">,</span> <span class="s1">&#39;weights_&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;mean_precision_&#39;</span><span class="p">,</span> <span class="s1">&#39;degrees_of_freedom_&#39;</span><span class="p">,</span> <span class="s1">&#39;precisions_&#39;</span><span class="p">,</span> <span class="s1">&#39;precisions_cholesky_&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span> <span class="o">=</span> <span class="n">n_components</span>
+
+<div class="viewcode-block" id="BayesianGaussianMixture.init_random_state"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.BayesianGaussianMixture.init_random_state">[docs]</a>    <span class="k">def</span> <span class="nf">init_random_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">random_state</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;The random_state has already been set for the distribution&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">random_state</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bayesian_mixture</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span></div>
+
+    <span class="k">def</span> <span class="nf">_postprocess_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        postprocesses the fitted model, adding the possibility to add noise or something</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_append_additional_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distribution_parameters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        appends additional parametrization</span>
+<span class="sd">        </span>
+<span class="sd">        :param distribution_parameters: the dictionary that contains the distributions</span>
+<span class="sd">            parametrization</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="BayesianGaussianMixture.get_params"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.BayesianGaussianMixture.get_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">params_dict_items</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;distribution_name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">),</span>
+                             <span class="p">(</span><span class="s2">&quot;n_components&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">params_dict_items</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BayesianGaussianMixture.fit"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.BayesianGaussianMixture.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_list</span><span class="p">,</span> <span class="n">smooth_update</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fits data_list on the parametrized model</span>
+<span class="sd">        </span>
+<span class="sd">        :param data_list: list or numpy array with individuals as rows</span>
+<span class="sd">        :param smooth_update: determines to which extent the new samples account for the</span>
+<span class="sd">            new distribution.</span>
+<span class="sd">        :return: dict specifiying current parametrization</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+            <span class="s2">&quot;The random_state for the distribution has not been set, call the&quot;</span> \
+            <span class="s2">&quot; &#39;init_random_state&#39; member function to set it&quot;</span>
+
+        <span class="n">old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bayesian_mixture</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bayesian_mixture</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_postprocess_fitted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bayesian_mixture</span><span class="p">)</span>
+        <span class="n">distribution_parameters</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="c1"># smooth update and fill out distribution parameters dict to return</span>
+        <span class="c1"># distribution parameters can also be tuples of ndarray</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parametrization</span><span class="p">:</span>
+            <span class="n">hdf_name</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>  <span class="c1"># remove sklearn trailing underscore</span>
+            <span class="n">orig</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">old</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bayesian_mixture</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">orig</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="n">mix</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">smooth_update</span> <span class="o">*</span> <span class="n">a</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">smooth_update</span><span class="p">)</span> <span class="o">*</span> <span class="n">b</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">orig</span><span class="p">,</span> <span class="n">new</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mix</span><span class="p">)):</span>
+                    <span class="n">distribution_parameters</span><span class="p">[</span><span class="n">hdf_name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)]</span> <span class="o">=</span> <span class="n">mix</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mix</span> <span class="o">=</span> <span class="n">smooth_update</span> <span class="o">*</span> <span class="n">orig</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">smooth_update</span><span class="p">)</span> <span class="o">*</span> <span class="n">new</span>
+                <span class="n">distribution_parameters</span><span class="p">[</span><span class="n">hdf_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mix</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bayesian_mixture</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">mix</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;covariances_&#39;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;New covariances:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">mix</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;means_&#39;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;New means:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">mix</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_append_additional_parameters</span><span class="p">(</span><span class="n">distribution_parameters</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">distribution_parameters</span></div>
+
+<div class="viewcode-block" id="BayesianGaussianMixture.sample"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.BayesianGaussianMixture.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_individuals</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sample n_individuals individuals under the current parametrization</span>
+<span class="sd">        </span>
+<span class="sd">        :param n_individuals: number of individuals to sample</span>
+<span class="sd">        :return: numpy array with n_individuals rows of individuals</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+            <span class="s2">&quot;The random_state for the distribution has not been set, call the&quot;</span> \
+            <span class="s2">&quot; &#39;init_random_state&#39; member function to set it&quot;</span>
+        <span class="n">individuals</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bayesian_mixture</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n_individuals</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">individuals</span></div></div>
+
+
+<div class="viewcode-block" id="NoisyBayesianGaussianMixture"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.NoisyBayesianGaussianMixture">[docs]</a><span class="k">class</span> <span class="nc">NoisyBayesianGaussianMixture</span><span class="p">(</span><span class="n">BayesianGaussianMixture</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    NoisyBayesianGaussianMixture is basically the same as BayesianGaussianMixture</span>
+<span class="sd">    but superimposed with noise</span>
+
+<span class="sd">    :param n_components: number of components in the mixture model</span>
+<span class="sd">    :param noise_magnitude: scalar factor that affects the magnitude of noise</span>
+<span class="sd">        applied on the fitted distribution parameters+</span>
+
+<span class="sd">    :param coordinate_scale: This should be a vector representing the scaling of</span>
+<span class="sd">        the coordinates. The noise applied to each coordinate `i` is</span>
+
+<span class="sd">          noise_magnitude * coordinate_scale[i]</span>
+
+<span class="sd">        Defaults to 1 for each coordinate.</span>
+
+<span class="sd">    :param noise_decay: factor that will decay the additive noise</span>
+<span class="sd">    :param kwargs: additional arguments that get passed on to</span>
+<span class="sd">        :class:`.BayesianGaussianMixture` distribution</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="p">,</span> <span class="n">noise_magnitude</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">coordinate_scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">noise_decay</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">BayesianGaussianMixture</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_decay</span> <span class="o">=</span> <span class="n">noise_decay</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_magnitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">noise_magnitude</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">coordinate_scale</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coordinate_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coordinate_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coordinate_scale</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_noise_magnitude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise_magnitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_value</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># list containing the additive noise values for each component</span>
+
+    <span class="k">def</span> <span class="nf">_postprocess_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        adds noise to the diagonalized components</span>
+<span class="sd">        </span>
+<span class="sd">        :param model: the considered model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;covariances_&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">noise_value</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">n_dims</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">covariances_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cov</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">covariances_</span><span class="p">):</span>
+                <span class="n">current_noise_value</span> <span class="o">=</span> \
+                    <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                                                    <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_noise_magnitude</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinate_scale</span><span class="p">,</span>
+                                                    <span class="n">size</span><span class="o">=</span><span class="n">n_dims</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">noise_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_noise_value</span><span class="p">)</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">covariances_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">current_noise_value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_noise_magnitude</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise_decay</span>
+
+    <span class="k">def</span> <span class="nf">_append_additional_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distribution_parameters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        appends noise parameters</span>
+<span class="sd">        </span>
+<span class="sd">        :param distribution_parameters: the dictionary that contains the distributions parametrization</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">distribution_parameters</span><span class="p">[</span><span class="s1">&#39;noise_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">noise_value</span><span class="p">)</span>
+
+<div class="viewcode-block" id="NoisyBayesianGaussianMixture.get_params"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.NoisyBayesianGaussianMixture.get_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">params_dict</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span>
+        <span class="n">params_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">distribution_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                <span class="n">noise_magnitude</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">noise_magnitude</span><span class="p">,</span>
+                                <span class="n">coordinate_scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coordinate_scale</span><span class="p">,</span>
+                                <span class="n">noise_decay</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">noise_decay</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">params_dict</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="NoisyGaussian"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.NoisyGaussian">[docs]</a><span class="k">class</span> <span class="nc">NoisyGaussian</span><span class="p">(</span><span class="n">Gaussian</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Additive Noisy Gaussian distribution. The initialization of its noise components</span>
+<span class="sd">    happens during the first fit where the magnitude of the noise in each</span>
+<span class="sd">    diagonalized component is estimated.</span>
+
+<span class="sd">    :param noise_magnitude: scalar factor that affects the magnitude of noise</span>
+<span class="sd">        applied on the distribution parameters</span>
+<span class="sd">    :param coordinate_scale: This should be a vector representing the scaling of</span>
+<span class="sd">        the coordinates. The noise applied to each coordinate `i` is</span>
+<span class="sd">        `noise_magnitude*coordinate_scale[i]`</span>
+<span class="sd">    :param noise_decay: Multiplicative decay of the noise components</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noise_magnitude</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">coordinate_scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">noise_decay</span><span class="o">=</span><span class="mf">0.95</span><span class="p">):</span>
+        <span class="n">Gaussian</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_decay</span> <span class="o">=</span> <span class="n">noise_decay</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_magnitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">noise_magnitude</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">coordinate_scale</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coordinate_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coordinate_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coordinate_scale</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_noise_magnitude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise_magnitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_value</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># vector containing the </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noisy_cov</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="NoisyGaussian.get_params"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.NoisyGaussian.get_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">params_dict</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span>
+        <span class="n">params_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">distribution_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                <span class="n">noise_magnitude</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">noise_magnitude</span><span class="p">,</span>
+                                <span class="n">coordinate_scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coordinate_scale</span><span class="p">,</span>
+                                <span class="n">noise_decay</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">noise_decay</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">params_dict</span></div>
+
+<div class="viewcode-block" id="NoisyGaussian.fit"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.NoisyGaussian.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_list</span><span class="p">,</span> <span class="n">smooth_update</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fits the parameters to the given data (see :class:`.Gaussian`) and additionally</span>
+<span class="sd">        adds noise in form of variance to the covariance matrix. Also, the noise</span>
+<span class="sd">        is decayed after each step</span>
+
+<span class="sd">        :param data_list: Data to be fitted to</span>
+<span class="sd">        :param smooth_update: Smooth the parameter update with regard to the</span>
+<span class="sd">            previous configuration</span>
+
+<span class="sd">        :return dict: describing parameter configuration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+            <span class="s2">&quot;The random_state for the distribution has not been set, call the&quot;</span> \
+            <span class="s2">&quot; &#39;init_random_state&#39; member function to set it&quot;</span>
+
+        <span class="n">Gaussian</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_list</span><span class="p">,</span> <span class="n">smooth_update</span><span class="p">)</span>
+        <span class="n">n_dims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_noise_magnitude</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinate_scale</span><span class="p">,</span>
+                                     <span class="n">size</span><span class="o">=</span><span class="n">n_dims</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noisy_cov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">noise_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_noise_magnitude</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise_decay</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Noisy cov</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">noisy_cov</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="s1">&#39;covariance_matrix&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">noisy_cov</span><span class="p">,</span> <span class="s1">&#39;noise_value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise_value</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="NoisyGaussian.sample"><a class="viewcode-back" href="../../../../ltl.optimizers.crossentropy.html#ltl.optimizers.crossentropy.distribution.NoisyGaussian.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_individuals</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Samples from current parametrization</span>
+
+<span class="sd">        :return: n_individuals Individuals</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+            <span class="s2">&quot;The random_state for the distribution has not been set, call the&quot;</span> \
+            <span class="s2">&quot; &#39;init_random_state&#39; member function to set it&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">noisy_cov</span><span class="p">,</span> <span class="n">n_individuals</span><span class="p">)</span></div></div>
+</pre></div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+      </div><!-- /row -->
+
+      <!-- row -->
+      <div class="row footer-relbar">
+<div id="navbar-related" class=" related navbar navbar-default" role="navigation" aria-label="related navigation">
+  <div class="navbar-inner">
+    <ul class="nav navbar-nav ">
+        <li><a href="../../../../index.html">LTL 0.4.2 documentation</a></li>
+    </ul>
+<ul class="nav navbar-nav pull-right hidden-xs hidden-sm">
+      
+        <li><a href="../../../../py-modindex.html" title="Python Module Index" >modules</a></li>
+        <li><a href="../../../../genindex.html" title="General Index" >index</a></li>
+        <li><a href="../../../index.html" >Module code</a></li>
+        <li><a href="../../../ltl.html" >ltl</a></li>
+        <li><a href="#">top</a></li> 
+      
+    </ul>
+  </div>
+</div>
+      </div><!-- /row -->
+
+      <!-- footer -->
+      <footer role="contentinfo">
+          &copy; Copyright 2017, Anand Subramoney.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.2.
+      </footer>
+      <!-- /footer -->
+
+    </div>
+    <!-- /container -->
+
+  </body>
+</html>

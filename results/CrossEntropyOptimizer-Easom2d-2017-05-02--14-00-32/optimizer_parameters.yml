@@ -1,7 +1,0 @@
-distribution: {distribution_name: NoisyGaussian, noise_bias: 0.05, noise_decay: 0.95}
-n_iteration: 100
-pop_size: 50
-rho: 0.2
-smoothing: 0.0
-stop_criterion: .inf
-temp_decay: 0
