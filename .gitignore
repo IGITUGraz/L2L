@@ -71,3 +71,4 @@ bin/path.conf
 /*.png
 
 tags
+_static
