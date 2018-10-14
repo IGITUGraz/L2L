@@ -1,13 +1,13 @@
 .. image:: https://circleci.com/gh/IGITUGraz/LTL.svg?style=svg&circle-token=227d26445f67e74ecc1c8904688859b1c49c292f
     :target: https://circleci.com/gh/IGITUGraz/LTL
 
-Learning To Learn (LTL)
-+++++++++++++++++++++++
+LTL Gradient-free Optimization Framework
+++++++++++++++++++++++++++++++++++++++++
 
 About
 *****
 
-The LTL package contains well documented and tested implementations of various gradient free optimization algorithms and defines an API that makes it usable with any optimizee that requires such optimization. All the implementations in this package are parallelilize and can run across different nodes and cores (but equally well on a single core). This package also provides a standard way to store and process the data produced during simulations.
+The LTL (Learning-to-learn) gradient-free optimization framework contains well documented and tested implementations of various gradient free optimization algorithms. It also defines an API that makes it easy to optimize (hyper-)parameters for any task (optimizee). All the implementations in this package are parallel and can run across different cores and nodes (but equally well on a single core). 
 
 Getting Started
 ***************
@@ -16,20 +16,17 @@ Choose one of the following options to get started:
 
 * If you are developing a new Optimizee or want to try out a new Optimizee with the
   Optimizers in the LTL package, install LTL as a python package. See section
-  `Installing the LTL Package`_ for more details (this automatically installs all
+  `Installing the LTL Package`_ for details on how to install the package (this automatically installs all
   requirements). See the `wiki <https://github.com/IGITUGraz/LTL/wiki/Writing-new-
-  Optimizees>`_ for more details.
+  Optimizees>`_ for more details on how to write a new optimizee.
 
-* If you want to add a new Optimizer or want to modify the function Optimizees in
-  the LTL package, install the requirements according to `Installing Requirements`_.
+* If you want to add a new Optimizer in the LTL package, install the requirements according to `Installing Requirements`_.
 
-In both cases, you should build the documentation according to `Building Documentation`_ and **read it**!
+Documentation is available at `<https://igitugraz.github.io/ltl/>`_.
+
 
 Installing the LTL Package
 **************************
-
-The Better way
---------------
 
 From the Top-Level directory of the directory, run the following command:
 
@@ -55,19 +52,6 @@ This should also install the `sphinx` package which should now enable you to bui
 the documentation as specified below.
 
 
-Installing Requirements
-***********************
-
-If you wish to install LTL as a python package, then you may ignore this section and
-continue from the section `Installing the LTL Package`_. If you however, wish to use
-it as-is, without installing, then the relevant requirements must be installed. This
-can be done by running the following from the root directory of the repository:
-
-    pip3 install --user -r requirements.txt
-
-Each optimizees and optimizers may have their own dependencies specified in the
-requirements.txt file within their respective package.
-
 Building Documentation
 **********************
 Run the following command from the `doc` directory
@@ -79,4 +63,3 @@ And open the documentation with
    firefox _build/html/index.html
 
 All further (and extensive) documentation is in the html documentation!
-Go read it!
