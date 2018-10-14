@@ -162,8 +162,7 @@ The optimizee subclasses :class:`~ltl.optimizees.optimizee.Optimizee` with a cla
 (Documentation linked below):
 
 1. :meth:`~ltl.optimizees.optimizee.Optimizee.create_individual` : Called to return a random individual_ (returns an Individual-Dict_)
-2. :meth:`~ltl.optimizees.optimizee.Optimizee.bounding_func` : Called to return a clipped version of individual_ (returns an Individual-Dict_)
-3. :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` : Runs the actual simulation and returns a fitness vector
+2. :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` : Runs the actual simulation and returns a fitness vector
 
 In order to maintain a consistent framework for communication between the optimizer and optimizee it is required to
 enforce certain requirements on the behaviour of the above functions. The details of these requirements for the
@@ -294,34 +293,6 @@ To run a LTL simulation, copy the file :file:`bin/ltl-template.py` (see :doc:`lt
 initialization of the appropriate `Optimizers` and `Optimizees`. The rest of the code should be left in place for
 logging and recording. See the source of :file:`bin/ltl-template.py` for more details.
 
-
-Parameter Bounding
-~~~~~~~~~~~~~~~~~~
-
-Most optimizees impose bounds on their parameters in some form. For example the
-:class:`~.FunctionGeneratorOptimizee` imposes a rectangular bound on the set of valid coordinates. Most Optimizers
-on the other hand do not have direct access to these bounds. Hence, If the optimizer wishes to support bounding, it must
-accept a bounding-function_ as an argument.
-
-.. _bounding-function:
-
-Bounding Function:
-  This is a function that takes as an argument an individual_ of the Optimizee (an Individual-Dict_) and returns an
-  individual_ that is a 'bounded' version of the said individual. This bounding may for instance be implemented by means
-  of clipping or normalization. Both the :class:`~.FunctionGeneratorOptimizee` and the
-  :class:`~.MNISTOptimizee` implement bounding functions in their classes which may be used in case a
-  function is required for bounding.
-
-Important Notes about Bounding
-------------------------------
-
-* If you're scaling/normalizing the value in `bounding_func`, remember to un-scale the value in the `Optimizee`'s 
-  `simulate` function before using it in your simulation.
-* A useful strategy that allows for an easy choice of `Optimizer` hyper-parameters would be to have the `Optimizer`
-  see *only* values within a certain range e.g. [0, 1].
-  For this, in the `create_individual` would scale the parameters and return values between [0, 1] which are used by
-  the `Optimizer`. The `simulate` function  would un-scale the value the `Optimizer` provides to the original range 
-  of the parameters. And the `bounding_func` would only clip the values to be between [0, 1] and do NO scaling.
 
 Examples
 ********

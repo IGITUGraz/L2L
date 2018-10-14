@@ -56,8 +56,6 @@ class GridSearchOptimizer(Optimizer):
     
     :param parameters: An instance of :class:`.GridSearchParameters`
 
-    :param optimizee_bounding_func: A function that returns the bound (between some limits) value of an individual
-    
     """
 
     def __init__(self, traj,

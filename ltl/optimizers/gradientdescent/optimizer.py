@@ -96,10 +96,6 @@ class GradientDescentOptimizer(Optimizer):
       :func:`~collections.namedtuple` :class:`.AdamParameters` containing the
       parameters needed by the Optimizer. The type of this parameter is used to select one of the GD variants.
     
-    :param optimizee_bounding_func:
-      This is a function that takes an individual as argument and returns another individual that is
-      within bounds (The bounds are defined by the function itself). If not provided, the individuals
-      are not bounded.
     """
 
     def __init__(self, traj,
