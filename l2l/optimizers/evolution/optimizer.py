@@ -136,7 +136,6 @@ class GeneticAlgorithmOptimizer(Optimizer):
             individual = self.eval_pop_inds[ind_index]
             individual.fitness.values = fitness
 
-
         traj.v_idx = -1  # set the trajectory back to default
 
         logger.info("-- End of generation {} --".format(self.g))

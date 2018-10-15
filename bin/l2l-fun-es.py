@@ -91,7 +91,6 @@ def run_experiment():
     # Path where the job will be executed
     traj.f_add_parameter_to_group("JUBE_params", "work_path", root_dir_path)
 
-
     ## Benchmark function
     function_id = 14
     bench_functs = BenchmarkedFunctions()

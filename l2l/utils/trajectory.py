@@ -27,8 +27,8 @@ class Trajectory:
         self.results = ResultGroup()
         self.results.f_add_result_group('all_results', "Contains all the results")
         self.current_results = {}
-        self._parameters.parameter_group= {}
-        self._parameters.parameter= {}
+        self._parameters.parameter_group = {}
+        self._parameters.parameter = {}
         self.individuals = {}
         self.v_idx = 0
 
@@ -140,7 +140,7 @@ class Trajectory:
         return self.__getattr__(key)
 
     def __getstate__(self):
-        print (self.__dict__)
+        print(self.__dict__)
         return self.__dict__
 
     def __setstate__(self, d):

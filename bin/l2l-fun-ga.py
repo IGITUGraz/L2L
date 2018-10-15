@@ -2,7 +2,7 @@ import logging.config
 import os
 
 import yaml
-from l2l.utils.environment import  Environment
+from l2l.utils.environment import Environment
 import numpy as np
 
 from l2l.optimizees.functions import tools as function_tools

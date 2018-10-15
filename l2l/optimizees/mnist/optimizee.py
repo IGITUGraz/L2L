@@ -3,7 +3,6 @@ from collections import namedtuple
 import numpy as np
 from sklearn.datasets import load_digits, fetch_mldata
 
-from l2l.logging_tools import configure_loggers
 from l2l.optimizees.optimizee import Optimizee
 from .nn import NeuralNetworkClassifier
 

@@ -9,6 +9,7 @@ class ParameterGroup():
     This class is a Dictionary which can be used to store parameters. It is used to fit the pypet already existing
     interface with the trajectory
     """
+
     def __init__(self):
         self.params = {}
 
@@ -37,10 +38,11 @@ class ResultGroup(sdictm):
     ResultGroup is a class derived from sdictm, which is a dictorary with parameters accessible using . (dot)
     Used to keep the interface with pypet trajectory result groups
     """
+
     def __init__(self):
         self._data = {}
 
-    def f_add_result_group(self, name, comment = ""):
+    def f_add_result_group(self, name, comment=""):
         """
         Adds a new results group to this dictionary
         :param name: Name of the new result group
@@ -48,7 +50,7 @@ class ResultGroup(sdictm):
         """
         self._data[name] = ResultGroup()
 
-    def f_add_result(self,key, val, comment = ""):
+    def f_add_result(self,key, val, comment=""):
         """
         Adds a result in a result group. The name of the result group precedes the name of the result name and
         they are split by a . (dot)
@@ -68,7 +70,7 @@ class ResultGroup(sdictm):
         else:
             self._data[key] = val
 
-    def f_add_result_to_group(self, group_name, key, val, comment = ""):
+    def f_add_result_to_group(self, group_name, key, val, comment=""):
         """
         Adds a result in a group.
         :param group_name: name of the group

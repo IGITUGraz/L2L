@@ -1,9 +1,8 @@
-from JUBE.jube2.main import main, continue_benchmarks
+from JUBE.jube2.main import main
 import os.path
 import pickle
 import time
 import logging
-import shutil
 
 logger = logging.getLogger("JUBERunner")
 
@@ -25,7 +24,7 @@ class JUBERunner():
         """
         self.trajectory = trajectory
         self.done = False
-        if not 'JUBE_params' in self.trajectory.par.keys():
+        if 'JUBE_params' not in self.trajectory.par.keys():
             print("exception")
         else:
             args = self.trajectory.par["JUBE_params"].params
@@ -64,7 +63,6 @@ class JUBERunner():
             os.makedirs(self.path + "trajectories")
             if not os.path.exists(self.path + "results"):
                 os.makedirs(self.path + "results")
-
 
     def write_pop_for_jube(self, trajectory, generation):
         """
@@ -129,12 +127,12 @@ class JUBERunner():
 
         if self.scheduler != 'None':
             f.write("    <use>files,sub_job</use>\n")
-            f.write("    <do done_file=\""+self.path + "/ready_files/ready_w_" + str(
+            f.write("    <do done_file=\"" + self.path + "/ready_files/ready_w_" + str(
                 self.generation) + "\">$submit_cmd $job_file </do> <!-- shell command -->\n")
         else:
             f.write("    <do done_file=\"" + self.path + "/ready_files/ready_w_" + str(
                 self.generation) + "\">$exec $index " + str(self.generation) +
-                    " -n $tasks_per_job </do> <!-- shell command -->\n")
+                " -n $tasks_per_job </do> <!-- shell command -->\n")
 
         f.write("    </step>   \n")
 
@@ -204,11 +202,11 @@ class JUBERunner():
         # Dump all trajectories for each optimizee run in the generation
         for ind in self.trajectory.individuals[generation]:
             trajectory.individual = ind
-            handle = open(self.path + "/trajectories/trajectory_" + str(ind.ind_idx) + "_"+str(generation) + ".bin",
+            handle = open(self.path + "/trajectories/trajectory_" + str(ind.ind_idx) + "_" + str(generation) + ".bin",
                           "wb")
             pickle.dump(trajectory, handle, pickle.HIGHEST_PROTOCOL)
             handle.close()
-            ready_files.append(path_ready+str(ind.ind_idx))
+            ready_files.append(path_ready + str(ind.ind_idx))
 
         # Call the main function from JUBE
         logger.info("JUBE running generation: " + str(self.generation))
@@ -276,9 +274,7 @@ def prepare_optimizee(optimizee, path):
     :param path: The path to store the optimizee.
     """
     # Serialize optimizee object so each process can run simulate on it independently on the CNs
-    f = open(path+"/optimizee.bin","wb")
+    f = open(path + "/optimizee.bin","wb")
     pickle.dump(optimizee, f)
     f.close()
     logger.info("Serialized optimizee writen to path: " + path + "/optimizee.bin")
-
-

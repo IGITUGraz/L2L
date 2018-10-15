@@ -39,7 +39,6 @@ def create_shared_logger_data(logger_names, log_levels, log_to_consoles,
 
     log_to_consoles = [bool(x) for x in log_to_consoles]
 
-
     global logger_names_global, log_levels_global, log_to_consoles_global
     global sim_name_global, log_directory_global
     logger_names_global = logger_names
@@ -78,7 +77,6 @@ def configure_loggers(exactly_once=False):
     log_to_consoles = log_to_consoles_global
     sim_name = sim_name_global
     log_directory = log_directory_global
-
 
     file_name_prefix = '%s_' % (sim_name,)
 

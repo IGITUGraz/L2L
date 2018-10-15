@@ -1,7 +1,6 @@
 import numpy as np
 
 from l2l.optimizees.optimizee import Optimizee
-from l2l.logging_tools import configure_loggers
 
 
 class FunctionGeneratorOptimizee(Optimizee):
