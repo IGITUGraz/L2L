@@ -28,7 +28,7 @@ class Optimizee:
         """
         This is the primary function that does the simulation for the given parameter given (within :obj:`traj`)
 
-        :param  ~utils.trajectory.Trajectory traj: The trajectory that contains the parameters and the
+        :param  ~l2l.utils.trajectory.Trajectory traj: The trajectory that contains the parameters and the
             individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.
             param1 is accessible using `traj.param1`
 

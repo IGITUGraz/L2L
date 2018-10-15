@@ -66,7 +66,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
     communicated to the individuals rather than the seed as in the paper.
     NOTE: Doesn't yet contain fitness shaping and mirrored sampling
 
-    :param  ~utils.trajectory.Trajectory traj:
+    :param  ~l2l.utils.trajectory.Trajectory traj:
       Use this trajectory to store the parameters of the specific runs. The parameters should be
       initialized based on the values in `parameters`
 

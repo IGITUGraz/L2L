@@ -54,7 +54,7 @@ class CrossEntropyOptimizer(Optimizer):
     return final distribution parameters.
     (The final distribution parameters contain information regarding the location of the maxima)
     
-    :param  ~utils.trajectory.Trajectory traj:
+    :param  ~l2l.utils.trajectory.Trajectory traj:
       Use this trajectory to store the parameters of the specific runs. The parameters should be
       initialized based on the values in `parameters`
     

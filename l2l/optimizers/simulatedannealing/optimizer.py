@@ -105,7 +105,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
 
     NOTE: This expects all parameters of the system to be of floating point
 
-    :param  ~utils.trajectory.Trajectory traj: Use this trajectory to store the parameters of the specific runs. The parameters should be
+    :param  ~l2l.utils.trajectory.Trajectory traj: Use this trajectory to store the parameters of the specific runs. The parameters should be
       initialized based on the values in `parameters`
     :param optimizee_create_individual: Function that creates a new individual
     :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each

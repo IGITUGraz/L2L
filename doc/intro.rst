@@ -115,7 +115,7 @@ The Trajectory is a container that is central to the simulation library. This co
     conditions of your numerical simulations. Usually, these are very basic data types, like integers, floats or maybe a
     bit more complex numpy arrays.
 
-In the simulations using the L2L Framework, there is a single :class:`~utils.trajectory.Trajectory` object (called
+In the simulations using the L2L Framework, there is a single :class:`~l2l.utils.trajectory.Trajectory` object (called
 :obj:`traj`). This object forms the backbone of communication between the optimizer and the optimizee. In short, it is
 used to acheive the following:
 
@@ -269,7 +269,7 @@ raise an error
 Some points to remember are the following:
 
 1.  The call to `self._expand_trajectory` not only causes the trajectory to store more parameter values to explore, but,
-    due to the mechanism underlying :meth:`~utils.trajectory.Trajectory.f_expand()`, also causes the framework to run
+    due to the mechanism underlying :meth:`~l2l.utils.trajectory.Trajectory.f_expand()`, also causes the framework to run
     the optimizee :meth:`~l2l.optimizees.optimizee.Optimizee.simulate` function on these parameters. Look at the
     documentation referenced in the footnote of iteration-loop_ for more details on this
 
@@ -307,10 +307,7 @@ Examples
 Data postprocessing
 *******************
 
-Having run the simulation, the next superpower required is the ability to make sense of all the data that we've dumped
-into the trajectory and (consequently) the HDF5 file.  Therefore to cover the most common cases (In fact, I really
-haven't YET come across any other cases), We have created the :mod:`~l2l.dataprocessing` with the relevant functions.
-Look up the documentation of the module for further details.
+Todo...
 
 .. _parallelization:
 

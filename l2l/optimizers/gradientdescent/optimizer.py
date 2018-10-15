@@ -78,7 +78,7 @@ class GradientDescentOptimizer(Optimizer):
 
     NOTE: This expects all parameters of the system to be of floating point
 
-    :param  ~utils.trajectory.Trajectory traj:
+    :param  ~l2l.utils.trajectory.Trajectory traj:
       Use this trajectory to store the parameters of the specific runs. The parameters should be
       initialized based on the values in `parameters`
     
@@ -274,7 +274,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         Classic Gradient Descent specific initializiation.
 
-        :param ~utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.
+        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.
 
         :return:
         """
@@ -284,7 +284,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         RMSProp specific initializiation.
 
-        :param ~utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.
+        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.
 
         :return:
         """
@@ -301,7 +301,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         ADAM specific initializiation.
 
-        :param ~utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.
+        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.
 
         :return:
         """
@@ -321,7 +321,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         Stochastic Gradient Descent specific initializiation.
 
-        :param ~utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.
+        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.
 
         :return:
         """
@@ -336,7 +336,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         Updates the current individual using the classic Gradient Descent algorithm.
 
-        :param ~utils.trajectory.Trajectory traj: The  trajectory which contains the parameters 
+        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory which contains the parameters 
             required by the update algorithm
 
         :param ~numpy.ndarray gradient: The gradient of the fitness curve, evaluated at the current individual
@@ -349,7 +349,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         Updates the current individual using the RMSProp algorithm.
 
-        :param ~utils.trajectory.Trajectory traj: The  trajectory which contains the parameters 
+        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory which contains the parameters 
             required by the update algorithm
 
         :param ~numpy.ndarray gradient: The gradient of the fitness curve, evaluated at the current individual
@@ -366,7 +366,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         Updates the current individual using the ADAM algorithm.
 
-        :param ~utils.trajectory.Trajectory traj: The  trajectory which contains the parameters 
+        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory which contains the parameters 
             required by the update algorithm
 
         :param ~numpy.ndarray gradient: The gradient of the fitness curve, evaluated at the current individual
@@ -388,7 +388,7 @@ class GradientDescentOptimizer(Optimizer):
         """
         Updates the current individual using a stochastic version of the gradient descent algorithm.
 
-        :param ~utils.trajectory.Trajectory traj: The  trajectory which contains the parameters 
+        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory which contains the parameters 
             required by the update algorithm
 
         :param ~numpy.ndarray gradient: The gradient of the fitness curve, evaluated at the current individual

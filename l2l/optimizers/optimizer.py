@@ -12,7 +12,7 @@ class Optimizer:
     This is the base class for the Optimizers i.e. the outer loop algorithms. These algorithms generate parameters, \
     give them to the inner loop to be evaluated, and with the resulting fitness modify the parameters in some way.
 
-    :param  ~utils.trajectory.Trajectory traj: Use this trajectory to store the parameters of the specific runs.
+    :param  ~l2l.utils.trajectory.Trajectory traj: Use this trajectory to store the parameters of the specific runs.
         The parameters should be initialized based on the values in :param parameters:
 
     :param optimizee_create_individual: A function which when called returns one instance of parameter (or "individual")
@@ -53,7 +53,7 @@ class Optimizer:
         list of parameters it wants evaluated at the next simulation cycle, increments :attr:`.Optimizer.g` and calls
         :meth:`._expand_trajectory`
 
-        :param  ~utils.trajectory.Trajectory traj: The trajectory that contains the parameters and the
+        :param  ~l2l.utils.trajectory.Trajectory traj: The trajectory that contains the parameters and the
             individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.
             param1 is accessible using `traj.param1`
 
@@ -71,7 +71,7 @@ class Optimizer:
         """
         Run any code required to clean-up, print final individuals etc.
 
-        :param  ~utils.trajectory.Trajectory traj: The  trajectory that contains the parameters and the
+        :param  ~l2l.utils.trajectory.Trajectory traj: The  trajectory that contains the parameters and the
             individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.
             param1 is accessible using `traj.param1`
 
@@ -83,7 +83,7 @@ class Optimizer:
         Add as many explored runs as individuals that need to be evaluated. Furthermore, add the individuals as explored
         parameters.
 
-        :param  ~utils.trajectory.Trajectory traj: The  trajectory that contains the parameters and the
+        :param  ~l2l.utils.trajectory.Trajectory traj: The  trajectory that contains the parameters and the
             individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.
             param1 is accessible using `traj.param1`
 

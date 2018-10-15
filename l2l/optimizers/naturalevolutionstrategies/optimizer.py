@@ -73,7 +73,7 @@ class NaturalEvolutionStrategiesOptimizer(Optimizer):
 
         where k and i are the indices of the individuals in descending order of fitness F_i
 
-    :param  ~utils.trajectory.Trajectory traj:
+    :param  ~l2l.utils.trajectory.Trajectory traj:
       Use this trajectory to store the parameters of the specific runs. The parameters should be
       initialized based on the values in `parameters`
 

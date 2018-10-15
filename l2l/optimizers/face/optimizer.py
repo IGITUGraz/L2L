@@ -55,7 +55,7 @@ class FACEOptimizer(Optimizer):
     return final distribution parameters.
     (The final distribution parameters contain information regarding the location of the maxima)
     
-    :param  ~utils.trajectory.Trajectory traj: Use this trajectory to store the parameters of the specific runs.
+    :param  ~l2l.utils.trajectory.Trajectory traj: Use this trajectory to store the parameters of the specific runs.
       The parameters should be initialized based on the values in `parameters`
     :param optimizee_create_individual: Function that creates a new individual. All parameters of the Individual-Dict
       returned should be of numpy.float64 type
