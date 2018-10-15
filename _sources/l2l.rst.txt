@@ -5,7 +5,7 @@ API Reference
 
     l2l.optimizees
     l2l.optimizers
-    l2l.dataprocessing
+    l2l.utils
     l2l.logging_tools
 
 

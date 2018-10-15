@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     
-    <title>Logging Tools &mdash; L2L 1.0.0-beta documentation</title>
+    <title>Simulation control &mdash; L2L 1.0.0-beta documentation</title>
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -51,8 +51,8 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="L2L 1.0.0-beta documentation" href="index.html" />
     <link rel="up" title="API Reference" href="l2l.html" />
-    <link rel="next" title="L2L Experiments" href="l2l-bin.html" />
-    <link rel="prev" title="Simulation control" href="l2l.utils.html" /> 
+    <link rel="next" title="Logging Tools" href="l2l.logging_tools.html" />
+    <link rel="prev" title="Optimizer using Natural Evolution Strategies" href="l2l.optimizers.naturalevolutionstrategies.html" /> 
   </head>
   <body role="document">
     <div id="navbar-top" class="navbar navbar-fixed-top navbar-default" role="navigation" aria-label="top navigation">
@@ -72,8 +72,9 @@
                 <a role="button" id="localToc" data-toggle="dropdown" data-target="#" href="#">Table Of Contents <b class="caret"></b></a>
                 <ul class="dropdown-menu localtoc sp-localtoc" role="menu" aria-labelledby="localToc">
                 <ul>
-<li><a class="reference internal" href="#">Logging Tools</a><ul>
-<li><a class="reference internal" href="#module-l2l.logging_tools">Module Functions</a></li>
+<li><a class="reference internal" href="#">Simulation control</a><ul>
+<li><a class="reference internal" href="#trajectory">Trajectory</a></li>
+<li><a class="reference internal" href="#individual">Individual</a></li>
 </ul>
 </li>
 </ul>
@@ -82,13 +83,13 @@
               </li>
 
             
-              <li><a href="l2l.utils.html" title="Simulation control" accesskey="P">previous </a></li>
-              <li><a href="l2l-bin.html" title="L2L Experiments" accesskey="N">next </a></li>
+              <li><a href="l2l.optimizers.naturalevolutionstrategies.html" title="Optimizer using Natural Evolution Strategies" accesskey="P">previous </a></li>
+              <li><a href="l2l.logging_tools.html" title="Logging Tools" accesskey="N">next </a></li>
               <li><a href="py-modindex.html" title="Python Module Index" >modules </a></li>
               <li><a href="genindex.html" title="General Index" accesskey="I">index </a></li>
               <li><a href="l2l.html" accesskey="U">API Reference</a></li>
             
-            <li class="visible-xs"><a href="_sources/l2l.logging_tools.rst.txt" rel="nofollow">Show Source</a></li>
+            <li class="visible-xs"><a href="_sources/l2l.utils.rst.txt" rel="nofollow">Show Source</a></li>
 
             <li class="visible-xs">
                 <form class="search form-search form-inline navbar-form navbar-right sp-searchbox" action="search.html" method="get">
@@ -127,11 +128,12 @@
 <li class="toctree-l1 current"><a class="reference internal" href="l2l.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="l2l.optimizees.html">Optimizees</a></li>
 <li class="toctree-l2"><a class="reference internal" href="l2l.optimizers.html">Optimizers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="l2l.utils.html">Simulation control</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Logging Tools</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-l2l.logging_tools">Module Functions</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Simulation control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#trajectory">Trajectory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#individual">Individual</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="l2l.logging_tools.html">Logging Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="l2l.html#other-module-functions">Other module functions</a></li>
 </ul>
 </li>
@@ -140,15 +142,15 @@
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="l2l.utils.html"
-                        title="previous chapter">Simulation control</a></p>
+  <p class="topless"><a href="l2l.optimizers.naturalevolutionstrategies.html"
+                        title="previous chapter">Optimizer using Natural Evolution Strategies</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="l2l-bin.html"
-                        title="next chapter">L2L Experiments</a></p>
+  <p class="topless"><a href="l2l.logging_tools.html"
+                        title="next chapter">Logging Tools</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/l2l.logging_tools.rst.txt"
+      <li><a href="_sources/l2l.utils.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -178,65 +180,13 @@
               <div class="bodywrapper">
                 <div class="body">
                   
-  <div class="section" id="logging-tools">
-<h1>Logging Tools<a class="headerlink" href="#logging-tools" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-l2l.logging_tools">
-<span id="module-functions"></span><h2>Module Functions<a class="headerlink" href="#module-l2l.logging_tools" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="l2l.logging_tools.create_shared_logger_data">
-<code class="descclassname">l2l.logging_tools.</code><code class="descname">create_shared_logger_data</code><span class="sig-paren">(</span><em>logger_names</em>, <em>log_levels</em>, <em>log_to_consoles</em>, <em>sim_name</em>, <em>log_directory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2l/logging_tools.html#create_shared_logger_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.logging_tools.create_shared_logger_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function must be called to create a shared copy of information that will be
-required to setup logging across processes. This must be run exactly once in the
-root process.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>logger_names</strong> – This is a list of names of the loggers whose output you’re
-interested in.</li>
-<li><strong>log_levels</strong> – This is the list of the same size of <cite>logger_names</cite> containing
-the log levels specified as strings (e.g. ‘INFO’, ‘DEBUG’, ‘WARNING’, ‘ERROR’).</li>
-<li><strong>log_to_consoles</strong> – This is a list of the same size of <cite>logger_names</cite> containing
-boolean values which indicate whether or not to redirect the output of the said
-logger to stdout or not. Note that with scoop, and output to stdout on any
-worker gets directed to the console of the main process.</li>
-<li><strong>sim_name</strong> – This is a string that is used when creating the log files.
-Short for simulation name.</li>
-<li><strong>log_directory</strong> – This is the path of the directory in which the log files will
-be stored. This directory must be an existing directory.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="l2l.logging_tools.configure_loggers">
-<code class="descclassname">l2l.logging_tools.</code><code class="descname">configure_loggers</code><span class="sig-paren">(</span><em>exactly_once=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2l/logging_tools.html#configure_loggers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.logging_tools.configure_loggers" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function configures the loggers using the shared information that was set by
-<a class="reference internal" href="#l2l.logging_tools.create_shared_logger_data" title="l2l.logging_tools.create_shared_logger_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_shared_logger_data()</span></code></a>. This function must be run at the beginning
-of every function that is parallelized in order to be able to reliably
-configure the loggers. As an example look at its usage in the method
-<a class="reference internal" href="l2l.optimizees.functions.html#l2l.optimizees.functions.optimizee.FunctionGeneratorOptimizee.simulate" title="l2l.optimizees.functions.optimizee.FunctionGeneratorOptimizee.simulate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">simulate()</span></code></a> from the
-class <a class="reference internal" href="l2l.optimizees.functions.html#l2l.optimizees.functions.optimizee.FunctionGeneratorOptimizee" title="l2l.optimizees.functions.optimizee.FunctionGeneratorOptimizee"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionGeneratorOptimizee</span></code></a></p>
-<p>You may also wish to call this function in your main simulation (after calling
-<a class="reference internal" href="#l2l.logging_tools.create_shared_logger_data" title="l2l.logging_tools.create_shared_logger_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_shared_logger_data()</span></code></a>) to configure the logging for the root process
-before any of the parallelized functions are run.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>exactly_once</strong> – If the configuration of logging is causing a significant
-overhead per parallelized run (This is a rather unlikely scenario), then this
-value may be set to <cite>True</cite>. When True, the function will configure the loggers
-exactly once per scoop worker.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+  <div class="section" id="simulation-control">
+<h1>Simulation control<a class="headerlink" href="#simulation-control" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="trajectory">
+<h2>Trajectory<a class="headerlink" href="#trajectory" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="individual">
+<h2>Individual<a class="headerlink" href="#individual" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -259,8 +209,8 @@ exactly once per scoop worker.</td>
     </ul>
 <ul class="nav navbar-nav pull-right hidden-xs hidden-sm">
       
-        <li><a href="l2l.utils.html" title="Simulation control" >previous</a></li>
-        <li><a href="l2l-bin.html" title="L2L Experiments" >next</a></li>
+        <li><a href="l2l.optimizers.naturalevolutionstrategies.html" title="Optimizer using Natural Evolution Strategies" >previous</a></li>
+        <li><a href="l2l.logging_tools.html" title="Logging Tools" >next</a></li>
         <li><a href="py-modindex.html" title="Python Module Index" >modules</a></li>
         <li><a href="genindex.html" title="General Index" >index</a></li>
         <li><a href="l2l.html" >API Reference</a></li>

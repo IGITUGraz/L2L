@@ -172,7 +172,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implements evolutionary algorithm</span>
 
-<span class="sd">    :param  ~utils.trajectory.Trajectory traj: Use this trajectory to store the parameters of the specific runs.</span>
+<span class="sd">    :param  ~l2l.utils.trajectory.Trajectory traj: Use this trajectory to store the parameters of the specific runs.</span>
 <span class="sd">      The parameters should be initialized based on the values in `parameters`</span>
 <span class="sd">    :param optimizee_create_individual: Function that creates a new individual</span>
 <span class="sd">    :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these</span>
@@ -277,7 +277,6 @@
             <span class="c1"># Use the ind_idx to update the fitness</span>
             <span class="n">individual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop_inds</span><span class="p">[</span><span class="n">ind_index</span><span class="p">]</span>
             <span class="n">individual</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">fitness</span>
-
 
         <span class="n">traj</span><span class="o">.</span><span class="n">v_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># set the trajectory back to default</span>
 

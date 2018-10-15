@@ -220,7 +220,7 @@
 
 <span class="sd">    NOTE: This expects all parameters of the system to be of floating point</span>
 
-<span class="sd">    :param  ~utils.trajectory.Trajectory traj:</span>
+<span class="sd">    :param  ~l2l.utils.trajectory.Trajectory traj:</span>
 <span class="sd">      Use this trajectory to store the parameters of the specific runs. The parameters should be</span>
 <span class="sd">      initialized based on the values in `parameters`</span>
 <span class="sd">    </span>
@@ -416,7 +416,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Classic Gradient Descent specific initializiation.</span>
 
-<span class="sd">        :param ~utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.</span>
+<span class="sd">        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.</span>
 
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -426,7 +426,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        RMSProp specific initializiation.</span>
 
-<span class="sd">        :param ~utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.</span>
+<span class="sd">        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.</span>
 
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -443,7 +443,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ADAM specific initializiation.</span>
 
-<span class="sd">        :param ~utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.</span>
+<span class="sd">        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.</span>
 
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -463,7 +463,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Stochastic Gradient Descent specific initializiation.</span>
 
-<span class="sd">        :param ~utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.</span>
+<span class="sd">        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory on which the parameters should get stored.</span>
 
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -478,7 +478,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates the current individual using the classic Gradient Descent algorithm.</span>
 
-<span class="sd">        :param ~utils.trajectory.Trajectory traj: The  trajectory which contains the parameters </span>
+<span class="sd">        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory which contains the parameters </span>
 <span class="sd">            required by the update algorithm</span>
 
 <span class="sd">        :param ~numpy.ndarray gradient: The gradient of the fitness curve, evaluated at the current individual</span>
@@ -491,7 +491,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates the current individual using the RMSProp algorithm.</span>
 
-<span class="sd">        :param ~utils.trajectory.Trajectory traj: The  trajectory which contains the parameters </span>
+<span class="sd">        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory which contains the parameters </span>
 <span class="sd">            required by the update algorithm</span>
 
 <span class="sd">        :param ~numpy.ndarray gradient: The gradient of the fitness curve, evaluated at the current individual</span>
@@ -508,7 +508,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates the current individual using the ADAM algorithm.</span>
 
-<span class="sd">        :param ~utils.trajectory.Trajectory traj: The  trajectory which contains the parameters </span>
+<span class="sd">        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory which contains the parameters </span>
 <span class="sd">            required by the update algorithm</span>
 
 <span class="sd">        :param ~numpy.ndarray gradient: The gradient of the fitness curve, evaluated at the current individual</span>
@@ -530,7 +530,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates the current individual using a stochastic version of the gradient descent algorithm.</span>
 
-<span class="sd">        :param ~utils.trajectory.Trajectory traj: The  trajectory which contains the parameters </span>
+<span class="sd">        :param ~l2l.utils.trajectory.Trajectory traj: The  trajectory which contains the parameters </span>
 <span class="sd">            required by the update algorithm</span>
 
 <span class="sd">        :param ~numpy.ndarray gradient: The gradient of the fitness curve, evaluated at the current individual</span>

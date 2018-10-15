@@ -143,7 +143,6 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">l2l.optimizees.optimizee</span> <span class="k">import</span> <span class="n">Optimizee</span>
-<span class="kn">from</span> <span class="nn">l2l.logging_tools</span> <span class="k">import</span> <span class="n">configure_loggers</span>
 
 
 <div class="viewcode-block" id="FunctionGeneratorOptimizee"><a class="viewcode-back" href="../../../../l2l.optimizees.functions.html#l2l.optimizees.functions.optimizee.FunctionGeneratorOptimizee">[docs]</a><span class="k">class</span> <span class="nc">FunctionGeneratorOptimizee</span><span class="p">(</span><span class="n">Optimizee</span><span class="p">):</span>
@@ -195,7 +194,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the value of the function chosen during initialization</span>
 
-<span class="sd">        :param ~utils.trajectory.Trajectory traj: Trajectory</span>
+<span class="sd">        :param ~l2l.utils.trajectory.Trajectory traj: Trajectory</span>
 <span class="sd">        :return: a single element :obj:`tuple` containing the value of the chosen function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># configure_loggers(exactly_once=True)    # logger configuration is here since this function is paralellised</span>
