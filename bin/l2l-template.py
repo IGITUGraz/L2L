@@ -1,5 +1,5 @@
 """
-This file is a typical example of a script used to run a LTL experiment. Read the comments in the file for more
+This file is a typical example of a script used to run a L2L experiment. Read the comments in the file for more
 explanations
 """
 
@@ -20,7 +20,7 @@ logger = logging.getLogger('bin.l2l-optimizee-optimizer')
 
 def main():
     # TODO when using the template: Give some *meaningful* name here
-    name = 'LTL'
+    name = 'L2L'
 
     # TODO when using the template: make a path.conf file and write the root path there
     try:

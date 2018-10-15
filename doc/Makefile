@@ -91,9 +91,9 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/LTL.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/L2L.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/LTL.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/L2L.qhc"
 
 .PHONY: applehelp
 applehelp:
@@ -110,8 +110,8 @@ devhelp:
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/LTL"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/LTL"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/L2L"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/L2L"
 	@echo "# devhelp"
 
 .PHONY: epub

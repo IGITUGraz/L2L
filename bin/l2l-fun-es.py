@@ -18,7 +18,7 @@ logger = logging.getLogger('bin.l2l-fun-es')
 
 
 def run_experiment():
-    name = 'LTL-FUN-ES'
+    name = 'L2L-FUN-ES'
     try:
         with open('bin/path.conf') as f:
             root_dir_path = f.read().strip()

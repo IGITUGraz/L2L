@@ -16,7 +16,7 @@ logger = logging.getLogger('bin.l2l-mnist-es')
 
 
 def run_experiment():
-    name = 'LTL-MNIST-CE'
+    name = 'L2L-MNIST-CE'
     try:
         with open('bin/path.conf') as f:
             root_dir_path = f.read().strip()

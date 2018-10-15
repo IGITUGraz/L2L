@@ -8,7 +8,7 @@ def main():
                         help='name of the directory that contains the results to be parsed')
     args = parser.parse_args()
 
-    master_branch_results_path = "https://github.com/IGITUGraz/LTL/tree/master/"
+    master_branch_results_path = "https://github.com/IGITUGraz/L2L/tree/master/"
     results_list = []
     for (dirpath, dirnames, filenames) in walk(args.dir_name):
         for ind, filename in enumerate(filenames):

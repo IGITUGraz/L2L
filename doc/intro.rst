@@ -115,7 +115,7 @@ The Trajectory is a container that is central to the simulation library. This co
     conditions of your numerical simulations. Usually, these are very basic data types, like integers, floats or maybe a
     bit more complex numpy arrays.
 
-In the simulations using the LTL Framework, there is a single :class:`~utils.trajectory.Trajectory` object (called
+In the simulations using the L2L Framework, there is a single :class:`~utils.trajectory.Trajectory` object (called
 :obj:`traj`). This object forms the backbone of communication between the optimizer and the optimizee. In short, it is
 used to acheive the following:
 
@@ -279,16 +279,16 @@ Some points to remember are the following:
 See the class documentation for more details: :class:`~l2l.optimizers.optimizer.Optimizer`
 
 
-Running an LTL simulation
+Running an L2L simulation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Before running a simulation for the first time, you need to specify the output directory for your results. To do so,
 create a new file :file:`bin/path.conf` with a single entry containing an absolute path or a path relative to the top-
-level LTL directory, e.g. :file:`./output_results/`, and create an empty folder at the path you specified. You also need
+level L2L directory, e.g. :file:`./output_results/`, and create an empty folder at the path you specified. You also need
 to commit any staged files to your local repo. Failing to follow these instructions raises an error when trying to run
 any of the test simulations.
 
-To run a LTL simulation, copy the file :file:`bin/l2l-template.py` (see :doc:`l2l-bin`) to
+To run a L2L simulation, copy the file :file:`bin/l2l-template.py` (see :doc:`l2l-bin`) to
 :file:`bin/l2l-{optimizeeabbr}-{optimizerabbr}.py`. Then fill in all the **TODOs** . Especially the parts with the
 initialization of the appropriate `Optimizers` and `Optimizees`. The rest of the code should be left in place for
 logging and recording. See the source of :file:`bin/l2l-template.py` for more details.
@@ -299,7 +299,7 @@ Examples
 
 * See :class:`~.FunctionGeneratorOptimizee` for an example of an `Optimizee` (based on simple function minimization).
 * See :class:`~.SimulatedAnnealingOptimizer` for an example of an implementation of simulated annealing `Optimizer`.
-* See :ref:`l2l-experiments` for an example implementation of an LTL experiment with an arbitrary `Optimizee` and `Optimizer`.
+* See :ref:`l2l-experiments` for an example implementation of an L2L experiment with an arbitrary `Optimizee` and `Optimizer`.
 
 
 .. _data-postprocessing:

@@ -18,7 +18,7 @@ logger = logging.getLogger('bin.l2l-fun-ce')
 
 
 def main():
-    name = 'LTL-FUN-CE'
+    name = 'L2L-FUN-CE'
     try:
         with open('bin/path.conf') as f:
             root_dir_path = f.read().strip()

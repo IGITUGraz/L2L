@@ -21,7 +21,7 @@ logger = logging.getLogger('bin.l2l-fun-gradientdescent')
 
 
 def main():
-    name = 'LTL-FUN-GD'
+    name = 'L2L-FUN-GD'
     try:
         with open('bin/path.conf') as f:
             root_dir_path = f.read().strip()

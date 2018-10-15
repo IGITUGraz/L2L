@@ -19,7 +19,7 @@ logger = logging.getLogger('bin.l2l-fun-face')
 
 
 def main():
-    name = 'LTL-FUN-FACE'
+    name = 'L2L-FUN-FACE'
     try:
         with open('bin/path.conf') as f:
             root_dir_path = f.read().strip()

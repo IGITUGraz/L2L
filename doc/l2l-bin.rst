@@ -1,6 +1,6 @@
 .. _l2l-experiments:
 
-LTL Experiments
+L2L Experiments
 ===============
 
 This is template script for setting up an experiment using an arbitrary Optimizer and Optimizee.
