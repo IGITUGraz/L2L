@@ -1,6 +1,3 @@
-.. image:: https://circleci.com/gh/IGITUGraz/LTL.svg?style=svg&circle-token=227d26445f67e74ecc1c8904688859b1c49c292f
-    :target: https://circleci.com/gh/IGITUGraz/LTL
-
 L2L Gradient-free Optimization Framework
 ++++++++++++++++++++++++++++++++++++++++
 
