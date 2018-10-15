@@ -75,6 +75,7 @@
 <li><a class="reference internal" href="#">Simulation control</a><ul>
 <li><a class="reference internal" href="#trajectory">Trajectory</a></li>
 <li><a class="reference internal" href="#individual">Individual</a></li>
+<li><a class="reference internal" href="#paramtergroup">ParamterGroup</a></li>
 </ul>
 </li>
 </ul>
@@ -131,6 +132,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Simulation control</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#trajectory">Trajectory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#individual">Individual</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#paramtergroup">ParamterGroup</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="l2l.logging_tools.html">Logging Tools</a></li>
@@ -184,9 +186,113 @@
 <h1>Simulation control<a class="headerlink" href="#simulation-control" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="trajectory">
 <h2>Trajectory<a class="headerlink" href="#trajectory" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="l2l.utils.trajectory.Trajectory">
+<em class="property">class </em><code class="descclassname">l2l.utils.trajectory.</code><code class="descname">Trajectory</code><span class="sig-paren">(</span><em>**keyword_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2l/utils/trajectory.html#Trajectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.utils.trajectory.Trajectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>The trajectory is a class which holds the history of the parameter space exploration, defines the current
+parameters to be explored and holds the results from each execution.
+Based on the pypet trajectory concept: <a class="reference external" href="https://github.com/SmokinCaterpillar/pypet">https://github.com/SmokinCaterpillar/pypet</a></p>
+<dl class="method">
+<dt id="l2l.utils.trajectory.Trajectory.f_add_parameter_group">
+<code class="descname">f_add_parameter_group</code><span class="sig-paren">(</span><em>name</em>, <em>comment=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2l/utils/trajectory.html#Trajectory.f_add_parameter_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.utils.trajectory.Trajectory.f_add_parameter_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new parameter group
+:param name: name of the new parameter group
+:param comment: ignored for the moment. Kept to match pypet interface.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="l2l.utils.trajectory.Trajectory.f_add_parameter_to_group">
+<code class="descname">f_add_parameter_to_group</code><span class="sig-paren">(</span><em>group_name</em>, <em>key</em>, <em>val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2l/utils/trajectory.html#Trajectory.f_add_parameter_to_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.utils.trajectory.Trajectory.f_add_parameter_to_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a parameter to an already existing group.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>group_name</strong> – Name of the group where the parameter should be added</li>
+<li><strong>key</strong> – Name of the parameter to be added</li>
+<li><strong>val</strong> – Value of the parameter</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Throws an exception if the group does not exist</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="l2l.utils.trajectory.Trajectory.f_add_result">
+<code class="descname">f_add_result</code><span class="sig-paren">(</span><em>key</em>, <em>val</em>, <em>comment=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2l/utils/trajectory.html#Trajectory.f_add_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.utils.trajectory.Trajectory.f_add_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a result to the trajectory
+:param key: it identifies either a generation params result group or another result
+:param val: The value to be added to the results
+TODO: verify where is the generation_params call performed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="l2l.utils.trajectory.Trajectory.f_add_parameter">
+<code class="descname">f_add_parameter</code><span class="sig-paren">(</span><em>key</em>, <em>val</em>, <em>comment=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2l/utils/trajectory.html#Trajectory.f_add_parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.utils.trajectory.Trajectory.f_add_parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a parameter to the trajectory
+:param key: Name of the parameter
+:param val: Value of the parameter
+:param comment</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="l2l.utils.trajectory.Trajectory.f_add_derived_parameter">
+<code class="descname">f_add_derived_parameter</code><span class="sig-paren">(</span><em>key</em>, <em>val</em>, <em>comment=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2l/utils/trajectory.html#Trajectory.f_add_derived_parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.utils.trajectory.Trajectory.f_add_derived_parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a derived parameter to the trajectory. Match the previous pypet interface.
+:param key: Name of the parameter
+:param val: Value of the parameter
+:param comment:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="l2l.utils.trajectory.Trajectory.f_expand">
+<code class="descname">f_expand</code><span class="sig-paren">(</span><em>build_dict</em>, <em>fail_safe=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2l/utils/trajectory.html#Trajectory.f_expand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.utils.trajectory.Trajectory.f_expand" title="Permalink to this definition">¶</a></dt>
+<dd><p>The expand function takes care of adding a new generation and individuals to the trajectory
+This is a critical function to allow the addition of a new generation, called by the optimizer
+from the postprocessing function
+:param build_dict: The dictionary containing the new generation id and its individuals
+:param fail_safe: Currently ignored</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="individual">
 <h2>Individual<a class="headerlink" href="#individual" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="l2l.utils.individual.Individual">
+<em class="property">class </em><code class="descclassname">l2l.utils.individual.</code><code class="descname">Individual</code><span class="sig-paren">(</span><em>generation=0</em>, <em>ind_idx=0</em>, <em>params=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2l/utils/individual.html#Individual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.utils.individual.Individual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#l2l.utils.groups.ParameterGroup" title="l2l.utils.groups.ParameterGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">l2l.utils.groups.ParameterGroup</span></code></a></p>
+<p>This class represents individuals in the parameter search. It derives from a Parameter group.
+The main elements which make an individual are the ID of its generation, its individual ID and the
+params specific for its run.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="paramtergroup">
+<h2>ParamterGroup<a class="headerlink" href="#paramtergroup" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="l2l.utils.groups.ParameterGroup">
+<em class="property">class </em><code class="descclassname">l2l.utils.groups.</code><code class="descname">ParameterGroup</code><a class="reference internal" href="_modules/l2l/utils/groups.html#ParameterGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.utils.groups.ParameterGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>This class is a Dictionary which can be used to store parameters. It is used to fit the pypet already existing
+interface with the trajectory</p>
+<dl class="method">
+<dt id="l2l.utils.groups.ParameterGroup.f_add_parameter">
+<code class="descname">f_add_parameter</code><span class="sig-paren">(</span><em>key</em>, <em>val</em>, <em>comment=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2l/utils/groups.html#ParameterGroup.f_add_parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.utils.groups.ParameterGroup.f_add_parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds parameter with name key and value val. The comment is ignored for the moment but kept for
+compatibility with the pypet groups
+:param key: Name of the parameter
+:param val: Value of the parameter
+:param comment: Ignores for the moment</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 

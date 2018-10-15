@@ -331,7 +331,7 @@ mapped one to one in the HDF5 file when you store data to disk. …</p>
 conditions of your numerical simulations. Usually, these are very basic data types, like integers, floats or maybe a
 bit more complex numpy arrays.</p>
 </div></blockquote>
-<p>In the simulations using the L2L Framework, there is a single <code class="xref py py-class docutils literal notranslate"><span class="pre">Trajectory</span></code> object (called
+<p>In the simulations using the L2L Framework, there is a single <a class="reference internal" href="l2l.utils.html#l2l.utils.trajectory.Trajectory" title="l2l.utils.trajectory.Trajectory"><code class="xref py py-class docutils literal notranslate"><span class="pre">Trajectory</span></code></a> object (called
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">traj</span></code>). This object forms the backbone of communication between the optimizer and the optimizee. In short, it is
 used to acheive the following:</p>
 <ol class="arabic simple">
@@ -456,7 +456,7 @@ raise an error</p>
 <p>Some points to remember are the following:</p>
 <ol class="arabic simple">
 <li>The call to <cite>self._expand_trajectory</cite> not only causes the trajectory to store more parameter values to explore, but,
-due to the mechanism underlying <code class="xref py py-meth docutils literal notranslate"><span class="pre">f_expand()</span></code>, also causes the framework to run
+due to the mechanism underlying <a class="reference internal" href="l2l.utils.html#l2l.utils.trajectory.Trajectory.f_expand" title="l2l.utils.trajectory.Trajectory.f_expand"><code class="xref py py-meth docutils literal notranslate"><span class="pre">f_expand()</span></code></a>, also causes the framework to run
 the optimizee <a class="reference internal" href="l2l.optimizees.html#l2l.optimizees.optimizee.Optimizee.simulate" title="l2l.optimizees.optimizee.Optimizee.simulate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">simulate()</span></code></a> function on these parameters. Look at the
 documentation referenced in the footnote of <a class="reference internal" href="#iteration-loop">iteration-loop</a> for more details on this</li>
 <li><strong>Always</strong> build the optimizer to maximize fitness. The weights that are passed in to the optimizer constructor

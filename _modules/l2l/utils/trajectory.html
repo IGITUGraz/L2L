@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    
+    <title>l2l.utils.trajectory &mdash; L2L 1.0.0-beta documentation</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    
+
+<link rel="stylesheet" href="../../../_static/css/basicstrap-base.css" type="text/css" />
+<link rel="stylesheet" id="current-theme" href="../../../_static/css/bootstrap3/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" id="current-adjust-theme" type="text/css" />
+
+<link rel="stylesheet" href="../../../_static/css/font-awesome.min.css">
+
+<style type="text/css">
+  body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+</style>
+
+<link rel="stylesheet" href="../../../_static/css/basicstrap.css" type="text/css" />
+<link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+<script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../../',
+            VERSION:     '1.0.0-beta',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+  };
+</script>
+    <script type="text/javascript" src="../../../_static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/bootstrap3.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/jquery.cookie.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/basicstrap.js"></script>
+<script type="text/javascript">
+</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="L2L 1.0.0-beta documentation" href="../../../index.html" />
+    <link rel="up" title="l2l" href="../../l2l.html" /> 
+  </head>
+  <body role="document">
+    <div id="navbar-top" class="navbar navbar-fixed-top navbar-default" role="navigation" aria-label="top navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../../index.html">L2L 1.0.0-beta documentation</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+              <li><a href="../../../py-modindex.html" title="Python Module Index" >modules </a></li>
+              <li><a href="../../../genindex.html" title="General Index" accesskey="I">index </a></li>
+              <li><a href="../../index.html" >Module code</a></li>
+              <li><a href="../../l2l.html" accesskey="U">l2l</a></li>
+            
+
+            <li class="visible-xs">
+                <form class="search form-search form-inline navbar-form navbar-right sp-searchbox" action="../../../search.html" method="get">
+                  <div class="input-append input-group">
+                    <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+                    <span class="input-group-btn">
+                    <input type="submit" class="btn" value="Go" />
+                    </span>
+                  </div>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </li>
+
+            
+
+          </ul>
+
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- container -->
+    <div class="container-fluid">
+
+      <!-- row -->
+      <div class="row">
+         
+<div class="col-md-3 hidden-xs" id="sidebar-wrapper">
+  <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../l2l.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../l2l-bin.html">L2L Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../indices.html">Indices and tables</a></li>
+</ul>
+
+<div id="searchbox" role="search">
+  <h3>Quick search</h3>
+  <form class="search form-inline" action="../../../search.html" method="get">
+      <div class="input-append input-group">
+        <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+        <span class="input-group-btn">
+        <input type="submit" class="btn" value="Go" />
+        </span>
+      </div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+  </div>
+</div> 
+        
+
+        <div class="col-md-9" id="content-wrapper">
+          <div class="document" role="main">
+            <div class="documentwrapper">
+              <div class="bodywrapper">
+                <div class="body">
+                  
+  <h1>Source code for l2l.utils.trajectory</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">l2l.utils.groups</span> <span class="k">import</span> <span class="n">ParameterGroup</span><span class="p">,</span> <span class="n">ResultGroup</span><span class="p">,</span> <span class="n">ParameterDict</span>
+<span class="kn">from</span> <span class="nn">l2l.utils.individual</span> <span class="k">import</span> <span class="n">Individual</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">logging</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;Trajectory&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Trajectory"><a class="viewcode-back" href="../../../l2l.utils.html#l2l.utils.trajectory.Trajectory">[docs]</a><span class="k">class</span> <span class="nc">Trajectory</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The trajectory is a class which holds the history of the parameter space exploration, defines the current</span>
+<span class="sd">    parameters to be explored and holds the results from each execution.</span>
+<span class="sd">    Based on the pypet trajectory concept: https://github.com/SmokinCaterpillar/pypet</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">keyword_args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the trajectory. Some parameters are kept to match the interface with the pypet trajectory.</span>
+<span class="sd">        TODO: remove all irrelevant attributes and simplify the class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">keyword_args</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">keyword_args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span> <span class="o">=</span> <span class="n">ParameterDict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># Contains all parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Contains all results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">individual</span> <span class="o">=</span> <span class="n">Individual</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">ResultGroup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">f_add_result_group</span><span class="p">(</span><span class="s1">&#39;all_results&#39;</span><span class="p">,</span> <span class="s2">&quot;Contains all the results&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">parameter_group</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">parameter</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">individuals</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_idx</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="Trajectory.f_add_parameter_group"><a class="viewcode-back" href="../../../l2l.utils.html#l2l.utils.trajectory.Trajectory.f_add_parameter_group">[docs]</a>    <span class="k">def</span> <span class="nf">f_add_parameter_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a new parameter group</span>
+<span class="sd">        :param name: name of the new parameter group</span>
+<span class="sd">        :param comment: ignored for the moment. Kept to match pypet interface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ParameterGroup</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Added new parameter group: &quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Trajectory.f_add_parameter_to_group"><a class="viewcode-back" href="../../../l2l.utils.html#l2l.utils.trajectory.Trajectory.f_add_parameter_to_group">[docs]</a>    <span class="k">def</span> <span class="nf">f_add_parameter_to_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_name</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a parameter to an already existing group.</span>
+
+<span class="sd">        :param group_name: Name of the group where the parameter should be added</span>
+<span class="sd">        :param key: Name of the parameter to be added</span>
+<span class="sd">        :param val: Value of the parameter</span>
+
+<span class="sd">        Throws an exception if the group does not exist</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># LOG(&quot;Key not found when adding to result group&quot;)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Group name not found when adding value to result group&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Trajectory.f_add_result"><a class="viewcode-back" href="../../../l2l.utils.html#l2l.utils.trajectory.Trajectory.f_add_result">[docs]</a>    <span class="k">def</span> <span class="nf">f_add_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a result to the trajectory</span>
+<span class="sd">        :param key: it identifies either a generation params result group or another result</span>
+<span class="sd">        :param val: The value to be added to the results</span>
+<span class="sd">        TODO: verify where is the generation_params call performed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;generation_params&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ResultGroup</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span></div>
+
+<div class="viewcode-block" id="Trajectory.f_add_parameter"><a class="viewcode-back" href="../../../l2l.utils.html#l2l.utils.trajectory.Trajectory.f_add_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">f_add_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a parameter to the trajectory</span>
+<span class="sd">        :param key: Name of the parameter</span>
+<span class="sd">        :param val: Value of the parameter</span>
+<span class="sd">        :param comment</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span></div>
+
+<div class="viewcode-block" id="Trajectory.f_add_derived_parameter"><a class="viewcode-back" href="../../../l2l.utils.html#l2l.utils.trajectory.Trajectory.f_add_derived_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">f_add_derived_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a derived parameter to the trajectory. Match the previous pypet interface.</span>
+<span class="sd">        :param key: Name of the parameter</span>
+<span class="sd">        :param val: Value of the parameter</span>
+<span class="sd">        :param comment:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">,</span><span class="n">comment</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Trajectory.f_expand"><a class="viewcode-back" href="../../../l2l.utils.html#l2l.utils.trajectory.Trajectory.f_expand">[docs]</a>    <span class="k">def</span> <span class="nf">f_expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">build_dict</span><span class="p">,</span> <span class="n">fail_safe</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The expand function takes care of adding a new generation and individuals to the trajectory</span>
+<span class="sd">        This is a critical function to allow the addition of a new generation, called by the optimizer</span>
+<span class="sd">        from the postprocessing function</span>
+<span class="sd">        :param build_dict: The dictionary containing the new generation id and its individuals</span>
+<span class="sd">        :param fail_safe: Currently ignored</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">gen</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ind_idx</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">build_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;generation&#39;</span><span class="p">:</span>
+                <span class="n">gen</span> <span class="o">=</span> <span class="n">build_dict</span><span class="p">[</span><span class="s1">&#39;generation&#39;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;ind_idx&#39;</span><span class="p">:</span>
+                <span class="n">ind_idx</span> <span class="o">=</span> <span class="n">build_dict</span><span class="p">[</span><span class="s1">&#39;ind_idx&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">build_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="c1"># TODO: Could/Should the build dictionary have more than one generation in it?</span>
+        <span class="n">generation</span> <span class="o">=</span> <span class="n">gen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">generation</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ind_idx</span><span class="p">:</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="n">Individual</span><span class="p">(</span><span class="n">generation</span><span class="p">,</span><span class="n">i</span><span class="p">,[])</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+                <span class="n">ind</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">generation</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Expanded trajectory for generation: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">generation</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle attribute access like a sdict</span>
+<span class="sd">        :param attr: The attribute to be accessed</span>
+<span class="sd">        :return: the value of this attributes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">attr</span><span class="p">:</span>
+            <span class="c1"># This is triggered exclusively in the case where __getattr__ is called from __getitem__</span>
+            <span class="n">attrs</span> <span class="o">=</span> <span class="n">attr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">at</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="p">[</span><span class="n">at</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">attr</span> <span class="o">==</span> <span class="s1">&#39;par&#39;</span> <span class="ow">or</span> <span class="n">attr</span> <span class="o">==</span> <span class="s1">&#39;parameters&#39;</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span><span class="n">default_value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></div>
+</pre></div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+      </div><!-- /row -->
+
+      <!-- row -->
+      <div class="row footer-relbar">
+<div id="navbar-related" class=" related navbar navbar-default" role="navigation" aria-label="related navigation">
+  <div class="navbar-inner">
+    <ul class="nav navbar-nav ">
+        <li><a href="../../../index.html">L2L 1.0.0-beta documentation</a></li>
+    </ul>
+<ul class="nav navbar-nav pull-right hidden-xs hidden-sm">
+      
+        <li><a href="../../../py-modindex.html" title="Python Module Index" >modules</a></li>
+        <li><a href="../../../genindex.html" title="General Index" >index</a></li>
+        <li><a href="../../index.html" >Module code</a></li>
+        <li><a href="../../l2l.html" >l2l</a></li>
+        <li><a href="#">top</a></li> 
+      
+    </ul>
+  </div>
+</div>
+      </div><!-- /row -->
+
+      <!-- footer -->
+      <footer role="contentinfo">
+          &copy; Copyright 2017, Anand Subramoney.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1.
+      </footer>
+      <!-- /footer -->
+
+    </div>
+    <!-- /container -->
+
+  </body>
+</html>
