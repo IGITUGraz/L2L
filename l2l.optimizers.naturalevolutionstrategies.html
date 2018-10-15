@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    
+    <title>Optimizer using Natural Evolution Strategies &mdash; L2L 1.0.0-beta documentation</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    
+
+<link rel="stylesheet" href="_static/css/basicstrap-base.css" type="text/css" />
+<link rel="stylesheet" id="current-theme" href="_static/css/bootstrap3/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" id="current-adjust-theme" type="text/css" />
+
+<link rel="stylesheet" href="_static/css/font-awesome.min.css">
+
+<style type="text/css">
+  body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+</style>
+
+<link rel="stylesheet" href="_static/css/basicstrap.css" type="text/css" />
+<link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+<script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    './',
+            VERSION:     '1.0.0-beta',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+  };
+</script>
+    <script type="text/javascript" src="_static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/bootstrap3.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery.cookie.min.js"></script>
+<script type="text/javascript" src="_static/js/basicstrap.js"></script>
+<script type="text/javascript">
+</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="L2L 1.0.0-beta documentation" href="index.html" />
+    <link rel="up" title="Optimizers" href="l2l.optimizers.html" />
+    <link rel="next" title="Data Processing Utility Functions" href="l2l.dataprocessing.html" />
+    <link rel="prev" title="Optimizer using Evolution Strategies" href="l2l.optimizers.evolutionstrategies.html" /> 
+  </head>
+  <body role="document">
+    <div id="navbar-top" class="navbar navbar-fixed-top navbar-default" role="navigation" aria-label="top navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index.html">L2L 1.0.0-beta documentation</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown visible-xs">
+                <a role="button" id="localToc" data-toggle="dropdown" data-target="#" href="#">Table Of Contents <b class="caret"></b></a>
+                <ul class="dropdown-menu localtoc sp-localtoc" role="menu" aria-labelledby="localToc">
+                <ul>
+<li><a class="reference internal" href="#">Optimizer using Natural Evolution Strategies</a><ul>
+<li><a class="reference internal" href="#naturalevolutionstrategiesoptimizer">NaturalEvolutionStrategiesOptimizer</a></li>
+<li><a class="reference internal" href="#naturalevolutionstrategiesparameters">NaturalEvolutionStrategiesParameters</a></li>
+</ul>
+</li>
+</ul>
+
+                </ul>
+              </li>
+
+            
+              <li><a href="l2l.optimizers.evolutionstrategies.html" title="Optimizer using Evolution Strategies" accesskey="P">previous </a></li>
+              <li><a href="l2l.dataprocessing.html" title="Data Processing Utility Functions" accesskey="N">next </a></li>
+              <li><a href="py-modindex.html" title="Python Module Index" >modules </a></li>
+              <li><a href="genindex.html" title="General Index" accesskey="I">index </a></li>
+              <li><a href="l2l.html" >API Reference</a></li>
+              <li><a href="l2l.optimizers.html" accesskey="U">Optimizers</a></li>
+            
+            <li class="visible-xs"><a href="_sources/l2l.optimizers.naturalevolutionstrategies.rst.txt" rel="nofollow">Show Source</a></li>
+
+            <li class="visible-xs">
+                <form class="search form-search form-inline navbar-form navbar-right sp-searchbox" action="search.html" method="get">
+                  <div class="input-append input-group">
+                    <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+                    <span class="input-group-btn">
+                    <input type="submit" class="btn" value="Go" />
+                    </span>
+                  </div>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </li>
+
+            
+
+          </ul>
+
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- container -->
+    <div class="container-fluid">
+
+      <!-- row -->
+      <div class="row">
+         
+<div class="col-md-3 hidden-xs" id="sidebar-wrapper">
+  <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="l2l.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="l2l.optimizees.html">Optimizees</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="l2l.optimizers.html">Optimizers</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="l2l.optimizers.html#optimizer-base-module">Optimizer Base Module</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="l2l.optimizers.html#implemented-examples">Implemented Examples</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="l2l.optimizers.crossentropy.html">Optimizer using Cross Entropy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="l2l.optimizers.face.html">Optimizer using FACE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="l2l.optimizers.gradientdescent.html">Optimizer using Gradient Descent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="l2l.optimizers.gridsearch.html">Optimizer using Grid Search</a></li>
+<li class="toctree-l4"><a class="reference internal" href="l2l.optimizers.evolution.html">Optimizer using Evolutionary Algorithm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="l2l.optimizers.simulatedannealing.html">Optimizer using Simulated Annealing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="l2l.optimizers.evolutionstrategies.html">Optimizer using Evolution Strategies</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Optimizer using Natural Evolution Strategies</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#naturalevolutionstrategiesoptimizer">NaturalEvolutionStrategiesOptimizer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#naturalevolutionstrategiesparameters">NaturalEvolutionStrategiesParameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="l2l.dataprocessing.html">Data Processing Utility Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="l2l.logging_tools.html">Logging Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="l2l.html#other-module-functions">Other module functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="l2l-bin.html">L2L Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="indices.html">Indices and tables</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="l2l.optimizers.evolutionstrategies.html"
+                        title="previous chapter">Optimizer using Evolution Strategies</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="l2l.dataprocessing.html"
+                        title="next chapter">Data Processing Utility Functions</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/l2l.optimizers.naturalevolutionstrategies.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" role="search">
+  <h3>Quick search</h3>
+  <form class="search form-inline" action="search.html" method="get">
+      <div class="input-append input-group">
+        <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+        <span class="input-group-btn">
+        <input type="submit" class="btn" value="Go" />
+        </span>
+      </div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+  </div>
+</div> 
+        
+
+        <div class="col-md-9" id="content-wrapper">
+          <div class="document" role="main">
+            <div class="documentwrapper">
+              <div class="bodywrapper">
+                <div class="body">
+                  
+  <div class="section" id="optimizer-using-natural-evolution-strategies">
+<h1>Optimizer using Natural Evolution Strategies<a class="headerlink" href="#optimizer-using-natural-evolution-strategies" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="naturalevolutionstrategiesoptimizer">
+<h2>NaturalEvolutionStrategiesOptimizer<a class="headerlink" href="#naturalevolutionstrategiesoptimizer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesOptimizer">
+<em class="property">class </em><code class="descclassname">l2l.optimizers.naturalevolutionstrategies.optimizer.</code><code class="descname">NaturalEvolutionStrategiesOptimizer</code><span class="sig-paren">(</span><em>traj</em>, <em>optimizee_create_individual</em>, <em>optimizee_fitness_weights</em>, <em>parameters</em>, <em>optimizee_bounding_func=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2l/optimizers/naturalevolutionstrategies/optimizer.html#NaturalEvolutionStrategiesOptimizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesOptimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="l2l.optimizers.html#l2l.optimizers.optimizer.Optimizer" title="l2l.optimizers.optimizer.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">l2l.optimizers.optimizer.Optimizer</span></code></a></p>
+<p>Class Implementing the separable natural evolution strategies optimizer in natural coordinates as in:</p>
+<p>Wierstra, D., Schaul, T., Peters, J., &amp; Schmidhuber, J. (2008). Natural evolution strategies.
+In Evolutionary Computation, 2008. CEC 2008.(IEEE World Congress on Computational Intelligence) (pp. 3381-3387).</p>
+<p>Glasmachers, T., Schaul, T., Yi, S., Wierstra, D., &amp; Schmidhuber, J. (2010). Exponential natural evolution strategies.
+In Proceedings of the 12th annual conference on Genetic and evolutionary computation (pp. 393-400).</p>
+<p>Wierstra, D., Schaul, T., Glasmachers, T., Sun, Y., Peters, J., &amp; Schmidhuber, J. (2014). Natural evolution strategies.
+In Journal of Machine Learning Research, 15(1) (pp. 949-980).</p>
+<p>In the pseudo code the algorithm does:</p>
+<dl class="docutils">
+<dt>For n iterations do:</dt>
+<dd><ul class="first last">
+<li><p class="first">Sample individuals z from multinormal search distribution with parameters mu, sigma</p>
+<p>s &lt;- sample from N(0,1)
+z &lt;- mu + sigma * s</p>
+</li>
+<li><p class="first">If mirrored sampling is enabled, also sample individuals with opposite perturbations s</p>
+<p>z &lt;- [mu + sigma * s, mu - sigma * s]</p>
+</li>
+<li><p class="first">evaluate individuals z and get fitnesses F_i(z)</p>
+</li>
+<li><p class="first">Update the parameters of the search distribution as</p>
+<blockquote>
+<div><p>mu_{t+1} &lt;- mu_{t+1} + eta_mu * sigma * sum(F_i * s_i)
+sigma_{t+1} &lt;- sigma_t * exp(eta_sigma / 2 * sum(F_i * (s_i ** 2 - 1))</p>
+</div></blockquote>
+</li>
+<li><p class="first">If fitness shaping is enabled, F_i is replaced with the utility u_i in the previous step, which is calculated as:</p>
+<blockquote>
+<div><p>u_i = max(0, log(n/2 + 1) - log(k)) / sum_{k=1}^{n}{max(0, log(n/2 + 1) - log(k))} - 1 / n</p>
+</div></blockquote>
+<p>where k and i are the indices of the individuals in descending order of fitness F_i</p>
+</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>traj</strong> (<em>Trajectory</em>) – Use this trajectory to store the parameters of the specific runs. The parameters should be
+initialized based on the values in <cite>parameters</cite></li>
+<li><strong>optimizee_create_individual</strong> – Function that creates a new individual. All parameters of the Individual-Dict returned should be
+of numpy.float64 type</li>
+<li><strong>optimizee_fitness_weights</strong> – Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each
+element of the fitness vector)</li>
+<li><strong>parameters</strong> – Instance of <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.7)"><code class="xref py py-func docutils literal notranslate"><span class="pre">namedtuple()</span></code></a> <code class="xref py py-class docutils literal notranslate"><span class="pre">NaturalEvolutionstrategiesParameters</span></code> containing the
+parameters needed by the Optimizer</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesOptimizer.post_process">
+<code class="descname">post_process</code><span class="sig-paren">(</span><em>traj</em>, <em>fitnesses_results</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2l/optimizers/naturalevolutionstrategies/optimizer.html#NaturalEvolutionStrategiesOptimizer.post_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesOptimizer.post_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="l2l.optimizers.html#l2l.optimizers.optimizer.Optimizer.post_process" title="l2l.optimizers.optimizer.Optimizer.post_process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">post_process()</span></code></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesOptimizer.end">
+<code class="descname">end</code><span class="sig-paren">(</span><em>traj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2l/optimizers/naturalevolutionstrategies/optimizer.html#NaturalEvolutionStrategiesOptimizer.end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesOptimizer.end" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="l2l.optimizers.html#l2l.optimizers.optimizer.Optimizer.end" title="l2l.optimizers.optimizer.Optimizer.end"><code class="xref py py-meth docutils literal notranslate"><span class="pre">end()</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="naturalevolutionstrategiesparameters">
+<h2>NaturalEvolutionStrategiesParameters<a class="headerlink" href="#naturalevolutionstrategiesparameters" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters">
+<em class="property">class </em><code class="descclassname">l2l.optimizers.naturalevolutionstrategies.optimizer.</code><code class="descname">NaturalEvolutionStrategiesParameters</code><a class="headerlink" href="#l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>learning_rate_mu</strong> – Learning rate for mean of distribution</li>
+<li><strong>learning_rate_sigma</strong> – Learning rate for standard deviation of distribution</li>
+<li><strong>mu</strong> – Initial mean of search distribution</li>
+<li><strong>sigma</strong> – Initial standard deviation of search distribution</li>
+<li><strong>mirrored_sampling_enabled</strong> – Should we turn on mirrored sampling i.e. sampling both e and -e</li>
+<li><strong>fitness_shaping_enabled</strong> – Should we turn on fitness shaping i.e. using only top <cite>fitness_shaping_ratio</cite> to update
+current individual?</li>
+<li><strong>pop_size</strong> – Number of individuals per simulation.</li>
+<li><strong>n_iteration</strong> – Number of iterations to perform</li>
+<li><strong>stop_criterion</strong> – (Optional) Stop if this fitness is reached.</li>
+<li><strong>seed</strong> – The random seed used for generating new individuals</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.fitness_shaping_enabled">
+<code class="descname">fitness_shaping_enabled</code><a class="headerlink" href="#l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.fitness_shaping_enabled" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.learning_rate_mu">
+<code class="descname">learning_rate_mu</code><a class="headerlink" href="#l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.learning_rate_mu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.learning_rate_sigma">
+<code class="descname">learning_rate_sigma</code><a class="headerlink" href="#l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.learning_rate_sigma" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.mirrored_sampling_enabled">
+<code class="descname">mirrored_sampling_enabled</code><a class="headerlink" href="#l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.mirrored_sampling_enabled" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.mu">
+<code class="descname">mu</code><a class="headerlink" href="#l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.mu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.n_iteration">
+<code class="descname">n_iteration</code><a class="headerlink" href="#l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.n_iteration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.pop_size">
+<code class="descname">pop_size</code><a class="headerlink" href="#l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.pop_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.seed">
+<code class="descname">seed</code><a class="headerlink" href="#l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.seed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.sigma">
+<code class="descname">sigma</code><a class="headerlink" href="#l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.sigma" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.stop_criterion">
+<code class="descname">stop_criterion</code><a class="headerlink" href="#l2l.optimizers.naturalevolutionstrategies.optimizer.NaturalEvolutionStrategiesParameters.stop_criterion" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+      </div><!-- /row -->
+
+      <!-- row -->
+      <div class="row footer-relbar">
+<div id="navbar-related" class=" related navbar navbar-default" role="navigation" aria-label="related navigation">
+  <div class="navbar-inner">
+    <ul class="nav navbar-nav ">
+        <li><a href="index.html">L2L 1.0.0-beta documentation</a></li>
+    </ul>
+<ul class="nav navbar-nav pull-right hidden-xs hidden-sm">
+      
+        <li><a href="l2l.optimizers.evolutionstrategies.html" title="Optimizer using Evolution Strategies" >previous</a></li>
+        <li><a href="l2l.dataprocessing.html" title="Data Processing Utility Functions" >next</a></li>
+        <li><a href="py-modindex.html" title="Python Module Index" >modules</a></li>
+        <li><a href="genindex.html" title="General Index" >index</a></li>
+        <li><a href="l2l.html" >API Reference</a></li>
+        <li><a href="l2l.optimizers.html" >Optimizers</a></li>
+        <li><a href="#">top</a></li> 
+      
+    </ul>
+  </div>
+</div>
+      </div><!-- /row -->
+
+      <!-- footer -->
+      <footer role="contentinfo">
+          &copy; Copyright 2017, Anand Subramoney.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1.
+      </footer>
+      <!-- /footer -->
+
+    </div>
+    <!-- /container -->
+
+  </body>
+</html>

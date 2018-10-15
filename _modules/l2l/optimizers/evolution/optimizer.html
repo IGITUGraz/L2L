@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    
+    <title>l2l.optimizers.evolution.optimizer &mdash; L2L 1.0.0-beta documentation</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    
+
+<link rel="stylesheet" href="../../../../_static/css/basicstrap-base.css" type="text/css" />
+<link rel="stylesheet" id="current-theme" href="../../../../_static/css/bootstrap3/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" id="current-adjust-theme" type="text/css" />
+
+<link rel="stylesheet" href="../../../../_static/css/font-awesome.min.css">
+
+<style type="text/css">
+  body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+</style>
+
+<link rel="stylesheet" href="../../../../_static/css/basicstrap.css" type="text/css" />
+<link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+<script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../../../',
+            VERSION:     '1.0.0-beta',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+  };
+</script>
+    <script type="text/javascript" src="../../../../_static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/bootstrap3.min.js"></script>
+<script type="text/javascript" src="../../../../_static/js/jquery.cookie.min.js"></script>
+<script type="text/javascript" src="../../../../_static/js/basicstrap.js"></script>
+<script type="text/javascript">
+</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="top" title="L2L 1.0.0-beta documentation" href="../../../../index.html" />
+    <link rel="up" title="l2l" href="../../../l2l.html" /> 
+  </head>
+  <body role="document">
+    <div id="navbar-top" class="navbar navbar-fixed-top navbar-default" role="navigation" aria-label="top navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../../../index.html">L2L 1.0.0-beta documentation</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+              <li><a href="../../../../py-modindex.html" title="Python Module Index" >modules </a></li>
+              <li><a href="../../../../genindex.html" title="General Index" accesskey="I">index </a></li>
+              <li><a href="../../../index.html" >Module code</a></li>
+              <li><a href="../../../l2l.html" accesskey="U">l2l</a></li>
+            
+
+            <li class="visible-xs">
+                <form class="search form-search form-inline navbar-form navbar-right sp-searchbox" action="../../../../search.html" method="get">
+                  <div class="input-append input-group">
+                    <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+                    <span class="input-group-btn">
+                    <input type="submit" class="btn" value="Go" />
+                    </span>
+                  </div>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </li>
+
+            
+
+          </ul>
+
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- container -->
+    <div class="container-fluid">
+
+      <!-- row -->
+      <div class="row">
+         
+<div class="col-md-3 hidden-xs" id="sidebar-wrapper">
+  <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
+<h3><a href="../../../../index.html">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../l2l.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../l2l-bin.html">L2L Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../indices.html">Indices and tables</a></li>
+</ul>
+
+<div id="searchbox" role="search">
+  <h3>Quick search</h3>
+  <form class="search form-inline" action="../../../../search.html" method="get">
+      <div class="input-append input-group">
+        <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+        <span class="input-group-btn">
+        <input type="submit" class="btn" value="Go" />
+        </span>
+      </div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+  </div>
+</div> 
+        
+
+        <div class="col-md-9" id="content-wrapper">
+          <div class="document" role="main">
+            <div class="documentwrapper">
+              <div class="bodywrapper">
+                <div class="body">
+                  
+  <h1>Source code for l2l.optimizers.evolution.optimizer</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">from</span> <span class="nn">deap</span> <span class="k">import</span> <span class="n">base</span><span class="p">,</span> <span class="n">creator</span><span class="p">,</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">deap.tools</span> <span class="k">import</span> <span class="n">HallOfFame</span>
+
+<span class="kn">from</span> <span class="nn">l2l</span> <span class="k">import</span> <span class="n">dict_to_list</span><span class="p">,</span> <span class="n">list_to_dict</span>
+<span class="kn">from</span> <span class="nn">l2l.optimizers.optimizer</span> <span class="k">import</span> <span class="n">Optimizer</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;l2l-ga&quot;</span><span class="p">)</span>
+
+<span class="n">GeneticAlgorithmParameters</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;GeneticAlgorithmParameters&#39;</span><span class="p">,</span>
+                                        <span class="p">[</span><span class="s1">&#39;seed&#39;</span><span class="p">,</span> <span class="s1">&#39;popsize&#39;</span><span class="p">,</span> <span class="s1">&#39;CXPB&#39;</span><span class="p">,</span> <span class="s1">&#39;MUTPB&#39;</span><span class="p">,</span> <span class="s1">&#39;NGEN&#39;</span><span class="p">,</span> <span class="s1">&#39;indpb&#39;</span><span class="p">,</span> <span class="s1">&#39;tournsize&#39;</span><span class="p">,</span> <span class="s1">&#39;matepar&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;mutpar&#39;</span><span class="p">])</span>
+<span class="n">GeneticAlgorithmParameters</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">:param seed: Random seed</span>
+<span class="s2">:param popsize: Size of the population</span>
+<span class="s2">:param CXPB: Crossover probability</span>
+<span class="s2">:param MUTPB: Mutation probability</span>
+<span class="s2">:param NGEN: Number of generations simulation should run for</span>
+<span class="s2">:param indpb: Probability of mutation of each element in individual</span>
+<span class="s2">:param tournsize: Size of the tournamaent used for fitness evaluation and selection</span>
+<span class="s2">:param matepar: Paramter used for blending two values during mating</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="GeneticAlgorithmOptimizer"><a class="viewcode-back" href="../../../../l2l.optimizers.evolution.html#l2l.optimizers.evolution.optimizer.GeneticAlgorithmOptimizer">[docs]</a><span class="k">class</span> <span class="nc">GeneticAlgorithmOptimizer</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implements evolutionary algorithm</span>
+
+<span class="sd">    :param  ~utils.trajectory.Trajectory traj: Use this trajectory to store the parameters of the specific runs.</span>
+<span class="sd">      The parameters should be initialized based on the values in `parameters`</span>
+<span class="sd">    :param optimizee_create_individual: Function that creates a new individual</span>
+<span class="sd">    :param optimizee_fitness_weights: Fitness weights. The fitness returned by the Optimizee is multiplied by these</span>
+<span class="sd">      values (one for each element of the fitness vector)</span>
+<span class="sd">    :param parameters: Instance of :func:`~collections.namedtuple` :class:`.GeneticAlgorithmOptimizer` containing the parameters</span>
+<span class="sd">      needed by the Optimizer</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traj</span><span class="p">,</span>
+                 <span class="n">optimizee_create_individual</span><span class="p">,</span>
+                 <span class="n">optimizee_fitness_weights</span><span class="p">,</span>
+                 <span class="n">parameters</span><span class="p">,</span>
+                 <span class="n">optimizee_bounding_func</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span>
+                         <span class="n">optimizee_create_individual</span><span class="o">=</span><span class="n">optimizee_create_individual</span><span class="p">,</span>
+                         <span class="n">optimizee_fitness_weights</span><span class="o">=</span><span class="n">optimizee_fitness_weights</span><span class="p">,</span>
+                         <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span> <span class="n">optimizee_bounding_func</span><span class="o">=</span><span class="n">optimizee_bounding_func</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_bounding_func</span> <span class="o">=</span> <span class="n">optimizee_bounding_func</span>
+        <span class="n">__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_individual_dict_spec</span> <span class="o">=</span> <span class="n">dict_to_list</span><span class="p">(</span><span class="n">optimizee_create_individual</span><span class="p">(),</span> <span class="n">get_dict_spec</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;seed&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Seed for RNG&#39;</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;popsize&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">popsize</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Population size&#39;</span><span class="p">)</span>  <span class="c1"># 185</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;CXPB&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">CXPB</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Crossover term&#39;</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;MUTPB&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">MUTPB</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Mutation probability&#39;</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;n_iteration&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">NGEN</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Number of generations&#39;</span><span class="p">)</span>
+
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;indpb&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">indpb</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Mutation parameter&#39;</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;tournsize&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">tournsize</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Selection parameter&#39;</span><span class="p">)</span>
+
+        <span class="c1"># ------- Create and register functions with DEAP ------- #</span>
+        <span class="c1"># delay_rate, slope, std_err, max_fraction_active</span>
+        <span class="n">creator</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;FitnessMax&quot;</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">Fitness</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizee_fitness_weights</span><span class="p">)</span>
+        <span class="n">creator</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;Individual&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">fitness</span><span class="o">=</span><span class="n">creator</span><span class="o">.</span><span class="n">FitnessMax</span><span class="p">)</span>
+
+        <span class="n">toolbox</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">Toolbox</span><span class="p">()</span>
+        <span class="c1"># Structure initializers</span>
+        <span class="n">toolbox</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;individual&quot;</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">initIterate</span><span class="p">,</span> <span class="n">creator</span><span class="o">.</span><span class="n">Individual</span><span class="p">,</span>
+                         <span class="k">lambda</span><span class="p">:</span> <span class="n">dict_to_list</span><span class="p">(</span><span class="n">optimizee_create_individual</span><span class="p">()))</span>
+        <span class="n">toolbox</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;population&quot;</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">initRepeat</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">toolbox</span><span class="o">.</span><span class="n">individual</span><span class="p">)</span>
+
+        <span class="c1"># Operator registering</span>
+        <span class="c1"># This complex piece of code is only necessary because we&#39;re using the</span>
+        <span class="c1"># DEAP framework and would like to decorate the DEAP mutation operator</span>
+        <span class="k">def</span> <span class="nf">bounding_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">bounding_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_bounding_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Deap Functions modify individuals in-place, Hence we must do the same</span>
+                    <span class="n">result_individuals_deap</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                    <span class="n">result_individuals</span> <span class="o">=</span> <span class="p">[</span><span class="n">list_to_dict</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_individual_dict_spec</span><span class="p">)</span>
+                                          <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result_individuals_deap</span><span class="p">]</span>
+                    <span class="n">bounded_individuals</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizee_bounding_func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result_individuals</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">deap_indiv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">result_individuals_deap</span><span class="p">):</span>
+                        <span class="n">deap_indiv</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">dict_to_list</span><span class="p">(</span><span class="n">bounded_individuals</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bounded Individual: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bounded_individuals</span><span class="p">))</span>
+                    <span class="k">return</span> <span class="n">result_individuals_deap</span>
+
+            <span class="k">return</span> <span class="n">bounding_wrapper</span>
+
+        <span class="n">toolbox</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;mate&quot;</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">cxBlend</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">matepar</span><span class="p">)</span>
+        <span class="n">toolbox</span><span class="o">.</span><span class="n">decorate</span><span class="p">(</span><span class="s2">&quot;mate&quot;</span><span class="p">,</span> <span class="n">bounding_decorator</span><span class="p">)</span>
+        <span class="n">toolbox</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;mutate&quot;</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">mutGaussian</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">mutpar</span><span class="p">,</span> <span class="n">indpb</span><span class="o">=</span><span class="n">traj</span><span class="o">.</span><span class="n">indpb</span><span class="p">)</span>
+        <span class="n">toolbox</span><span class="o">.</span><span class="n">decorate</span><span class="p">(</span><span class="s2">&quot;mutate&quot;</span><span class="p">,</span> <span class="n">bounding_decorator</span><span class="p">)</span>
+        <span class="n">toolbox</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">selTournament</span><span class="p">,</span> <span class="n">tournsize</span><span class="o">=</span><span class="n">traj</span><span class="o">.</span><span class="n">tournsize</span><span class="p">)</span>
+
+        <span class="c1"># ------- Initialize Population and Trajectory -------- #</span>
+        <span class="c1"># NOTE: The Individual object implements the list interface.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pop</span> <span class="o">=</span> <span class="n">toolbox</span><span class="o">.</span><span class="n">population</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">traj</span><span class="o">.</span><span class="n">popsize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop_inds</span> <span class="o">=</span> <span class="p">[</span><span class="n">ind</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">ind</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">valid</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span> <span class="o">=</span> <span class="p">[</span><span class="n">list_to_dict</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_individual_dict_spec</span><span class="p">)</span>
+                         <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop_inds</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># the current generation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolbox</span> <span class="o">=</span> <span class="n">toolbox</span>  <span class="c1"># the DEAP toolbox</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hall_of_fame</span> <span class="o">=</span> <span class="n">HallOfFame</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_expand_trajectory</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GeneticAlgorithmOptimizer.post_process"><a class="viewcode-back" href="../../../../l2l.optimizers.evolution.html#l2l.optimizers.evolution.optimizer.GeneticAlgorithmOptimizer.post_process">[docs]</a>    <span class="k">def</span> <span class="nf">post_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traj</span><span class="p">,</span> <span class="n">fitnesses_results</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        See :meth:`~l2l.optimizers.optimizer.Optimizer.post_process`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">CXPB</span><span class="p">,</span> <span class="n">MUTPB</span><span class="p">,</span> <span class="n">NGEN</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">CXPB</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">MUTPB</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">n_iteration</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Evaluating </span><span class="si">%i</span><span class="s2"> individuals&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">fitnesses_results</span><span class="p">))</span>
+
+        <span class="c1">#**************************************************************************************************************</span>
+        <span class="c1"># Storing run-information in the trajectory</span>
+        <span class="c1"># Reading fitnesses and performing distribution update</span>
+        <span class="c1">#**************************************************************************************************************</span>
+        <span class="k">for</span> <span class="n">run_index</span><span class="p">,</span> <span class="n">fitness</span> <span class="ow">in</span> <span class="n">fitnesses_results</span><span class="p">:</span>
+            <span class="c1"># We need to convert the current run index into an ind_idx</span>
+            <span class="c1"># (index of individual within one generation)</span>
+            <span class="n">traj</span><span class="o">.</span><span class="n">v_idx</span> <span class="o">=</span> <span class="n">run_index</span>
+            <span class="n">ind_index</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">ind_idx</span>
+
+            <span class="n">traj</span><span class="o">.</span><span class="n">f_add_result</span><span class="p">(</span><span class="s1">&#39;$set.$.individual&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span><span class="p">[</span><span class="n">ind_index</span><span class="p">])</span>
+            <span class="n">traj</span><span class="o">.</span><span class="n">f_add_result</span><span class="p">(</span><span class="s1">&#39;$set.$.fitness&#39;</span><span class="p">,</span> <span class="n">fitness</span><span class="p">)</span>
+
+            <span class="c1"># Use the ind_idx to update the fitness</span>
+            <span class="n">individual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop_inds</span><span class="p">[</span><span class="n">ind_index</span><span class="p">]</span>
+            <span class="n">individual</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">fitness</span>
+
+
+        <span class="n">traj</span><span class="o">.</span><span class="n">v_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># set the trajectory back to default</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;-- End of generation </span><span class="si">{}</span><span class="s2"> --&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">))</span>
+        <span class="n">best_inds</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">selBest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_pop_inds</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">best_ind</span> <span class="ow">in</span> <span class="n">best_inds</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best individual is </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">list_to_dict</span><span class="p">(</span><span class="n">best_ind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_individual_dict_spec</span><span class="p">),</span>
+                                                 <span class="n">best_ind</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hall_of_fame</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_pop_inds</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;-- Hall of fame --&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">hof_ind</span> <span class="ow">in</span> <span class="n">tools</span><span class="o">.</span><span class="n">selBest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hall_of_fame</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;HOF individual is </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">list_to_dict</span><span class="p">(</span><span class="n">hof_ind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_individual_dict_spec</span><span class="p">),</span>
+                                                      <span class="n">hof_ind</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+
+        <span class="c1"># ------- Create the next generation by crossover and mutation -------- #</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">&lt;</span> <span class="n">NGEN</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># not necessary for the last generation</span>
+            <span class="c1"># Select the next generation individuals</span>
+            <span class="n">offspring</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toolbox</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">))</span>
+            <span class="c1"># Clone the selected individuals</span>
+            <span class="n">offspring</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toolbox</span><span class="o">.</span><span class="n">clone</span><span class="p">,</span> <span class="n">offspring</span><span class="p">))</span>
+
+            <span class="c1"># Apply crossover and mutation on the offspring</span>
+            <span class="k">for</span> <span class="n">child1</span><span class="p">,</span> <span class="n">child2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">offspring</span><span class="p">[::</span><span class="mi">2</span><span class="p">],</span> <span class="n">offspring</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">CXPB</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">toolbox</span><span class="o">.</span><span class="n">mate</span><span class="p">(</span><span class="n">child1</span><span class="p">,</span> <span class="n">child2</span><span class="p">)</span>
+                    <span class="k">del</span> <span class="n">child1</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">values</span>
+                    <span class="k">del</span> <span class="n">child2</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">values</span>
+
+            <span class="k">for</span> <span class="n">mutant</span> <span class="ow">in</span> <span class="n">offspring</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">MUTPB</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">toolbox</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="n">mutant</span><span class="p">)</span>
+                    <span class="k">del</span> <span class="n">mutant</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">values</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)))</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">offspring</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Mutating more&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">o1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">offspring</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">o2</span> <span class="ow">in</span> <span class="n">offspring</span><span class="p">[</span><span class="n">i</span><span class="p">:]:</span>
+                        <span class="k">if</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">o1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">o2</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.8</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">toolbox</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="n">o2</span><span class="p">)</span>
+
+            <span class="c1"># The population is entirely replaced by the offspring</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">offspring</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop_inds</span> <span class="o">=</span> <span class="p">[</span><span class="n">ind</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">ind</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">valid</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span> <span class="o">=</span> <span class="p">[</span><span class="n">list_to_dict</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_individual_dict_spec</span><span class="p">)</span>
+                             <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop_inds</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># Update generation counter</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_expand_trajectory</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GeneticAlgorithmOptimizer.end"><a class="viewcode-back" href="../../../../l2l.optimizers.evolution.html#l2l.optimizers.evolution.optimizer.GeneticAlgorithmOptimizer.end">[docs]</a>    <span class="k">def</span> <span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        See :meth:`~l2l.optimizers.optimizer.Optimizer.end`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># ------------ Finished all runs and print result --------------- #</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;-- End of (successful) evolution --&quot;</span><span class="p">)</span>
+        <span class="n">best_inds</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">selBest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">best_ind</span> <span class="ow">in</span> <span class="n">best_inds</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Best individual is </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">best_ind</span><span class="p">,</span> <span class="n">best_ind</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;-- Hall of fame --&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">hof_ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hall_of_fame</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;HOF individual is </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">hof_ind</span><span class="p">,</span> <span class="n">hof_ind</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">values</span><span class="p">))</span></div></div>
+</pre></div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+      </div><!-- /row -->
+
+      <!-- row -->
+      <div class="row footer-relbar">
+<div id="navbar-related" class=" related navbar navbar-default" role="navigation" aria-label="related navigation">
+  <div class="navbar-inner">
+    <ul class="nav navbar-nav ">
+        <li><a href="../../../../index.html">L2L 1.0.0-beta documentation</a></li>
+    </ul>
+<ul class="nav navbar-nav pull-right hidden-xs hidden-sm">
+      
+        <li><a href="../../../../py-modindex.html" title="Python Module Index" >modules</a></li>
+        <li><a href="../../../../genindex.html" title="General Index" >index</a></li>
+        <li><a href="../../../index.html" >Module code</a></li>
+        <li><a href="../../../l2l.html" >l2l</a></li>
+        <li><a href="#">top</a></li> 
+      
+    </ul>
+  </div>
+</div>
+      </div><!-- /row -->
+
+      <!-- footer -->
+      <footer role="contentinfo">
+          &copy; Copyright 2017, Anand Subramoney.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1.
+      </footer>
+      <!-- /footer -->
+
+    </div>
+    <!-- /container -->
+
+  </body>
+</html>

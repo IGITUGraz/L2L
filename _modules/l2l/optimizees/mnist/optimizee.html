@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    
+    <title>l2l.optimizees.mnist.optimizee &mdash; L2L 1.0.0-beta documentation</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    
+
+<link rel="stylesheet" href="../../../../_static/css/basicstrap-base.css" type="text/css" />
+<link rel="stylesheet" id="current-theme" href="../../../../_static/css/bootstrap3/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" id="current-adjust-theme" type="text/css" />
+
+<link rel="stylesheet" href="../../../../_static/css/font-awesome.min.css">
+
+<style type="text/css">
+  body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+</style>
+
+<link rel="stylesheet" href="../../../../_static/css/basicstrap.css" type="text/css" />
+<link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+<script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../../../',
+            VERSION:     '1.0.0-beta',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+  };
+</script>
+    <script type="text/javascript" src="../../../../_static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/bootstrap3.min.js"></script>
+<script type="text/javascript" src="../../../../_static/js/jquery.cookie.min.js"></script>
+<script type="text/javascript" src="../../../../_static/js/basicstrap.js"></script>
+<script type="text/javascript">
+</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="top" title="L2L 1.0.0-beta documentation" href="../../../../index.html" />
+    <link rel="up" title="l2l" href="../../../l2l.html" /> 
+  </head>
+  <body role="document">
+    <div id="navbar-top" class="navbar navbar-fixed-top navbar-default" role="navigation" aria-label="top navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../../../index.html">L2L 1.0.0-beta documentation</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+              <li><a href="../../../../py-modindex.html" title="Python Module Index" >modules </a></li>
+              <li><a href="../../../../genindex.html" title="General Index" accesskey="I">index </a></li>
+              <li><a href="../../../index.html" >Module code</a></li>
+              <li><a href="../../../l2l.html" accesskey="U">l2l</a></li>
+            
+
+            <li class="visible-xs">
+                <form class="search form-search form-inline navbar-form navbar-right sp-searchbox" action="../../../../search.html" method="get">
+                  <div class="input-append input-group">
+                    <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+                    <span class="input-group-btn">
+                    <input type="submit" class="btn" value="Go" />
+                    </span>
+                  </div>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </li>
+
+            
+
+          </ul>
+
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- container -->
+    <div class="container-fluid">
+
+      <!-- row -->
+      <div class="row">
+         
+<div class="col-md-3 hidden-xs" id="sidebar-wrapper">
+  <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
+<h3><a href="../../../../index.html">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../l2l.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../l2l-bin.html">L2L Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../indices.html">Indices and tables</a></li>
+</ul>
+
+<div id="searchbox" role="search">
+  <h3>Quick search</h3>
+  <form class="search form-inline" action="../../../../search.html" method="get">
+      <div class="input-append input-group">
+        <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+        <span class="input-group-btn">
+        <input type="submit" class="btn" value="Go" />
+        </span>
+      </div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+  </div>
+</div> 
+        
+
+        <div class="col-md-9" id="content-wrapper">
+          <div class="document" role="main">
+            <div class="documentwrapper">
+              <div class="bodywrapper">
+                <div class="body">
+                  
+  <h1>Source code for l2l.optimizees.mnist.optimizee</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_digits</span><span class="p">,</span> <span class="n">fetch_mldata</span>
+
+<span class="kn">from</span> <span class="nn">l2l.logging_tools</span> <span class="k">import</span> <span class="n">configure_loggers</span>
+<span class="kn">from</span> <span class="nn">l2l.optimizees.optimizee</span> <span class="k">import</span> <span class="n">Optimizee</span>
+<span class="kn">from</span> <span class="nn">.nn</span> <span class="k">import</span> <span class="n">NeuralNetworkClassifier</span>
+
+<span class="n">MNISTOptimizeeParameters</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;MNISTOptimizeeParameters&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;n_hidden&#39;</span><span class="p">,</span> <span class="s1">&#39;seed&#39;</span><span class="p">,</span> <span class="s1">&#39;use_small_mnist&#39;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="MNISTOptimizee"><a class="viewcode-back" href="../../../../l2l.optimizees.mnist.html#l2l.optimizees.mnist.optimizee.MNISTOptimizee">[docs]</a><span class="k">class</span> <span class="nc">MNISTOptimizee</span><span class="p">(</span><span class="n">Optimizee</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implements a simple function optimizee. Functions are generated using the FunctionGenerator.</span>
+<span class="sd">    NOTE: Make sure the optimizee_fitness_weights is set to (-1,) to minimize the value of the function</span>
+
+<span class="sd">    :param traj:</span>
+<span class="sd">        The trajectory used to conduct the optimization.</span>
+
+<span class="sd">    :param parameters:</span>
+<span class="sd">        Instance of :func:`~collections.namedtuple` :class:`.MNISTOptimizeeParameters`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traj</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">use_small_mnist</span><span class="p">:</span>
+            <span class="c1"># 8 x 8 images</span>
+            <span class="n">mnist_digits</span> <span class="o">=</span> <span class="n">load_digits</span><span class="p">()</span>
+            <span class="n">n_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mnist_digits</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">n_images</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mnist_digits</span><span class="o">.</span><span class="n">images</span><span class="p">)</span>  <span class="c1"># 1797</span>
+            <span class="n">data_images</span> <span class="o">=</span> <span class="n">mnist_digits</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_images</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">16.</span>  <span class="c1"># -&gt; 1797 x 64</span>
+            <span class="n">data_targets</span> <span class="o">=</span> <span class="n">mnist_digits</span><span class="o">.</span><span class="n">target</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># 28 x 28 images</span>
+            <span class="n">mnist_digits</span> <span class="o">=</span> <span class="n">fetch_mldata</span><span class="p">(</span><span class="s1">&#39;MNIST original&#39;</span><span class="p">)</span>
+            <span class="n">n_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mnist_digits</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">data_images</span> <span class="o">=</span> <span class="n">mnist_digits</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="mf">255.</span>  <span class="c1"># -&gt; 70000 x 284</span>
+            <span class="n">n_images</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_images</span><span class="p">)</span>
+            <span class="n">data_targets</span> <span class="o">=</span> <span class="n">mnist_digits</span><span class="o">.</span><span class="n">target</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_images</span> <span class="o">=</span> <span class="n">n_images</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_images</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_targets</span> <span class="o">=</span> <span class="n">data_images</span><span class="p">,</span> <span class="n">data_targets</span>
+
+        <span class="n">seed</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">seed</span>
+        <span class="n">n_hidden</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">n_hidden</span>
+
+        <span class="n">seed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="n">n_output</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># This is always true for mnist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nn</span> <span class="o">=</span> <span class="n">NeuralNetworkClassifier</span><span class="p">(</span><span class="n">n_input</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_output</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="c1"># create_individual can be called because __init__ is complete except for traj initializtion</span>
+        <span class="n">indiv_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_individual</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">indiv_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">traj</span><span class="o">.</span><span class="n">individual</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">individual</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;seed&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MNISTOptimizee.create_individual"><a class="viewcode-back" href="../../../../l2l.optimizees.mnist.html#l2l.optimizees.mnist.optimizee.MNISTOptimizee.create_individual">[docs]</a>    <span class="k">def</span> <span class="nf">create_individual</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a random value of parameter within given bounds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">weight_shapes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">get_weights_shapes</span><span class="p">()</span>
+        <span class="n">cumulative_num_weights_per_layer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">weight_shape</span><span class="p">)</span> <span class="k">for</span> <span class="n">weight_shape</span> <span class="ow">in</span> <span class="n">weight_shapes</span><span class="p">])</span>
+
+        <span class="n">flattened_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">cumulative_num_weights_per_layer</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">weight_shape</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">weight_shapes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">flattened_weights</span><span class="p">[:</span><span class="n">cumulative_num_weights_per_layer</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">weight_shape</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">weight_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">flattened_weights</span><span class="p">[</span><span class="n">cumulative_num_weights_per_layer</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span><span class="n">cumulative_num_weights_per_layer</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">weight_shape</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">weight_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># return dict(weights=self.random_state.randn(cumulative_num_weights_per_layer[-1]))</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="n">flattened_weights</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MNISTOptimizee.bounding_func"><a class="viewcode-back" href="../../../../l2l.optimizees.mnist.html#l2l.optimizees.mnist.optimizee.MNISTOptimizee.bounding_func">[docs]</a>    <span class="k">def</span> <span class="nf">bounding_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">individual</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Bounds the individual within the required bounds via coordinate clipping</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">individual</span></div>
+
+<div class="viewcode-block" id="MNISTOptimizee.simulate"><a class="viewcode-back" href="../../../../l2l.optimizees.mnist.html#l2l.optimizees.mnist.optimizee.MNISTOptimizee.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the value of the function chosen during initialization</span>
+
+<span class="sd">        :param ~utils.trajectory.Trajectory traj: Trajectory</span>
+<span class="sd">        :return: a single element :obj:`tuple` containing the value of the chosen function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># configure_loggers(exactly_once=True)  # logger configuration is here since this function is paralellised</span>
+        <span class="c1"># taken care of by jube</span>
+
+        <span class="n">flattened_weights</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">individual</span><span class="o">.</span><span class="n">weights</span>
+        <span class="n">weight_shapes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">get_weights_shapes</span><span class="p">()</span>
+
+        <span class="n">cumulative_num_weights_per_layer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">weight_shape</span><span class="p">)</span> <span class="k">for</span> <span class="n">weight_shape</span> <span class="ow">in</span> <span class="n">weight_shapes</span><span class="p">])</span>
+
+        <span class="n">weights</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">weight_shape</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">weight_shapes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">flattened_weights</span><span class="p">[:</span><span class="n">cumulative_num_weights_per_layer</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">weight_shape</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">flattened_weights</span><span class="p">[</span>
+                    <span class="n">cumulative_num_weights_per_layer</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span><span class="n">cumulative_num_weights_per_layer</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">weight_shape</span><span class="p">)</span>
+            <span class="n">weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">set_weights</span><span class="p">(</span><span class="o">*</span><span class="n">weights</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_images</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_targets</span><span class="p">)</span></div></div>
+</pre></div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+      </div><!-- /row -->
+
+      <!-- row -->
+      <div class="row footer-relbar">
+<div id="navbar-related" class=" related navbar navbar-default" role="navigation" aria-label="related navigation">
+  <div class="navbar-inner">
+    <ul class="nav navbar-nav ">
+        <li><a href="../../../../index.html">L2L 1.0.0-beta documentation</a></li>
+    </ul>
+<ul class="nav navbar-nav pull-right hidden-xs hidden-sm">
+      
+        <li><a href="../../../../py-modindex.html" title="Python Module Index" >modules</a></li>
+        <li><a href="../../../../genindex.html" title="General Index" >index</a></li>
+        <li><a href="../../../index.html" >Module code</a></li>
+        <li><a href="../../../l2l.html" >l2l</a></li>
+        <li><a href="#">top</a></li> 
+      
+    </ul>
+  </div>
+</div>
+      </div><!-- /row -->
+
+      <!-- footer -->
+      <footer role="contentinfo">
+          &copy; Copyright 2017, Anand Subramoney.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1.
+      </footer>
+      <!-- /footer -->
+
+    </div>
+    <!-- /container -->
+
+  </body>
+</html>

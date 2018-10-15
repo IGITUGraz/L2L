@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    
+    <title>l2l.optimizers.optimizer &mdash; L2L 1.0.0-beta documentation</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    
+
+<link rel="stylesheet" href="../../../_static/css/basicstrap-base.css" type="text/css" />
+<link rel="stylesheet" id="current-theme" href="../../../_static/css/bootstrap3/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" id="current-adjust-theme" type="text/css" />
+
+<link rel="stylesheet" href="../../../_static/css/font-awesome.min.css">
+
+<style type="text/css">
+  body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+</style>
+
+<link rel="stylesheet" href="../../../_static/css/basicstrap.css" type="text/css" />
+<link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+<script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../../',
+            VERSION:     '1.0.0-beta',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+  };
+</script>
+    <script type="text/javascript" src="../../../_static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/bootstrap3.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/jquery.cookie.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/basicstrap.js"></script>
+<script type="text/javascript">
+</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="L2L 1.0.0-beta documentation" href="../../../index.html" />
+    <link rel="up" title="l2l" href="../../l2l.html" /> 
+  </head>
+  <body role="document">
+    <div id="navbar-top" class="navbar navbar-fixed-top navbar-default" role="navigation" aria-label="top navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../../index.html">L2L 1.0.0-beta documentation</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+              <li><a href="../../../py-modindex.html" title="Python Module Index" >modules </a></li>
+              <li><a href="../../../genindex.html" title="General Index" accesskey="I">index </a></li>
+              <li><a href="../../index.html" >Module code</a></li>
+              <li><a href="../../l2l.html" accesskey="U">l2l</a></li>
+            
+
+            <li class="visible-xs">
+                <form class="search form-search form-inline navbar-form navbar-right sp-searchbox" action="../../../search.html" method="get">
+                  <div class="input-append input-group">
+                    <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+                    <span class="input-group-btn">
+                    <input type="submit" class="btn" value="Go" />
+                    </span>
+                  </div>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </li>
+
+            
+
+          </ul>
+
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- container -->
+    <div class="container-fluid">
+
+      <!-- row -->
+      <div class="row">
+         
+<div class="col-md-3 hidden-xs" id="sidebar-wrapper">
+  <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../l2l.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../l2l-bin.html">L2L Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../indices.html">Indices and tables</a></li>
+</ul>
+
+<div id="searchbox" role="search">
+  <h3>Quick search</h3>
+  <form class="search form-inline" action="../../../search.html" method="get">
+      <div class="input-append input-group">
+        <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+        <span class="input-group-btn">
+        <input type="submit" class="btn" value="Go" />
+        </span>
+      </div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+  </div>
+</div> 
+        
+
+        <div class="col-md-9" id="content-wrapper">
+          <div class="document" role="main">
+            <div class="documentwrapper">
+              <div class="bodywrapper">
+                <div class="body">
+                  
+  <h1>Source code for l2l.optimizers.optimizer</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">from</span> <span class="nn">pypet</span> <span class="k">import</span> <span class="n">cartesian_product</span>
+
+<span class="kn">from</span> <span class="nn">l2l</span> <span class="k">import</span> <span class="n">get_grouped_dict</span>
+
+<span class="n">OptimizerParameters</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;OptimizerParamters&#39;</span><span class="p">,</span> <span class="p">[])</span>
+
+
+<div class="viewcode-block" id="Optimizer"><a class="viewcode-back" href="../../../l2l.optimizers.html#l2l.optimizers.optimizer.Optimizer">[docs]</a><span class="k">class</span> <span class="nc">Optimizer</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the base class for the Optimizers i.e. the outer loop algorithms. These algorithms generate parameters, \</span>
+<span class="sd">    give them to the inner loop to be evaluated, and with the resulting fitness modify the parameters in some way.</span>
+
+<span class="sd">    :param  ~utils.trajectory.Trajectory traj: Use this trajectory to store the parameters of the specific runs.</span>
+<span class="sd">        The parameters should be initialized based on the values in :param parameters:</span>
+
+<span class="sd">    :param optimizee_create_individual: A function which when called returns one instance of parameter (or &quot;individual&quot;)</span>
+
+<span class="sd">    :param optimizee_fitness_weights: The weights which should be multiplied with the fitness returned from the</span>
+<span class="sd">        :class:`~l2l.optimizees.optimizee.Optimizee` -- one for each element of the fitness (fitness can be</span>
+<span class="sd">        multi-dimensional). If some element is negative, the Optimizer minimizes that element of fitness instead of</span>
+<span class="sd">        maximizing. By default, the `Optimizer` maximizes all fitness dimensions.</span>
+
+<span class="sd">    :param parameters: A named tuple containing the parameters for the Optimizer class</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traj</span><span class="p">,</span>
+                 <span class="n">optimizee_create_individual</span><span class="p">,</span>
+                 <span class="n">optimizee_fitness_weights</span><span class="p">,</span>
+                 <span class="n">optimizee_bounding_func</span><span class="p">,</span>
+                 <span class="n">parameters</span><span class="p">):</span>
+        <span class="c1"># Creating Placeholders for individuals and results that are about to be explored</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;generation&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Current generation&#39;</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;ind_idx&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Index of individual&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Initializing basic variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_create_individual</span> <span class="o">=</span> <span class="n">optimizee_create_individual</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_fitness_weights</span> <span class="o">=</span> <span class="n">optimizee_fitness_weights</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_bounding_func</span> <span class="o">=</span> <span class="n">optimizee_bounding_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
+
+        <span class="c1">#: The current generation number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1">#: The population (i.e. list of individuals) to be evaluated at the next iteration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Optimizer.post_process"><a class="viewcode-back" href="../../../l2l.optimizers.html#l2l.optimizers.optimizer.Optimizer.post_process">[docs]</a>    <span class="k">def</span> <span class="nf">post_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traj</span><span class="p">,</span> <span class="n">fitnesses_results</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is the key function of this class. Given a set of :obj:`fitnesses_results`,  and the :obj:`traj`, it uses</span>
+<span class="sd">        the fitness to decide on the next set of parameters to be evaluated. Then it fills the :attr:`.Optimizer.eval_pop` with the</span>
+<span class="sd">        list of parameters it wants evaluated at the next simulation cycle, increments :attr:`.Optimizer.g` and calls</span>
+<span class="sd">        :meth:`._expand_trajectory`</span>
+
+<span class="sd">        :param  ~utils.trajectory.Trajectory traj: The trajectory that contains the parameters and the</span>
+<span class="sd">            individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.</span>
+<span class="sd">            param1 is accessible using `traj.param1`</span>
+
+<span class="sd">        :param list fitnesses_results: This is a list of fitness results that contain tuples run index and the fitness.</span>
+<span class="sd">            It is of the form `[(run_idx, run), ...]`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># NOTE: Always remember to keep the following two lines.</span>
+        <span class="c1"># TODO: Set eval_pop to the values of parameters you want to evaluate in the next cycle</span>
+        <span class="c1"># self.eval_pop = ...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_expand_trajectory</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Optimizer.end"><a class="viewcode-back" href="../../../l2l.optimizers.html#l2l.optimizers.optimizer.Optimizer.end">[docs]</a>    <span class="k">def</span> <span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run any code required to clean-up, print final individuals etc.</span>
+
+<span class="sd">        :param  ~utils.trajectory.Trajectory traj: The  trajectory that contains the parameters and the</span>
+<span class="sd">            individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.</span>
+<span class="sd">            param1 is accessible using `traj.param1`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Optimizer._expand_trajectory"><a class="viewcode-back" href="../../../l2l.optimizers.html#l2l.optimizers.optimizer.Optimizer._expand_trajectory">[docs]</a>    <span class="k">def</span> <span class="nf">_expand_trajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add as many explored runs as individuals that need to be evaluated. Furthermore, add the individuals as explored</span>
+<span class="sd">        parameters.</span>
+
+<span class="sd">        :param  ~utils.trajectory.Trajectory traj: The  trajectory that contains the parameters and the</span>
+<span class="sd">            individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.</span>
+<span class="sd">            param1 is accessible using `traj.param1`</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">grouped_params_dict</span> <span class="o">=</span> <span class="n">get_grouped_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span><span class="p">)</span>
+        <span class="n">grouped_params_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;individual.&#39;</span> <span class="o">+</span> <span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">grouped_params_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+        <span class="n">final_params_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;generation&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">],</span>
+                             <span class="s1">&#39;ind_idx&#39;</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span><span class="p">))}</span>
+        <span class="n">final_params_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">grouped_params_dict</span><span class="p">)</span>
+
+        <span class="c1"># We need to convert them to lists or write our own custom IndividualParameter ;-)</span>
+        <span class="c1"># Note the second argument to `cartesian_product`: This is for only having the cartesian product</span>
+        <span class="c1"># between ``generation x (ind_idx AND individual)``, so that every individual has just one</span>
+        <span class="c1"># unique index within a generation.</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_expand</span><span class="p">(</span><span class="n">cartesian_product</span><span class="p">(</span><span class="n">final_params_dict</span><span class="p">,</span>
+                                        <span class="p">[(</span><span class="s1">&#39;ind_idx&#39;</span><span class="p">,)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">grouped_params_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="s1">&#39;generation&#39;</span><span class="p">]))</span></div></div>
+</pre></div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+      </div><!-- /row -->
+
+      <!-- row -->
+      <div class="row footer-relbar">
+<div id="navbar-related" class=" related navbar navbar-default" role="navigation" aria-label="related navigation">
+  <div class="navbar-inner">
+    <ul class="nav navbar-nav ">
+        <li><a href="../../../index.html">L2L 1.0.0-beta documentation</a></li>
+    </ul>
+<ul class="nav navbar-nav pull-right hidden-xs hidden-sm">
+      
+        <li><a href="../../../py-modindex.html" title="Python Module Index" >modules</a></li>
+        <li><a href="../../../genindex.html" title="General Index" >index</a></li>
+        <li><a href="../../index.html" >Module code</a></li>
+        <li><a href="../../l2l.html" >l2l</a></li>
+        <li><a href="#">top</a></li> 
+      
+    </ul>
+  </div>
+</div>
+      </div><!-- /row -->
+
+      <!-- footer -->
+      <footer role="contentinfo">
+          &copy; Copyright 2017, Anand Subramoney.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1.
+      </footer>
+      <!-- /footer -->
+
+    </div>
+    <!-- /container -->
+
+  </body>
+</html>

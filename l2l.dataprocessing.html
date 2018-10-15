@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     
-    <title>Quickstart &mdash; L2L 1.0.0-beta documentation</title>
+    <title>Data Processing Utility Functions &mdash; L2L 1.0.0-beta documentation</title>
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -50,8 +50,9 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="L2L 1.0.0-beta documentation" href="index.html" />
-    <link rel="next" title="Overview" href="intro.html" />
-    <link rel="prev" title="L2L" href="index.html" /> 
+    <link rel="up" title="API Reference" href="l2l.html" />
+    <link rel="next" title="Logging Tools" href="l2l.logging_tools.html" />
+    <link rel="prev" title="Optimizer using Natural Evolution Strategies" href="l2l.optimizers.naturalevolutionstrategies.html" /> 
   </head>
   <body role="document">
     <div id="navbar-top" class="navbar navbar-fixed-top navbar-default" role="navigation" aria-label="top navigation">
@@ -71,9 +72,8 @@
                 <a role="button" id="localToc" data-toggle="dropdown" data-target="#" href="#">Table Of Contents <b class="caret"></b></a>
                 <ul class="dropdown-menu localtoc sp-localtoc" role="menu" aria-labelledby="localToc">
                 <ul>
-<li><a class="reference internal" href="#">Quickstart</a><ul>
-<li><a class="reference internal" href="#running-an-experiment">Running an experiment</a></li>
-<li><a class="reference internal" href="#writing-optimizees-and-optimizers">Writing Optimizees and Optimizers</a></li>
+<li><a class="reference internal" href="#">Data Processing Utility Functions</a><ul>
+<li><a class="reference internal" href="#module-functions">Module Functions</a></li>
 </ul>
 </li>
 </ul>
@@ -82,12 +82,13 @@
               </li>
 
             
-              <li><a href="index.html" title="L2L" accesskey="P">previous </a></li>
-              <li><a href="intro.html" title="Overview" accesskey="N">next </a></li>
+              <li><a href="l2l.optimizers.naturalevolutionstrategies.html" title="Optimizer using Natural Evolution Strategies" accesskey="P">previous </a></li>
+              <li><a href="l2l.logging_tools.html" title="Logging Tools" accesskey="N">next </a></li>
               <li><a href="py-modindex.html" title="Python Module Index" >modules </a></li>
               <li><a href="genindex.html" title="General Index" accesskey="I">index </a></li>
+              <li><a href="l2l.html" accesskey="U">API Reference</a></li>
             
-            <li class="visible-xs"><a href="_sources/quickstart.rst.txt" rel="nofollow">Show Source</a></li>
+            <li class="visible-xs"><a href="_sources/l2l.dataprocessing.rst.txt" rel="nofollow">Show Source</a></li>
 
             <li class="visible-xs">
                 <form class="search form-search form-inline navbar-form navbar-right sp-searchbox" action="search.html" method="get">
@@ -121,27 +122,33 @@
   <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
 <h3><a href="index.html">Table of Contents</a></h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#running-an-experiment">Running an experiment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#writing-optimizees-and-optimizers">Writing Optimizees and Optimizers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="l2l.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="l2l.optimizees.html">Optimizees</a></li>
+<li class="toctree-l2"><a class="reference internal" href="l2l.optimizers.html">Optimizers</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Data Processing Utility Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-functions">Module Functions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="l2l.html">API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="l2l.logging_tools.html">Logging Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="l2l.html#other-module-functions">Other module functions</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="l2l-bin.html">L2L Experiments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="indices.html">Indices and tables</a></li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">L2L</a></p>
+  <p class="topless"><a href="l2l.optimizers.naturalevolutionstrategies.html"
+                        title="previous chapter">Optimizer using Natural Evolution Strategies</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="intro.html"
-                        title="next chapter">Overview</a></p>
+  <p class="topless"><a href="l2l.logging_tools.html"
+                        title="next chapter">Logging Tools</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/quickstart.rst.txt"
+      <li><a href="_sources/l2l.dataprocessing.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -171,26 +178,22 @@
               <div class="bodywrapper">
                 <div class="body">
                   
-  <div class="section" id="quickstart">
-<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="running-an-experiment">
-<h2>Running an experiment<a class="headerlink" href="#running-an-experiment" title="Permalink to this headline">¶</a></h2>
-<p>With existing implementations of optimizees and optimizers:</p>
-<ul class="simple">
-<li>See <a class="reference internal" href="l2l-bin.html#l2l-experiments"><span class="std std-ref">L2L Experiments</span></a> for an example implementation of an L2L experiment with an arbitrary <cite>Optimizee</cite> and
-<cite>Optimizer</cite>. The source code also contains <a class="reference external" href="https://github.com/IGITUGraz/L2L/tree/master/bin">many examples</a> of
-scripts for various combinations of Optimizees and Optimizers.</li>
-<li>See <a class="reference internal" href="intro.html#data-postprocessing"><span class="std std-ref">Data postprocessing</span></a> for details on how to use the generated data for plots and analysis.</li>
-</ul>
-</div>
-<div class="section" id="writing-optimizees-and-optimizers">
-<h2>Writing Optimizees and Optimizers<a class="headerlink" href="#writing-optimizees-and-optimizers" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>See <a class="reference internal" href="l2l.optimizees.functions.html#l2l.optimizees.functions.optimizee.FunctionGeneratorOptimizee" title="l2l.optimizees.functions.optimizee.FunctionGeneratorOptimizee"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionGeneratorOptimizee</span></code></a> for an example of an <cite>Optimizee</cite> (based on simple
-function minimization).</li>
-<li>See <a class="reference internal" href="l2l.optimizers.simulatedannealing.html#l2l.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer" title="l2l.optimizers.simulatedannealing.optimizer.SimulatedAnnealingOptimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimulatedAnnealingOptimizer</span></code></a> for an example of an
-implementation of simulated annealing <cite>Optimizer</cite>.</li>
-</ul>
+  <div class="section" id="data-processing-utility-functions">
+<h1>Data Processing Utility Functions<a class="headerlink" href="#data-processing-utility-functions" title="Permalink to this headline">¶</a></h1>
+<p>The following Utility functions make the following assumptions regarding the storage
+of data in the trajectory.</p>
+<ol class="arabic simple">
+<li>All the results for each run data is stored under <code class="docutils literal notranslate"><span class="pre">'$set.$'</span></code>. To clarify, it
+should not be stored under simply <code class="docutils literal notranslate"><span class="pre">'$'</span></code>.</li>
+<li>All generation wise parameters (i.e. parameters that correspond to a particular
+generation rather than) are stored under generation groups whose name is given
+by “generation_&lt;Number&gt;” (Note that Number does not have trailing 0’s). See
+<a class="reference internal" href="l2l.optimizers.crossentropy.html#l2l.optimizers.crossentropy.optimizer.CrossEntropyOptimizer.post_process" title="l2l.optimizers.crossentropy.optimizer.CrossEntropyOptimizer.post_process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">post_process()</span></code></a> of class
+<a class="reference internal" href="l2l.optimizers.crossentropy.html#l2l.optimizers.crossentropy.optimizer.CrossEntropyOptimizer" title="l2l.optimizers.crossentropy.optimizer.CrossEntropyOptimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">CrossEntropyOptimizer</span></code></a> to see how generation
+parameters are stored.</li>
+</ol>
+<div class="section" id="module-functions">
+<h2>Module Functions<a class="headerlink" href="#module-functions" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -213,10 +216,11 @@ implementation of simulated annealing <cite>Optimizer</cite>.</li>
     </ul>
 <ul class="nav navbar-nav pull-right hidden-xs hidden-sm">
       
-        <li><a href="index.html" title="L2L" >previous</a></li>
-        <li><a href="intro.html" title="Overview" >next</a></li>
+        <li><a href="l2l.optimizers.naturalevolutionstrategies.html" title="Optimizer using Natural Evolution Strategies" >previous</a></li>
+        <li><a href="l2l.logging_tools.html" title="Logging Tools" >next</a></li>
         <li><a href="py-modindex.html" title="Python Module Index" >modules</a></li>
         <li><a href="genindex.html" title="General Index" >index</a></li>
+        <li><a href="l2l.html" >API Reference</a></li>
         <li><a href="#">top</a></li> 
       
     </ul>

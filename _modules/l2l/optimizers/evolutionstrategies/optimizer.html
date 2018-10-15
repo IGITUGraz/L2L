@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    
+    <title>l2l.optimizers.evolutionstrategies.optimizer &mdash; L2L 1.0.0-beta documentation</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    
+
+<link rel="stylesheet" href="../../../../_static/css/basicstrap-base.css" type="text/css" />
+<link rel="stylesheet" id="current-theme" href="../../../../_static/css/bootstrap3/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" id="current-adjust-theme" type="text/css" />
+
+<link rel="stylesheet" href="../../../../_static/css/font-awesome.min.css">
+
+<style type="text/css">
+  body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+</style>
+
+<link rel="stylesheet" href="../../../../_static/css/basicstrap.css" type="text/css" />
+<link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+<script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../../../',
+            VERSION:     '1.0.0-beta',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+  };
+</script>
+    <script type="text/javascript" src="../../../../_static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/js/bootstrap3.min.js"></script>
+<script type="text/javascript" src="../../../../_static/js/jquery.cookie.min.js"></script>
+<script type="text/javascript" src="../../../../_static/js/basicstrap.js"></script>
+<script type="text/javascript">
+</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="top" title="L2L 1.0.0-beta documentation" href="../../../../index.html" />
+    <link rel="up" title="l2l" href="../../../l2l.html" /> 
+  </head>
+  <body role="document">
+    <div id="navbar-top" class="navbar navbar-fixed-top navbar-default" role="navigation" aria-label="top navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../../../index.html">L2L 1.0.0-beta documentation</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+
+            
+              <li><a href="../../../../py-modindex.html" title="Python Module Index" >modules </a></li>
+              <li><a href="../../../../genindex.html" title="General Index" accesskey="I">index </a></li>
+              <li><a href="../../../index.html" >Module code</a></li>
+              <li><a href="../../../l2l.html" accesskey="U">l2l</a></li>
+            
+
+            <li class="visible-xs">
+                <form class="search form-search form-inline navbar-form navbar-right sp-searchbox" action="../../../../search.html" method="get">
+                  <div class="input-append input-group">
+                    <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+                    <span class="input-group-btn">
+                    <input type="submit" class="btn" value="Go" />
+                    </span>
+                  </div>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </li>
+
+            
+
+          </ul>
+
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- container -->
+    <div class="container-fluid">
+
+      <!-- row -->
+      <div class="row">
+         
+<div class="col-md-3 hidden-xs" id="sidebar-wrapper">
+  <div class="sidebar hidden-xs" role="navigation" aria-label="main navigation">
+<h3><a href="../../../../index.html">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../l2l.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../l2l-bin.html">L2L Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../indices.html">Indices and tables</a></li>
+</ul>
+
+<div id="searchbox" role="search">
+  <h3>Quick search</h3>
+  <form class="search form-inline" action="../../../../search.html" method="get">
+      <div class="input-append input-group">
+        <input type="text" class="search-query form-control" name="q" placeholder="Search...">
+        <span class="input-group-btn">
+        <input type="submit" class="btn" value="Go" />
+        </span>
+      </div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+  </div>
+</div> 
+        
+
+        <div class="col-md-9" id="content-wrapper">
+          <div class="document" role="main">
+            <div class="documentwrapper">
+              <div class="bodywrapper">
+                <div class="body">
+                  
+  <h1>Source code for l2l.optimizers.evolutionstrategies.optimizer</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">l2l</span> <span class="k">import</span> <span class="n">dict_to_list</span><span class="p">,</span> <span class="n">list_to_dict</span>
+<span class="kn">from</span> <span class="nn">l2l.optimizers.optimizer</span> <span class="k">import</span> <span class="n">Optimizer</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;optimizers.evolutionstrategies&quot;</span><span class="p">)</span>
+
+<span class="n">EvolutionStrategiesParameters</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;EvolutionStrategiesParameters&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="s1">&#39;learning_rate&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;noise_std&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mirrored_sampling_enabled&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;fitness_shaping_enabled&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pop_size&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;n_iteration&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;stop_criterion&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;seed&#39;</span><span class="p">,</span>
+<span class="p">])</span>
+
+<span class="n">EvolutionStrategiesParameters</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">:param learning_rate: Learning rate</span>
+<span class="s2">:param noise_std: Standard deviation of the step size (The step has 0 mean)</span>
+<span class="s2">:param mirrored_sampling_enabled: Should we turn on mirrored sampling i.e. sampling both e and -e</span>
+<span class="s2">:param fitness_shaping_enabled: Should we turn on fitness shaping i.e. using only top `fitness_shaping_ratio` to update</span>
+<span class="s2">       current individual?</span>
+<span class="s2">:param pop_size: Number of individuals per simulation.</span>
+<span class="s2">:param n_iteration: Number of iterations to perform</span>
+<span class="s2">:param stop_criterion: (Optional) Stop if this fitness is reached.</span>
+<span class="s2">:param seed: The random seed used for generating new individuals</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="EvolutionStrategiesOptimizer"><a class="viewcode-back" href="../../../../l2l.optimizers.evolutionstrategies.html#l2l.optimizers.evolutionstrategies.optimizer.EvolutionStrategiesOptimizer">[docs]</a><span class="k">class</span> <span class="nc">EvolutionStrategiesOptimizer</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class Implementing the evolution strategies optimizer</span>
+
+<span class="sd">    as in: Salimans, T., Ho, J., Chen, X. &amp; Sutskever, I. Evolution Strategies as a Scalable Alternative to</span>
+<span class="sd">            Reinforcement   Learning. arXiv:1703.03864 [cs, stat] (2017).</span>
+
+<span class="sd">    In the pseudo code the algorithm does:</span>
+
+<span class="sd">    For n iterations do:</span>
+<span class="sd">      - Perturb the current individual by adding a value with 0 mean and `noise_std` standard deviation</span>
+<span class="sd">      - If mirrored sampling is enabled, also perturb the current individual by subtracting the same values that were</span>
+<span class="sd">        added in the previous step</span>
+<span class="sd">      - evaluate individuals and get fitness</span>
+<span class="sd">      - Update the fitness as</span>
+
+<span class="sd">            theta_{t+1} &lt;- theta_t + alpha  * sum{F_i * e_i} / (n * sigma^2)</span>
+
+<span class="sd">        where F_i is the fitness and e_i is the perturbation</span>
+<span class="sd">      - If fitness shaping is enabled, F_i is replaced with the utility u_i in the previous step, which is calculated as:</span>
+
+<span class="sd">            u_i = max(0, log(n/2 + 1) - log(k)) / sum_{k=1}^{n}{max(0, log(n/2 + 1) - log(k))} - 1 / n</span>
+
+<span class="sd">        As in the paper: Wierstra, D. et al. Natural Evolution Strategies. Journal of Machine Learning Research 15,</span>
+<span class="sd">         949–980 (2014).</span>
+
+<span class="sd">        where k and i are the indices of the individuals in descending order of fitness F_i</span>
+
+
+
+<span class="sd">    NOTE: This is not the most efficient implementation in terms of communication, since the new parameters are</span>
+<span class="sd">    communicated to the individuals rather than the seed as in the paper.</span>
+<span class="sd">    NOTE: Doesn&#39;t yet contain fitness shaping and mirrored sampling</span>
+
+<span class="sd">    :param  ~utils.trajectory.Trajectory traj:</span>
+<span class="sd">      Use this trajectory to store the parameters of the specific runs. The parameters should be</span>
+<span class="sd">      initialized based on the values in `parameters`</span>
+
+<span class="sd">    :param optimizee_create_individual:</span>
+<span class="sd">      Function that creates a new individual. All parameters of the Individual-Dict returned should be</span>
+<span class="sd">      of numpy.float64 type</span>
+
+<span class="sd">    :param optimizee_fitness_weights:</span>
+<span class="sd">      Fitness weights. The fitness returned by the Optimizee is multiplied by these values (one for each</span>
+<span class="sd">      element of the fitness vector)</span>
+
+<span class="sd">    :param parameters:</span>
+<span class="sd">      Instance of :func:`~collections.namedtuple` :class:`.CrossEntropyParameters` containing the</span>
+<span class="sd">      parameters needed by the Optimizer</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">traj</span><span class="p">,</span>
+                 <span class="n">optimizee_create_individual</span><span class="p">,</span>
+                 <span class="n">optimizee_fitness_weights</span><span class="p">,</span>
+                 <span class="n">parameters</span><span class="p">,</span>
+                 <span class="n">optimizee_bounding_func</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">traj</span><span class="p">,</span>
+            <span class="n">optimizee_create_individual</span><span class="o">=</span><span class="n">optimizee_create_individual</span><span class="p">,</span>
+            <span class="n">optimizee_fitness_weights</span><span class="o">=</span><span class="n">optimizee_fitness_weights</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+            <span class="n">optimizee_bounding_func</span><span class="o">=</span><span class="n">optimizee_bounding_func</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_bounding_func</span> <span class="o">=</span> <span class="n">optimizee_bounding_func</span>
+
+        <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">pop_size</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;pop_size needs to be greater than 0&quot;</span><span class="p">)</span>
+
+        <span class="c1"># The following parameters are recorded</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;learning_rate&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Learning rate&#39;</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;noise_std&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">noise_std</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Standard deviation of noise&#39;</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span>
+            <span class="s1">&#39;mirrored_sampling_enabled&#39;</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">mirrored_sampling_enabled</span><span class="p">,</span>
+            <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Flag to enable mirrored sampling&#39;</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span>
+            <span class="s1">&#39;fitness_shaping_enabled&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">fitness_shaping_enabled</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Flag to enable fitness shaping&#39;</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span>
+            <span class="s1">&#39;pop_size&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">pop_size</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Number of minimal individuals simulated in each run&#39;</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span><span class="s1">&#39;n_iteration&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">n_iteration</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Number of iterations to run&#39;</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span>
+            <span class="s1">&#39;stop_criterion&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">stop_criterion</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Stop if best individual reaches this fitness&#39;</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter</span><span class="p">(</span>
+            <span class="s1">&#39;seed&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">seed</span><span class="p">),</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;Seed used for random number generation in optimizer&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_individual_arr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_individual_dict_spec</span> <span class="o">=</span> <span class="n">dict_to_list</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_create_individual</span><span class="p">(),</span> <span class="n">get_dict_spec</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">noise_std_shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">noise_std</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">assert</span> <span class="n">noise_std_shape</span> <span class="o">==</span> <span class="p">()</span> <span class="ow">or</span> <span class="n">noise_std_shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_individual_arr</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_derived_parameter</span><span class="p">(</span>
+            <span class="s1">&#39;dimension&#39;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_individual_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+            <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;The dimension of the parameter space of the optimizee&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Added a generation-wise parameter logging</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">f_add_result_group</span><span class="p">(</span>
+            <span class="s1">&#39;generation_params&#39;</span><span class="p">,</span>
+            <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;This contains the optimizer parameters that are&#39;</span>
+                    <span class="s1">&#39; common across a generation&#39;</span><span class="p">)</span>
+
+        <span class="c1"># The following parameters are recorded as generation parameters i.e. once per generation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># the current generation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pop_size</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">pop_size</span>  <span class="c1"># Population size is dynamic in FACE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness_in_run</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_individual_in_run</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># The first iteration does not pick the values out of the Gaussian distribution. It picks randomly</span>
+        <span class="c1"># (or at-least as randomly as optimizee_create_individual creates individuals)</span>
+
+        <span class="c1"># Note that this array stores individuals as an np.array of floats as opposed to Individual-Dicts</span>
+        <span class="c1"># This is because this array is used within the context of the cross entropy algorithm and</span>
+        <span class="c1"># Thus needs to handle the optimizee individuals as vectors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_perturbations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_perturbations</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
+        <span class="n">current_eval_pop_arr</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_individual_arr</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_perturbations</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span> <span class="o">=</span> <span class="p">[</span><span class="n">list_to_dict</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_individual_dict_spec</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">current_eval_pop_arr</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">list_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_individual_arr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_individual_dict_spec</span><span class="p">))</span>
+
+        <span class="c1"># Bounding function has to be applied AFTER the individual has been converted to a dict</span>
+        <span class="k">if</span> <span class="n">optimizee_bounding_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizee_bounding_func</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dict_to_list</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_expand_trajectory</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_perturbations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traj</span><span class="p">):</span>
+        <span class="n">pop_size</span><span class="p">,</span> <span class="n">noise_std</span><span class="p">,</span> <span class="n">mirrored_sampling_enabled</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">pop_size</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">noise_std</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">mirrored_sampling_enabled</span>
+        <span class="n">perturbations</span> <span class="o">=</span> <span class="n">noise_std</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">pop_size</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">current_individual_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mirrored_sampling_enabled</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">perturbations</span><span class="p">,</span> <span class="o">-</span><span class="n">perturbations</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">perturbations</span>
+
+<div class="viewcode-block" id="EvolutionStrategiesOptimizer.post_process"><a class="viewcode-back" href="../../../../l2l.optimizers.evolutionstrategies.html#l2l.optimizers.evolutionstrategies.optimizer.EvolutionStrategiesOptimizer.post_process">[docs]</a>    <span class="k">def</span> <span class="nf">post_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traj</span><span class="p">,</span> <span class="n">fitnesses_results</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        See :meth:`~l2l.optimizers.optimizer.Optimizer.post_process`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n_iteration</span><span class="p">,</span> <span class="n">stop_criterion</span><span class="p">,</span> <span class="n">learning_rate</span><span class="p">,</span> <span class="n">noise_std</span><span class="p">,</span> <span class="n">fitness_shaping_enabled</span> <span class="o">=</span> \
+            <span class="n">traj</span><span class="o">.</span><span class="n">n_iteration</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">stop_criterion</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">noise_std</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">fitness_shaping_enabled</span>
+
+        <span class="n">weighted_fitness_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1">#**************************************************************************************************************</span>
+        <span class="c1"># Storing run-information in the trajectory</span>
+        <span class="c1"># Reading fitnesses and performing distribution update</span>
+        <span class="c1">#**************************************************************************************************************</span>
+        <span class="k">for</span> <span class="n">run_index</span><span class="p">,</span> <span class="n">fitness</span> <span class="ow">in</span> <span class="n">fitnesses_results</span><span class="p">:</span>
+            <span class="c1"># We need to convert the current run index into an ind_idx</span>
+            <span class="c1"># (index of individual within one generation)</span>
+            <span class="n">traj</span><span class="o">.</span><span class="n">v_idx</span> <span class="o">=</span> <span class="n">run_index</span>
+            <span class="n">ind_index</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">ind_idx</span>
+
+            <span class="n">traj</span><span class="o">.</span><span class="n">f_add_result</span><span class="p">(</span><span class="s1">&#39;$set.$.individual&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span><span class="p">[</span><span class="n">ind_index</span><span class="p">])</span>
+            <span class="n">traj</span><span class="o">.</span><span class="n">f_add_result</span><span class="p">(</span><span class="s1">&#39;$set.$.fitness&#39;</span><span class="p">,</span> <span class="n">fitness</span><span class="p">)</span>
+
+            <span class="n">weighted_fitness_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">fitness</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_fitness_weights</span><span class="p">))</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">v_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># set trajectory back to default</span>
+
+        <span class="n">weighted_fitness_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">weighted_fitness_list</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="c1"># NOTE: It is necessary to clear the finesses_results to clear the data in the reference, and del</span>
+        <span class="c1">#^ is used to make sure it&#39;s not used in the rest of this function</span>
+        <span class="n">fitnesses_results</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">fitnesses_results</span>
+
+        <span class="c1"># Last fitness is for the previous `current_individual_arr`</span>
+        <span class="n">weighted_fitness_list</span> <span class="o">=</span> <span class="n">weighted_fitness_list</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">current_individual_fitness</span> <span class="o">=</span> <span class="n">weighted_fitness_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Performs descending arg-sort of weighted fitness</span>
+        <span class="n">fitness_sorting_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">weighted_fitness_list</span><span class="p">)))</span>
+
+        <span class="c1"># Sorting the data according to fitness</span>
+        <span class="n">sorted_population</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop_arr</span><span class="p">[</span><span class="n">fitness_sorting_indices</span><span class="p">]</span>
+        <span class="n">sorted_fitness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weighted_fitness_list</span><span class="p">)[</span><span class="n">fitness_sorting_indices</span><span class="p">]</span>
+        <span class="n">sorted_perturbations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_perturbations</span><span class="p">[</span><span class="n">fitness_sorting_indices</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_individual_in_run</span> <span class="o">=</span> <span class="n">sorted_population</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness_in_run</span> <span class="o">=</span> <span class="n">sorted_fitness</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;-- End of generation </span><span class="si">%d</span><span class="s2"> --&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Evaluated </span><span class="si">%d</span><span class="s2"> individuals&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">weighted_fitness_list</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;  Best Fitness: </span><span class="si">%.4f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness_in_run</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;  Average Fitness: </span><span class="si">%.4f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sorted_fitness</span><span class="p">))</span>
+
+        <span class="c1">#**************************************************************************************************************</span>
+        <span class="c1"># Storing Generation Parameters / Results in the trajectory</span>
+        <span class="c1">#**************************************************************************************************************</span>
+        <span class="c1"># These entries correspond to the generation that has been simulated prior to this post-processing run</span>
+
+        <span class="c1"># Documentation of algorithm parameters for the current generation</span>
+        <span class="c1">#</span>
+        <span class="c1"># generation          - The index of the evaluated generation</span>
+        <span class="c1"># best_fitness_in_run - The highest fitness among the individuals in the</span>
+        <span class="c1">#                       evaluated generation</span>
+        <span class="c1"># pop_size            - Population size</span>
+        <span class="n">generation_result_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;generation&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span>
+            <span class="s1">&#39;best_fitness_in_run&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness_in_run</span><span class="p">,</span>
+            <span class="s1">&#39;current_individual_fitness&#39;</span><span class="p">:</span> <span class="n">current_individual_fitness</span><span class="p">,</span>
+            <span class="s1">&#39;average_fitness_in_run&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sorted_fitness</span><span class="p">),</span>
+            <span class="s1">&#39;pop_size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop_size</span>
+        <span class="p">}</span>
+
+        <span class="n">generation_name</span> <span class="o">=</span> <span class="s1">&#39;generation_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">generation_params</span><span class="o">.</span><span class="n">f_add_result_group</span><span class="p">(</span><span class="n">generation_name</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">generation_params</span><span class="o">.</span><span class="n">f_add_result</span><span class="p">(</span>
+            <span class="n">generation_name</span> <span class="o">+</span> <span class="s1">&#39;.algorithm_params&#39;</span><span class="p">,</span>
+            <span class="n">generation_result_dict</span><span class="p">,</span>
+            <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;These are the parameters that correspond to the algorithm. &quot;</span>
+                    <span class="s2">&quot;Look at the source code for `EvolutionStrategiesOptimizer::post_process()` &quot;</span>
+                    <span class="s2">&quot;for comments documenting these parameters&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">fitness_shaping_enabled</span><span class="p">:</span>
+            <span class="n">sorted_utilities</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">n_individuals</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_fitness</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_individuals</span><span class="p">):</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="n">n_individuals</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">sorted_utilities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+            <span class="n">sorted_utilities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sorted_utilities</span><span class="p">)</span>
+            <span class="n">sorted_utilities</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sorted_utilities</span><span class="p">)</span>
+            <span class="n">sorted_utilities</span> <span class="o">-=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="n">n_individuals</span><span class="p">)</span>
+            <span class="c1"># assert np.sum(sorted_utilities) == 0., &quot;Sum of utilities is not 0, but %.4f&quot; % np.sum(sorted_utilities)</span>
+            <span class="n">fitnesses_to_fit</span> <span class="o">=</span> <span class="n">sorted_utilities</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fitnesses_to_fit</span> <span class="o">=</span> <span class="n">sorted_fitness</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">fitnesses_to_fit</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_perturbations</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_individual_arr</span> <span class="o">+=</span> <span class="n">learning_rate</span> \
+                                       <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">f</span> <span class="o">*</span> <span class="n">e</span> <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">fitnesses_to_fit</span><span class="p">,</span> <span class="n">sorted_perturbations</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> \
+                                       <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fitnesses_to_fit</span><span class="p">)</span> <span class="o">*</span> <span class="n">noise_std</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1">#**************************************************************************************************************</span>
+        <span class="c1"># Create the next generation by sampling the inferred distribution</span>
+        <span class="c1">#**************************************************************************************************************</span>
+        <span class="c1"># Note that this is only done in case the evaluated run is not the last run</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="c1"># check if to stop</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">&lt;</span> <span class="n">n_iteration</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness_in_run</span> <span class="o">&lt;</span> <span class="n">stop_criterion</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_perturbations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_perturbations</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
+            <span class="n">current_eval_pop_arr</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_individual_arr</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_perturbations</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span> <span class="o">=</span> <span class="p">[</span><span class="n">list_to_dict</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_individual_dict_spec</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">current_eval_pop_arr</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">list_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_individual_arr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_individual_dict_spec</span><span class="p">))</span>
+
+            <span class="c1"># Bounding function has to be applied AFTER the individual has been converted to a dict</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_bounding_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizee_bounding_func</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dict_to_list</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_pop</span><span class="p">])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># Update generation counter</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_expand_trajectory</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EvolutionStrategiesOptimizer.end"><a class="viewcode-back" href="../../../../l2l.optimizers.evolutionstrategies.html#l2l.optimizers.evolutionstrategies.optimizer.EvolutionStrategiesOptimizer.end">[docs]</a>    <span class="k">def</span> <span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        See :meth:`~l2l.optimizers.optimizer.Optimizer.end`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">best_last_indiv_dict</span> <span class="o">=</span> <span class="n">list_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_individual_in_run</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizee_individual_dict_spec</span><span class="p">)</span>
+
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_result</span><span class="p">(</span><span class="s1">&#39;final_individual&#39;</span><span class="p">,</span> <span class="n">best_last_indiv_dict</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_result</span><span class="p">(</span><span class="s1">&#39;final_fitness&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness_in_run</span><span class="p">)</span>
+        <span class="n">traj</span><span class="o">.</span><span class="n">f_add_result</span><span class="p">(</span><span class="s1">&#39;n_iteration&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># ------------ Finished all runs and print result --------------- #</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;-- End of (successful) ES optimization --&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+      </div><!-- /row -->
+
+      <!-- row -->
+      <div class="row footer-relbar">
+<div id="navbar-related" class=" related navbar navbar-default" role="navigation" aria-label="related navigation">
+  <div class="navbar-inner">
+    <ul class="nav navbar-nav ">
+        <li><a href="../../../../index.html">L2L 1.0.0-beta documentation</a></li>
+    </ul>
+<ul class="nav navbar-nav pull-right hidden-xs hidden-sm">
+      
+        <li><a href="../../../../py-modindex.html" title="Python Module Index" >modules</a></li>
+        <li><a href="../../../../genindex.html" title="General Index" >index</a></li>
+        <li><a href="../../../index.html" >Module code</a></li>
+        <li><a href="../../../l2l.html" >l2l</a></li>
+        <li><a href="#">top</a></li> 
+      
+    </ul>
+  </div>
+</div>
+      </div><!-- /row -->
+
+      <!-- footer -->
+      <footer role="contentinfo">
+          &copy; Copyright 2017, Anand Subramoney.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1.
+      </footer>
+      <!-- /footer -->
+
+    </div>
+    <!-- /container -->
+
+  </body>
+</html>
