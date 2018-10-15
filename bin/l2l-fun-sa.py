@@ -2,7 +2,7 @@ import logging.config
 import os
 
 import numpy as np
-from utils.environment import Environment
+from l2l.utils.environment import Environment
 
 from l2l.optimizees.functions import tools as function_tools
 from l2l.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
@@ -12,7 +12,7 @@ from l2l.paths import Paths
 
 from l2l.logging_tools import create_shared_logger_data, configure_loggers
 
-import utils.JUBE_runner as jube
+from l2l import utils as jube
 
 logger = logging.getLogger('bin.l2l-fun-sa')
 

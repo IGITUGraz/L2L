@@ -2,7 +2,7 @@ import logging.config
 import os
 
 import yaml
-from utils.environment import  Environment
+from l2l.utils.environment import  Environment
 import numpy as np
 
 from l2l.optimizees.functions import tools as function_tools
@@ -11,7 +11,7 @@ from l2l.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from l2l.optimizers.evolution import GeneticAlgorithmOptimizer, GeneticAlgorithmParameters
 from l2l.paths import Paths
 
-import utils.JUBE_runner as jube
+from l2l import utils as jube
 
 logger = logging.getLogger('l2l-fun-ga')
 

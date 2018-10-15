@@ -1,4 +1,4 @@
-from utils.groups import ParameterGroup
+from l2l.utils.groups import ParameterGroup
 
 
 class Individual(ParameterGroup):

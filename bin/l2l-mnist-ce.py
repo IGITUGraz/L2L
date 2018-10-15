@@ -1,7 +1,7 @@
 import logging.config
 
 import numpy as np
-from utils.environment import Environment
+from l2l.utils.environment import Environment
 
 from l2l.dataprocessing import get_skeleton_traj, get_var_from_generations
 from l2l.logging_tools import create_shared_logger_data, configure_loggers
@@ -10,7 +10,7 @@ from l2l.optimizers.crossentropy import CrossEntropyParameters, CrossEntropyOpti
 from l2l.optimizers.crossentropy.distribution import NoisyGaussian
 from l2l.paths import Paths
 
-import utils.JUBE_runner as jube
+from l2l import utils as jube
 
 logger = logging.getLogger('bin.l2l-mnist-es')
 

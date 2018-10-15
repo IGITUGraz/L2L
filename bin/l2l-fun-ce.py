@@ -1,7 +1,7 @@
 import logging.config
 import os
 
-from utils.environment import Environment
+from l2l.utils.environment import Environment
 
 from l2l.optimizees.functions import tools as function_tools
 from l2l.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
@@ -9,7 +9,7 @@ from l2l.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from l2l.optimizers.crossentropy.distribution import NoisyGaussian
 from l2l.optimizers.crossentropy import CrossEntropyOptimizer, CrossEntropyParameters
 from l2l.paths import Paths
-import utils.JUBE_runner as jube
+from l2l import utils as jube
 
 import numpy as np
 from l2l.logging_tools import create_shared_logger_data, configure_loggers

@@ -1,9 +1,9 @@
 import logging.config
 
 import numpy as np
-from utils.environment import Environment
+from l2l.utils.environment import Environment
 
-from l2l import dict_to_list
+from l2l import dict_to_list, utils as jube
 from l2l.dataprocessing import get_skeleton_traj, get_var_from_runs, get_var_from_generations
 from l2l.logging_tools import create_shared_logger_data, configure_loggers
 from l2l.optimizees.functions import tools as function_tools
@@ -11,8 +11,6 @@ from l2l.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from l2l.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from l2l.optimizers.evolutionstrategies import EvolutionStrategiesParameters, EvolutionStrategiesOptimizer
 from l2l.paths import Paths
-
-import utils.JUBE_runner as jube
 
 logger = logging.getLogger('bin.l2l-fun-es')
 

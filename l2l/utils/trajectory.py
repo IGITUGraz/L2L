@@ -1,6 +1,6 @@
 import time
-from utils.groups import ParameterGroup, ResultGroup, ParameterDict
-from utils.individual import Individual
+from l2l.utils.groups import ParameterGroup, ResultGroup, ParameterDict
+from l2l.utils import Individual
 import logging
 
 logging = logging.getLogger("Trajectory")
