@@ -4,10 +4,10 @@ import warnings
 
 import yaml
 
-from ltl.optimizees.functions.function_generator import FunctionGenerator, GaussianParameters, PermutationParameters, \
+from l2l.optimizees.functions.function_generator import FunctionGenerator, GaussianParameters, PermutationParameters, \
     EasomParameters, LangermannParameters, MichalewiczParameters, ShekelParameters, RastriginParameters, \
     RosenbrockParameters, ChasmParameters, AckleyParameters
-from ltl.paths import Paths
+from l2l.paths import Paths
 
 warnings.filterwarnings("ignore")
 

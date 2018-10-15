@@ -6,6 +6,6 @@ LTL
 
     quickstart
     intro
-    ltl
-    ltl-bin
+    l2l
+    l2l-bin
     indices

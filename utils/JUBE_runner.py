@@ -80,10 +80,10 @@ class JUBERunner():
         f = open(self.filename, 'w')
         f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
         f.write("<jube>\n")
-        f.write("  <benchmark name=\"ltl_inner_loop\" outpath=\"bench_run\">\n")
+        f.write("  <benchmark name=\"l2l_inner_loop\" outpath=\"bench_run\">\n")
 
         # Write the parameters for this run
-        f.write("    <parameterset name=\"ltl_parameters\">\n")
+        f.write("    <parameterset name=\"l2l_parameters\">\n")
         f.write("      <parameter name=\"index\" type=\"int\">")
         indexes = ""
         for individual in eval_pop:
@@ -124,7 +124,7 @@ class JUBERunner():
         f.write("    <!-- Operation -->\n")
         f.write("    <step name=\"submit\" work_dir=\"" + self.path +
                 "/work/jobsystem_bench_${jube_benchmark_id}_${jube_wp_id}\" >\n")
-        f.write("    <use>ltl_parameters</use>\n")
+        f.write("    <use>l2l_parameters</use>\n")
         f.write("    <use>execute_set</use>\n")
 
         if self.scheduler != 'None':

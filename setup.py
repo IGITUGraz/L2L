@@ -2,12 +2,12 @@ from setuptools import setup
 from setuptools import find_packages
 import re
 
-from ltl.version import FULL_VERSION
+from l2l.version import FULL_VERSION
 
 """
-This file installs the ltl package.
+This file installs the l2l package.
 Note that it does not perform any installation of the documentation. For this, follow the specified procedure in the
- README. For updating the version, update MAJOR_VERSION and FULL_VERSION in ltl/version.py
+ README. For updating the version, update MAJOR_VERSION and FULL_VERSION in l2l/version.py
 """
 
 
@@ -37,6 +37,6 @@ setup(
     description="This module provides the infrastructure create optimizers and "
                 "optimizees in order to implement learning-to-learn",
     install_requires=requirements,
-    provides=['ltl'],
+    provides=['l2l'],
     dependency_links=dependency_links,
 )

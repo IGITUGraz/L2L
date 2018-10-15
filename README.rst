@@ -1,28 +1,28 @@
 .. image:: https://circleci.com/gh/IGITUGraz/LTL.svg?style=svg&circle-token=227d26445f67e74ecc1c8904688859b1c49c292f
     :target: https://circleci.com/gh/IGITUGraz/LTL
 
-LTL Gradient-free Optimization Framework
+L2L Gradient-free Optimization Framework
 ++++++++++++++++++++++++++++++++++++++++
 
 About
 *****
 
-The LTL (Learning-to-learn) gradient-free optimization framework contains well documented and tested implementations of various gradient free optimization algorithms. It also defines an API that makes it easy to optimize (hyper-)parameters for any task (optimizee). All the implementations in this package are parallel and can run across different cores and nodes (but equally well on a single core). 
+The L2L (Learning-to-learn) gradient-free optimization framework contains well documented and tested implementations of various gradient free optimization algorithms. It also defines an API that makes it easy to optimize (hyper-)parameters for any task (optimizee). All the implementations in this package are parallel and can run across different cores and nodes (but equally well on a single core).
 
-NOTE: The LTL framework is currently in **BETA**
+NOTE: The L2L framework is currently in **BETA**
 
 Getting Started
 ***************
 
 
-If you are developing a new Optimizee or want to try out a new Optimizee with the Optimizers in the LTL package, install
-LTL as a python package. See section `Installing the LTL Package`_ for details on how to install the package (this
+If you are developing a new Optimizee or want to try out a new Optimizee with the Optimizers in the L2L package, install
+L2L as a python package. See section `Installing the L2L Package`_ for details on how to install the package (this
 automatically installs all requirements). 
 
-Documentation is available at `<https://igitugraz.github.io/LTL/>`_.
+Documentation is available at `<https://igitugraz.github.io/L2L/>`_.
 
 
-Installing the LTL Package
+Installing the L2L Package
 **************************
 
 From the Top-Level directory of the directory, run the following command:
@@ -42,8 +42,8 @@ without requiring a reinstall). In order to uninstall one may run the following:
 *Note that if the setup was done using sudo access, then the uninstall must also
 be done using sudo access*
 
-Having installed this package, we now have access to the top level `ltl` module
-which contains all the relevant modules relevant for using the ltl package.
+Having installed this package, we now have access to the top level `l2l` module
+which contains all the relevant modules relevant for using the l2l package.
 
 This should also install the `sphinx` package which should now enable you to build
 the documentation as specified below.

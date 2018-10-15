@@ -23,7 +23,7 @@ import sys
 sys.path.insert(0, os.path.abspath('../bin'))
 sys.path.insert(0, os.path.abspath('..'))
 
-from ltl.version import MAJOR_VERSION, FULL_VERSION  # noqa: E402
+from l2l.version import MAJOR_VERSION, FULL_VERSION  # noqa: E402
 
 # -- General configuration ------------------------------------------------
 
@@ -322,7 +322,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'ltl', 'LTL Documentation',
+    (master_doc, 'l2l', 'LTL Documentation',
      [author], 1)
 ]
 
@@ -380,4 +380,4 @@ def setup(app):
 
 nitpicky = True
 nitpick_ignore = [('py:obj', 'traj'), ('py:obj', 'traj.individual'), ('py:mod', 'pypet'),
-                  ('py:obj', 'fitnesses_results'), ('py:meth', 'ltl.optimizers.optimizer.Optimizer.__init__')]
+                  ('py:obj', 'fitnesses_results'), ('py:meth', 'l2l.optimizers.optimizer.Optimizer.__init__')]

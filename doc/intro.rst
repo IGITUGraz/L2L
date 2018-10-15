@@ -53,27 +53,27 @@ Iteration loop
 ~~~~~~~~~~~~~~
 
 
-The progress of execution in the script shown in :doc:`ltl-bin` goes as follows:
+The progress of execution in the script shown in :doc:`l2l-bin` goes as follows:
 
 1. At the beginning, a *population* of *individuals*  is created by the `Optimizer` by calling the `Optimizee`'s
    :meth:`~.Optimizee.create_individual` method.
-2. The `Optimizer` then puts these *individuals* in its member variable :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop`
-   and calls its :meth:`~ltl.optimizers.optimizer.Optimizer._expand_trajectory` method. This is the \*key\* step to
+2. The `Optimizer` then puts these *individuals* in its member variable :attr:`~l2l.optimizers.optimizer.Optimizer.eval_pop`
+   and calls its :meth:`~l2l.optimizers.optimizer.Optimizer._expand_trajectory` method. This is the \*key\* step to
    starting and continuing the loop and should be done in all new `Optimizer` s added.
 
    .. _third-step:
 
 3. One `Optimizee` run for each *individual* (parameter) is created in
-   :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop` by calling the `Optimizee`'s
-   :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` method.  Each `Optimizee` run can happen in parallel across
+   :attr:`~l2l.optimizers.optimizer.Optimizer.eval_pop` by calling the `Optimizee`'s
+   :meth:`~l2l.optimizees.optimizee.Optimizee.simulate` method.  Each `Optimizee` run can happen in parallel across
    cores and even across nodes if enabled as described in :ref:`parallelization`.
-4. the `Optimizee`'s :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` method runs whatever simulation it has to run
+4. the `Optimizee`'s :meth:`~l2l.optimizees.optimizee.Optimizee.simulate` method runs whatever simulation it has to run
    with the given *individual* (parameter) and returns a Python :obj:`tuple` with one or more fitness values [#]_.
-5. Once the runs are done, `Optimizer`'s :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` method is called 
+5. Once the runs are done, `Optimizer`'s :meth:`~l2l.optimizers.optimizer.Optimizer.post_process` method is called 
    with the list of *individuals* and their fitness values as returned by the `Optimizee`'s
-   :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` method.  The `Optimizer` can choose to do whatever it wants with
+   :meth:`~l2l.optimizees.optimizee.Optimizee.simulate` method.  The `Optimizer` can choose to do whatever it wants with
    the fitnesses, and use it to create a new set of *individuals* which it puts into its
-   :attr:`~ltl.optimizers.optimizer.Optimizer.eval_pop` attribute (after clearing it of the old *population*).
+   :attr:`~l2l.optimizers.optimizer.Optimizer.eval_pop` attribute (after clearing it of the old *population*).
 6. The loop continues from :ref:`3. <third-step>`
 
 
@@ -84,12 +84,12 @@ The progress of execution in the script shown in :doc:`ltl-bin` goes as follows:
 Writing new algorithms
 **********************
 
-* For a new **Optimizee**: Create a copy of the class :class:`~ltl.optimizees.optimizee.Optimizee` into a new python
+* For a new **Optimizee**: Create a copy of the class :class:`~l2l.optimizees.optimizee.Optimizee` into a new python
   module with an appropriate name and fill in the functions. E.g. for a DMS task optimizee, you would create
-  a module (i.e. directory with a `__init__.py` file) as `ltl/optimizees/dms/` and copy the above class there.
-* For a new **Optimizer**: Create a copy of the class :class:`~ltl.optimizers.optimizer.Optimizer` into a new python
+  a module (i.e. directory with a `__init__.py` file) as `l2l/optimizees/dms/` and copy the above class there.
+* For a new **Optimizer**: Create a copy of the class :class:`~l2l.optimizers.optimizer.Optimizer` into a new python
   module with an appropriate name and fill in the functions. (same as above)
-* For a new **experiment**: Create a copy of the file :file:`bin/ltl-template.py` with an appropriate name and fill in
+* For a new **experiment**: Create a copy of the file :file:`bin/l2l-template.py` with an appropriate name and fill in
   the *TODOs*.
 * Add an entry in :file:`bin/logging.yaml` for the new class/file you created. See logging_.
 
@@ -125,7 +125,7 @@ used to acheive the following:
 
 :obj:`traj` object is passed as a mandatory argument to the constructors of both the Optimizee and Optimizer.
 Additionally, we automatically passes this object as an argument to the functions
-:meth:`~ltl.optimizees.optimizee.Optimizee.simulate` and :meth:`~ltl.optimizers.optimizer.Optimizer.post_process`
+:meth:`~l2l.optimizees.optimizee.Optimizee.simulate` and :meth:`~l2l.optimizers.optimizer.Optimizer.post_process`
 
 .. _Individual-Dict:
 .. _Individual-Dicts:
@@ -143,7 +143,7 @@ names as keys, and parameter values as values. The following need to be noted ab
 
 2.  The dictionary must contain **exactly** those parameters that are going to be explored by the `Optimizer`.
     This is because this dictionary is used to expand the trajectory in the
-    :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` function. See the note about expanding trajectories in
+    :meth:`~l2l.optimizers.optimizer.Optimizer.post_process` function. See the note about expanding trajectories in
     ref:`optimizer-constructor`
 
 In the documentation above, whenever the term individual_ is used, it is assumed that the object referred to is
@@ -158,11 +158,11 @@ fact that its keys represent parameter names.
 Optimizee
 ~~~~~~~~~
 
-The optimizee subclasses :class:`~ltl.optimizees.optimizee.Optimizee` with a class that contains four mandatory methods
+The optimizee subclasses :class:`~l2l.optimizees.optimizee.Optimizee` with a class that contains four mandatory methods
 (Documentation linked below):
 
-1. :meth:`~ltl.optimizees.optimizee.Optimizee.create_individual` : Called to return a random individual_ (returns an Individual-Dict_)
-2. :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` : Runs the actual simulation and returns a fitness vector
+1. :meth:`~l2l.optimizees.optimizee.Optimizee.create_individual` : Called to return a random individual_ (returns an Individual-Dict_)
+2. :meth:`~l2l.optimizees.optimizee.Optimizee.simulate` : Runs the actual simulation and returns a fitness vector
 
 In order to maintain a consistent framework for communication between the optimizer and optimizee it is required to
 enforce certain requirements on the behaviour of the above functions. The details of these requirements for the
@@ -195,13 +195,13 @@ individual of the optimizee must contain a key named ``'sim_control.seed'``
 *NOTE* that the parameter group named `individual` itself is created in the constructor of the base `Optimizee` class.
 Thus, the derived class need only implement the addition of parameters as shown above.
 
-The :meth:`~ltl.optimizees.optimizee.Optimizee.create_individual` function:
+The :meth:`~l2l.optimizees.optimizee.Optimizee.create_individual` function:
 ---------------------------------------------------------------------------
 
 This must return an individual_ of the optimizee, i.e. it must return an Individual-Dict_ representing
 a valid random individual of the optimizee.
 
-The :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` function:
+The :meth:`~l2l.optimizees.optimizee.Optimizee.simulate` function:
 ------------------------------------------------------------------
 
 This function only receives as argument the trajectory :obj:`traj` set to a particular run. Thus it must source all
@@ -209,21 +209,21 @@ required parameters from the :obj:`traj` and the member variables of the `Optimi
 with these parameters and always return a tuple (*even for 1-D fitness!!*) representing the fitness to be used for
 optimizing.
 _
-See the class documentation for more details: :class:`~ltl.optimizees.optimizee.Optimizee`
+See the class documentation for more details: :class:`~l2l.optimizees.optimizee.Optimizee`
 
 Optimizer
 ~~~~~~~~~
 
-The optimizer subclasses :class:`~ltl.optimizers.optimizer.Optimizer` with a class that contains two mandatory methods:
+The optimizer subclasses :class:`~l2l.optimizers.optimizer.Optimizer` with a class that contains two mandatory methods:
 
-1. :meth:`~ltl.optimizers.optimizer.Optimizer.__init__`: This is the constructor which performs the duties of
+1. :meth:`~l2l.optimizers.optimizer.Optimizer.__init__`: This is the constructor which performs the duties of
    initializing the trajectory and the initial generation_ of the simulation.
-2. :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` : knowing the fitness for the current parameters, it
+2. :meth:`~l2l.optimizers.optimizer.Optimizer.post_process` : knowing the fitness for the current parameters, it
    generates a new set of parameters and runs the next batch of simulations.
 
 And one optional method:
 
-1. :meth:`~ltl.optimizers.optimizer.Optimizer.end` : Tertiary method to do cleanup, printing results etc.
+1. :meth:`~l2l.optimizers.optimizer.Optimizer.end` : Tertiary method to do cleanup, printing results etc.
 
 Note that in order to maintain a consistent framework for communication between the optimizer and optimizee, we enforce
 a certain protocol for the above function. The details of this protocol are outlined below
@@ -249,11 +249,11 @@ Note that all the (non-exploring) paramters to the `Optimizer` is passed in to i
 :func:`~collections.namedtuple` to keep the paramters documented. For examples see :class:`.GeneticAlgorithmParameters`
 or :class:`.SimulatedAnnealingParameters`
 
-The :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` function:
+The :meth:`~l2l.optimizers.optimizer.Optimizer.post_process` function:
 ----------------------------------------------------------------------
 
 This function receives, along with the trajectory :obj:`traj`, a list of tuples. Each tuple has the structure
-`(run_index, run_fitness_tuple)`. The :meth:`~ltl.optimizers.optimizer.Optimizer.post_process` function also has
+`(run_index, run_fitness_tuple)`. The :meth:`~l2l.optimizers.optimizer.Optimizer.post_process` function also has
 access to the individuals whose fitness was calculated (via the member `self.eval_pop`), and the generation index
 (`self.g`), along with any other user defined member variable.
 
@@ -270,13 +270,13 @@ Some points to remember are the following:
 
 1.  The call to `self._expand_trajectory` not only causes the trajectory to store more parameter values to explore, but,
     due to the mechanism underlying :meth:`~utils.trajectory.Trajectory.f_expand()`, also causes the framework to run
-    the optimizee :meth:`~ltl.optimizees.optimizee.Optimizee.simulate` function on these parameters. Look at the
+    the optimizee :meth:`~l2l.optimizees.optimizee.Optimizee.simulate` function on these parameters. Look at the
     documentation referenced in the footnote of iteration-loop_ for more details on this
 
 2.  **Always** build the optimizer to maximize fitness. The weights that are passed in to the optimizer constructor
     can be made negative if one wishes to perform minimization
 
-See the class documentation for more details: :class:`~ltl.optimizers.optimizer.Optimizer`
+See the class documentation for more details: :class:`~l2l.optimizers.optimizer.Optimizer`
 
 
 Running an LTL simulation
@@ -288,10 +288,10 @@ level LTL directory, e.g. :file:`./output_results/`, and create an empty folder 
 to commit any staged files to your local repo. Failing to follow these instructions raises an error when trying to run
 any of the test simulations.
 
-To run a LTL simulation, copy the file :file:`bin/ltl-template.py` (see :doc:`ltl-bin`) to
-:file:`bin/ltl-{optimizeeabbr}-{optimizerabbr}.py`. Then fill in all the **TODOs** . Especially the parts with the
+To run a LTL simulation, copy the file :file:`bin/l2l-template.py` (see :doc:`l2l-bin`) to
+:file:`bin/l2l-{optimizeeabbr}-{optimizerabbr}.py`. Then fill in all the **TODOs** . Especially the parts with the
 initialization of the appropriate `Optimizers` and `Optimizees`. The rest of the code should be left in place for
-logging and recording. See the source of :file:`bin/ltl-template.py` for more details.
+logging and recording. See the source of :file:`bin/l2l-template.py` for more details.
 
 
 Examples
@@ -299,7 +299,7 @@ Examples
 
 * See :class:`~.FunctionGeneratorOptimizee` for an example of an `Optimizee` (based on simple function minimization).
 * See :class:`~.SimulatedAnnealingOptimizer` for an example of an implementation of simulated annealing `Optimizer`.
-* See :ref:`ltl-experiments` for an example implementation of an LTL experiment with an arbitrary `Optimizee` and `Optimizer`.
+* See :ref:`l2l-experiments` for an example implementation of an LTL experiment with an arbitrary `Optimizee` and `Optimizer`.
 
 
 .. _data-postprocessing:
@@ -309,7 +309,7 @@ Data postprocessing
 
 Having run the simulation, the next superpower required is the ability to make sense of all the data that we've dumped
 into the trajectory and (consequently) the HDF5 file.  Therefore to cover the most common cases (In fact, I really
-haven't YET come across any other cases), We have created the :mod:`~ltl.dataprocessing` with the relevant functions.
+haven't YET come across any other cases), We have created the :mod:`~l2l.dataprocessing` with the relevant functions.
 Look up the documentation of the module for further details.
 
 .. _parallelization:
@@ -332,7 +332,7 @@ Logging
     to output messages to a console/file.
 
 2.  Setting up logging in a multiprocessing environment is a mind-numbingly painful process. Therefore, to keep users
-    sane, we have provided the module :mod:`~ltl.logging_tools` with 2 functions which can be used to conveniently setup
+    sane, we have provided the module :mod:`~l2l.logging_tools` with 2 functions which can be used to conveniently setup
     logging. See the module documentation for more details.
 
 3.  As far as using loggers is concerned, the convention is one logger per file. The name of the logger should reflect
@@ -363,7 +363,7 @@ different Individual-Dicts_ representing the individual. One solution for this i
 like they are optimizing a vector (in the case of python, a list). Thus, the Optimizer requires the ability to convert
 back and forth between a list and a dictionary. For this purpose, we have the following functions
 
-1.  :meth:`~ltl.dict_to_list`
-2.  :meth:`~ltl.list_to_dict`
+1.  :meth:`~l2l.dict_to_list`
+2.  :meth:`~l2l.list_to_dict`
 
 Check their documentation for more details.
