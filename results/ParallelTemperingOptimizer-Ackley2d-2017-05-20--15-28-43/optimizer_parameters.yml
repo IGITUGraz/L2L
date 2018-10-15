@@ -1,5 +1,0 @@
-{cooling_schedules: 'Schedule.EXPONENTIAL_ADDAPTIVE Schedule.EXPONENTIAL_ADDAPTIVE
-    Schedule.EXPONENTIAL_ADDAPTIVE Schedule.LINEAR_ADDAPTIVE Schedule.LINEAR_ADDAPTIVE ',
-  decay_parameters: '0.99 0.99 0.99 0.99 0.99 ', n_iteration: 1000, n_parallel_runs: 5,
-  noisy_step: 0.03, seed: 78543, stop_criterion: .inf, temperature_bounds: '[ 0.8  0.
-    ] [ 0.7  0. ] [ 0.6  0. ] [ 1.   0.1] [ 0.9  0.2] '}

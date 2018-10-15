@@ -1,2 +1,0 @@
-{exploration_rate: 0.01, learning_rate: 0.01, n_iteration: 100, n_random_steps: 5,
-  stochastic_decay: 0.99, stochastic_deviation: 1, stop_criterion: .inf}

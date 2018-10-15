@@ -1,6 +1,0 @@
-benchmark_id: 8
-dims: 2
-functions:
-- ShekelParameters: {A: default, c: default}
-mu: 0.0
-sigma: 0.01
