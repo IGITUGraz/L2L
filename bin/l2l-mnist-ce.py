@@ -3,7 +3,6 @@ import logging.config
 import numpy as np
 from l2l.utils.environment import Environment
 
-from l2l.dataprocessing import get_skeleton_traj, get_var_from_generations
 from l2l.logging_tools import create_shared_logger_data, configure_loggers
 from l2l.optimizees.mnist.optimizee import MNISTOptimizeeParameters, MNISTOptimizee
 from l2l.optimizers.crossentropy import CrossEntropyParameters, CrossEntropyOptimizer
@@ -131,57 +130,9 @@ def run_experiment():
     return traj.v_storage_service.filename, traj.v_name, paths
 
 
-def process_results(filename, trajname, paths):
-    from l2l.matplotlib_ import plt
-
-    traj = get_skeleton_traj(filename, trajname)
-
-    # fitness_list, run_id_list = get_var_from_runs(traj, 'results.fitness', with_ids=True, status_interval=200)
-    algorithm_params_list = get_var_from_generations(traj, 'algorithm_params')
-
-    best_fitness_list = [x['best_fitness_in_run'] for x in algorithm_params_list]
-    average_fitness_list = [x['average_fitness_in_run'] for x in algorithm_params_list]
-    generation_list = [x['generation'] for x in algorithm_params_list]
-    # current_individual_fitness = [x['current_individual_fitness'] for x in algorithm_params_list]
-
-    # pop_size_list = [params_dict['pop_size'] for params_dict in algorithm_params_list]
-
-    # pop_size_list_cumsum = np.cumsum(pop_size_list)
-    # gen_no_list = np.zeros_like(run_id_list)  # gen_no_list[i] = gen no of ith run
-    # gen_no_list[pop_size_list_cumsum[:-1]] = 1
-    # gen_no_list = np.cumsum(gen_no_list)
-    #
-    # fitness_list = np.array(fitness_list)
-
-    fig, ax = plt.subplots(figsize=(15, 7))
-    ngen = 5000
-    ax.plot(generation_list[:ngen], best_fitness_list[:ngen], label='best fitness')
-    ax.plot(generation_list[:ngen], average_fitness_list[:ngen], label='average fitness')
-    ax.annotate('%.2f%%' % (best_fitness_list[1000] * 100), xy=(1000, best_fitness_list[1000]), xytext=(1000, 1.05),
-                arrowprops=dict(facecolor='black', shrink=0.05), xycoords='data',
-                )
-    ax.annotate('%.2f%%' % (best_fitness_list[2000] * 100), xy=(2000, best_fitness_list[2000]), xytext=(2000, 1.05),
-                arrowprops=dict(facecolor='black', shrink=0.05), xycoords='data',
-                )
-    ax.annotate('%.2f%%' % (best_fitness_list[3000] * 100), xy=(3000, best_fitness_list[3000]), xytext=(3000, 1.05),
-                arrowprops=dict(facecolor='black', shrink=0.05), xycoords='data',
-                )
-    ax.annotate('%.2f%%' % (best_fitness_list[4000] * 100), xy=(4000, best_fitness_list[4000]), xytext=(4000, 1.05),
-                arrowprops=dict(facecolor='black', shrink=0.05), xycoords='data',
-                )
-    ax.annotate('%.2f%%' % (best_fitness_list[5000] * 100), xy=(5000, best_fitness_list[5000]), xytext=(5000, 1.05),
-                arrowprops=dict(facecolor='black', shrink=0.05), xycoords='data',
-                )
-    ax.set(ylim=[0, 1.1], xlabel='Generation', ylabel="Performance")
-    ax.legend()
-    ax.set_title("Testing", fontsize='small')
-    fig.savefig(paths.get_fpath('mnist-small-ce-performance', '.png'))
-
-
 def main():
     filename, trajname, paths = run_experiment()
     logger.info("Plotting now")
-    process_results(filename, trajname, paths)
 
 
 if __name__ == '__main__':

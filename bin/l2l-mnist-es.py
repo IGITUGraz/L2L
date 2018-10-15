@@ -5,7 +5,6 @@ import numpy as np
 from pypet import Environment
 
 from l2l import dict_to_list
-from l2l.dataprocessing import get_skeleton_traj, get_var_from_runs, get_var_from_generations
 from l2l.logging_tools import create_shared_logger_data, configure_loggers
 from l2l.optimizees.mnist.optimizee import MNISTOptimizeeParameters, MNISTOptimizee
 from l2l.optimizers.evolutionstrategies import EvolutionStrategiesParameters, EvolutionStrategiesOptimizer
@@ -93,57 +92,9 @@ def run_experiment():
     return traj.v_storage_service.filename, traj.v_name, paths
 
 
-def process_results(filename, trajname, paths):
-    from l2l.matplotlib_ import plt
-
-    traj = get_skeleton_traj(filename, trajname)
-
-    fitness_list, run_id_list = get_var_from_runs(traj, 'results.fitness', with_ids=True, status_interval=200)
-    algorithm_params_list = get_var_from_generations(traj, 'algorithm_params')
-
-    best_fitness_list = [x['best_fitness_in_run'] for x in algorithm_params_list]
-    average_fitness_list = [x['average_fitness_in_run'] for x in algorithm_params_list]
-    generation_list = [x['generation'] for x in algorithm_params_list]
-    current_individual_fitness = [x['current_individual_fitness'] for x in algorithm_params_list]
-
-    pop_size_list = [params_dict['pop_size'] for params_dict in algorithm_params_list]
-
-    pop_size_list_cumsum = np.cumsum(pop_size_list)
-    gen_no_list = np.zeros_like(run_id_list)  # gen_no_list[i] = gen no of ith run
-    gen_no_list[pop_size_list_cumsum[:-1]] = 1
-    gen_no_list = np.cumsum(gen_no_list)
-
-    fitness_list = np.array(fitness_list)
-
-    fig, ax = plt.subplots(figsize=(15, 7))
-    ax.plot(gen_no_list, fitness_list, '.', label='fitness distribution')
-    ax.plot(generation_list, current_individual_fitness, label='current individual fitness')
-    ax.plot(generation_list, best_fitness_list, label='best fitness')
-    ax.plot(generation_list, average_fitness_list, label='average fitness')
-    ax.legend()
-    ax.set_title("Testing", fontsize='small')
-    fig.savefig(paths.get_fpath('fitness-v-generation', 'png', t=str(datetime.now())))
-
-    individual_list, run_id_list = get_var_from_runs(traj, 'results.individual', with_ids=True, status_interval=200)
-
-    individual_list_arr = [dict_to_list(ind) for ind in individual_list]
-
-    xs = [p[0] for p in individual_list_arr]
-    ys = [p[1] for p in individual_list_arr]
-
-    fig, ax = plt.subplots(figsize=(15, 15))
-    ax.scatter(xs, ys)
-    # ax.set(xlim=(-5, 5), ylim=(-5, 5))
-
-    fig.savefig(paths.get_fpath('es-explored-points', 'png', t=str(datetime.now())))
-
-    logger.info("Plots are in %s", paths.results_path)
-
-
 def main():
     filename, trajname, paths = run_experiment()
     logger.info("Plotting now")
-    process_results(filename, trajname, paths)
 
 
 if __name__ == '__main__':
