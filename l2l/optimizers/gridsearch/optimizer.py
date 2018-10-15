@@ -12,7 +12,7 @@ logger = logging.getLogger("optimizers.gridsearch")
 
 GridSearchParameters = namedtuple('GridSearchParameters', ['param_grid'])
 GridSearchParameters.__doc__ = """
-:param param_grid dict: This is the data structure specifying the grid over which to search. This should be a
+:param dict param_grid: This is the data structure specifying the grid over which to search. This should be a
     dictionary as follows::
     
         optimizee_param_grid['param_name'] = (lower_bound, higher_bound, n_steps)

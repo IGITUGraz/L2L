@@ -86,7 +86,7 @@ class NaturalEvolutionStrategiesOptimizer(Optimizer):
       element of the fitness vector)
 
     :param parameters:
-      Instance of :func:`~collections.namedtuple` :class:`.NaturalEvolutionstrategiesParameters` containing the
+      Instance of :func:`~collections.namedtuple` :class:`.NaturalEvolutionStrategiesParameters` containing the
       parameters needed by the Optimizer
 
     """

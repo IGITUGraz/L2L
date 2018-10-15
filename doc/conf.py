@@ -379,5 +379,6 @@ def setup(app):
 
 
 nitpicky = True
-nitpick_ignore = [('py:mod', 'pypet'),
+nitpick_ignore = [('py:obj', 'traj'),
+                  ('py:obj', 'traj.individual'),
                   ('py:obj', 'fitnesses_results'), ('py:meth', 'l2l.optimizers.optimizer.Optimizer.__init__')]

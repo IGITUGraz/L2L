@@ -1,5 +1,5 @@
-from l2l.utils import Trajectory
-from l2l.utils import JUBERunner
+from l2l.utils.trajectory import Trajectory
+from l2l.utils.JUBE_runner import JUBERunner
 import logging
 
 logger = logging.getLogger("utils.Environment")

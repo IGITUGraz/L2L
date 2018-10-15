@@ -4,7 +4,7 @@ import logging
 logging = logging.getLogger("util.groups")
 
 
-class ParameterGroup():
+class ParameterGroup:
     """
     This class is a Dictionary which can be used to store parameters. It is used to fit the pypet already existing
     interface with the trajectory

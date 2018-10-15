@@ -16,3 +16,11 @@ Individual
     :members:
     :undoc-members:
     :show-inheritance:
+
+ParamterGroup
+-------------
+
+.. autoclass:: l2l.utils.groups.ParameterGroup
+    :members:
+    :undoc-members:
+    :show-inheritance:

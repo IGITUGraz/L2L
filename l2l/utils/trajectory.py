@@ -1,6 +1,6 @@
 import time
 from l2l.utils.groups import ParameterGroup, ResultGroup, ParameterDict
-from l2l.utils import Individual
+from l2l.utils.individual import Individual
 import logging
 
 logging = logging.getLogger("Trajectory")
@@ -48,6 +48,7 @@ class Trajectory:
         :param group_name: Name of the group where the parameter should be added
         :param key: Name of the parameter to be added
         :param val: Value of the parameter
+
         Throws an exception if the group does not exist
         """
         if group_name in self._parameters.keys():
