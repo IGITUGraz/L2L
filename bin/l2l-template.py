@@ -13,6 +13,8 @@ from l2l.optimizees.optimizee import Optimizee
 from l2l.optimizers.optimizer import Optimizer, OptimizerParameters
 from l2l.paths import Paths
 
+import l2l.utils.JUBE_runner as jube
+
 # We first setup the logger and read the logging config which controls the verbosity and destination of the logs from
 # various parts of the code.
 logger = logging.getLogger('bin.l2l-optimizee-optimizer')
@@ -62,9 +64,55 @@ def main():
     # Get the trajectory from the environment.
     traj = env.trajectory
 
+    # Set JUBE params
+    traj.f_add_parameter_group("JUBE_params", "Contains JUBE parameters")
+
+    # Scheduler parameters
+    # These parameters need to be filled in when using a scheduler
+    # Name of the scheduler
+    # traj.f_add_parameter_to_group("JUBE_params", "scheduler", "Slurm")
+    # Command to submit jobs to the schedulers
+    traj.f_add_parameter_to_group("JUBE_params", "submit_cmd", "sbatch")
+    # Template file for the particular scheduler
+    traj.f_add_parameter_to_group("JUBE_params", "job_file", "job.run")
+    # Number of nodes to request for each run
+    traj.f_add_parameter_to_group("JUBE_params", "nodes", "1")
+    # Requested time for the compute resources
+    traj.f_add_parameter_to_group("JUBE_params", "walltime", "00:01:00")
+    # MPI Processes per node
+    traj.f_add_parameter_to_group("JUBE_params", "ppn", "1")
+    # CPU cores per MPI process
+    traj.f_add_parameter_to_group("JUBE_params", "cpu_pp", "1")
+    # Threads per process
+    traj.f_add_parameter_to_group("JUBE_params", "threads_pp", "1")
+    # Type of emails to be sent from the scheduler
+    traj.f_add_parameter_to_group("JUBE_params", "mail_mode", "ALL")
+    # Email to notify events from the scheduler
+    traj.f_add_parameter_to_group("JUBE_params", "mail_address", "s.diaz@fz-juelich.de")
+
+    # These parameters need to be filled in always because JUBE takes care of exploring all the required
+    # parameters from the optimizer
+    # Error file for the job
+    traj.f_add_parameter_to_group("JUBE_params", "err_file", "stderr")
+    # Output file for the job
+    traj.f_add_parameter_to_group("JUBE_params", "out_file", "stdout")
+    # JUBE parameters for multiprocessing. Relevant even without scheduler.
+    # MPI Processes per job
+    traj.f_add_parameter_to_group("JUBE_params", "tasks_per_job", "1")
+    # The execution command
+    traj.f_add_parameter_to_group("JUBE_params", "exec", "mpirun python3 " + root_dir_path +
+                                  "/run_files/run_optimizee.py")
+    # Ready file for a generation
+    traj.f_add_parameter_to_group("JUBE_params", "ready_file", root_dir_path + "/readyfiles/ready_w_")
+    # Path where the job will be executed
+    traj.f_add_parameter_to_group("JUBE_params", "work_path", root_dir_path)
+
     ## Innerloop simulator
     # TODO when using the template: Change the optimizee to the appropriate Optimizee class
     optimizee = Optimizee(traj)
+
+    # Prepare optimizee for jube runs
+    jube.prepare_optimizee(optimizee, root_dir_path)
 
     ## Outerloop optimizer initialization
     # TODO when using the template: Change the optimizer to the appropriate Optimizer class
