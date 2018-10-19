@@ -2,7 +2,7 @@ import logging.config
 from datetime import datetime
 
 import numpy as np
-from pypet import Environment
+from l2l.utils.environment import Environment
 
 from l2l import dict_to_list
 from l2l.logging_tools import create_shared_logger_data, configure_loggers
@@ -30,7 +30,7 @@ def run_experiment():
     print("All output logs can be found in directory ", paths.logs_path)
 
     # Create an environment that handles running our simulation
-    # This initializes a PyPet environment
+    # This initializes an environment
     env = Environment(
         trajectory=trajectory_name,
         filename=paths.output_dir_path,

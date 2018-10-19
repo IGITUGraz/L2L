@@ -3,7 +3,7 @@ import os
 import itertools
 
 import numpy as np
-from pypet import Environment
+from l2l.utils.environment import Environment
 
 from l2l.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from l2l.optimizees.functions.optimizee import FunctionGeneratorOptimizee
@@ -73,7 +73,7 @@ def main():
         optimizer_parameters = optimizer_parameters_fn()
 
         # Create an environment that handles running our simulation
-        # This initializes a PyPet environment
+        # This initializes an environment
         env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                           comment='{} data'.format(name),
                           # freeze_input=True,

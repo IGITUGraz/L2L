@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from pypet import cartesian_product
+from l2l.utils.tools import cartesian_product
 
 from l2l import get_grouped_dict
 

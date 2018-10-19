@@ -42,7 +42,7 @@ def main():
     traj_file = os.path.join(paths.output_dir_path, 'data.h5')
 
     # Create an environment that handles running our simulation
-    # This initializes a PyPet environment
+    # This initializes an environment
     env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
                       comment='{} data'.format(name),
                       add_time=True,

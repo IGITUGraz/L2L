@@ -2,7 +2,7 @@ import logging
 from collections import namedtuple
 
 import numpy as np
-from pypet.utils.explore import cartesian_product
+from l2l.utils.tools import cartesian_product
 
 from l2l import DictEntryType
 from l2l import dict_to_list

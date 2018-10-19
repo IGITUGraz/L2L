@@ -31,7 +31,7 @@ def run_experiment():
     print("All output logs can be found in directory ", paths.logs_path)
 
     # Create an environment that handles running our simulation
-    # This initializes a PyPet environment
+    # This initializes an environment
     env = Environment(
         trajectory=trajectory_name,
         filename=paths.output_dir_path,

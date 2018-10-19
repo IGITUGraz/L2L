@@ -5,8 +5,7 @@ explanations
 
 import logging.config
 
-from pypet import Environment
-from pypet import pypetconstants
+from l2l.utils.environment import Environment
 
 from l2l.logging_tools import create_shared_logger_data, configure_loggers
 from l2l.optimizees.optimizee import Optimizee
@@ -41,7 +40,7 @@ def main():
     print("All output logs can be found in directory ", paths.logs_path)
 
     # Create an environment that handles running our simulation
-    # This initializes a PyPet environment. See Pypet documentation for more details on environment and trajectory.
+    # This initializes an environment. This environment is based on the Pypet implementation.
     # Uncomment 'freeze_input', 'multipproc', 'use_scoop' and 'wrap_mode' lines to disable running the experiment
     # across cores and nodes.
     env = Environment(trajectory=name, filename=paths.output_dir_path, file_title='{} data'.format(name),
@@ -49,8 +48,6 @@ def main():
                       add_time=True,
                       freeze_input=False,
                       multiproc=True,
-                      use_scoop=True,
-                      wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
                       automatic_storing=True,
                       log_stdout=False,  # Sends stdout to logs
                       )
