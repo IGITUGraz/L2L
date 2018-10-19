@@ -165,13 +165,14 @@ For actual examples, see <code class="file docutils literal notranslate"><span c
 
 <span class="kn">import</span> <span class="nn">logging.config</span>
 
-<span class="kn">from</span> <span class="nn">pypet</span> <span class="k">import</span> <span class="n">Environment</span>
-<span class="kn">from</span> <span class="nn">pypet</span> <span class="k">import</span> <span class="n">pypetconstants</span>
+<span class="kn">from</span> <span class="nn">l2l.utils.environment</span> <span class="k">import</span> <span class="n">Environment</span>
 
 <span class="kn">from</span> <span class="nn">l2l.logging_tools</span> <span class="k">import</span> <span class="n">create_shared_logger_data</span><span class="p">,</span> <span class="n">configure_loggers</span>
 <span class="kn">from</span> <span class="nn">l2l.optimizees.optimizee</span> <span class="k">import</span> <span class="n">Optimizee</span>
 <span class="kn">from</span> <span class="nn">l2l.optimizers.optimizer</span> <span class="k">import</span> <span class="n">Optimizer</span><span class="p">,</span> <span class="n">OptimizerParameters</span>
 <span class="kn">from</span> <span class="nn">l2l.paths</span> <span class="k">import</span> <span class="n">Paths</span>
+
+<span class="kn">import</span> <span class="nn">l2l.utils.JUBE_runner</span> <span class="k">as</span> <span class="nn">jube</span>
 
 <span class="c1"># We first setup the logger and read the logging config which controls the verbosity and destination of the logs from</span>
 <span class="c1"># various parts of the code.</span>
@@ -199,7 +200,7 @@ For actual examples, see <code class="file docutils literal notranslate"><span c
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All output logs can be found in directory &quot;</span><span class="p">,</span> <span class="n">paths</span><span class="o">.</span><span class="n">logs_path</span><span class="p">)</span>
 
     <span class="c1"># Create an environment that handles running our simulation</span>
-    <span class="c1"># This initializes a PyPet environment. See Pypet documentation for more details on environment and trajectory.</span>
+    <span class="c1"># This initializes an environment. This environment is based on the Pypet implementation.</span>
     <span class="c1"># Uncomment &#39;freeze_input&#39;, &#39;multipproc&#39;, &#39;use_scoop&#39; and &#39;wrap_mode&#39; lines to disable running the experiment</span>
     <span class="c1"># across cores and nodes.</span>
     <span class="n">env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">trajectory</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">paths</span><span class="o">.</span><span class="n">output_dir_path</span><span class="p">,</span> <span class="n">file_title</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
@@ -207,8 +208,6 @@ For actual examples, see <code class="file docutils literal notranslate"><span c
                       <span class="n">add_time</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                       <span class="n">freeze_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                       <span class="n">multiproc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                      <span class="n">use_scoop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                      <span class="n">wrap_mode</span><span class="o">=</span><span class="n">pypetconstants</span><span class="o">.</span><span class="n">WRAP_MODE_LOCAL</span><span class="p">,</span>
                       <span class="n">automatic_storing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                       <span class="n">log_stdout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Sends stdout to logs</span>
                       <span class="p">)</span>
@@ -222,9 +221,55 @@ For actual examples, see <code class="file docutils literal notranslate"><span c
     <span class="c1"># Get the trajectory from the environment.</span>
     <span class="n">traj</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">trajectory</span>
 
+    <span class="c1"># Set JUBE params</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;Contains JUBE parameters&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Scheduler parameters</span>
+    <span class="c1"># These parameters need to be filled in when using a scheduler</span>
+    <span class="c1"># Name of the scheduler</span>
+    <span class="c1"># traj.f_add_parameter_to_group(&quot;JUBE_params&quot;, &quot;scheduler&quot;, &quot;Slurm&quot;)</span>
+    <span class="c1"># Command to submit jobs to the schedulers</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;submit_cmd&quot;</span><span class="p">,</span> <span class="s2">&quot;sbatch&quot;</span><span class="p">)</span>
+    <span class="c1"># Template file for the particular scheduler</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;job_file&quot;</span><span class="p">,</span> <span class="s2">&quot;job.run&quot;</span><span class="p">)</span>
+    <span class="c1"># Number of nodes to request for each run</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;nodes&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
+    <span class="c1"># Requested time for the compute resources</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;walltime&quot;</span><span class="p">,</span> <span class="s2">&quot;00:01:00&quot;</span><span class="p">)</span>
+    <span class="c1"># MPI Processes per node</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;ppn&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
+    <span class="c1"># CPU cores per MPI process</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;cpu_pp&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
+    <span class="c1"># Threads per process</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;threads_pp&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
+    <span class="c1"># Type of emails to be sent from the scheduler</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;mail_mode&quot;</span><span class="p">,</span> <span class="s2">&quot;ALL&quot;</span><span class="p">)</span>
+    <span class="c1"># Email to notify events from the scheduler</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;mail_address&quot;</span><span class="p">,</span> <span class="s2">&quot;s.diaz@fz-juelich.de&quot;</span><span class="p">)</span>
+
+    <span class="c1"># These parameters need to be filled in always because JUBE takes care of exploring all the required</span>
+    <span class="c1"># parameters from the optimizer</span>
+    <span class="c1"># Error file for the job</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;err_file&quot;</span><span class="p">,</span> <span class="s2">&quot;stderr&quot;</span><span class="p">)</span>
+    <span class="c1"># Output file for the job</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;out_file&quot;</span><span class="p">,</span> <span class="s2">&quot;stdout&quot;</span><span class="p">)</span>
+    <span class="c1"># JUBE parameters for multiprocessing. Relevant even without scheduler.</span>
+    <span class="c1"># MPI Processes per job</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;tasks_per_job&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
+    <span class="c1"># The execution command</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;exec&quot;</span><span class="p">,</span> <span class="s2">&quot;mpirun python3 &quot;</span> <span class="o">+</span> <span class="n">root_dir_path</span> <span class="o">+</span>
+                                  <span class="s2">&quot;/run_files/run_optimizee.py&quot;</span><span class="p">)</span>
+    <span class="c1"># Ready file for a generation</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;ready_file&quot;</span><span class="p">,</span> <span class="n">root_dir_path</span> <span class="o">+</span> <span class="s2">&quot;/readyfiles/ready_w_&quot;</span><span class="p">)</span>
+    <span class="c1"># Path where the job will be executed</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">f_add_parameter_to_group</span><span class="p">(</span><span class="s2">&quot;JUBE_params&quot;</span><span class="p">,</span> <span class="s2">&quot;work_path&quot;</span><span class="p">,</span> <span class="n">root_dir_path</span><span class="p">)</span>
+
     <span class="c1">## Innerloop simulator</span>
     <span class="c1"># TODO when using the template: Change the optimizee to the appropriate Optimizee class</span>
     <span class="n">optimizee</span> <span class="o">=</span> <span class="n">Optimizee</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
+
+    <span class="c1"># Prepare optimizee for jube runs</span>
+    <span class="n">jube</span><span class="o">.</span><span class="n">prepare_optimizee</span><span class="p">(</span><span class="n">optimizee</span><span class="p">,</span> <span class="n">root_dir_path</span><span class="p">)</span>
 
     <span class="c1">## Outerloop optimizer initialization</span>
     <span class="c1"># TODO when using the template: Change the optimizer to the appropriate Optimizer class</span>
