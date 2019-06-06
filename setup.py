@@ -24,6 +24,8 @@ def get_requirements(filename):
             assert match_obj, "Cannot make sense of url {}".format(req)
             requirements[i] = "{req}=={ver}".format(req=match_obj.group(1), ver=match_obj.group(2))
             dependency_links.append(req)
+    dependency_links += \
+        ['http://apps.fz-juelich.de/jsc/jube/jube2/download.php?version=latest']
     return requirements, dependency_links
 
 
