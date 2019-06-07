@@ -1,4 +1,4 @@
-from JUBE.jube2.main import main
+from jube2.main import main
 import os.path
 import pickle
 import time
