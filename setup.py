@@ -36,7 +36,7 @@ setup(
     author_email="anand@igi.tugraz.at, arjun@igi.tugraz.at",
     description="This module provides the infrastructure create optimizers and "
                 "optimizees in order to implement learning-to-learn",
-    setup_requires=['cython', 'numpy',],
+    setup_requires=['Cython', 'numpy'],
     install_requires=requirements,
     provides=['l2l'],
     dependency_links=dependency_links,

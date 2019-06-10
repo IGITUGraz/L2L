@@ -51,18 +51,18 @@ class JUBERunner():
         self.executor = args['exec']
         self.filename = ""
         self.path = args['work_path']
-
+        self.paths = args['paths_obj']
         # Create directories for workspace
         subdirs = ['jube_xml', 'run_files', 'ready_files', 'trajectories', 'results', 'work']
         self.work_paths = {sdir: os.path.join(self.path, sdir) for sdir in subdirs}
 
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+        os.makedirs(self.path, exist_ok=True)
 
         for dir in self.work_paths:
-            if not os.path.exists(dir):
-                os.makedirs(dir)
+            os.makedirs(self.work_paths[dir], exist_ok=True)
+
         self.zeepath = os.path.join(self.path, "optimizee.bin")
+
 
     def write_pop_for_jube(self, trajectory, generation):
         """
@@ -86,7 +86,7 @@ class JUBERunner():
         f.write('      <parameter name="index" type="int">')
 
         inds = [i.ind_idx for i in eval_pop]
-        indexes = ",".join(inds)
+        indexes = ",".join(str(i) for i in inds)
 
         f.write(indexes)
         f.write('</parameter>\n')
@@ -284,7 +284,7 @@ def prepare_optimizee(optimizee, path):
     :param path: The path to store the optimizee.
     """
     # Serialize optimizee object so each process can run simulate on it independently on the CNs
-    fname = os.path.join(path, "/optimizee.bin")
+    fname = os.path.join(path, "optimizee.bin")
     f = open(fname, "wb")
     pickle.dump(optimizee, f)
     f.close()

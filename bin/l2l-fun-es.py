@@ -3,13 +3,15 @@ import logging.config
 import numpy as np
 from l2l.utils.environment import Environment
 
-from l2l import dict_to_list, utils as jube
+from l2l import dict_to_list
+import l2l.utils.JUBE_runner as jube
 from l2l.logging_tools import create_shared_logger_data, configure_loggers
 from l2l.optimizees.functions import tools as function_tools
 from l2l.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from l2l.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from l2l.optimizers.evolutionstrategies import EvolutionStrategiesParameters, EvolutionStrategiesOptimizer
 from l2l.paths import Paths
+import os
 
 logger = logging.getLogger('bin.l2l-fun-es')
 
@@ -83,12 +85,16 @@ def run_experiment():
     # MPI Processes per job
     traj.f_add_parameter_to_group("JUBE_params", "tasks_per_job", "1")
     # The execution command
-    traj.f_add_parameter_to_group("JUBE_params", "exec", "mpirun python3 " + root_dir_path +
-                                  "/run_files/run_optimizee.py")
+    traj.f_add_parameter_to_group("JUBE_params", "exec", "python " +
+                                  os.path.join(paths.root_dir_path, "run_files/run_optimizee.py"))
     # Ready file for a generation
-    traj.f_add_parameter_to_group("JUBE_params", "ready_file", root_dir_path + "/readyfiles/ready_w_")
+    traj.f_add_parameter_to_group("JUBE_params", "ready_file",
+                                  os.path.join(paths.root_dir_path, "ready_files/ready_w_"))
     # Path where the job will be executed
-    traj.f_add_parameter_to_group("JUBE_params", "work_path", root_dir_path)
+    traj.f_add_parameter_to_group("JUBE_params", "work_path", paths.root_dir_path)
+
+    ### Maybe we should pass the Paths object to avoid defining paths here and there
+    traj.f_add_parameter_to_group("JUBE_params", "paths_obj", paths)
 
     ## Benchmark function
     function_id = 14
