@@ -1,7 +1,6 @@
 from setuptools import setup
 from setuptools import find_packages
 import re
-
 from l2l.version import FULL_VERSION
 
 """
@@ -24,6 +23,7 @@ def get_requirements(filename):
             assert match_obj, "Cannot make sense of url {}".format(req)
             requirements[i] = "{req}=={ver}".format(req=match_obj.group(1), ver=match_obj.group(2))
             dependency_links.append(req)
+
     return requirements, dependency_links
 
 
@@ -36,7 +36,9 @@ setup(
     author_email="anand@igi.tugraz.at, arjun@igi.tugraz.at",
     description="This module provides the infrastructure create optimizers and "
                 "optimizees in order to implement learning-to-learn",
+    setup_requires=['Cython', 'numpy'],
     install_requires=requirements,
     provides=['l2l'],
     dependency_links=dependency_links,
 )
+

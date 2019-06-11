@@ -141,7 +141,7 @@ class Trajectory:
         return self.__getattr__(key)
 
     def __getstate__(self):
-        print(self.__dict__)
+        # print(self.__dict__)
         return self.__dict__
 
     def __setstate__(self, d):

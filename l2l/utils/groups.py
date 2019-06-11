@@ -1,4 +1,4 @@
-from sdict.sdict import sdictm
+from l2l import sdictm
 import logging
 
 logging = logging.getLogger("util.groups")
