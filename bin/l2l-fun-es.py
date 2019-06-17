@@ -110,7 +110,7 @@ def run_experiment():
     optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
 
     # Prepare optimizee for jube runs
-    jube.prepare_optimizee(optimizee, root_dir_path)
+    jube.prepare_optimizee(optimizee, paths.root_dir_path)
 
     ## Outerloop optimizer initialization
     optimizer_seed = 1234

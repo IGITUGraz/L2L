@@ -254,9 +254,9 @@ class JUBERunner():
         :return true if all files are present, false otherwise
         """
         trajpath = os.path.join(self.work_paths["trajectories"],
-                                'trajectory_" + str(idx) + "_" + str(iteration) + ".bin"')
+                                'trajectory_" + str(idx) + "_" + str(iteration) + ".bin')
         respath = os.path.join(self.work_paths['results'],
-                               'results_" + str(idx) + "_" + str(iteration) + ".bin"')
+                               'results_" + str(idx) + "_" + str(iteration) + ".bin')
         f = open(os.path.join(self.work_paths["run_files"], "run_optimizee.py"), "w")
         f.write('import pickle\n' +
                 'import sys\n' +
