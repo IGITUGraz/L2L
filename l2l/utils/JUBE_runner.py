@@ -272,7 +272,7 @@ class JUBERunner():
                 'handle_res = open("' + respath + '", "wb")\n' +
                 'pickle.dump(res, handle_res, pickle.HIGHEST_PROTOCOL)\n' +
                 'handle_res.close()\n\n' +
-                'handle_res = open("' + path_ready + ' + str(idx)", "wb")\n' +
+                'handle_res = open("' + path_ready + '" + str(idx), "wb")\n' +
                 'handle_res.close()')
         f.close()
 
