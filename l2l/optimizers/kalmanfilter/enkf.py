@@ -3,8 +3,16 @@ import abc
 
 from .kalman_utils import _get_shapes, _encode_targets, _get_batches
 from abc import ABCMeta
-from numba import jit
 
+try:
+    from numba import jit
+except ModuleNotFoundError:
+    def jit(**kwargs):
+        def decorator(f):
+            def wrapper(*args, **kwargs):
+                return f(*args, **kwargs)
+            return wrapper
+        return decorator
 
 class KalmanFilter(metaclass=ABCMeta):
 
