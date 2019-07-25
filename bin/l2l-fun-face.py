@@ -11,6 +11,7 @@ from l2l.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from l2l.optimizers.crossentropy.distribution import Gaussian
 from l2l.optimizers.face.optimizer import FACEOptimizer, FACEParameters
 from l2l.paths import Paths
+from l2l.utils import JUBE_runner as jube
 
 from l2l.logging_tools import create_shared_logger_data, configure_loggers
 
@@ -55,6 +56,13 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
+    # Set JUBE params
+    traj.f_add_parameter_group("JUBE_params", "Contains JUBE parameters")
+    traj.f_add_parameter_to_group("JUBE_params", "exec", "python3 " +
+                                  os.path.join(paths.simulation_path, "run_files/run_optimizee.py"))
+    # Paths
+    traj.f_add_parameter_to_group("JUBE_params", "paths", paths)
+
     ## Benchmark function
     function_id = 4
     bench_functs = BenchmarkedFunctions()
@@ -67,6 +75,9 @@ def main():
 
     ## Innerloop simulator
     optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
+
+    # Prepare optimizee for jube runs
+    jube.prepare_optimizee(optimizee, paths.simulation_path)
 
     ## Outerloop optimizer initialization
     parameters = FACEParameters(min_pop_size=20, max_pop_size=50, n_elite=10, smoothing=0.2, temp_decay=0,

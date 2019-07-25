@@ -1,4 +1,5 @@
 import logging.config
+import os
 from datetime import datetime
 
 import numpy as np
@@ -9,6 +10,7 @@ from l2l.logging_tools import create_shared_logger_data, configure_loggers
 from l2l.optimizees.mnist.optimizee import MNISTOptimizeeParameters, MNISTOptimizee
 from l2l.optimizers.evolutionstrategies import EvolutionStrategiesParameters, EvolutionStrategiesOptimizer
 from l2l.paths import Paths
+from l2l.utils import JUBE_runner as jube
 
 logger = logging.getLogger('bin.l2l-mnist-es')
 
@@ -51,11 +53,21 @@ def run_experiment():
     # Get the trajectory from the environment
     traj = env.trajectory
 
+    # Set JUBE params
+    traj.f_add_parameter_group("JUBE_params", "Contains JUBE parameters")
+    # Execution command
+    traj.f_add_parameter_to_group("JUBE_params", "exec", "python3 " +
+                                  os.path.join(paths.simulation_path, "run_files/run_optimizee.py"))
+    # Paths
+    traj.f_add_parameter_to_group("JUBE_params", "paths", paths)
+
     optimizee_seed = 200
 
     optimizee_parameters = MNISTOptimizeeParameters(n_hidden=10, seed=optimizee_seed, use_small_mnist=True)
     ## Innerloop simulator
     optimizee = MNISTOptimizee(traj, optimizee_parameters)
+    # Prepare optimizee for jube runs
+    jube.prepare_optimizee(optimizee, paths.simulation_path)
 
     logger.info("Optimizee parameters: %s", optimizee_parameters)
 
