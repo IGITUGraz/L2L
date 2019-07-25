@@ -96,9 +96,6 @@ class EnsembleKalmanFilter(KalmanFilter):
         self.observations = _encode_targets(observations, self.gamma_s)
 
         for i in range(self.maxit):
-            if (i % 100) == 0:
-                print('Iteration {}/{}'.format(i, self.maxit))
-
             # now get mini_batches
             if self.n_batches > self.dims:
                 num_batches = 1
