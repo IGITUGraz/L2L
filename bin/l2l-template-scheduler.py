@@ -70,6 +70,35 @@ def main():
     # Paths
     traj.f_add_parameter_to_group("JUBE_params", "paths", paths)
 
+    # Scheduler parameters
+    # Name of the scheduler
+    traj.f_add_parameter_to_group("JUBE_params", "scheduler", "Slurm")
+    # Command to submit jobs to the schedulers
+    traj.f_add_parameter_to_group("JUBE_params", "submit_cmd", "sbatch")
+    # Template file for the particular scheduler
+    traj.f_add_parameter_to_group("JUBE_params", "job_file", "job.run")
+    # Number of nodes to request for each run
+    traj.f_add_parameter_to_group("JUBE_params", "nodes", "1")
+    # Requested time for the compute resources
+    traj.f_add_parameter_to_group("JUBE_params", "walltime", "00:01:00")
+    # Threads per process
+    traj.f_add_parameter_to_group("JUBE_params", "threads_pp", "1")
+    # Type of emails to be sent from the scheduler
+    traj.f_add_parameter_to_group("JUBE_params", "mail_mode", "ALL")
+    # Email to notify events from the scheduler
+    traj.f_add_parameter_to_group("JUBE_params", "mail_address", "me@myemail.com")
+    # Error file for the job
+    traj.f_add_parameter_to_group("JUBE_params", "err_file", "stderr")
+    # Output file for the job
+    traj.f_add_parameter_to_group("JUBE_params", "out_file", "stdout")
+    # JUBE parameters for multiprocessing.
+    # MPI Processes per job
+    traj.f_add_parameter_to_group("JUBE_params", "tasks_per_job", "1")
+    # MPI Processes per node
+    traj.f_add_parameter_to_group("JUBE_params", "ppn", "1")
+    # CPU cores per MPI process
+    traj.f_add_parameter_to_group("JUBE_params", "cpu_pp", "1")
+
     ## Innerloop simulator
     # TODO when using the template: Change the optimizee to the appropriate Optimizee class
     optimizee = Optimizee(traj)

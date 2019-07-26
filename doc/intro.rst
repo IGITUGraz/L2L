@@ -299,13 +299,15 @@ The L2L framework works with JUBE in order to deploy the execution of the differ
 the available computational resources. This requires that the trajectory contains a parameter group called JUBE_params
 which contains details for the right execution of the program.
 
-In order to launch simulations on a laptop or a local cluster without a scheduler, only the mandatory parameters must
-be specified. These parameters are part of the template.
+**Mandatory** steps to define the execution of the optimizees:
 1. Add a parameter group to the :obj: traj called JUBE_params using its :meth: f_add_parameter_group.
 2. Setup the execution command :attr: exec by using the trajectory :meth: f_add_parameter_to_group.
 3. Setup the ready and working paths :attr: exec by using the trajectory :meth: f_add_parameter_to_group.
 
-To launch the simulations on a cluster with a scheduler, the following parameters must be defined. They currently match
+In order to launch simulations on a laptop or a local cluster without a scheduler, only the mandatory parameters must
+be specified. These parameters are part of the template.
+
+To launch the simulations on a cluster with a scheduler, the following optional parameters must be defined. They currently match
 slurm but this can also be adjusted to other schedulers.
 1. Name of the scheduler, :atr: "scheduler", e.g. "Slurm"
 2. Command to submit jobs to the schedulers, :atr: "submit_cmd", e.g. "sbatch"
