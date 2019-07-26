@@ -13,7 +13,8 @@ logger = logging.getLogger("optimizers.kalmanfilter")
 EnsembleKalmanFilterParameters = namedtuple(
     'EnsembleKalmanFilter', ['noise', 'gamma', 'maxit', 'n_iteration',
                              'pop_size', 'n_batches', 'online', 'epsilon',
-                             'decay_rate', 'seed', 'data', 'observations']
+                             'decay_rate', 'seed', 'data', 'observations',
+                             'sampling_generation']
 )
 
 EnsembleKalmanFilterParameters.__doc__ = """
@@ -25,6 +26,9 @@ EnsembleKalmanFilterParameters.__doc__ = """
 :param n_batches: int, Number of mini-batches to use in the Kalman Filter
 :param online: bool, Indicates if only one data point will used, 
                Default: False
+:param sampling_generation: After `sampling_gerneration` steps a gaussian sampling 
+        on the parameters of the best individual is done, ranked by the fitness
+        value 
 :param epsilon: float, A value which is used when sampling from the best individual. 
                 The value is multiplied to the covariance matrix as follows:
                 :math:`\\epsilon * I` where I is the identity matrix with the 
@@ -41,7 +45,7 @@ EnsembleKalmanFilterParameters.__doc__ = """
              Uses a random generator seeded with this seed.
 :param data: nd numpy array, numpy array containing data in format 
              (batch_size, data)
-:param observations: nd numpy array, observation or targets, should be e.g. 
+:param observations: nd numpy array, observation or targets, should be an
                      array of integers
 """
 
@@ -79,6 +83,7 @@ class EnsembleKalmanFilter(Optimizer):
         traj.f_add_parameter('shuffle', parameters.shuffle)
         traj.f_add_parameter('n_batches', parameters.n_batches)
         traj.f_add_parameter('online', parameters.online)
+        traj.f_add_parameter('sampling_generation', parameters.sampling_generation)
         traj.f_add_parameter('epsilon', parameters.epsilon)
         traj.f_add_parameter('decay_rate', parameters.decay_rate)
         traj.f_add_parameter('seed', np.uint32(parameters.seed),
@@ -180,7 +185,7 @@ class EnsembleKalmanFilter(Optimizer):
         traj.results.generation_params.f_add_result(
             generation_name + '.algorithm_params', generation_result_dict)
 
-        if traj.generation > 1 and traj.generation % 1000 == 0:
+        if traj.generation > 1 and traj.generation % traj.sampling_generation == 0:
             params, self.best_fitness, self.best_individual = self._new_individuals(
                 traj, ens_fitnesses, individuals)
             self.eval_pop = [dict(ens=params[i],

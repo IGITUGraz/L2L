@@ -7,6 +7,7 @@ from abc import ABCMeta
 try:
     from numba import jit
 except ModuleNotFoundError:
+    # create a mock decorator if `numba` is not found
     def jit(**kwargs):
         def decorator(f):
             def wrapper(*args, **kwargs):
@@ -14,11 +15,20 @@ except ModuleNotFoundError:
             return wrapper
         return decorator
 
+
 class KalmanFilter(metaclass=ABCMeta):
+    """
+    Abstract Kalman Filter class
+
+    """
 
     @abc.abstractmethod
     def fit(self, ensemble, ensemble_size,
             observations, model_output, gamma, noise, p):
+        """
+        Abstract fit function for the Ensemble Kalman Filter with parameters
+        used in the Ensemble Kalman Filter formulation
+        """
         pass
 
 
