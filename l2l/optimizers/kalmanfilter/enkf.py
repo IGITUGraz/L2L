@@ -47,8 +47,6 @@ class EnsembleKalmanFilter(KalmanFilter):
             between [0, dims], otherwise do mini-batch. `dims` is the number of
             observations. Default is False
         """
-        self.Cpp = None
-        self.Cup = None
         self.ensemble = None
         self.observations = None
 
@@ -86,8 +84,8 @@ class EnsembleKalmanFilter(KalmanFilter):
             observed data, Default is `None`
         :return self, Possible outputs are:
             ensembles: nd numpy array, optimized `ensembles`
-            Cpp: nd numpy array, covariance matrix of the model output
-            Cup: nd numpy array, covariance matrix of the model output and the
+            c_pp: nd numpy array, covariance matrix of the model output
+            c_up: nd numpy array, covariance matrix of the model output and the
                 ensembles
         """
         model_output = model_output.copy()
@@ -102,7 +100,6 @@ class EnsembleKalmanFilter(KalmanFilter):
 
         # copy the data so we do not overwrite the original arguments
         self.ensemble = ensemble.copy()
-        self.observations = observations.copy()
         self.observations = _encode_targets(observations, self.gamma_s)
 
         for i in range(self.maxit):
@@ -124,24 +121,24 @@ class EnsembleKalmanFilter(KalmanFilter):
                     # now get only the individuals output according to idx
                     g_tmp = model_output[:, :, d]
                     # Calculate the covariances
-                    Cpp = _cov_mat(g_tmp, g_tmp, ensemble_size)
-                    Cup = _cov_mat(self.ensemble, g_tmp, ensemble_size)
+                    c_pp = _cov_mat(g_tmp, g_tmp, ensemble_size)
+                    c_up = _cov_mat(self.ensemble, g_tmp, ensemble_size)
                     self.ensemble = _update_step(self.ensemble,
                                                  self.observations[d],
                                                  g_tmp, self.gamma,
-                                                 Cpp, Cup)
+                                                 c_pp, c_up)
         return self
 
 
 @jit(nopython=True, parallel=True)
-def _update_step(ensemble, observations, g, gamma, Cpp, Cup):
+def _update_step(ensemble, observations, g, gamma, cpp, cup):
     """
     Update step of the kalman filter
 
     Calculates the covariances and returns new ensembles
     """
     return ensemble + (
-                Cup @ np.linalg.lstsq(Cpp + gamma, (observations - g).T)[0]).T
+                cup @ np.linalg.lstsq(cpp + gamma, (observations - g).T)[0]).T
 
 
 @jit(parallel=True)

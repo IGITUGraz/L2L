@@ -2,9 +2,7 @@ import logging
 import numpy as np
 
 from collections import namedtuple
-from l2l import get_grouped_dict
-from l2l.utils.tools import cartesian_product
-from .enkf import EnsembleKalmanFilter as EnKF
+from enkf import EnsembleKalmanFilter as EnKF
 from l2l import dict_to_list
 from l2l.optimizers.optimizer import Optimizer
 
@@ -129,23 +127,6 @@ class EnsembleKalmanFilter(Optimizer):
         self._expand_trajectory(traj)
 
     def post_process(self, traj, fitnesses_results):
-        """
-        This is the key function of this class. Given a set of :obj:`fitnesses_results`,
-        and the :obj:`traj`, it uses the fitness to decide on the next set of
-        parameters to be evaluated. Then it fills the :attr:`.Optimizer.eval_pop`
-        with the list of parameters it wants evaluated at the next simulation
-        cycle, increments :attr:`.Optimizer.g` and calls :meth:`._expand_trajectory`
-
-        :param  ~l2l.utils.trajectory.Trajectory traj: The trajectory that contains the parameters and the
-            individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.
-            param1 is accessible using `traj.param1`
-
-        :param list fitnesses_results: This is a list of fitness results that contain tuples run index and the fitness.
-            It is of the form `[(run_idx, run), ...]`
-
-        """
-
-        # old_eval_pop = self.eval_pop.copy()
         self.eval_pop.clear()
 
         individuals = traj.individuals[traj.generation]
@@ -236,32 +217,3 @@ class EnsembleKalmanFilter(Optimizer):
             "The last individual {} was with fitness {}".format(
                 self.best_individual, self.best_fitness))
         logger.info("-- End of (successful) EnKF optimization --")
-
-    def _expand_trajectory(self, traj):
-        """
-        Add as many explored runs as individuals that need to be evaluated. Furthermore, add the individuals as explored
-        parameters.
-
-        :param  ~l2l.utils.trajectory.Trajectory traj: The  trajectory that contains the parameters and the
-            individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.
-            param1 is accessible using `traj.param1`
-
-        :return:
-        """
-
-        grouped_params_dict = get_grouped_dict(self.eval_pop)
-        grouped_params_dict = {'individual.' + key: val for key, val in
-                               grouped_params_dict.items()}
-
-        final_params_dict = {'generation': [traj.generation],
-                             'ind_idx': range(len(self.eval_pop))}
-        final_params_dict.update(grouped_params_dict)
-
-        # We need to convert them to lists or write our own custom IndividualParameter ;-)
-        # Note the second argument to `cartesian_product`: This is for only having the cartesian product
-        # between ``generation x (ind_idx AND individual)``, so that every individual has just one
-        # unique index within a generation.
-        traj.f_expand(cartesian_product(final_params_dict,
-                                        [('ind_idx',) + tuple(
-                                            grouped_params_dict.keys()),
-                                         'generation']))
