@@ -2,17 +2,17 @@ import logging
 import numpy as np
 
 from collections import namedtuple
-from enkf import EnsembleKalmanFilter as EnKF
+from l2l.optimizers.kalmanfilter.enkf import EnsembleKalmanFilter as EnKF
 from l2l import dict_to_list
 from l2l.optimizers.optimizer import Optimizer
+from l2l.optimizers.crossentropy.distribution import Gaussian
 
 logger = logging.getLogger("optimizers.kalmanfilter")
 
 EnsembleKalmanFilterParameters = namedtuple(
     'EnsembleKalmanFilter', ['noise', 'gamma', 'maxit', 'n_iteration',
-                             'pop_size', 'n_batches', 'online', 'epsilon',
-                             'decay_rate', 'seed', 'data', 'observations',
-                             'sampling_generation']
+                             'pop_size', 'n_batches', 'online', 'seed',
+                             'data', 'observations', 'sampling_generation']
 )
 
 EnsembleKalmanFilterParameters.__doc__ = """
@@ -27,18 +27,6 @@ EnsembleKalmanFilterParameters.__doc__ = """
 :param sampling_generation: After `sampling_gerneration` steps a gaussian sampling 
         on the parameters of the best individual is done, ranked by the fitness
         value 
-:param epsilon: float, A value which is used when sampling from the best individual. 
-                The value is multiplied to the covariance matrix as follows:
-                :math:`\\epsilon * I` where I is the identity matrix with the 
-                same size as the covariance matrix. The value is 
-                exponentially decaying and should be in [0,1] and used in 
-                combination with `decay_rate`. 
-:param decay_rate: float, Decay rate for the sampling. 
-                For the exponential decay as follows:
-                .. math::
-                    \\epsilon = \\epsilon_0 e^{-decay_rate * epoch}
-
-                Where :math:`\\epsilon` is the value from `epsilon`. The
 :param seed: The random seed used to sample and fit the distribution. 
              Uses a random generator seeded with this seed.
 :param data: nd numpy array, numpy array containing data in format 
@@ -56,7 +44,6 @@ class EnsembleKalmanFilter(Optimizer):
     def __init__(self, traj,
                  optimizee_create_individual,
                  optimizee_fitness_weights,
-                 optimizee_create_new_individuals,
                  parameters,
                  optimizee_bounding_func=None):
         super().__init__(traj,
@@ -68,7 +55,6 @@ class EnsembleKalmanFilter(Optimizer):
         self.optimizee_bounding_func = optimizee_bounding_func
         self.optimizee_create_individual = optimizee_create_individual
         self.optimizee_fitness_weights = optimizee_fitness_weights
-        self.optimizee_create_new_individuals = optimizee_create_new_individuals
         self.parameters = parameters
 
         traj.f_add_parameter('gamma', parameters.gamma, comment='Noise level')
@@ -82,8 +68,6 @@ class EnsembleKalmanFilter(Optimizer):
         traj.f_add_parameter('n_batches', parameters.n_batches)
         traj.f_add_parameter('online', parameters.online)
         traj.f_add_parameter('sampling_generation', parameters.sampling_generation)
-        traj.f_add_parameter('epsilon', parameters.epsilon)
-        traj.f_add_parameter('decay_rate', parameters.decay_rate)
         traj.f_add_parameter('seed', np.uint32(parameters.seed),
                              comment='Seed used for random number generation '
                                      'in optimizer')
@@ -98,12 +82,6 @@ class EnsembleKalmanFilter(Optimizer):
 
         # Set the random state seed for distribution
         self.random_state = np.random.RandomState(traj.parameters.seed)
-
-        # for the sampling procedure
-        # `epsilon` value given by the user
-        self.epsilon = parameters.epsilon
-        # decay rate
-        self.decay_rate = parameters.decay_rate
 
         #: The population (i.e. list of individuals) to be evaluated at the
         # next iteration
@@ -168,7 +146,7 @@ class EnsembleKalmanFilter(Optimizer):
 
         if traj.generation > 1 and traj.generation % traj.sampling_generation == 0:
             params, self.best_fitness, self.best_individual = self._new_individuals(
-                traj, ens_fitnesses, individuals)
+                traj, ens_fitnesses, individuals, ensemble_size)
             self.eval_pop = [dict(ens=params[i],
                                   inputs=self.inputs,
                                   targets=self.targets)
@@ -182,7 +160,16 @@ class EnsembleKalmanFilter(Optimizer):
         traj.generation += 1
         self._expand_trajectory(traj)
 
-    def _new_individuals(self, traj, fitnesses, individuals):
+    @staticmethod
+    def _create_individual_distribution(random_state, weights,
+                                        ensemble_size):
+        dist = Gaussian()
+        dist.init_random_state(random_state)
+        dist.fit(weights)
+        new_individuals = dist.sample(ensemble_size)
+        return new_individuals
+
+    def _new_individuals(self, traj, fitnesses, individuals, ensemble_size):
         """
         Sample new individuals by first ranking and then sampling from a
         gaussian distribution. The
@@ -191,14 +178,12 @@ class EnsembleKalmanFilter(Optimizer):
         best_fitness = fitnesses[ranking_idx][0]
         best_ranking_idx = ranking_idx[0]
         best_individual = individuals[best_ranking_idx]
-        # do the decay
-        eps = self.epsilon * np.exp(-self.decay_rate * traj.generation)
         # now do the sampling
         params = [
-            self.optimizee_create_new_individuals(self.random_state,
-                                                  individuals[
-                                                      best_ranking_idx].params,
-                                                  eps)
+            self._create_individual_distribution(self.random_state,
+                                                 individuals[
+                                                     best_ranking_idx].params,
+                                                 ensemble_size)
             for _ in range(traj.pop_size)]
         return params, best_fitness, best_individual
 
