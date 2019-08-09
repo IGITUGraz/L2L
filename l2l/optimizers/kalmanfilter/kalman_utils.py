@@ -1,6 +1,6 @@
 import numpy as np
-from numpy.linalg import norm, inv
-from numpy import sqrt
+from enum import Enum
+from numpy.linalg import norm
 
 
 def _get_mean(x):
@@ -28,31 +28,39 @@ def _get_shapes(observations, model_output):
     return gamma_shape, dimensions
 
 
-def _calculate_cost(y, y_hat, loss_function='BCE'):
+class LossFunctions(Enum):
+    CE = 'CE'
+    MAE = 'MAE'
+    MSE = 'MSE'
+    NORM = 'NORM'
+
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_
+
+
+def _calculate_cost(y, y_hat, loss_function):
     """
     Loss functions
     :param y: target
-    :param y_hat: calculated output (here G(u) or feed-forword output a)
-    :param loss_function: name of the loss function
+    :param y_hat: calculated output (here G(u) or feed-forward output a)
+    :param loss_function: Enum, name of the loss function
            `MAE` is the Mean Absolute Error or l1 - loss
            `MSE` is the Mean Squared Error or l2 - loss
            `CE` cross-entropy loss, requires `y_hat` to be in [0, 1]
-           `norm` norm-2 or Forbenius norm of `y - y_hat`
+           `NORM` norm-2 or Frobenius norm of `y - y_hat`
     :return: cost calculated according to `loss_function`
     """
-    if loss_function == 'CE':
+    if loss_function == LossFunctions.CE:
         term1 = -y * np.log(y_hat)
         term2 = (1 - y) * np.log(1 - y_hat)
         return np.sum(term1 - term2)
-    elif loss_function == 'MAE':
+    elif loss_function == LossFunctions.MAE:
         return np.sum(np.absolute(y_hat - y)) / len(y)
-    elif loss_function == 'MSE':
+    elif loss_function == LossFunctions.MSE:
         return np.sum((y_hat - y) ** 2) / len(y)
-    elif loss_function == 'norm':
+    elif loss_function == LossFunctions.NORM:
         return norm(y - y_hat)
-    else:
-        raise KeyError(
-            'Loss Function \'{}\' not understood.'.format(loss_function))
 
 
 def _l1_regularization(weights, lambda_=0.1):

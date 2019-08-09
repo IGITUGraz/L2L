@@ -1,8 +1,6 @@
 import numpy as np
-import abc
-
-from .kalman_utils import _get_shapes, _encode_targets, _get_batches
-from abc import ABCMeta
+from l2l.optimizers.kalmanfilter.kalman_utils import _get_shapes, \
+    _encode_targets, _get_batches
 
 try:
     from numba import jit
@@ -16,29 +14,14 @@ except ModuleNotFoundError:
         return decorator
 
 
-class KalmanFilter(metaclass=ABCMeta):
-    """
-    Abstract Kalman Filter class
-
-    """
-
-    @abc.abstractmethod
-    def fit(self, ensemble, ensemble_size,
-            observations, model_output, gamma, noise, p):
-        """
-        Abstract fit function for the Ensemble Kalman Filter with parameters
-        used in the Ensemble Kalman Filter formulation
-        """
-        pass
-
-
-class EnsembleKalmanFilter(KalmanFilter):
+class EnsembleKalmanFilter:
     def __init__(self, maxit=1, n_batches=1, online=False):
         """
         Ensemble Kalman Filter (EnKF)
 
         EnKF following the formulation found in Iglesias et al. (2013),
         The Ensemble Kalman Filter for Inverse Problems.
+        doi:10.1088/0266-5611/29/4/045001
 
         :param maxit: int, maximum number of iterations
         :param n_batches, int,  number of batches to used in mini-batch. If set
