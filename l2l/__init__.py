@@ -57,6 +57,9 @@ class sdictm(object):
             raise RuntimeError("should be initialized with a dictionary only")
         assert isinstance(self._data, dict)
 
+    def __repr__(self):
+        return self._data.__repr__()
+
     def __getattr__(self, attr):
         if attr == '__getstate__':
             raise AttributeError()
@@ -81,6 +84,9 @@ class sdictm(object):
             object.__setattr__(self, attr, value)
         else:
             self._data[attr] = value
+
+    def __iter__(self):
+        return iter(self._data)
 
     def get(self, key, default_value):
         value = self[key]
