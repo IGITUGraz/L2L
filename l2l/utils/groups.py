@@ -26,6 +26,9 @@ class ParameterGroup:
     def __str__(self):
         return str(self.params)
 
+    def __repr__(self):
+        return self.params.__repr__()
+
     def __getstate__(self):
         return self.__dict__
 
@@ -40,6 +43,7 @@ class ResultGroup(sdictm):
     """
 
     def __init__(self):
+        super(ResultGroup, self).__init__({})
         self._data = {}
 
     def f_add_result_group(self, name, comment=""):
