@@ -25,7 +25,7 @@ class JUBERunner():
         self.trajectory = trajectory
         self.done = False
         if 'JUBE_params' not in self.trajectory.par.keys():
-            print("exception")
+            raise Exception("JUBE parameters not found in trajectory")
         else:
             args = self.trajectory.par["JUBE_params"].params
 
@@ -202,7 +202,7 @@ class JUBERunner():
         args.append(self.filename)
         self.done = False
         ready_files = []
-        path_ready = os.path.join(self.work_paths["ready_files"], "ready_")
+        path_ready = os.path.join(self.work_paths["ready_files"], "ready_%d_"%generation)
         self.prepare_run_file(path_ready)
 
         # Dump all trajectories for each optimizee run in the generation
