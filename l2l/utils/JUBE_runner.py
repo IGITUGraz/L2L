@@ -200,7 +200,7 @@ class JUBERunner():
         args.append(self.filename)
         self.done = False
         ready_files = []
-        path_ready = os.path.join(self.work_paths["ready_files"], "ready_")
+        path_ready = os.path.join(self.work_paths["ready_files"], "ready_%d_"%generation)
         self.prepare_run_file(path_ready)
 
         # Dump all trajectories for each optimizee run in the generation
