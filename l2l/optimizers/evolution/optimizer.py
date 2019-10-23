@@ -181,14 +181,20 @@ class GeneticAlgorithmOptimizer(Optimizer):
             # The population is entirely replaced by the offspring
             self.pop[:] = offspring
 
-            self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness.valid]
-            self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec)
+            self.eval_pop_inds[:] = [ind for ind in self.pop if not ind.fitness.valid]
+            self.eval_pop[:] = [list_to_dict(ind, self.optimizee_individual_dict_spec)
                              for ind in self.eval_pop_inds]
 
             self.g += 1  # Update generation counter
-            self._expand_trajectory(traj)
+            if len(self.eval_pop) == 0 and self.g < (NGEN - 1):
+                raise Exception("No more mutants to evaluate where generated. "
+                                "Increasing population size may help.")
+            elif len(self.eval_pop) == 0 and self.g >= (NGEN - 1):
+                return
+            else:
+                self._expand_trajectory(traj)
 
-    def end(self):
+    def end(self, traj):
         """
         See :meth:`~l2l.optimizers.optimizer.Optimizer.end`
         """
