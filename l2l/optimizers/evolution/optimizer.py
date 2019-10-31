@@ -2,6 +2,7 @@ import logging
 import random
 
 from collections import namedtuple
+import numpy as np
 
 from deap import base, creator, tools
 from deap.tools import HallOfFame
@@ -143,7 +144,9 @@ class GeneticAlgorithmOptimizer(Optimizer):
         for best_ind in best_inds:
             print("Best individual is %s, %s" % (list_to_dict(best_ind, self.optimizee_individual_dict_spec),
                                                  best_ind.fitness.values))
+        best_inds = list(map(self.toolbox.clone, best_inds))
 
+        # add the bestest individuals this generation to HoF
         self.hall_of_fame.update(self.eval_pop_inds)
 
         logger.info("-- Hall of fame --")
@@ -165,21 +168,36 @@ class GeneticAlgorithmOptimizer(Optimizer):
                     del child1.fitness.values
                     del child2.fitness.values
 
-            for mutant in offspring:
+            for mutant in offspring[:]:
                 if random.random() < MUTPB:
                     self.toolbox.mutate(mutant)
                     del mutant.fitness.values
 
             if len(set(map(tuple, offspring))) < len(offspring):
                 logger.info("Mutating more")
-                for i, o1 in enumerate(offspring):
-                    for o2 in offspring[i:]:
+                for i, o1 in enumerate(offspring[:-1]):
+                    for o2 in offspring[i+1:]:
                         if tuple(o1) == tuple(o2):
                             if random.random() < 0.8:
                                 self.toolbox.mutate(o2)
 
             # The population is entirely replaced by the offspring
             self.pop[:] = offspring
+
+            # keep the best of the best
+            # _valid_ids = [i for i, ind in enumerate(self.pop) if ind.fitness.valid]
+            # if len(_valid_ids):
+            #     _valid_fitness = [np.dot(self.pop[i].fitness.values, self.pop[i].fitness.weights) \
+            #                                                                  for i in _valid_ids]
+            #     sorted_fit = np.argsort(_valid_fitness)
+            #     if sorted_fit.size == 1:
+            #         self.pop[_valid_ids[0]] = best_inds[0]
+            #     else:
+            #         max_len = min(2, sorted_fit.size)
+            #         for i, id_idx in enumerate(sorted_fit[::-1][:max_len]):
+            #             pop_idx = _valid_ids[id_idx]
+            #             self.pop[pop_idx] = best_inds[i]
+
 
             self.eval_pop_inds[:] = [ind for ind in self.pop if not ind.fitness.valid]
             self.eval_pop[:] = [list_to_dict(ind, self.optimizee_individual_dict_spec)
@@ -189,10 +207,8 @@ class GeneticAlgorithmOptimizer(Optimizer):
             if len(self.eval_pop) == 0 and self.g < (NGEN - 1):
                 raise Exception("No more mutants to evaluate where generated. "
                                 "Increasing population size may help.")
-            elif len(self.eval_pop) == 0 and self.g >= (NGEN - 1):
-                return
-            else:
-                self._expand_trajectory(traj)
+
+            self._expand_trajectory(traj)
 
     def end(self, traj):
         """
