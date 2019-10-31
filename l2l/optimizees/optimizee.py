@@ -24,7 +24,7 @@ class Optimizee:
         :return dict: A dictionary containing the names of the parameters and their values
         """
 
-    def simulate(self, traj):
+    def simulate(self, traj, queue=None):
         """
         This is the primary function that does the simulation for the given parameter given (within :obj:`traj`)
 
