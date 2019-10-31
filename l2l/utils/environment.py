@@ -61,8 +61,17 @@ class Environment:
                     for ind in self.trajectory.individuals[it]:
                         self.trajectory.individual = ind
 
+                        # trying to avoid huge memory consumption after many individuals
+                        from multiprocessing import Process, Queue
 
-                        result[it].append((ind.ind_idx, runfunc(self.trajectory)))
+
+                        queue = Queue()
+                        p = Process(target=runfunc, args=(self.trajectory, queue))
+                        p.start()
+                        p.join()  # this blocks until the process terminates
+                        fitness = queue.get()
+
+                        result[it].append((ind.ind_idx, fitness))
                         self.run_id = self.run_id + 1
 
                         import gc
