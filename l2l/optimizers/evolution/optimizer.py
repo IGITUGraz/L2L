@@ -170,7 +170,8 @@ class GeneticAlgorithmOptimizer(Optimizer):
                                     for o in offspring])
             best_ids = np.argsort([np.dot(o.fitness.values, o.fitness.weights) \
                                     for o in best_inds])
-            offspring[offsp_ids[0:2]] = best_inds[best_ids[-2:]]
+            for i in range(2):
+                offspring[offsp_ids[i]] = best_inds[best_ids[-2+i:]]
 
             # Apply crossover and mutation on the offspring
             for child1, child2 in zip(offspring[::2], offspring[1::2]):
