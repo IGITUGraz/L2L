@@ -270,7 +270,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
 
         self.current_individual_arr += learning_rate \
                                        * np.sum([f * e for f, e in zip(fitnesses_to_fit, sorted_perturbations)], axis=0) \
-                                       / (len(fitnesses_to_fit) * noise_std ** 2)
+                                       / (len(fitnesses_to_fit) * np.asarray(noise_std) ** 2)
 
         # **************************************************************************************************************
         # Create the next generation by sampling the inferred distribution
@@ -292,7 +292,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
             if self.optimizee_bounding_func is not None:
                 self.eval_pop[:] = [self.optimizee_bounding_func(ind) for ind in self.eval_pop]
 
-            self.eval_pop_arr[:] = np.array([dict_to_list(ind) for ind in self.eval_pop])
+            self.eval_pop_arr[:] = np.asarray([dict_to_list(ind) for ind in self.eval_pop])
 
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)

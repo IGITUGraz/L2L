@@ -144,7 +144,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         for best_ind in best_inds:
             print("Best individual is %s, %s" % (list_to_dict(best_ind, self.optimizee_individual_dict_spec),
                                                  best_ind.fitness.values))
-        best_inds = list(map(self.toolbox.clone, best_inds))
+
 
         # add the bestest individuals this generation to HoF
         self.hall_of_fame.update(self.eval_pop_inds)
@@ -154,12 +154,23 @@ class GeneticAlgorithmOptimizer(Optimizer):
             logger.info("HOF individual is %s, %s" % (list_to_dict(hof_ind, self.optimizee_individual_dict_spec),
                                                       hof_ind.fitness.values))
 
+        bob_inds = tools.selBest(self.hall_of_fame, 2)
+        bob_inds = list(map(self.toolbox.clone, bob_inds))
+
         # ------- Create the next generation by crossover and mutation -------- #
         if self.g < NGEN - 1:  # not necessary for the last generation
             # Select the next generation individuals
+            # Tournament of population - a list of "pointers"
             offspring = self.toolbox.select(self.pop, len(self.pop))
             # Clone the selected individuals
             offspring = list(map(self.toolbox.clone, offspring))
+
+            #switch worst-good with best
+            offsp_ids = np.argsort([np.dot(o.fitness.values, o.fitness.weights) \
+                                    for o in offspring])
+            best_ids = np.argsort([np.dot(o.fitness.values, o.fitness.weights) \
+                                    for o in best_inds])
+            offspring[offsp_ids[0:2]] = best_inds[best_ids[-2:]]
 
             # Apply crossover and mutation on the offspring
             for child1, child2 in zip(offspring[::2], offspring[1::2]):
@@ -183,21 +194,6 @@ class GeneticAlgorithmOptimizer(Optimizer):
 
             # The population is entirely replaced by the offspring
             self.pop[:] = offspring
-
-            # keep the best of the best
-            # _valid_ids = [i for i, ind in enumerate(self.pop) if ind.fitness.valid]
-            # if len(_valid_ids):
-            #     _valid_fitness = [np.dot(self.pop[i].fitness.values, self.pop[i].fitness.weights) \
-            #                                                                  for i in _valid_ids]
-            #     sorted_fit = np.argsort(_valid_fitness)
-            #     if sorted_fit.size == 1:
-            #         self.pop[_valid_ids[0]] = best_inds[0]
-            #     else:
-            #         max_len = min(2, sorted_fit.size)
-            #         for i, id_idx in enumerate(sorted_fit[::-1][:max_len]):
-            #             pop_idx = _valid_ids[id_idx]
-            #             self.pop[pop_idx] = best_inds[i]
-
 
             self.eval_pop_inds[:] = [ind for ind in self.pop if not ind.fitness.valid]
             self.eval_pop[:] = [list_to_dict(ind, self.optimizee_individual_dict_spec)
