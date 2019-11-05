@@ -165,13 +165,14 @@ class GeneticAlgorithmOptimizer(Optimizer):
             # Clone the selected individuals
             offspring = list(map(self.toolbox.clone, offspring))
 
-            #switch worst-good with best
+            #sorts small to big
+            #switch worst-good with best of best
             offsp_ids = np.argsort([np.dot(o.fitness.values, o.fitness.weights) \
                                     for o in offspring])
             best_ids = np.argsort([np.dot(o.fitness.values, o.fitness.weights) \
-                                    for o in best_inds])
+                                    for o in bob_inds])
             for i in range(2):
-                offspring[offsp_ids[i]] = best_inds[best_ids[-2+i:]]
+                offspring[int(offsp_ids[i])] = best_inds[int(best_ids[-2+i])]
 
             # Apply crossover and mutation on the offspring
             for child1, child2 in zip(offspring[::2], offspring[1::2]):
