@@ -52,7 +52,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
                          parameters=parameters, optimizee_bounding_func=optimizee_bounding_func)
         self.optimizee_bounding_func = optimizee_bounding_func
         __, self.optimizee_individual_dict_spec = dict_to_list(optimizee_create_individual(), get_dict_spec=True)
-
+        self.optimizee_create_individual = optimizee_create_individual
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
         traj.f_add_parameter('popsize', parameters.popsize, comment='Population size')  # 185
         traj.f_add_parameter('CXPB', parameters.CXPB, comment='Crossover term')
@@ -187,9 +187,16 @@ class GeneticAlgorithmOptimizer(Optimizer):
                     del child2.fitness.values
 
             for mutant in offspring[:]:
-                f = to_fit(mutant)
-                if random.random() < MUTPB or f <= 0:
-                    self.toolbox.mutate(mutant)
+                if random.random() < MUTPB:
+                    f = to_fit(mutant) if mutant.fitness.valid else None
+                    print("f = {}".format(f))
+                    # if this was an unfit individual, replace with a "foreigner"
+                    if f is not None and f <= 0:
+                        x = self.optimizee_create_individual()
+                        d = list_to_dict(x, self.optimizee_individual_dict_spec)
+                        mutant[:] = dict_to_list(self.optimizee_bounding_func(d))
+                    else:
+                        self.toolbox.mutate(mutant)
                     del mutant.fitness.values
 
             if len(set(map(tuple, offspring))) < len(offspring):
