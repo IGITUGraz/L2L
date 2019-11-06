@@ -181,7 +181,6 @@ class GeneticAlgorithmOptimizer(Optimizer):
             # Apply crossover and mutation on the offspring
             for child1, child2 in zip(offspring[::2], offspring[1::2]):
                 f1, f2 = to_fit(child1), to_fit(child2)
-
                 if random.random() < CXPB and f1 > 0 and f2 > 0:
                     self.toolbox.mate(child1, child2)
                     del child1.fitness.values
@@ -200,6 +199,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
                         if tuple(o1) == tuple(o2):
                             if random.random() < 0.8:
                                 self.toolbox.mutate(o2)
+                                del o2.fitness.values
 
             # The population is entirely replaced by the offspring
             self.pop[:] = offspring
