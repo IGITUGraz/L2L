@@ -172,11 +172,12 @@ class GeneticAlgorithmOptimizer(Optimizer):
 
             if len(set(map(tuple, offspring))) < len(offspring):
                 logger.info("Mutating more")
-                for i, o1 in enumerate(offspring):
-                    for o2 in offspring[i:]:
+                for i, o1 in enumerate(offspring[:-1]):
+                    for o2 in offspring[i + 1:]:
                         if tuple(o1) == tuple(o2):
                             if random.random() < 0.8:
                                 self.toolbox.mutate(o2)
+                                del o2.fitness.values
 
             # The population is entirely replaced by the offspring
             self.pop[:] = offspring
