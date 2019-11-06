@@ -116,6 +116,9 @@ class GeneticAlgorithmOptimizer(Optimizer):
         """
         See :meth:`~l2l.optimizers.optimizer.Optimizer.post_process`
         """
+        def to_fit(ind):
+            return np.dot(ind.fitness.values, ind.fitness.weights)
+
         CXPB, MUTPB, NGEN = traj.CXPB, traj.MUTPB, traj.n_iteration
 
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
@@ -167,22 +170,26 @@ class GeneticAlgorithmOptimizer(Optimizer):
 
             #sorts small to big
             #switch worst-good with best of best
-            offsp_ids = np.argsort([np.dot(o.fitness.values, o.fitness.weights) \
-                                    for o in offspring])
-            best_ids = np.argsort([np.dot(o.fitness.values, o.fitness.weights) \
-                                    for o in bob_inds])
+            offsp_ids = np.argsort([to_fit(o) for o in offspring])
+            best_ids = np.argsort([to_fit(o)  for o in bob_inds])
             for i in range(2):
-                offspring[int(offsp_ids[i])] = best_inds[int(best_ids[-2+i])]
+                off_f = to_fit(offspring[int(offsp_ids[i])])
+                bob_f = to_fit(best_inds[int(best_ids[-2 + i])])
+                if bob_f > off_f:
+                    offspring[int(offsp_ids[i])] = best_inds[int(best_ids[-2+i])]
 
             # Apply crossover and mutation on the offspring
             for child1, child2 in zip(offspring[::2], offspring[1::2]):
-                if random.random() < CXPB:
+                f1, f2 = to_fit(child1), to_fit(child2)
+
+                if random.random() < CXPB and f1 > 0 and f2 > 0:
                     self.toolbox.mate(child1, child2)
                     del child1.fitness.values
                     del child2.fitness.values
 
             for mutant in offspring[:]:
-                if random.random() < MUTPB:
+                f = to_fit(mutant)
+                if random.random() < MUTPB or f <= 0:
                     self.toolbox.mutate(mutant)
                     del mutant.fitness.values
 
