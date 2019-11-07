@@ -181,7 +181,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
             # Apply crossover and mutation on the offspring
             for child1, child2 in zip(offspring[::2], offspring[1::2]):
                 f1, f2 = to_fit(child1), to_fit(child2)
-                if random.random() < CXPB and f1 > 0 and f2 > 0:
+                if random.random() < CXPB and (f1 > 0 or f2 > 0):
                     self.toolbox.mate(child1, child2)
                     del child1.fitness.values
                     del child2.fitness.values
