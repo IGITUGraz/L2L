@@ -2,7 +2,6 @@ import logging
 import random
 
 from collections import namedtuple
-import numpy as np
 
 from deap import base, creator, tools
 from deap.tools import HallOfFame
@@ -52,7 +51,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
                          parameters=parameters, optimizee_bounding_func=optimizee_bounding_func)
         self.optimizee_bounding_func = optimizee_bounding_func
         __, self.optimizee_individual_dict_spec = dict_to_list(optimizee_create_individual(), get_dict_spec=True)
-        self.optimizee_create_individual = optimizee_create_individual
+
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
         traj.f_add_parameter('popsize', parameters.popsize, comment='Population size')  # 185
         traj.f_add_parameter('CXPB', parameters.CXPB, comment='Crossover term')
@@ -116,9 +115,6 @@ class GeneticAlgorithmOptimizer(Optimizer):
         """
         See :meth:`~l2l.optimizers.optimizer.Optimizer.post_process`
         """
-        def to_fit(ind):
-            return np.dot(ind.fitness.values, ind.fitness.weights)
-
         CXPB, MUTPB, NGEN = traj.CXPB, traj.MUTPB, traj.n_iteration
 
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
@@ -148,8 +144,6 @@ class GeneticAlgorithmOptimizer(Optimizer):
             print("Best individual is %s, %s" % (list_to_dict(best_ind, self.optimizee_individual_dict_spec),
                                                  best_ind.fitness.values))
 
-
-        # add the bestest individuals this generation to HoF
         self.hall_of_fame.update(self.eval_pop_inds)
 
         logger.info("-- Hall of fame --")
@@ -157,52 +151,29 @@ class GeneticAlgorithmOptimizer(Optimizer):
             logger.info("HOF individual is %s, %s" % (list_to_dict(hof_ind, self.optimizee_individual_dict_spec),
                                                       hof_ind.fitness.values))
 
-        bob_inds = tools.selBest(self.hall_of_fame, 2)
-        bob_inds = list(map(self.toolbox.clone, bob_inds))
-
         # ------- Create the next generation by crossover and mutation -------- #
         if self.g < NGEN - 1:  # not necessary for the last generation
             # Select the next generation individuals
-            # Tournament of population - a list of "pointers"
             offspring = self.toolbox.select(self.pop, len(self.pop))
             # Clone the selected individuals
             offspring = list(map(self.toolbox.clone, offspring))
 
-            #sorts small to big
-            #switch worst-good with best of best
-            offsp_ids = np.argsort([to_fit(o) for o in offspring])
-            best_ids = np.argsort([to_fit(o)  for o in bob_inds])
-            for i in range(2):
-                off_f = to_fit(offspring[int(offsp_ids[i])])
-                bob_f = to_fit(best_inds[int(best_ids[-2 + i])])
-                if bob_f > off_f:
-                    offspring[int(offsp_ids[i])] = best_inds[int(best_ids[-2+i])]
-
             # Apply crossover and mutation on the offspring
             for child1, child2 in zip(offspring[::2], offspring[1::2]):
-                f1, f2 = to_fit(child1), to_fit(child2)
-                if random.random() < CXPB and (f1 > 0 or f2 > 0):
+                if random.random() < CXPB:
                     self.toolbox.mate(child1, child2)
                     del child1.fitness.values
                     del child2.fitness.values
 
-            for mutant in offspring[:]:
+            for mutant in offspring:
                 if random.random() < MUTPB:
-                    f = to_fit(mutant) if mutant.fitness.valid else None
-                    print("f = {}".format(f))
-                    # if this was an unfit individual, replace with a "foreigner"
-                    if f is not None and f <= 0:
-                        x = self.optimizee_create_individual()
-                        d = list_to_dict(x, self.optimizee_individual_dict_spec)
-                        mutant[:] = dict_to_list(self.optimizee_bounding_func(d))
-                    else:
-                        self.toolbox.mutate(mutant)
+                    self.toolbox.mutate(mutant)
                     del mutant.fitness.values
 
             if len(set(map(tuple, offspring))) < len(offspring):
                 logger.info("Mutating more")
                 for i, o1 in enumerate(offspring[:-1]):
-                    for o2 in offspring[i+1:]:
+                    for o2 in offspring[i + 1:]:
                         if tuple(o1) == tuple(o2):
                             if random.random() < 0.8:
                                 self.toolbox.mutate(o2)
@@ -211,18 +182,14 @@ class GeneticAlgorithmOptimizer(Optimizer):
             # The population is entirely replaced by the offspring
             self.pop[:] = offspring
 
-            self.eval_pop_inds[:] = [ind for ind in self.pop if not ind.fitness.valid]
-            self.eval_pop[:] = [list_to_dict(ind, self.optimizee_individual_dict_spec)
+            self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness.valid]
+            self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec)
                              for ind in self.eval_pop_inds]
 
             self.g += 1  # Update generation counter
-            if len(self.eval_pop) == 0 and self.g < (NGEN - 1):
-                raise Exception("No more mutants to evaluate where generated. "
-                                "Increasing population size may help.")
-
             self._expand_trajectory(traj)
 
-    def end(self, traj):
+    def end(self):
         """
         See :meth:`~l2l.optimizers.optimizer.Optimizer.end`
         """
