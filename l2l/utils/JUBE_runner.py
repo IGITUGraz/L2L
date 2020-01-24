@@ -222,7 +222,7 @@ class JUBERunner():
 
         # Wait for ready files to be written
         while not self.is_done(ready_files):
-            time.sleep(5)
+            time.sleep(15)
 
         # Touch done generation
         logger.info("JUBE finished generation: " + str(self.generation))
