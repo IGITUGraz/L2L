@@ -13,11 +13,13 @@ class Individual(ParameterGroup):
         Initialization of the individual
         :param generation: ID of the generation to which this individual belongs to
         :param ind_idx: global ID of the individual
-        :param params: individual parameters which are used to execute the optimizee simulate function
+        :param params: individual parameters which are used to execute the optimizee
+                       simulate function
         """
         self.params = {}
         for i in params:
-            self.f_add_parameter(i.keys()[0], i[i.keys()[0]])
+            k = list(i.keys())[0]
+            self.f_add_parameter(k, i[k])
         self.generation = generation
         self.ind_idx = ind_idx
 
