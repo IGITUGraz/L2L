@@ -37,3 +37,8 @@ class Individual(ParameterGroup):
 
     def __setstate__(self, d):
         self.__dict__.update(d)
+
+    def copy(self):
+        ind = Individual(self.generation, self.ind_idx)
+        ind.params = self.params.copy()
+        return ind

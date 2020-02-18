@@ -32,6 +32,23 @@ class Trajectory:
         self.individuals = {}
         self.v_idx = 0
 
+    def copy(self):
+        from copy import copy as cp
+        t = Trajectory()
+        if hasattr(self, '_name'):
+            t._name = cp(self._name)
+
+        t._timestamp = cp(self._timestamp)
+        t._parameters = cp(self._parameters)
+        t._results = cp(self._results)
+        t.individual = cp(self.individual)
+        t.results = cp(self._results)
+        t.current_results = cp(self.current_results)
+        t.individuals = cp(self.individuals)
+        t.v_idx = cp(self.v_idx)
+
+        return t
+
     def f_add_parameter_group(self, name, comment=""):
         """
         Adds a new parameter group
