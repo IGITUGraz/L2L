@@ -62,15 +62,7 @@ class Environment:
                         self.trajectory.individual = ind
 
                         # trying to avoid huge memory consumption after many individuals
-                        from multiprocessing import Process, Queue
-
-
-                        queue = Queue()
-                        p = Process(target=runfunc, args=(self.trajectory, queue))
-                        p.start()
-                        p.join()  # this blocks until the process terminates
-                        fitness = queue.get()
-
+                        fitness = runfunc(self.trajectory)
                         result[it].append((ind.ind_idx, fitness))
                         self.run_id = self.run_id + 1
 

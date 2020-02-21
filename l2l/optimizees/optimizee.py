@@ -24,17 +24,13 @@ class Optimizee:
         :return dict: A dictionary containing the names of the parameters and their values
         """
 
-    def simulate(self, traj, queue=None):
+    def simulate(self, traj):
         """
         This is the primary function that does the simulation for the given parameter given (within :obj:`traj`)
 
         :param  ~l2l.utils.trajectory.Trajectory traj: The trajectory that contains the parameters and the
             individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.
             param1 is accessible using `traj.param1`
-        :param ~multiplrocessing.Queue: A Queue object to return the fintess(es) value(s). This allows serially
-            executing simulations to keep low memory footprint. To return the results via the Queue, they need to be put
-            into the object via queue.put((fitness0, fintess1, ..., fitnessN)) . Note that the Optimizee should either
-            put the fitnesses into the queue or (exclusive) return as a queue (see below)
 
         :return: a :class:`tuple` containing the fitness values of the current run. The :class:`tuple` allows a
             multi-dimensional fitness function.
