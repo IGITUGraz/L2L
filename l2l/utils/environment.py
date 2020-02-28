@@ -29,8 +29,10 @@ class Environment:
             self.path = os.path.abspath(os.path.dirname(self.filename))
         else:
             stack = inspect.stack()
-            caller = os.path.dirname(stack[1].filename)
-            self.path = os.path.abspath(os.path.join(caller, 'per_gen_trajectories'))
+            self.path = os.path.dirname(stack[1].filename)
+
+
+        self.per_gen_path = os.path.abspath(os.path.join(self.path, 'per_gen_trajectories'))
 
         self.automatic_storing = keyword_args.get('automatic_storing', True)
 
@@ -90,9 +92,9 @@ class Environment:
             self.trajectory.current_results = result[it]
 
             if self.automatic_storing:
-                trajfname = "trajectory_{}_{:020d}.bin".format('final', generation)
+                trajfname = "Trajectory_{}_{:020d}.bin".format('final', generation)
                 handle = open(
-                    os.path.join(self.path, trajfname), "wb")
+                    os.path.join(self.per_gen_path, trajfname), "wb")
                 pickle.dump(trajectory, handle, pickle.HIGHEST_PROTOCOL)
                 handle.close()
 
