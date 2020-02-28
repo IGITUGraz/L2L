@@ -92,7 +92,7 @@ class Environment:
             self.trajectory.current_results = result[it]
 
             if self.automatic_storing:
-                trajfname = "Trajectory_{}_{:020d}.bin".format('final', generation)
+                trajfname = "Trajectory_{}_{:020d}.bin".format('final', it)
                 handle = open(
                     os.path.join(self.per_gen_path, trajfname), "wb")
                 pickle.dump(trajectory, handle, pickle.HIGHEST_PROTOCOL)
