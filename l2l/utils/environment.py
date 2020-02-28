@@ -1,6 +1,8 @@
 from l2l.utils.trajectory import Trajectory
 from l2l.utils.JUBE_runner import JUBERunner
 import logging
+import inspect
+import os
 
 logger = logging.getLogger("utils.Environment")
 
@@ -24,6 +26,14 @@ class Environment:
             self.trajectory = Trajectory(name=keyword_args['trajectory'])
         if 'filename' in keyword_args:
             self.filename = keyword_args['filename']
+            self.path = os.path.abspath(os.path.dirname(self.filename))
+        else:
+            stack = inspect.stack()
+            caller = os.path.dirname(stack[1].filename)
+            self.path = os.path.abspath(os.path.join(caller, 'per_gen_trajectories'))
+
+        self.automatic_storing = keyword_args.get('automatic_storing', True)
+
         self.postprocessing = None
         self.multiprocessing = True
         if 'multiprocessing' in keyword_args:
@@ -71,11 +81,21 @@ class Environment:
 
                 except Exception as e:
                     if self.logging:
-                        logger.exception("Error during serial execution of individuals: %s" % str(e.__cause__))
+                        logger.exception(
+                            "Error during serial execution of individuals: %s" % str(e.__cause__))
                     raise e
+
             # Add results to the trajectory
             self.trajectory.results.f_add_result_to_group("all_results", it, result[it])
             self.trajectory.current_results = result[it]
+
+            if self.automatic_storing:
+                trajfname = "trajectory_{}_{:020d}.bin".format('final', generation)
+                handle = open(
+                    os.path.join(self.path, trajfname), "wb")
+                pickle.dump(trajectory, handle, pickle.HIGHEST_PROTOCOL)
+                handle.close()
+
             # Perform the postprocessing step in order to generate the new parameter set
             self.postprocessing(self.trajectory, result[it])
 
