@@ -60,6 +60,9 @@ class sdictm(object):
     def __repr__(self):
         return self._data.__repr__()
 
+    def __str__(self):
+        return self._data.__str__()
+
     def __getattr__(self, attr):
         if attr == '__getstate__':
             raise AttributeError()
