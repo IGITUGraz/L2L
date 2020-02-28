@@ -3,6 +3,7 @@ from l2l.utils.JUBE_runner import JUBERunner
 import logging
 import inspect
 import os
+import pickle
 
 logger = logging.getLogger("utils.Environment")
 
@@ -31,8 +32,9 @@ class Environment:
             stack = inspect.stack()
             self.path = os.path.dirname(stack[1].filename)
 
-
         self.per_gen_path = os.path.abspath(os.path.join(self.path, 'per_gen_trajectories'))
+        os.makedirs(self.path, exist_ok=True)
+        os.makedirs(self.per_gen_path, exist_ok=True)
 
         self.automatic_storing = keyword_args.get('automatic_storing', True)
 
@@ -95,7 +97,7 @@ class Environment:
                 trajfname = "Trajectory_{}_{:020d}.bin".format('final', it)
                 handle = open(
                     os.path.join(self.per_gen_path, trajfname), "wb")
-                pickle.dump(trajectory, handle, pickle.HIGHEST_PROTOCOL)
+                pickle.dump(self.trajectory, handle, pickle.HIGHEST_PROTOCOL)
                 handle.close()
 
             # Perform the postprocessing step in order to generate the new parameter set
