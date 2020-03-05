@@ -1,9 +1,10 @@
-from l2l.utils.trajectory import Trajectory
-from l2l.utils.JUBE_runner import JUBERunner
-import logging
 import inspect
+import logging
 import os
 import pickle
+
+from l2l.utils.JUBE_runner import JUBERunner
+from l2l.utils.trajectory import Trajectory
 
 logger = logging.getLogger("utils.Environment")
 
@@ -47,7 +48,11 @@ class Environment:
         if 'multiprocessing' in keyword_args:
             self.multiprocessing = keyword_args['multiprocessing']
         self.run_id = 0
+
+        self.logging = False
         self.enable_logging()
+
+
 
     def run(self, runfunc):
         """
@@ -60,12 +65,13 @@ class Environment:
             result[it] = []
             if self.multiprocessing:
                 # Multiprocessing is done through JUBE, either with or without scheduler
-                logging.info("Environment run starting JUBERunner for n iterations: " + str(self.trajectory.par['n_iteration']))
+                logging.info(
+                    "Environment run starting JUBERunner for n iterations: " + str(self.trajectory.par['n_iteration']))
                 jube = JUBERunner(self.trajectory)
                 # Initialize new JUBE run and execute it
                 try:
-                    jube.write_pop_for_jube(self.trajectory,it)
-                    result[it][:] = jube.run(self.trajectory,it)
+                    jube.write_pop_for_jube(self.trajectory, it)
+                    result[it][:] = jube.run(self.trajectory, it)
                 except Exception as e:
                     if self.logging:
                         logger.exception("Error launching JUBE run: %s" % str(e.__cause__))

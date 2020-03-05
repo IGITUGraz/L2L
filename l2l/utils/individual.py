@@ -16,6 +16,7 @@ class Individual(ParameterGroup):
         :param params: individual parameters which are used to execute the optimizee
                        simulate function
         """
+        super(ParameterGroup, self).__init__()
         self.params = {}
         for i in params:
             k = list(i.keys())[0]
@@ -51,7 +52,7 @@ class Individual(ParameterGroup):
         for k in sorted(self.params.keys()):
             s += "{}: {:10.4f}, ".format(k, self.params[k])
 
-        return "{%s}"%(s[:-2])
+        return "{%s}" % (s[:-2])
 
     def tolist(self):
         return [self.params[k] for k in sorted(self.params.keys())]

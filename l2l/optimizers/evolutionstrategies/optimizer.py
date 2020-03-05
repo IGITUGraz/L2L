@@ -2,7 +2,6 @@ import logging
 from collections import namedtuple
 
 import numpy as np
-
 from l2l import dict_to_list, list_to_dict
 from l2l.optimizers.optimizer import Optimizer
 
@@ -43,15 +42,16 @@ class EvolutionStrategiesOptimizer(Optimizer):
 
     For n iterations do:
       - Perturb the current individual by adding a value with 0 mean and `noise_std` standard deviation
-      - If mirrored sampling is enabled, also perturb the current individual by subtracting the same values that were
-        added in the previous step
+      - If mirrored sampling is enabled, also perturb the current individual by subtracting the same
+        values that were added in the previous step
       - evaluate individuals and get fitness
       - Update the fitness as
 
             theta_{t+1} <- theta_t + alpha  * sum{F_i * e_i} / (n * sigma^2)
 
         where F_i is the fitness and e_i is the perturbation
-      - If fitness shaping is enabled, F_i is replaced with the utility u_i in the previous step, which is calculated as:
+      - If fitness shaping is enabled, F_i is replaced with the utility u_i in the previous step,
+        which is calculated as:
 
             u_i = max(0, log(n/2 + 1) - log(k)) / sum_{k=1}^{n}{max(0, log(n/2 + 1) - log(k))} - 1 / n
 
@@ -181,10 +181,10 @@ class EvolutionStrategiesOptimizer(Optimizer):
             traj.n_iteration, traj.stop_criterion, traj.learning_rate, traj.noise_std, traj.fitness_shaping_enabled
 
         weighted_fitness_list = []
-        #**************************************************************************************************************
+        # ********************************************************************************************
         # Storing run-information in the trajectory
         # Reading fitnesses and performing distribution update
-        #**************************************************************************************************************
+        # ********************************************************************************************
         for run_index, fitness in fitnesses_results:
             # We need to convert the current run index into an ind_idx
             # (index of individual within one generation)
@@ -199,7 +199,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
 
         weighted_fitness_list = np.array(weighted_fitness_list).ravel()
         # NOTE: It is necessary to clear the finesses_results to clear the data in the reference, and del
-        #^ is used to make sure it's not used in the rest of this function
+        # ^ is used to make sure it's not used in the rest of this function
         fitnesses_results.clear()
         del fitnesses_results
 
@@ -223,11 +223,11 @@ class EvolutionStrategiesOptimizer(Optimizer):
         logger.info('  Best Fitness: %.4f', self.best_fitness_in_run)
         logger.info('  Average Fitness: %.4f', np.mean(sorted_fitness))
 
-        #**************************************************************************************************************
+        # ********************************************************************************************
         # Storing Generation Parameters / Results in the trajectory
-        #**************************************************************************************************************
-        # These entries correspond to the generation that has been simulated prior to this post-processing run
-
+        # ********************************************************************************************
+        # These entries correspond to the generation that has been simulated prior to this
+        # post-processing run
         # Documentation of algorithm parameters for the current generation
         #
         # generation          - The index of the evaluated generation
@@ -268,13 +268,13 @@ class EvolutionStrategiesOptimizer(Optimizer):
 
         assert len(fitnesses_to_fit) == len(sorted_perturbations)
 
-        self.current_individual_arr += learning_rate \
-                                       * np.sum([f * e for f, e in zip(fitnesses_to_fit, sorted_perturbations)], axis=0) \
-                                       / (len(fitnesses_to_fit) * np.asarray(noise_std) ** 2)
+        sum_fits = np.sum([f * e for f, e in zip(fitnesses_to_fit, sorted_perturbations)], axis=0)
+        weight = len(fitnesses_to_fit) * np.asarray(noise_std) ** 2
+        self.current_individual_arr += learning_rate * (sum_fits / weight)
 
-        #**************************************************************************************************************
+        # ********************************************************************************************
         # Create the next generation by sampling the inferred distribution
-        #**************************************************************************************************************
+        # ********************************************************************************************
         # Note that this is only done in case the evaluated run is not the last run
         self.eval_pop.clear()
 
@@ -283,7 +283,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
             self.current_perturbations = self._get_perturbations(traj)
             current_eval_pop_arr = (self.current_individual_arr + self.current_perturbations).tolist()
 
-            self.eval_pop[:] = [list_to_dict(ind, self.optimizee_individual_dict_spec) \
+            self.eval_pop[:] = [list_to_dict(ind, self.optimizee_individual_dict_spec)
                                 for ind in current_eval_pop_arr]
             self.eval_pop.append(
                 list_to_dict(self.current_individual_arr, self.optimizee_individual_dict_spec))
