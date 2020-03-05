@@ -181,10 +181,10 @@ class EvolutionStrategiesOptimizer(Optimizer):
             traj.n_iteration, traj.stop_criterion, traj.learning_rate, traj.noise_std, traj.fitness_shaping_enabled
 
         weighted_fitness_list = []
-        # **************************************************************************************************************
+        #**************************************************************************************************************
         # Storing run-information in the trajectory
         # Reading fitnesses and performing distribution update
-        # **************************************************************************************************************
+        #**************************************************************************************************************
         for run_index, fitness in fitnesses_results:
             # We need to convert the current run index into an ind_idx
             # (index of individual within one generation)
@@ -199,7 +199,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
 
         weighted_fitness_list = np.array(weighted_fitness_list).ravel()
         # NOTE: It is necessary to clear the finesses_results to clear the data in the reference, and del
-        # ^ is used to make sure it's not used in the rest of this function
+        #^ is used to make sure it's not used in the rest of this function
         fitnesses_results.clear()
         del fitnesses_results
 
@@ -223,9 +223,9 @@ class EvolutionStrategiesOptimizer(Optimizer):
         logger.info('  Best Fitness: %.4f', self.best_fitness_in_run)
         logger.info('  Average Fitness: %.4f', np.mean(sorted_fitness))
 
-        # **************************************************************************************************************
+        #**************************************************************************************************************
         # Storing Generation Parameters / Results in the trajectory
-        # **************************************************************************************************************
+        #**************************************************************************************************************
         # These entries correspond to the generation that has been simulated prior to this post-processing run
 
         # Documentation of algorithm parameters for the current generation
@@ -272,9 +272,9 @@ class EvolutionStrategiesOptimizer(Optimizer):
                                        * np.sum([f * e for f, e in zip(fitnesses_to_fit, sorted_perturbations)], axis=0) \
                                        / (len(fitnesses_to_fit) * np.asarray(noise_std) ** 2)
 
-        # **************************************************************************************************************
+        #**************************************************************************************************************
         # Create the next generation by sampling the inferred distribution
-        # **************************************************************************************************************
+        #**************************************************************************************************************
         # Note that this is only done in case the evaluated run is not the last run
         self.eval_pop.clear()
 
