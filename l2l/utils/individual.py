@@ -3,18 +3,20 @@ from l2l.utils.groups import ParameterGroup
 
 class Individual(ParameterGroup):
     """
-    This class represents individuals in the parameter search. It derives from a Parameter group.
-    The main elements which make an individual are the ID of its generation, its individual ID and the
-    params specific for its run.
+    This class represents individuals in the parameter search. It derives from a
+    Parameter group.
+    The main elements which make an individual are the ID of its generation,
+    its individual ID and the params specific for its run.
     """
 
     def __init__(self, generation=0, ind_idx=0, params=[]):
         """
         Initialization of the individual
-        :param generation: ID of the generation to which this individual belongs to
+        :param generation: ID of the generation to which this individual
+                           belongs to
         :param ind_idx: global ID of the individual
-        :param params: individual parameters which are used to execute the optimizee
-                       simulate function
+        :param params: individual parameters which are used to execute the
+                       optimizee simulate function
         """
         super(ParameterGroup, self).__init__()
         self.params = {}
