@@ -24,7 +24,11 @@ class Environment:
         The trajectory object holds individual parameters and history per generation of the exploration process.
         """
         if 'trajectory' in keyword_args:
-            self.trajectory = Trajectory(name=keyword_args['trajectory'])
+            traj = keyword_args['trajectory']
+            if isinstance(traj, Trajectory):
+                self.trajectory = traj
+            else:
+                self.trajectory = Trajectory(name=traj)
         if 'filename' in keyword_args:
             self.filename = keyword_args['filename']
             self.path = os.path.abspath(os.path.dirname(self.filename))
@@ -52,12 +56,12 @@ class Environment:
         :return: the results of running a whole generation. Dictionary indexed by generation id.
         """
         result = {}
-        for it in range(self.trajectory.par['n_iteration']):
+        for it in range(self.trajectory.par['generation'], self.trajectory.par['n_iteration']):
+            result[it] = []
             if self.multiprocessing:
                 # Multiprocessing is done through JUBE, either with or without scheduler
                 logging.info("Environment run starting JUBERunner for n iterations: " + str(self.trajectory.par['n_iteration']))
                 jube = JUBERunner(self.trajectory)
-                result[it] = []
                 # Initialize new JUBE run and execute it
                 try:
                     jube.write_pop_for_jube(self.trajectory,it)
@@ -69,7 +73,6 @@ class Environment:
 
             else:
                 # Sequential calls to the runfunc in the optimizee
-                result[it] = []
                 # Call runfunc on each individual from the trajectory
                 try:
                     for ind in self.trajectory.individuals[it]:
@@ -92,13 +95,13 @@ class Environment:
             # Add results to the trajectory
             self.trajectory.results.f_add_result_to_group("all_results", it, result[it])
             self.trajectory.current_results = result[it]
+            self.trajectory.par['generation'] = it
 
             if self.automatic_storing:
                 trajfname = "Trajectory_{}_{:020d}.bin".format('final', it)
-                handle = open(
-                    os.path.join(self.per_gen_path, trajfname), "wb")
-                pickle.dump(self.trajectory, handle, pickle.HIGHEST_PROTOCOL)
-                handle.close()
+                traj_path = os.path.join(self.per_gen_path, trajfname)
+                with open(traj_path, "wb") as handle:
+                    pickle.dump(self.trajectory, handle, pickle.HIGHEST_PROTOCOL)
 
             # Perform the postprocessing step in order to generate the new parameter set
             self.postprocessing(self.trajectory, result[it])

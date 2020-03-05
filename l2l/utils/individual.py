@@ -42,3 +42,19 @@ class Individual(ParameterGroup):
         ind = Individual(self.generation, self.ind_idx)
         ind.params = self.params.copy()
         return ind
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        s = ""
+        for k in sorted(self.params.keys()):
+            s += "{}: {:10.4f}, ".format(k, self.params[k])
+
+        return "{%s}"%(s[:-2])
+
+    def tolist(self):
+        return [self.params[k] for k in sorted(self.params.keys())]
+
+    def todict(self):
+        return {k: self.params[k] for k in sorted(self.params.keys())}

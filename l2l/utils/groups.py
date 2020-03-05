@@ -89,7 +89,7 @@ class ResultGroup(sdictm):
             raise Exception("Group name not found when adding value to result group")
 
     def __str__(self):
-        return str(self.results)
+        return str(self._data)
 
     def __getstate__(self):
         return self.__dict__
