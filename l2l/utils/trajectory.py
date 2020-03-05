@@ -100,11 +100,12 @@ class Trajectory:
         ind_idx = []
         for key in build_dict.keys():
             if key == 'generation':
-                gen = build_dict['generation']
+                gen[:] = build_dict['generation']
             elif key == 'ind_idx':
                 ind_idx = build_dict['ind_idx']
             else:
                 params[key] = build_dict[key]
+
         # TODO: Could/Should the build dictionary have more than one generation in it?
         generation = gen[0]
         self.individuals[generation] = []

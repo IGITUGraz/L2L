@@ -47,10 +47,10 @@ class Environment:
                 # Initialize new JUBE run and execute it
                 try:
                     jube.write_pop_for_jube(self.trajectory,it)
-                    result[it] = jube.run(self.trajectory,it)
+                    result[it][:] = jube.run(self.trajectory,it)
                 except Exception as e:
                     if self.logging:
-                        logger.exception("Error launching JUBE run: " + str(e.__cause__))
+                        logger.exception("Error launching JUBE run: %s" % str(e.__cause__))
                     raise e
 
             else:
@@ -60,12 +60,27 @@ class Environment:
                 try:
                     for ind in self.trajectory.individuals[it]:
                         self.trajectory.individual = ind
-                        result[it].append((ind.ind_idx, runfunc(self.trajectory)))
+
+                        # trying to avoid huge memory consumption after many individuals
+                        from multiprocessing import Process, Queue
+
+
+                        queue = Queue()
+                        p = Process(target=runfunc, args=(self.trajectory, queue))
+                        p.start()
+                        p.join()  # this blocks until the process terminates
+                        fitness = queue.get()
+
+                        result[it].append((ind.ind_idx, fitness))
                         self.run_id = self.run_id + 1
-                except:
+
+                        import gc
+                        gc.collect()
+
+                except Exception as e:
                     if self.logging:
-                        logger.exception("Error during serial execution of individuals")
-                    raise
+                        logger.exception("Error during serial execution of individuals: %s" % str(e.__cause__))
+                    raise e
             # Add results to the trajectory
             self.trajectory.results.f_add_result_to_group("all_results", it, result[it])
             self.trajectory.current_results = result[it]
