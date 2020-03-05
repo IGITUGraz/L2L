@@ -40,8 +40,8 @@ class Environment:
             stack = inspect.stack()
             self.path = os.path.dirname(stack[1].filename)
 
-        self.per_gen_path = os.path.abspath(
-                                os.path.join(self.path, 'per_gen_trajectories'))
+        self.per_gen_path = \
+            os.path.abspath(os.path.join(self.path, 'per_gen_trajectories'))
         os.makedirs(self.path, exist_ok=True)
         os.makedirs(self.per_gen_path, exist_ok=True)
 
@@ -103,8 +103,9 @@ class Environment:
                 except Exception as e:
                     if self.logging:
                         logger.exception(
-                            "Error during serial execution of individuals: %s" %\
-                            str(e.__cause__))
+                            "Error during serial execution "
+                            "of individuals: {}".format(e.__cause__)
+                        )
                     raise e
 
             # Add results to the trajectory

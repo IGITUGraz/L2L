@@ -19,17 +19,17 @@ EvolutionStrategiesParameters = namedtuple('EvolutionStrategiesParameters', [
 ])
 
 EvolutionStrategiesParameters.__doc__ = """
-:param learning_rate: Learning rate
-:param noise_std: Standard deviation of the step size (The step has 0 mean)
-:param mirrored_sampling_enabled: Should we turn on mirrored sampling i.e. 
-                                  sampling both e and -e
-:param fitness_shaping_enabled: Should we turn on fitness shaping i.e. using 
-                                only top `fitness_shaping_ratio` to update
-                                current individual?
-:param pop_size: Number of individuals per simulation.
-:param n_iteration: Number of iterations to perform
-:param stop_criterion: (Optional) Stop if this fitness is reached.
-:param seed: The random seed used for generating new individuals
+    :param learning_rate: Learning rate
+    :param noise_std: Standard deviation of the step size (The step has 0 mean)
+    :param mirrored_sampling_enabled: Should we turn on mirrored sampling i.e. 
+                                      sampling both e and -e
+    :param fitness_shaping_enabled: Should we turn on fitness shaping i.e. using 
+                                    only top `fitness_shaping_ratio` to update
+                                    current individual?
+    :param pop_size: Number of individuals per simulation.
+    :param n_iteration: Number of iterations to perform
+    :param stop_criterion: (Optional) Stop if this fitness is reached.
+    :param seed: The random seed used for generating new individuals
 """
 
 
@@ -172,7 +172,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
         # as vectors
         self.current_perturbations = self._get_perturbations(traj)
         current_eval_pop_arr = (
-                    self.current_individual_arr + self.current_perturbations).tolist()
+            self.current_individual_arr + self.current_perturbations).tolist()
 
         self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec)
                          for ind in current_eval_pop_arr]
@@ -194,7 +194,8 @@ class EvolutionStrategiesOptimizer(Optimizer):
         pop_size, noise_std, mirrored_sampling_enabled = \
             traj.pop_size, traj.noise_std, traj.mirrored_sampling_enabled
 
-        rand = self.random_state.randn(pop_size, *self.current_individual_arr.shape)
+        rand = self.random_state.randn(
+                                pop_size, *self.current_individual_arr.shape)
         perturbations = noise_std * rand
         if mirrored_sampling_enabled:
             return np.vstack((perturbations, -perturbations))
@@ -322,8 +323,9 @@ class EvolutionStrategiesOptimizer(Optimizer):
         # check if to stop
         if self.g < n_iteration - 1 and self.best_fitness_in_run < stop_criterion:
             self.current_perturbations = self._get_perturbations(traj)
-            current_eval_pop_arr = (
-                self.current_individual_arr + self.current_perturbations).tolist()
+            perturbated = \
+                self.current_individual_arr + self.current_perturbations
+            current_eval_pop_arr = perturbated.tolist()
 
             self.eval_pop[:] = [
                 list_to_dict(ind, self.optimizee_individual_dict_spec)
@@ -335,8 +337,8 @@ class EvolutionStrategiesOptimizer(Optimizer):
             # Bounding function has to be applied AFTER the individual has been
             # converted to a dict
             if self.optimizee_bounding_func is not None:
-                self.eval_pop[:] = [self.optimizee_bounding_func(ind) for ind in
-                                    self.eval_pop]
+                self.eval_pop[:] = [self.optimizee_bounding_func(ind)
+                                                for ind in self.eval_pop]
 
             self.eval_pop_arr[:] = np.asarray(
                 [dict_to_list(ind) for ind in self.eval_pop])

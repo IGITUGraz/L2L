@@ -3,8 +3,8 @@ from l2l.utils.groups import ParameterGroup
 
 class Individual(ParameterGroup):
     """
-    This class represents individuals in the parameter search. It derives from a
-    Parameter group.
+    This class represents individuals in the parameter search. It derives
+    from a Parameter group.
     The main elements which make an individual are the ID of its generation,
     its individual ID and the params specific for its run.
     """
