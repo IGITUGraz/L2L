@@ -19,17 +19,17 @@ EvolutionStrategiesParameters = namedtuple('EvolutionStrategiesParameters', [
 ])
 
 EvolutionStrategiesParameters.__doc__ = """
-    :param learning_rate: Learning rate
-    :param noise_std: Standard deviation of the step size (The step has 0 mean)
-    :param mirrored_sampling_enabled: Should we turn on mirrored sampling i.e. 
-                                      sampling both e and -e
-    :param fitness_shaping_enabled: Should we turn on fitness shaping i.e. using 
-                                    only top `fitness_shaping_ratio` to update
-                                    current individual?
-    :param pop_size: Number of individuals per simulation.
-    :param n_iteration: Number of iterations to perform
-    :param stop_criterion: (Optional) Stop if this fitness is reached.
-    :param seed: The random seed used for generating new individuals
+ :param learning_rate: Learning rate
+ :param noise_std: Standard deviation of the step size (The step has 0 mean)
+ :param mirrored_sampling_enabled: Should we turn on mirrored sampling i.e.
+                                   sampling both e and -e
+ :param fitness_shaping_enabled: Should we turn on fitness shaping i.e. using 
+                                only top `fitness_shaping_ratio` to update
+                                current individual?
+ :param pop_size: Number of individuals per simulation.
+ :param n_iteration: Number of iterations to perform
+ :param stop_criterion: (Optional) Stop if this fitness is reached.
+ :param seed: The random seed used for generating new individuals
 """
 
 
@@ -137,11 +137,12 @@ class EvolutionStrategiesOptimizer(Optimizer):
 
         self.random_state = np.random.RandomState(traj.parameters.seed)
 
-        self.current_individual_arr, self.optimizee_individual_dict_spec = dict_to_list(
-            self.optimizee_create_individual(), get_dict_spec=True)
+        self.current_individual_arr, self.optimizee_individual_dict_spec = \
+            dict_to_list(self.optimizee_create_individual(), get_dict_spec=True)
 
         noise_std_shape = np.array(parameters.noise_std).shape
-        assert noise_std_shape == () or noise_std_shape == self.current_individual_arr.shape
+        ind_shape = self.current_individual_arr.shape
+        assert noise_std_shape == () or noise_std_shape == ind_shape
 
         traj.f_add_derived_parameter(
             'dimension',
@@ -157,7 +158,8 @@ class EvolutionStrategiesOptimizer(Optimizer):
         # The following parameters are recorded as generation parameters
         # i.e. once per generation
         self.g = 0  # the current generation
-        self.pop_size = parameters.pop_size  # Population size is dynamic in FACE
+        # Population size is dynamic in FACE
+        self.pop_size = parameters.pop_size
         self.best_fitness_in_run = -np.inf
         self.best_individual_in_run = None
 
@@ -284,8 +286,8 @@ class EvolutionStrategiesOptimizer(Optimizer):
         traj.results.generation_params.f_add_result(
             generation_name + '.algorithm_params',
             generation_result_dict,
-            comment="These are the parameters that correspond to the algorithm. "
-                    "Look at the source code for "
+            comment="These are the parameters that correspond to the "
+                    "algorithm. Look at the source code for "
                     "`EvolutionStrategiesOptimizer::post_process()` "
                     "for comments documenting these parameters"
         )
@@ -321,7 +323,8 @@ class EvolutionStrategiesOptimizer(Optimizer):
         self.eval_pop.clear()
 
         # check if to stop
-        if self.g < n_iteration - 1 and self.best_fitness_in_run < stop_criterion:
+        max_g = n_iteration - 1
+        if self.g < max_g and self.best_fitness_in_run < stop_criterion:
             self.current_perturbations = self._get_perturbations(traj)
             perturbated = \
                 self.current_individual_arr + self.current_perturbations
@@ -338,7 +341,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
             # converted to a dict
             if self.optimizee_bounding_func is not None:
                 self.eval_pop[:] = [self.optimizee_bounding_func(ind)
-                                                for ind in self.eval_pop]
+                                    for ind in self.eval_pop]
 
             self.eval_pop_arr[:] = np.asarray(
                 [dict_to_list(ind) for ind in self.eval_pop])
