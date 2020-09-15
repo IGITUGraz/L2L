@@ -20,7 +20,7 @@ class CEOptimizerTestCase(unittest.TestCase):
             automatic_storing=True,
             log_stdout=False,  # Sends stdout to logs
         )
-        self.trajectory = self.env.trajectory
+        self.traj = self.env.trajectory
         ## Benchmark function
         function_id = 14
         bench_functs = BenchmarkedFunctions()
@@ -28,7 +28,7 @@ class CEOptimizerTestCase(unittest.TestCase):
             bench_functs.get_function_by_index(function_id, noise=True)
 
         optimizee_seed = 1
-        self.optimizee = FunctionGeneratorOptimizee(self.trajectory, benchmark_function, seed=optimizee_seed)
+        self.optimizee = FunctionGeneratorOptimizee(self.traj, benchmark_function, seed=optimizee_seed)
 
     def test_setup(self):
 
@@ -43,7 +43,7 @@ class CEOptimizerTestCase(unittest.TestCase):
         seed=1)
 
         optimizer = EvolutionStrategiesOptimizer(
-        self.trajectory,
+        self.traj,
         optimizee_create_individual=self.optimizee.create_individual,
         optimizee_fitness_weights=(-1.,),
         parameters=parameters,
