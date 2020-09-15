@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.linalg import inv
 from l2l.optimizers.kalmanfilter.kalman_utils import _get_shapes, \
     _encode_targets, _get_batches
 
@@ -108,8 +109,8 @@ def _update_step(ensemble, observations, g, gamma, cpp, cup):
 
     Calculates the covariances and returns new ensembles
     """
-    return ensemble + (
-                cup @ np.linalg.lstsq(cpp + gamma, (observations - g).T)[0]).T
+    cpg_inv = np.inv((cpp + gamma).cpu()).to(device)
+    return ((cup @ cpg_inv) @ (observations - g).T).T + ensemble
 
 
 @jit(parallel=True)
