@@ -51,7 +51,7 @@ class SetupTestCase(unittest.TestCase):
         traj = env.trajectory
         traj.f_add_parameter_group("Test_params", "Contains Test parameters")
         traj.f_add_parameter_to_group("Test_params", "param1", "value1")
-        self.assertEqual(self,"value1",traj.Test_paras.param1)
+        self.assertEqual("value1", traj.Test_params.params["param1"])
 
     def test_logger_setup(self):
         create_shared_logger_data(
@@ -88,7 +88,7 @@ class SetupTestCase(unittest.TestCase):
 
         jube.prepare_optimizee(self.optimizee, self.paths.root_dir_path)
 
-        fname = os.path.join(self.path.root_dir_path, "optimizee.bin")
+        fname = os.path.join(self.paths.root_dir_path, "optimizee.bin")
         try:
             f = open(fname, "r")
             f.close()
