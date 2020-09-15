@@ -7,7 +7,8 @@ from l2l.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParame
 from l2l.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from l2l.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 
-class SACEOptimizerTestCase(unittest.TestCase):
+
+class SAOptimizerTestCase(unittest.TestCase):
 
     def setUp(self):
         name = "test_trajectory"
@@ -32,7 +33,7 @@ class SACEOptimizerTestCase(unittest.TestCase):
 
     def test_setup(self):
 
-        parameters = SimulatedAnnealingParameters(n_parallel_runs=50, noisy_step=.03, temp_decay=.99, n_iteration=100,
+        parameters = SimulatedAnnealingParameters(n_parallel_runs=1, noisy_step=.03, temp_decay=.99, n_iteration=1,
                                                   stop_criterion=np.Inf, seed=np.random.randint(1e5),
                                                   cooling_schedule=AvailableCoolingSchedules.QUADRATIC_ADDAPTIVE)
 
@@ -42,10 +43,13 @@ class SACEOptimizerTestCase(unittest.TestCase):
                                                 optimizee_bounding_func=self.optimizee.bounding_func)
 
         self.assertIsNotNone(optimizer.parameters)
+        self.env.add_postprocessing(optimizer.post_process)
+
         try:
-            optimizer.post_process()
+            self.env.run(self.optimizee.simulate)
         except Exception:
             self.fail()
+        optimizer.end(self.trajectory)
 
 
 def suite():
