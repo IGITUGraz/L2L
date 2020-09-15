@@ -10,18 +10,18 @@ from l2l.optimizers.crossentropy.distribution import Gaussian
 logger = logging.getLogger("optimizers.kalmanfilter")
 
 EnsembleKalmanFilterParameters = namedtuple(
-    'EnsembleKalmanFilter', ['noise', 'gamma', 'maxit', 'n_iteration',
-                             'pop_size', 'n_batches', 'online', 'seed',
+    'EnsembleKalmanFilter', ['noise', 'gamma', 'max_iterations', 'n_iteration',
+                             'pop_size', 'online', 'seed',
                              'data', 'observations', 'sampling_generation']
 )
 
 EnsembleKalmanFilterParameters.__doc__ = """
 :param noise: float, Noise level
 :param gamma
-:param maxit: int, Epochs to run inside the Kalman Filter
+:param max_iteration: int, Epochs/Repititions to run inside the Kalman Filter, 
+                      Default: 1
 :param n_iteration: int, Number of iterations to perform
 :param pop_size: int, Minimal number of individuals per simulation.
-:param n_batches: int, Number of mini-batches to use in the Kalman Filter
 :param online: bool, Indicates if only one data point will used, 
                Default: False
 :param sampling_generation: After `sampling_gerneration` steps a gaussian sampling 
@@ -39,6 +39,14 @@ EnsembleKalmanFilterParameters.__doc__ = """
 class EnsembleKalmanFilter(Optimizer):
     """
     Class for an Ensemble Kalman Filter optimizer
+
+    Note: Requires targets or observations and model output (`model_output`).
+    Targets have to come from the dataset, model outputs have to come from the
+    model itself and should be called `model_output` returned as a dictionary
+    from the optmizee. `model_output` should have a 3 dimensional form  as
+    `(n_ensembles, ensemble, batch_size)`. `batch_size` corresponds to the
+    number of observations, `n_ensembles` to `pop_size` and ensemble are the
+    parameters to optimize.
     """
 
     def __init__(self, traj,
@@ -60,7 +68,7 @@ class EnsembleKalmanFilter(Optimizer):
         traj.f_add_parameter('gamma', parameters.gamma, comment='Noise level')
         traj.f_add_parameter('noise', parameters.noise,
                              comment='Multivariate noise distribution')
-        traj.f_add_parameter('maxit', parameters.maxit,
+        traj.f_add_parameter('max_iterations', parameters.max_iterations,
                              comment='Maximum iterations')
         traj.f_add_parameter('n_iteration', parameters.n_iteration,
                              comment='Number of iterations to run')
@@ -109,29 +117,32 @@ class EnsembleKalmanFilter(Optimizer):
 
         individuals = traj.individuals[traj.generation]
         gamma = traj.gamma
-        ens_res = []
         ens_fitnesses = []
+        ensembles = []
+        model_output = []
+        ensemble_size = traj.pop_size
 
         # go over all individuals
         for i in individuals:
             # optimization
-            ens = np.array(i.ens)
-            ensemble_size = ens.shape[0]
+            ens = np.array(i.ensemble)
+            ensembles.append(ens)
             # get the score/fitness of the individual
             fitness_per_individual = traj.current_results[i.ind_idx][1][
                 'loss']
             ens_fitnesses.append(fitness_per_individual)
-            model_output = traj.current_results[i.ind_idx][1]['out']
-            enkf = EnKF(maxit=traj.maxit,
-                        online=traj.online,
-                        n_batches=traj.n_batches)
-            enkf.fit(ensemble=ens,
-                     ensemble_size=ensemble_size,
-                     u_exact=None,
-                     observations=self.targets,
-                     model_output=model_output,
-                     noise=traj.noise, p=None, gamma=gamma)
-            ens_res.append(enkf.ensemble)
+            # model output
+            mo = np.array(traj.current_results[i.ind_idx][1]['model_output'])
+            model_output.append(mo)
+        enkf = EnKF(maxit=traj.max_iterations,
+                    online=traj.online)
+        enkf.fit(ensemble=ensembles,
+                 ensemble_size=ensemble_size,
+                 observations=self.targets,
+                 model_output=model_output,
+                 gamma=gamma)
+        # results
+        ens_res = enkf.ensemble
 
         generation_name = 'generation_{}'.format(traj.generation)
         traj.results.generation_params.f_add_result_group(generation_name)
@@ -147,7 +158,7 @@ class EnsembleKalmanFilter(Optimizer):
         if traj.generation > 1 and traj.generation % traj.sampling_generation == 0:
             params, self.best_fitness, self.best_individual = self._new_individuals(
                 traj, ens_fitnesses, individuals, ensemble_size)
-            self.eval_pop = [dict(ens=params[i],
+            self.eval_pop = [dict(ensemble=params[i],
                                   inputs=self.inputs,
                                   targets=self.targets)
                              for i in range(traj.pop_size)]

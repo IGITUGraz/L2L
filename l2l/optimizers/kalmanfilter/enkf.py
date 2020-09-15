@@ -16,7 +16,7 @@ except ModuleNotFoundError:
 
 
 class EnsembleKalmanFilter:
-    def __init__(self, maxit=1, n_batches=1, online=False):
+    def __init__(self, maxit=1, online=False):
         """
         Ensemble Kalman Filter (EnKF)
 
@@ -25,8 +25,6 @@ class EnsembleKalmanFilter:
         doi:10.1088/0266-5611/29/4/045001
 
         :param maxit: int, maximum number of iterations
-        :param n_batches, int,  number of batches to used in mini-batch. If set
-            to `1` uses the whole given dataset. Default is `1`.
         :param online, bool, True if one random data point is requested,
             between [0, dims], otherwise do mini-batch. `dims` is the number of
             observations. Default is False
@@ -36,7 +34,6 @@ class EnsembleKalmanFilter:
 
         self.maxit = maxit
         self.online = online
-        self.n_batches = n_batches
         self.gamma = 0.
         self.gamma_s = 0
         self.dims = 0
@@ -75,30 +72,16 @@ class EnsembleKalmanFilter:
         self.observations = _encode_targets(observations, self.gamma_s)
 
         for i in range(self.maxit):
-            # now get mini_batches
-            if self.n_batches > self.dims:
-                num_batches = 1
-            else:
-                num_batches = self.n_batches
-            mini_batches = _get_batches(
-                num_batches, shape=self.dims, online=self.online)
-
-            for idx in mini_batches:
-                # in case of online learning idx should be an int
-                # put it into a list to loop over it
-                if not isinstance(idx, np.ndarray):
-                    idx = [idx]
-
-                for d in idx:
-                    # now get only the individuals output according to idx
-                    g_tmp = model_output[:, :, d]
-                    # Calculate the covariances
-                    c_pp = _cov_mat(g_tmp, g_tmp, ensemble_size)
-                    c_up = _cov_mat(self.ensemble, g_tmp, ensemble_size)
-                    self.ensemble = _update_step(self.ensemble,
-                                                 self.observations[d],
-                                                 g_tmp, self.gamma,
-                                                 c_pp, c_up)
+            for d in range(len(self.observations)):
+                # now get only the individuals output according to idx
+                g_tmp = model_output[:, :, d]
+                # Calculate the covariances
+                c_pp = _cov_mat(g_tmp, g_tmp, ensemble_size)
+                c_up = _cov_mat(self.ensemble, g_tmp, ensemble_size)
+                self.ensemble = _update_step(self.ensemble,
+                                             self.observations[d],
+                                             g_tmp, self.gamma,
+                                             c_pp, c_up)
         return self
 
 
