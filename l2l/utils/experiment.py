@@ -124,46 +124,29 @@ class Experiment(object):
         print('JUBE parameters used: {}'.format(all_jube_params))
         return self.traj, all_jube_params
 
-    def prepare_optimizee(self, optimizee, optimizee_parameters):
-        """
-
-        :param optimizee: optimizee module, e.g. `from l2l.optimizees.mnist
-        import nn` then `nn` is the optimizee
-        :param optimizee_parameters: Namedtuple, parameters of the optimizee
-        :return: optimizee object, initialized optimizee object
-        """
-        self.optimizee = optimizee(self.traj, optimizee_parameters)
-        jube.prepare_optimizee(optimizee, self.paths.root_dir_path)
-        self.logger.info("Optimizee parameters: %s", optimizee_parameters)
-        return self.optimizee
-
-    def prepare_optimizer(self, optimizer, optimizer_parameters,
-                          optimizee_fitness_weights=(-1,)):
-        """
-        :param optimizer: optimizer module, e.g. `from l2l.optimizer.evolution
-        import GeneticAlgorithmOptimizer`, then `GeneticAlgorithmOptimizer` is
-        the optimizer
-        :param optimizer_parameters: Namedtuple, parameters of the optimizer
-        :param optimizee_fitness_weights, tuple or list, array for the weights,
-        Default: ((-1,))
-        :return: optimizer object, initialized optimizer object
-        """
-        self.optimizer = optimizer(self.traj,
-                                   optimizee_create_individual=self.optimizee.create_individual,
-                                   parameters=optimizer_parameters,
-                                   optimizee_bounding_func=self.optimizee.bounding_func,
-                                   optimizee_fitness_weights=optimizee_fitness_weights)
-        self.logger.info("Optimizer parameters: %s", optimizer_parameters)
-        # Add post processing
-        self.env.add_postprocessing(self.optimizer.post_process())
-        return self.optimizer
-
-    def run_experiment(self):
+    def run_experiment(self, optimizee, optimizee_parameters, optimizer,
+                       optimizer_parameters):
         """
         Runs the simulation with all parameter combinations
+
+        Optimizee and optimizer object are required as well as their parameters
+        as namedtuples
+
+        :param optimizee: optimizee object
+        :param optimizee_parameters: Namedtuple, parameters of the optimizee
+        :param optimizer: optimizer object
+        :param optimizer_parameters: Namedtuple, parameters of the optimizer
+        :return traj, trajectory object
+        :return path, Path object
         """
-        self.env.run(self.optimizee.simulate)
+        self.logger.info("Optimizee parameters: %s", optimizee_parameters)
+        self.logger.info("Optimizer parameters: %s", optimizer_parameters)
+        # Add post processing
+        self.env.add_postprocessing(optimizer.post_process)
+        # Run the simulation
+        self.env.run(optimizee.simulate)
         # Outer-loop optimizer end
-        self.optimizer.end()
+        optimizer.end()
         # Finally disable logging and close all log-files
         self.env.disable_logging()
+        return self.traj, self.paths
