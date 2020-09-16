@@ -141,6 +141,7 @@ class Experiment(object):
         """
         self.logger.info("Optimizee parameters: %s", optimizee_parameters)
         self.logger.info("Optimizer parameters: %s", optimizer_parameters)
+        jube.prepare_optimizee(optimizee, self.paths.root_dir_path)
         # Add post processing
         self.env.add_postprocessing(optimizer.post_process)
         # Run the simulation
