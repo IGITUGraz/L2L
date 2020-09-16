@@ -12,16 +12,16 @@ import os
 
 class SetupTestCase(unittest.TestCase):
 
-    def setup(self):
+    def setUp(self):
         self.name = "test_trajectory"
-
-    def test_paths(self):
         try:
-            with open('bin/path.conf') as f:
+            with open('../../bin/path.conf') as f:
                 root_dir_path = f.read().strip()
         except FileNotFoundError:
             self.fail("L2L is not well configured. Missing path file.")
         self.paths = Paths(self.name, dict(run_num='test'), root_dir_path=root_dir_path, suffix="-" + self.name)
+
+    def test_paths(self):
         self.assertIsNotNone(self.paths)
         self.assertIsNotNone(Paths.simulation_path)
 
@@ -37,7 +37,7 @@ class SetupTestCase(unittest.TestCase):
             log_stdout=False,
         )
         traj = env.trajectory
-        self.assertNotNone(traj.individual)
+        self.assertIsNotNone(traj.individual)
 
     def test_trajectory_parms_setup(self):
         env = Environment(
@@ -101,9 +101,11 @@ def suite():
     suite = unittest.makeSuite(SetupTestCase, 'test')
     return suite
 
+
 def run():
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite())
+
 
 if __name__ == "__main__":
     run()
