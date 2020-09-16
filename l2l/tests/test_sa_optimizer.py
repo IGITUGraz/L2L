@@ -32,8 +32,8 @@ class SAOptimizerTestCase(unittest.TestCase):
         self.optimizee = FunctionGeneratorOptimizee(self.trajectory, benchmark_function, seed=optimizee_seed)
 
     def test_setup(self):
-
         parameters = SimulatedAnnealingParameters(n_parallel_runs=1, noisy_step=.03, temp_decay=.99, n_iteration=1,
+
                                                   stop_criterion=np.Inf, seed=np.random.randint(1e5),
                                                   cooling_schedule=AvailableCoolingSchedules.QUADRATIC_ADDAPTIVE)
 

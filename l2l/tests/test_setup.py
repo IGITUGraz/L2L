@@ -20,6 +20,8 @@ class SetupTestCase(unittest.TestCase):
         except FileNotFoundError:
             self.fail("L2L is not well configured. Missing path file.")
         self.paths = Paths(self.name, dict(run_num='test'), root_dir_path=root_dir_path, suffix="-" + self.name)
+
+    def test_paths(self):
         self.assertIsNotNone(self.paths)
         self.assertIsNotNone(Paths.simulation_path)
 
@@ -36,7 +38,6 @@ class SetupTestCase(unittest.TestCase):
         )
         traj = env.trajectory
         self.assertIsNotNone(traj.individual)
-
 
     def test_trajectory_parms_setup(self):
         env = Environment(
@@ -100,9 +101,11 @@ def suite():
     suite = unittest.makeSuite(SetupTestCase, 'test')
     return suite
 
+
 def run():
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite())
+
 
 if __name__ == "__main__":
     run()
