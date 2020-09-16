@@ -26,15 +26,14 @@ class Experiment(object):
 
     def prepare_experiment(self, **kwargs):
         """
-
-        :param root_dir_path: str, Path to the results folder. Accepts relative
-        paths. Will check if the folder exists and create if not.
+        Prepare the experiment by creating the enviroment and
         :param kwargs: optional dictionary, contains
             - name: str, name of the run, Default: L2L-run
             - trajectory_name: str, name of the trajectory, Default: trajectory
             - log_stdout: bool, if stdout should be sent to logs, Default:False
             - jube_parameter: dict, User specified parameter for jube.
                 See notes section for default jube parameter
+            - multiprocessing, bool, enable multiprocessing, Default: False
         :return
 
         :notes
@@ -76,6 +75,7 @@ class Experiment(object):
             add_time=True,
             automatic_storing=True,
             log_stdout=kwargs.get('log_stdout', False),  # Sends stdout to logs
+            multiprocessing=kwargs.get('multiprocessing', False)
         )
 
         create_shared_logger_data(
@@ -103,8 +103,8 @@ class Experiment(object):
             "err_file": "stderr",
             "out_file": "stdout",
             "tasks_per_job": "1",
-            "exec": "mpirun python3 " + os.path.join(self.paths.root_dir_path,
-                                                     "run_files/run_optimizee.py"),
+            "exec": "python " + os.path.join(self.paths.simulation_path,
+                                             "run_files/run_optimizee.py"),
             "ready_file": os.path.join(self.paths.root_dir_path,
                                        "ready_files/ready_w_"),
             "work_path": self.paths.root_dir_path,
@@ -130,7 +130,7 @@ class Experiment(object):
         Runs the simulation with all parameter combinations
 
         Optimizee and optimizer object are required as well as their parameters
-        as namedtuples
+        as namedtuples.
 
         :param optimizee: optimizee object
         :param optimizee_parameters: Namedtuple, parameters of the optimizee
@@ -141,7 +141,7 @@ class Experiment(object):
         """
         self.logger.info("Optimizee parameters: %s", optimizee_parameters)
         self.logger.info("Optimizer parameters: %s", optimizer_parameters)
-        jube.prepare_optimizee(optimizee, self.paths.root_dir_path)
+        jube.prepare_optimizee(optimizee, self.paths.simulation_path)
         # Add post processing
         self.env.add_postprocessing(optimizer.post_process)
         # Run the simulation
