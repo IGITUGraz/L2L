@@ -26,8 +26,7 @@ class JUBERunner():
         self.done = False
         if 'JUBE_params' not in self.trajectory.par.keys():
             raise KeyError("The trajectory must contain the parameter group JUBE_params")
-        else:
-            args = self.trajectory.par["JUBE_params"].params
+        args = self.trajectory.parameters["JUBE_params"].params
 
         self._prefix = args.get('fileprefix', "")
         self.jube_config = {

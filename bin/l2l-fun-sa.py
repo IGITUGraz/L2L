@@ -59,7 +59,7 @@ def main():
     # Set JUBE params
     traj.f_add_parameter_group("JUBE_params", "Contains JUBE parameters")
     # Execution command
-    traj.f_add_parameter_to_group("JUBE_params", "exec", "python3 " +
+    traj.f_add_parameter_to_group("JUBE_params", "exec", "python " +
                                   os.path.join(paths.simulation_path, "run_files/run_optimizee.py"))
     # Paths
     traj.f_add_parameter_to_group("JUBE_params", "paths", paths)
