@@ -302,7 +302,15 @@ which contains details for the right execution of the program.
 **Mandatory** steps to define the execution of the optimizees:
 1. Add a parameter group to the :obj: traj called JUBE_params using its :meth: f_add_parameter_group.
 2. Setup the execution command :attr: exec by using the trajectory :meth: f_add_parameter_to_group.
+Add parameter to group receives three parameters, which in this case should be specified as:
+group_name=JUBE_params, key="exec", val=<execution command string>
+This <execution command string> will be used to launch individual optimizees. An example of a simple call without using MPI calls
+is: "python " + os.path.join(paths.simulation_path, "run_files/run_optimizee.py"
 3. Setup the ready and working paths :attr: exec by using the trajectory :meth: f_add_parameter_to_group.
+Add parameter to group receives three parameters, which in this case should be specified as:
+group_name=JUBE_params, key="paths", val=<path object>
+<path object> should contain the root working path. An example of this path is:
+paths = Paths(name, dict(run_num='test'), root_dir_path=<root_dir_path>, suffix="-example")
 
 In order to launch simulations on a laptop or a local cluster without a scheduler, only the mandatory parameters must
 be specified. These parameters are part of the template.
