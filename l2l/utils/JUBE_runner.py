@@ -28,6 +28,7 @@ class JUBERunner():
             raise KeyError("The trajectory must contain the parameter group JUBE_params")
         args = self.trajectory.parameters["JUBE_params"].params
 
+
         self._prefix = args.get('fileprefix', "")
         self.jube_config = {
             'submit_cmd': args.get('submit_cmd', ""),
