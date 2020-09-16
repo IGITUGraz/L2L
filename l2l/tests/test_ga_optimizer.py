@@ -2,12 +2,12 @@ import unittest
 
 import numpy as np
 from l2l.utils.environment import Environment
-from l2l.optimizers.evolutionstrategies import EvolutionStrategiesParameters, EvolutionStrategiesOptimizer
+from l2l.optimizers.evolution import GeneticAlgorithmOptimizer, GeneticAlgorithmParameters
 
 from l2l.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from l2l.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 
-class CEOptimizerTestCase(unittest.TestCase):
+class GAOptimizerTestCase(unittest.TestCase):
 
     def setUp(self):
         name = "test_trajectory"
@@ -20,7 +20,7 @@ class CEOptimizerTestCase(unittest.TestCase):
             automatic_storing=True,
             log_stdout=False,  # Sends stdout to logs
         )
-        self.traj = self.env.trajectory
+        self.trajectory = self.env.trajectory
         ## Benchmark function
         function_id = 14
         bench_functs = BenchmarkedFunctions()
@@ -28,26 +28,19 @@ class CEOptimizerTestCase(unittest.TestCase):
             bench_functs.get_function_by_index(function_id, noise=True)
 
         optimizee_seed = 1
-        self.optimizee = FunctionGeneratorOptimizee(self.traj, benchmark_function, seed=optimizee_seed)
+        self.optimizee = FunctionGeneratorOptimizee(self.trajectory, benchmark_function, seed=optimizee_seed)
 
     def test_setup(self):
 
-        parameters = EvolutionStrategiesParameters(
-        learning_rate=0.1,
-        noise_std=1.0,
-        mirrored_sampling_enabled=True,
-        fitness_shaping_enabled=True,
-        pop_size=1,
-        n_iteration=1,
-        stop_criterion=np.Inf,
-        seed=1)
+        parameters = GeneticAlgorithmParameters(seed=0, popsize=50, CXPB=0.5,
+                                                MUTPB=0.3, NGEN=100, indpb=0.02,
+                                                tournsize=15, matepar=0.5,
+                                                mutpar=1
+                                                )
 
-        optimizer = EvolutionStrategiesOptimizer(
-        self.traj,
-        optimizee_create_individual=self.optimizee.create_individual,
-        optimizee_fitness_weights=(-1.,),
-        parameters=parameters,
-        optimizee_bounding_func=self.optimizee.bounding_func)
+        optimizer = GeneticAlgorithmOptimizer(self.trajectory, optimizee_create_individual=self.optimizee.create_individual,
+                                              optimizee_fitness_weights=(-0.1,),
+                                              parameters=parameters)
 
         self.assertIsNotNone(optimizer.parameters)
         try:
@@ -57,7 +50,7 @@ class CEOptimizerTestCase(unittest.TestCase):
 
 
 def suite():
-    suite = unittest.makeSuite(CEOptimizerTestCase, 'test')
+    suite = unittest.makeSuite(GAOptimizerTestCase, 'test')
     return suite
 
 
