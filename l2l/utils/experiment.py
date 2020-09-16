@@ -1,0 +1,169 @@
+import logging.config
+import os
+
+from l2l.utils.environment import Environment
+
+from l2l.logging_tools import create_shared_logger_data, configure_loggers
+from l2l.paths import Paths
+import l2l.utils.JUBE_runner as jube
+
+
+class Experiment(object):
+    def __init__(self, root_dir_path):
+        """
+        Prepares and starts the l2l simulation.
+
+        :param root_dir_path: str, Path to the results folder. Accepts relative
+        paths. Will check if the folder exists and create if not.
+        """
+        self.root_dir_path = root_dir_path
+        self.logger = logging.getLogger('bin.l2l')
+        self.paths = None
+        self.env = None
+        self.traj = None
+        self.optimizee = None
+        self.optimizer = None
+
+    def prepare_experiment(self, **kwargs):
+        """
+
+        :param root_dir_path: str, Path to the results folder. Accepts relative
+        paths. Will check if the folder exists and create if not.
+        :param kwargs: optional dictionary, contains
+            - name: str, name of the run, Default: L2L-run
+            - trajectory_name: str, name of the trajectory, Default: trajectory
+            - log_stdout: bool, if stdout should be sent to logs, Default:False
+            - jube_parameter: dict, User specified parameter for jube.
+                See notes section for default jube parameter
+        :return
+
+        :notes
+           Default JUBE parameters are:
+            - scheduler: Slurm,
+            - submit_cmd: sbatch,
+            - job_file: job.run,
+            - nodes: 1,
+            - walltime: 01:00:00,
+            - ppn: 1,
+            - cpu_pp: 1,
+            - threads_pp: 4,
+            - mail_mode: ALL,
+            - err_file: stderr,
+            - out_file: stdout,
+            - tasks_per_job: 1
+        """
+        name = kwargs.get('name', 'L2L-run')
+        if not os.path.isdir(self.root_dir_path):
+            os.mkdir(os.path.abspath(self.root_dir_path))
+            print('Created a folder at {}'.format(self.root_dir_path))
+
+        trajectory_name = kwargs.get('trajectory_name', 'trajectory')
+
+        self.paths = Paths(name, dict(run_num='test'),
+                           root_dir_path=self.root_dir_path,
+                           suffix="-" + trajectory_name)
+
+        print("All output logs can be found in directory ",
+              self.paths.logs_path)
+
+        # Create an environment that handles running our simulation
+        # This initializes an environment
+        self.env = Environment(
+            trajectory=trajectory_name,
+            filename=self.paths.output_dir_path,
+            file_title='{} data'.format(name),
+            comment='{} data'.format(name),
+            add_time=True,
+            automatic_storing=True,
+            log_stdout=kwargs.get('log_stdout', False),  # Sends stdout to logs
+        )
+
+        create_shared_logger_data(
+            logger_names=['bin', 'optimizers'],
+            log_levels=['INFO', 'INFO'],
+            log_to_consoles=[True, True],
+            sim_name=name,
+            log_directory=self.paths.logs_path)
+        configure_loggers()
+
+        # Get the trajectory from the environment
+        self.traj = self.env.trajectory
+
+        # Set JUBE params
+        default_jube_params = {
+            "scheduler": "Slurm",
+            "submit_cmd": "sbatch",
+            "job_file": "job.run",
+            "nodes": "1",
+            "walltime": "01:00:00",
+            "ppn": "1",
+            "cpu_pp": "1",
+            "threads_pp": "4",
+            "mail_mode": "ALL",
+            "err_file": "stderr",
+            "out_file": "stdout",
+            "tasks_per_job": "1",
+            "exec": "mpirun python3 " + os.path.join(self.paths.root_dir_path,
+                                                     "run_files/run_optimizee.py"),
+            "ready_file": os.path.join(self.paths.root_dir_path,
+                                       "ready_files/ready_w_"),
+            "work_path": self.paths.root_dir_path,
+            "paths_obj": self.paths,
+        }
+        all_jube_params = {}
+        self.traj.f_add_parameter_group("JUBE_params",
+                                        "Contains JUBE parameters")
+        if kwargs.get('jube_parameter'):
+            for k, v in kwargs['jube_parameter'].items():
+                self.traj.f_add_parameter_group("JUBE_params", k, v)
+                all_jube_params[k] = v
+        for k, v in default_jube_params.items():
+            if k not in kwargs.get('jube_parameter').keys():
+                self.traj.f_add_parameter_to_group("JUBE_params", k, v)
+                all_jube_params[k] = v
+        print('JUBE parameters used: {}'.format(all_jube_params))
+        return self.traj, all_jube_params
+
+    def prepare_optimizee(self, optimizee, optimizee_parameters):
+        """
+
+        :param optimizee: optimizee module, e.g. `from l2l.optimizees.mnist
+        import nn` then `nn` is the optimizee
+        :param optimizee_parameters: Namedtuple, parameters of the optimizee
+        :return: optimizee object, initialized optimizee object
+        """
+        self.optimizee = optimizee(self.traj, optimizee_parameters)
+        jube.prepare_optimizee(optimizee, self.paths.root_dir_path)
+        self.logger.info("Optimizee parameters: %s", optimizee_parameters)
+        return self.optimizee
+
+    def prepare_optimizer(self, optimizer, optimizer_parameters,
+                          optimizee_fitness_weights=(-1,)):
+        """
+        :param optimizer: optimizer module, e.g. `from l2l.optimizer.evolution
+        import GeneticAlgorithmOptimizer`, then `GeneticAlgorithmOptimizer` is
+        the optimizer
+        :param optimizer_parameters: Namedtuple, parameters of the optimizer
+        :param optimizee_fitness_weights, tuple or list, array for the weights,
+        Default: ((-1,))
+        :return: optimizer object, initialized optimizer object
+        """
+        self.optimizer = optimizer(self.traj,
+                                   optimizee_create_individual=self.optimizee.create_individual,
+                                   parameters=optimizer_parameters,
+                                   optimizee_bounding_func=self.optimizee.bounding_func,
+                                   optimizee_fitness_weights=optimizee_fitness_weights)
+        self.logger.info("Optimizer parameters: %s", optimizer_parameters)
+        # Add post processing
+        self.env.add_postprocessing(self.optimizer.post_process())
+        return self.optimizer
+
+    def run_experiment(self):
+        """
+        Runs the simulation with all parameter combinations
+        """
+        self.env.run(self.optimizee.simulate)
+        # Outer-loop optimizer end
+        self.optimizer.end()
+        # Finally disable logging and close all log-files
+        self.env.disable_logging()
