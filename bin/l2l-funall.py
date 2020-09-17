@@ -14,6 +14,7 @@ from l2l.optimizers.gradientdescent.optimizer import GradientDescentOptimizer, R
     AdamParameters, StochasticGDParameters
 from l2l.optimizers.gridsearch import GridSearchOptimizer, GridSearchParameters
 from l2l.paths import Paths
+from l2l.utils import JUBE_runner as jube
 
 from l2l.logging_tools import create_shared_logger_data, configure_loggers
 
@@ -45,7 +46,8 @@ def main():
         (CrossEntropyOptimizer,
          lambda: CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0,
                                         n_iteration=n_iterations,
-                                        distribution=NoisyGaussian(noise_decay=0.95, noise_bias=0.05))),
+                                        distribution=NoisyGaussian(noise_decay=0.95),
+                                        stop_criterion=np.inf, seed=102)),
         (FACEOptimizer,
          lambda: FACEParameters(min_pop_size=20, max_pop_size=50, n_elite=10, smoothing=0.2, temp_decay=0,
                                 n_iteration=n_iterations, distribution=Gaussian(), n_expand=5)),
@@ -93,11 +95,20 @@ def main():
 
         # Get the trajectory from the environment
         traj = env.trajectory
+        # Set JUBE params
+        traj.f_add_parameter_group("JUBE_params", "Contains JUBE parameters")
+        # Execution command
+        traj.f_add_parameter_to_group("JUBE_params", "exec", "python " +
+                                      os.path.join(paths.simulation_path, "run_files/run_optimizee.py"))
+        # Paths
+        traj.f_add_parameter_to_group("JUBE_params", "paths", paths)
 
         (benchmark_name, benchmark_function), benchmark_parameters = \
             bench_functs.get_function_by_index(function_id, noise=True)
 
-        optimizee = FunctionGeneratorOptimizee(traj, benchmark_function)
+        optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=100)
+        # Prepare optimizee for jube runs
+        jube.prepare_optimizee(optimizee, paths.simulation_path)
 
         optimizee_fitness_weights = -1.
         # Gradient descent does descent!

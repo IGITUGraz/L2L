@@ -14,6 +14,7 @@ from l2l.paths import Paths
 from l2l.optimizers.crossentropy.distribution import NoisyBayesianGaussianMixture
 
 from l2l.logging_tools import create_shared_logger_data, configure_loggers
+from l2l.utils import JUBE_runner as jube
 
 warnings.filterwarnings("ignore")
 
@@ -56,6 +57,14 @@ def main():
 
     # Get the trajectory from the environment
     traj = env.trajectory
+    # Set JUBE params
+    traj.f_add_parameter_group("JUBE_params", "Contains JUBE parameters")
+    # Execution command
+    traj.f_add_parameter_to_group("JUBE_params", "exec", "python " +
+                                  os.path.join(paths.simulation_path, "run_files/run_optimizee.py"))
+    # Paths
+    traj.f_add_parameter_to_group("JUBE_params", "paths", paths)
+
 
     function_id = 14
     bench_functs = BenchmarkedFunctions()
@@ -68,6 +77,9 @@ def main():
 
     ## Innerloop simulator
     optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
+
+    # Prepare optimizee for jube runs
+    jube.prepare_optimizee(optimizee, paths.simulation_path)
 
     ## Outerloop optimizer initialization
     parameters = CrossEntropyParameters(pop_size=50, rho=0.9, smoothing=0.0, temp_decay=0, n_iteration=160,
