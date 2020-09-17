@@ -1,3 +1,8 @@
+from collections import namedtuple
+
+OptimizerParameters = namedtuple('OptimizeeParameters', [])
+
+
 class Optimizee:
     """
     This is the base class for the Optimizees, i.e. the inner loop algorithms. Often, these are the implementations that
