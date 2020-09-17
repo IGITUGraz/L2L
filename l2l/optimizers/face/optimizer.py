@@ -202,7 +202,7 @@ class FACEOptimizer(Optimizer):
         # Storing Generation Parameters / Results in the trajectory
         # **************************************************************************************************************
         # These entries correspond to the generation that has been simulated prior to this post-processing run
-
+        traj.results.generation_params.f_add_result_group(generation_name, 'New generation added to results')
         traj.results.generation_params.f_add_result(generation_name + '.g', self.g,
                                                     comment='The index of the evaluated generation')
         traj.results.generation_params.f_add_result(generation_name + '.gamma', self.gamma,

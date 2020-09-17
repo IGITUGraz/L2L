@@ -25,9 +25,9 @@ class JUBERunner():
         self.trajectory = trajectory
         self.done = False
         if 'JUBE_params' not in self.trajectory.par.keys():
-            raise Exception("JUBE parameters not found in trajectory")
-        else:
-            args = self.trajectory.par["JUBE_params"].params
+            raise KeyError("The trajectory must contain the parameter group JUBE_params")
+        args = self.trajectory.parameters["JUBE_params"].params
+
 
         self._prefix = args.get('fileprefix', "")
         self.jube_config = {
@@ -50,8 +50,7 @@ class JUBERunner():
 
         self.executor = args['exec']
         self.filename = ""
-        self.path = args['work_path']
-        self.paths = args['paths_obj']
+        self.path = args['paths'].simulation_path
         # Create directories for workspace
         subdirs = ['jube_xml', 'run_files', 'ready_files', 'trajectories', 'results', 'work']
         self.work_paths = {sdir: os.path.join(self.path, sdir) for sdir in subdirs}
@@ -288,4 +287,4 @@ def prepare_optimizee(optimizee, path):
     f = open(fname, "wb")
     pickle.dump(optimizee, f)
     f.close()
-    logger.info("Serialized optimizee writen to path: " + fname)
+    logger.info("Serialized optimizee writen to path: {}".format(fname))

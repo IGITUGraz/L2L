@@ -9,6 +9,7 @@ from l2l.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from l2l.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from l2l.optimizers.paralleltempering.optimizer import ParallelTemperingParameters, ParallelTemperingOptimizer, AvailableCoolingSchedules
 from l2l.paths import Paths
+from l2l.utils import JUBE_runner as jube
 
 from l2l.logging_tools import create_shared_logger_data, configure_loggers
 
@@ -54,6 +55,13 @@ def main():
     # Get the trajectory from the environment
     traj = env.trajectory
 
+    # Set JUBE params
+    traj.f_add_parameter_group("JUBE_params", "Contains JUBE parameters")
+    traj.f_add_parameter_to_group("JUBE_params", "exec", "python " +
+                                  os.path.join(paths.simulation_path, "run_files/run_optimizee.py"))
+    # Paths
+    traj.f_add_parameter_to_group("JUBE_params", "paths", paths)
+
     ## Benchmark function
     function_id = 14
     bench_functs = BenchmarkedFunctions()
@@ -66,6 +74,9 @@ def main():
 
     ## Innerloop simulator
     optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
+
+    # Prepare optimizee for jube runs
+    jube.prepare_optimizee(optimizee, paths.simulation_path)
 
     #--------------------------------------------------------------------------
     # configure settings for parallel tempering:
@@ -89,12 +100,12 @@ def main():
 
     # has to be from 1 to 0, first entry hast to be larger than second
     # represents the starting temperature and the ending temperature
-    temperature_bounds = [
+    temperature_bounds = np.array([
         [0.8, 0],
         [0.7, 0],
         [0.6, 0],
         [1, 0.1],
-        [0.9, 0.2]]
+        [0.9, 0.2]])
 
     # decay parameter for each schedule. If needed can be different for each
     # schedule
