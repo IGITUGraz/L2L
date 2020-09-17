@@ -34,7 +34,9 @@ class Experiment(object):
             - jube_parameter: dict, User specified parameter for jube.
                 See notes section for default jube parameter
             - multiprocessing, bool, enable multiprocessing, Default: False
-        :return
+        :return all_jube_params, dict, a dictionary with all parameters for jube
+            given by the user and default ones
+        :return traj, trajectory object
 
         :notes
            Default JUBE parameters are:
@@ -110,13 +112,16 @@ class Experiment(object):
             "work_path": self.paths.root_dir_path,
             "paths_obj": self.paths,
         }
+        # Will contain all jube parameters
         all_jube_params = {}
         self.traj.f_add_parameter_group("JUBE_params",
                                         "Contains JUBE parameters")
+        # Go through the parameter dictionary and add to the trjacectory
         if kwargs.get('jube_parameter'):
             for k, v in kwargs['jube_parameter'].items():
                 self.traj.f_add_parameter_group("JUBE_params", k, v)
                 all_jube_params[k] = v
+        # Default parameter are added if they are not already set by the user
         for k, v in default_jube_params.items():
             if k not in kwargs.get('jube_parameter').keys():
                 self.traj.f_add_parameter_to_group("JUBE_params", k, v)
