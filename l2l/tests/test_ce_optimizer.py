@@ -30,6 +30,7 @@ class CEOptimizerTestCase(unittest.TestCase):
         optimizee_seed = 1
         self.optimizee = FunctionGeneratorOptimizee(self.trajectory, benchmark_function, seed=optimizee_seed)
 
+
     def test_setup(self):
 
         parameters = EvolutionStrategiesParameters(
