@@ -68,7 +68,7 @@ class SetupTestCase(unittest.TestCase):
 
     def test_juberunner_setup(self):
         name = "test_trajectory"
-        self.env = Environment(
+        env = Environment(
             trajectory=name,
             filename=".",
             file_title='{} data'.format(name),
@@ -77,7 +77,11 @@ class SetupTestCase(unittest.TestCase):
             automatic_storing=True,
             log_stdout=False,  # Sends stdout to logs
         )
-        self.traj = self.env.trajectory
+        traj = env.trajectory
+        traj.f_add_parameter_group("JUBE_params", "Contains JUBE parameters")
+        traj.f_add_parameter_to_group("JUBE_params", "exec", "python " +
+                                      os.path.join(self.paths.simulation_path, "run_files/run_optimizee.py"))
+        traj.f_add_parameter_to_group("JUBE_params", "paths", self.paths)
         ## Benchmark function
         function_id = 14
         bench_functs = BenchmarkedFunctions()
@@ -85,9 +89,9 @@ class SetupTestCase(unittest.TestCase):
             bench_functs.get_function_by_index(function_id, noise=True)
 
         optimizee_seed = 1
-        self.optimizee = FunctionGeneratorOptimizee(self.traj, benchmark_function, seed=optimizee_seed)
+        optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=optimizee_seed)
 
-        jube.prepare_optimizee(self.optimizee, self.paths.root_dir_path)
+        jube.prepare_optimizee(optimizee, self.paths.root_dir_path)
 
         fname = os.path.join(self.paths.root_dir_path, "optimizee.bin")
         try:
