@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-OptimizerParameters = namedtuple('OptimizeeParameters', [])
+OptimizeeParameters = namedtuple('OptimizeeParameters', [])
 
 
 class Optimizee:
