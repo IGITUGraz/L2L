@@ -27,7 +27,6 @@ class SAOptimizerTestCase(OptimizerTestCase):
         except Exception:
             self.fail(Exception.__name__)
 
-
 def suite():
     suite = unittest.makeSuite(SAOptimizerTestCase, 'test')
     return suite

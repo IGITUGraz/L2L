@@ -10,6 +10,7 @@ from l2l.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 
 import os
 
+
 class SetupTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -82,6 +83,7 @@ class SetupTestCase(unittest.TestCase):
         traj.f_add_parameter_to_group("JUBE_params", "exec", "python " +
                                       os.path.join(self.paths.simulation_path, "run_files/run_optimizee.py"))
         traj.f_add_parameter_to_group("JUBE_params", "paths", self.paths)
+
         ## Benchmark function
         function_id = 14
         bench_functs = BenchmarkedFunctions()
@@ -94,6 +96,7 @@ class SetupTestCase(unittest.TestCase):
         jube.prepare_optimizee(optimizee, self.paths.root_dir_path)
 
         fname = os.path.join(self.paths.root_dir_path, "optimizee.bin")
+
         try:
             f = open(fname, "r")
             f.close()
