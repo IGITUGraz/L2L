@@ -27,8 +27,8 @@ class CEOptimizerTestCase(OptimizerTestCase):
         except Exception as e:
             self.fail(e.__name__)
         best = self.experiment.optimizer.best_individual['coords']
-        self.assertEqual(best[0], -3.5324410918288693)
-        self.assertEqual(best[1], -4.0766140523120225)
+        self.assertEqual(best[0], -4.998856251826551)
+        self.assertEqual(best[1], -1.9766742736816023)
         self.experiment.end_experiment(optimizer)
 
 

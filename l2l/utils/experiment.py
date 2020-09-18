@@ -93,7 +93,7 @@ class Experiment(object):
 
         # Set JUBE params
         default_jube_params = {
-            "scheduler": "None",
+            # "scheduler": "None",
             "submit_cmd": "sbatch",
             "job_file": "job.run",
             "nodes": "1",

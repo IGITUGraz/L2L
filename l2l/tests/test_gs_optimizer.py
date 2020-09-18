@@ -28,10 +28,9 @@ class GSOptimizerTestCase(OptimizerTestCase):
         except Exception as e:
             self.fail(e.__name__)
         print(self.experiment.optimizer)
-        best = list_to_dict(self.experiment.optimizer.current_individual.tolist(),
-                             self.experiment.optimizer.optimizee_individual_dict_spec)['coords']
-        self.assertEqual(best[0],-4.998856251826551)
-        self.assertEqual(best[1],-1.9766742736816023)
+        best = self.experiment.optimizer.best_individual['coords']
+        self.assertEqual(best[0],5)
+        self.assertEqual(best[1],5)
         self.experiment.end_experiment(optimizer)
 
 

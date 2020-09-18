@@ -92,6 +92,7 @@ class GridSearchOptimizer(Optimizer):
                 curr_param_list = [x.ravel() for x in curr_param_list]
                 curr_param_list = np.stack(curr_param_list, axis=-1)
                 self.param_list[param_name] = curr_param_list
+            self.size = len(self.param_list[param_name])
 
         self.param_list = cartesian_product(self.param_list, tuple(sorted(optimizee_param_grid.keys())))
 
@@ -101,12 +102,16 @@ class GridSearchOptimizer(Optimizer):
             traj.grid_spec.f_add_parameter(param_name + '.lower_bound', param_grid_spec[0])
             traj.grid_spec.f_add_parameter(param_name + '.uper_bound', param_grid_spec[1])
         traj.f_add_parameter('n_iteration', 1, comment='Grid search does only 1 iteration')
-        # Expanding the trajectory
-        self.param_list = {('individual.' + key): value for key, value in self.param_list.items()}
-        self.param_list['generation']=[0]
-        traj.f_expand(self.param_list)
         #: The current generation number
         self.g = 0
+        # Expanding the trajectory
+        grouped_params_dict = {'individual.' + key: value for key, value in self.param_list.items()}
+        final_params_dict = {'generation': [self.g],
+                             'ind_idx': range(self.size)}
+        final_params_dict.update(grouped_params_dict)
+        traj.f_expand(cartesian_product(final_params_dict,
+                                        [('ind_idx',) + tuple(grouped_params_dict.keys()), 'generation']))
+
         #: The population (i.e. list of individuals) to be evaluated at the next iteration
         self.eval_pop = None
 
@@ -131,14 +136,14 @@ class GridSearchOptimizer(Optimizer):
 
         for run_idx, run_fitness, run_weighted_fitness in zip(run_idx_array, fitness_array, weighted_fitness_array):
             traj.v_idx = run_idx
-            traj.results.f_add_result('$set.$.fitness', np.array(run_fitness))
-            traj.results.f_add_result('$set.$.weighted_fitness', run_weighted_fitness)
+            traj.f_add_result('$set.$.fitness', np.array(run_fitness))
+            traj.f_add_result('$set.$.weighted_fitness', run_weighted_fitness)
 
         logger.info('Best Individual is:')
         logger.info('')
 
         traj.v_idx = run_idx_array[max_fitness_indiv_index]
-        individual = traj.par.individual
+        individual = traj.individual
         self.best_individual = {}
         for param_name, _, _ in self.optimizee_individual_dict_spec:
             logger.info('  %s: %s', param_name, individual[param_name])
