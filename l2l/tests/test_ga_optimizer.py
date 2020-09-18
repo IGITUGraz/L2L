@@ -1,6 +1,6 @@
 import unittest
 
-from .test_optimizer import OptimizerTestCase
+from l2l.tests.test_optimizer import OptimizerTestCase
 from l2l.optimizers.evolution import GeneticAlgorithmOptimizer, GeneticAlgorithmParameters
 
 
@@ -25,7 +25,7 @@ class GAOptimizerTestCase(OptimizerTestCase):
                                   optimizee_parameters=self.optimizee_parameters,
                                   optimizer=optimizer,
                                   optimizer_parameters=optimizer_parameters)
-        except Exception:
+        except Exception as e:
             self.fail(Exception.__name__)
         best = self.experiment.optimizer.best_individual['coords']
         self.assertEqual(best[0], -4.998856251826551)

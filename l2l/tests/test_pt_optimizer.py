@@ -1,6 +1,6 @@
 import unittest
 
-from .test_optimizer import OptimizerTestCase
+from l2l.tests.test_optimizer import OptimizerTestCase
 import numpy as np
 from l2l.optimizers.paralleltempering.optimizer import AvailableCoolingSchedules
 from l2l.optimizers.paralleltempering.optimizer import ParallelTemperingParameters, ParallelTemperingOptimizer
@@ -46,8 +46,8 @@ class PTOptimizerTestCase(OptimizerTestCase):
                                   optimizee_parameters=self.optimizee_parameters,
                                   optimizer=optimizer,
                                   optimizer_parameters=optimizer_parameters)
-        except Exception:
-            self.fail(Exception.__name__)
+        except Exception as e:
+            self.fail(e.__name__)
 
 def suite():
     suite = unittest.makeSuite(PTOptimizerTestCase, 'test')

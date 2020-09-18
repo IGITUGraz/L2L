@@ -1,7 +1,7 @@
 import unittest
 
 import numpy as np
-from .test_optimizer import OptimizerTestCase
+from l2l.tests.test_optimizer import OptimizerTestCase
 from l2l.optimizers.crossentropy.distribution import NoisyGaussian
 from l2l.optimizers.crossentropy import CrossEntropyOptimizer, CrossEntropyParameters
 
@@ -24,8 +24,8 @@ class CEOptimizerTestCase(OptimizerTestCase):
                                   optimizee_parameters=self.optimizee_parameters,
                                   optimizer=optimizer,
                                   optimizer_parameters=optimizer_parameters)
-        except Exception:
-            self.fail(Exception.__name__)
+        except Exception as e:
+            self.fail(e.__name__)
         best = self.experiment.optimizer.best_individual['coords']
         self.assertEqual(best[0], -3.5324410918288693)
         self.assertEqual(best[1], -4.0766140523120225)

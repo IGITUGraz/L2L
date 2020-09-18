@@ -40,7 +40,7 @@ class Experiment(object):
 
         :notes
            Default JUBE parameters are:
-            - scheduler: Slurm,
+            - scheduler: None,
             - submit_cmd: sbatch,
             - job_file: job.run,
             - nodes: 1,
@@ -77,7 +77,7 @@ class Experiment(object):
             add_time=True,
             automatic_storing=True,
             log_stdout=kwargs.get('log_stdout', False),  # Sends stdout to logs
-            multiprocessing=kwargs.get('multiprocessing', False)
+            multiprocessing=kwargs.get('multiprocessing', True)
         )
 
         create_shared_logger_data(
@@ -93,7 +93,7 @@ class Experiment(object):
 
         # Set JUBE params
         default_jube_params = {
-            "scheduler": "Slurm",
+            "scheduler": "None",
             "submit_cmd": "sbatch",
             "job_file": "job.run",
             "nodes": "1",
