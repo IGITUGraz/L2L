@@ -92,19 +92,26 @@ class GridSearchOptimizer(Optimizer):
                 curr_param_list = [x.ravel() for x in curr_param_list]
                 curr_param_list = np.stack(curr_param_list, axis=-1)
                 self.param_list[param_name] = curr_param_list
+            self.size = len(self.param_list[param_name])
 
         self.param_list = cartesian_product(self.param_list, tuple(sorted(optimizee_param_grid.keys())))
 
         # Adding the bounds information to the trajectory
-        traj.parameters.f_add_parameter_group('grid_spec')
+        traj.f_add_parameter_group('grid_spec')
         for param_name, param_grid_spec in optimizee_param_grid.items():
-            traj.parameters.grid_spec.f_add_parameter(param_name + '.lower_bound', )
-
-        # Expanding the trajectory
-        self.param_list = {('individual.' + key): value for key, value in self.param_list.items()}
-        traj.f_expand(self.param_list)
+            traj.grid_spec.f_add_parameter(param_name + '.lower_bound', param_grid_spec[0])
+            traj.grid_spec.f_add_parameter(param_name + '.uper_bound', param_grid_spec[1])
+        traj.f_add_parameter('n_iteration', 1, comment='Grid search does only 1 iteration')
         #: The current generation number
         self.g = 0
+        # Expanding the trajectory
+        grouped_params_dict = {'individual.' + key: value for key, value in self.param_list.items()}
+        final_params_dict = {'generation': [self.g],
+                             'ind_idx': range(self.size)}
+        final_params_dict.update(grouped_params_dict)
+        traj.f_expand(cartesian_product(final_params_dict,
+                                        [('ind_idx',) + tuple(grouped_params_dict.keys()), 'generation']))
+
         #: The population (i.e. list of individuals) to be evaluated at the next iteration
         self.eval_pop = None
 
@@ -129,14 +136,14 @@ class GridSearchOptimizer(Optimizer):
 
         for run_idx, run_fitness, run_weighted_fitness in zip(run_idx_array, fitness_array, weighted_fitness_array):
             traj.v_idx = run_idx
-            traj.results.f_add_result('$set.$.fitness', np.array(run_fitness))
-            traj.results.f_add_result('$set.$.weighted_fitness', run_weighted_fitness)
+            traj.f_add_result('$set.$.fitness', np.array(run_fitness))
+            traj.f_add_result('$set.$.weighted_fitness', run_weighted_fitness)
 
         logger.info('Best Individual is:')
         logger.info('')
 
         traj.v_idx = run_idx_array[max_fitness_indiv_index]
-        individual = traj.par.individual
+        individual = traj.individual
         self.best_individual = {}
         for param_name, _, _ in self.optimizee_individual_dict_spec:
             logger.info('  %s: %s', param_name, individual[param_name])
@@ -148,6 +155,32 @@ class GridSearchOptimizer(Optimizer):
 
         self.g += 1
         traj.v_idx = -1
+
+    def _expand_trajectory(self, traj):
+        """
+        Add as many explored runs as individuals that need to be evaluated. Furthermore, add the individuals as explored
+        parameters.
+
+        :param  ~l2l.utils.trajectory.Trajectory traj: The  trajectory that contains the parameters and the
+            individual that we want to simulate. The individual is accessible using `traj.individual` and parameter e.g.
+            param1 is accessible using `traj.param1`
+
+        :return:
+        """
+
+        grouped_params_dict = get_grouped_dict(self.eval_pop)
+        grouped_params_dict = {'individual.' + key: val for key, val in grouped_params_dict.items()}
+
+        final_params_dict = {'generation': [self.g],
+                             'ind_idx': range(len(self.eval_pop))}
+        final_params_dict.update(grouped_params_dict)
+
+        # We need to convert them to lists or write our own custom IndividualParameter ;-)
+        # Note the second argument to `cartesian_product`: This is for only having the cartesian product
+        # between ``generation x (ind_idx AND individual)``, so that every individual has just one
+        # unique index within a generation.
+        traj.f_expand(cartesian_product(final_params_dict,
+                                        [('ind_idx',) + tuple(grouped_params_dict.keys()), 'generation']))
 
     def end(self, traj):
         """

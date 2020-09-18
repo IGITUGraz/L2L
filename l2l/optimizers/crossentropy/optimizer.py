@@ -124,7 +124,7 @@ class CrossEntropyOptimizer(Optimizer):
         self.T = 1  # This is the temperature used to filter evaluated samples in this run
         self.pop_size = parameters.pop_size  # Population size is dynamic in FACE
         self.best_fitness_in_run = -np.inf
-        self.best_individual_in_run = None
+        self.best_individual = None
 
         # The first iteration does not pick the values out of the Gaussian distribution. It picks randomly
         # (or at-least as randomly as optimizee_create_individual creates individuals)
@@ -192,7 +192,8 @@ class CrossEntropyOptimizer(Optimizer):
         # See original describtion of cross entropy for optimization
         elite_individuals = sorted_population[:n_elite]
 
-        self.best_individual_in_run = sorted_population[0]
+        self.best_individual = list_to_dict(sorted_population[0],
+                                            self.optimizee_individual_dict_spec)
         self.best_fitness_in_run = sorted_fitness[0]
         self.gamma = sorted_fitness[n_elite - 1]
 
@@ -280,8 +281,7 @@ class CrossEntropyOptimizer(Optimizer):
         """
         See :meth:`~l2l.optimizers.optimizer.Optimizer.end`
         """
-        best_last_indiv_dict = list_to_dict(self.best_individual_in_run.tolist(),
-                                            self.optimizee_individual_dict_spec)
+        best_last_indiv_dict = self.best_individual
 
         traj.f_add_result('final_individual', best_last_indiv_dict)
         traj.f_add_result('final_fitness', self.best_fitness_in_run)

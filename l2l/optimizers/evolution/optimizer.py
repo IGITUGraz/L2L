@@ -108,6 +108,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         self.g = 0  # the current generation
         self.toolbox = toolbox  # the DEAP toolbox
         self.hall_of_fame = HallOfFame(20)
+        self.best_individual = None
 
         self._expand_trajectory(traj)
 
@@ -140,6 +141,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
 
         logger.info("-- End of generation {} --".format(self.g))
         best_inds = tools.selBest(self.eval_pop_inds, 2)
+        self.best_individual = list_to_dict(best_inds[0], self.optimizee_individual_dict_spec)
         for best_ind in best_inds:
             print("Best individual is %s, %s" % (list_to_dict(best_ind, self.optimizee_individual_dict_spec),
                                                  best_ind.fitness.values))
@@ -189,7 +191,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 
-    def end(self):
+    def end(self, traj):
         """
         See :meth:`~l2l.optimizers.optimizer.Optimizer.end`
         """

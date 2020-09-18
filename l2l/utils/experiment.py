@@ -40,7 +40,7 @@ class Experiment(object):
 
         :notes
            Default JUBE parameters are:
-            - scheduler: Slurm,
+            - scheduler: None,
             - submit_cmd: sbatch,
             - job_file: job.run,
             - nodes: 1,
@@ -77,7 +77,7 @@ class Experiment(object):
             add_time=True,
             automatic_storing=True,
             log_stdout=kwargs.get('log_stdout', False),  # Sends stdout to logs
-            multiprocessing=kwargs.get('multiprocessing', False)
+            multiprocessing=kwargs.get('multiprocessing', True)
         )
 
         create_shared_logger_data(
@@ -93,7 +93,7 @@ class Experiment(object):
 
         # Set JUBE params
         default_jube_params = {
-            "scheduler": "Slurm",
+            # "scheduler": "None",
             "submit_cmd": "sbatch",
             "job_file": "job.run",
             "nodes": "1",
@@ -105,7 +105,7 @@ class Experiment(object):
             "err_file": "stderr",
             "out_file": "stdout",
             "tasks_per_job": "1",
-            "exec": "python " + os.path.join(self.paths.simulation_path,
+            "exec": "python3 " + os.path.join(self.paths.simulation_path,
                                              "run_files/run_optimizee.py"),
             "ready_file": os.path.join(self.paths.root_dir_path,
                                        "ready_files/ready_w_"),
@@ -116,7 +116,7 @@ class Experiment(object):
         all_jube_params = {}
         self.traj.f_add_parameter_group("JUBE_params",
                                         "Contains JUBE parameters")
-        # Go through the parameter dictionary and add to the trjacectory
+        # Go through the parameter dictionary and add to the trajcectory
         if kwargs.get('jube_parameter'):
             for k, v in kwargs['jube_parameter'].items():
                 self.traj.f_add_parameter_group("JUBE_params", k, v)
@@ -144,6 +144,9 @@ class Experiment(object):
         :return traj, trajectory object
         :return path, Path object
         """
+        self.optimizee = optimizee
+        self.optimizer = optimizer
+        self.optimizer = optimizer
         self.logger.info("Optimizee parameters: %s", optimizee_parameters)
         self.logger.info("Optimizer parameters: %s", optimizer_parameters)
         jube.prepare_optimizee(optimizee, self.paths.simulation_path)
@@ -151,8 +154,10 @@ class Experiment(object):
         self.env.add_postprocessing(optimizer.post_process)
         # Run the simulation
         self.env.run(optimizee.simulate)
+
+    def end_experiment(self, optimizer):
         # Outer-loop optimizer end
-        optimizer.end()
+        optimizer.end(self.traj)
         # Finally disable logging and close all log-files
         self.env.disable_logging()
         return self.traj, self.paths

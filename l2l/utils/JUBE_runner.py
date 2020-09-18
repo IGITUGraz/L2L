@@ -50,7 +50,7 @@ class JUBERunner():
 
         self.executor = args['exec']
         self.filename = ""
-        self.path = args['paths'].simulation_path
+        self.path = args['paths_obj'].simulation_path
         # Create directories for workspace
         subdirs = ['jube_xml', 'run_files', 'ready_files', 'trajectories', 'results', 'work']
         self.work_paths = {sdir: os.path.join(self.path, sdir) for sdir in subdirs}
@@ -105,7 +105,7 @@ class JUBERunner():
             f.write('    <parameter name="walltime">' + self.jube_config['walltime'] + '</parameter>\n')
             f.write('    <parameter name="ppn" type="int">' + self.jube_config['ppn'] + '</parameter>\n')
             f.write('    <parameter name="ready_file_scheduler" mode="python" type="string"> ' +
-                    os.path.join(self.work_paths['ready_files'], 'ready_ + ${index} + ') +
+                    os.path.join(self.work_paths['ready_files'], 'ready_${index} ') +
                     '</parameter>\n')
             f.write('    <parameter name="ready_file">' + self.jube_config['ready_file'] +
                     str(self.generation) + '</parameter>\n')
