@@ -143,7 +143,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
         self.g = 0  # the current generation
         self.pop_size = parameters.pop_size  # Population size is dynamic in FACE
         self.best_fitness_in_run = -np.inf
-        self.best_individual_in_run = None
+        self.best_individual = None
 
         # The first iteration does not pick the values out of the Gaussian distribution. It picks randomly
         # (or at-least as randomly as optimizee_create_individual creates individuals)
@@ -215,7 +215,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
         sorted_fitness = np.asarray(weighted_fitness_list)[fitness_sorting_indices]
         sorted_perturbations = self.current_perturbations[fitness_sorting_indices]
 
-        self.best_individual_in_run = sorted_population[0]
+        self.best_individual = list_to_dict(sorted_population[0], self.optimizee_individual_dict_spec)
         self.best_fitness_in_run = sorted_fitness[0]
 
         logger.info("-- End of generation %d --", self.g)
@@ -299,7 +299,7 @@ class EvolutionStrategiesOptimizer(Optimizer):
         """
         See :meth:`~l2l.optimizers.optimizer.Optimizer.end`
         """
-        best_last_indiv_dict = list_to_dict(self.best_individual_in_run.tolist(), self.optimizee_individual_dict_spec)
+        best_last_indiv_dict = self.best_individual
 
         traj.f_add_result('final_individual', best_last_indiv_dict)
         traj.f_add_result('final_fitness', self.best_fitness_in_run)

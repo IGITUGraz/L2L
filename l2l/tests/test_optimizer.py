@@ -6,6 +6,7 @@ from l2l.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from l2l.optimizees.functions.optimizee import FunctionGeneratorOptimizee
 from collections import namedtuple
 
+
 class OptimizerTestCase(unittest.TestCase):
 
     def setUp(self):
