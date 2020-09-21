@@ -16,10 +16,11 @@ class OptimizerTestCase(unittest.TestCase):
         (benchmark_name, benchmark_function), benchmark_parameters = \
             bench_functs.get_function_by_index(function_id, noise=True)
 
-        self.experiment = Experiment(root_dir_path='/home/sandra/Documents/L2L/results')
+        self.experiment = Experiment(root_dir_path='../../results')
         jube_params = {}
         self.trajectory, all_jube_params = self.experiment.prepare_experiment(name='L2L',
                                                                               log_stdout=True,
                                                                               jube_parameter=jube_params)
         self.optimizee_parameters = namedtuple('OptimizeeParameters', [])
-        self.optimizee = FunctionGeneratorOptimizee(self.trajectory,benchmark_function, seed=1)
+        self.optimizee = FunctionGeneratorOptimizee(
+            self.trajectory, benchmark_function, seed=1)

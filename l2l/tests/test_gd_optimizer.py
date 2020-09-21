@@ -4,6 +4,7 @@ import numpy as np
 from l2l.optimizers.gradientdescent.optimizer import GradientDescentOptimizer
 from l2l.optimizers.gradientdescent.optimizer import RMSPropParameters
 from l2l.tests.test_optimizer import OptimizerTestCase
+from l2l.utils.experiment import Experiment
 
 from l2l import list_to_dict
 
@@ -21,6 +22,7 @@ class GDOptimizerTestCase(OptimizerTestCase):
                                              parameters=optimizer_parameters,
                                              optimizee_bounding_func=self.optimizee.bounding_func)
         self.assertIsNotNone(optimizer.parameters)
+        self.experiment = Experiment(root_dir_path='../../results')
 
         try:
 

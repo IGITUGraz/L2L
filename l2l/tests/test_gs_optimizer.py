@@ -5,6 +5,7 @@ from l2l.tests.test_optimizer import OptimizerTestCase
 from l2l.optimizers.gridsearch import GridSearchOptimizer, GridSearchParameters
 
 from l2l import list_to_dict
+from l2l.utils.experiment import Experiment
 
 
 class GSOptimizerTestCase(OptimizerTestCase):
@@ -18,19 +19,20 @@ class GSOptimizerTestCase(OptimizerTestCase):
                                         optimizee_fitness_weights=(-0.1,),
                                         parameters=optimizer_parameters)
         self.assertIsNotNone(optimizer.parameters)
+        self.experiment = Experiment(root_dir_path='../../results')
 
         try:
 
             self.experiment.run_experiment(optimizee=self.optimizee,
-                                  optimizee_parameters=self.optimizee_parameters,
-                                  optimizer=optimizer,
-                                  optimizer_parameters=optimizer_parameters)
+                                           optimizee_parameters=self.optimizee_parameters,
+                                           optimizer=optimizer,
+                                           optimizer_parameters=optimizer_parameters)
         except Exception as e:
             self.fail(e.__name__)
         print(self.experiment.optimizer)
         best = self.experiment.optimizer.best_individual['coords']
-        self.assertEqual(best[0],5)
-        self.assertEqual(best[1],5)
+        self.assertEqual(best[0], 5)
+        self.assertEqual(best[1], 5)
         self.experiment.end_experiment(optimizer)
 
 

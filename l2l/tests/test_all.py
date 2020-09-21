@@ -1,16 +1,16 @@
 import unittest
 
 
-from . import test_ce_optimizer
-from . import test_ga_optimizer
-from . import test_sa_optimizer
-from . import test_gd_optimizer
-from . import test_innerloop
-from . import test_outerloop
-from . import test_setup
+from l2l.tests import test_ce_optimizer
+from l2l.tests import test_ga_optimizer
+from l2l.tests import test_sa_optimizer
+from l2l.tests import test_gd_optimizer
+from l2l.tests import test_innerloop
+from l2l.tests import test_outerloop
+from l2l.tests import test_setup
 
 
-def suite():
+def test_suite():
 
     suite = unittest.TestSuite()
     suite.addTest(test_setup.suite())
@@ -27,4 +27,4 @@ def suite():
 if __name__ == "__main__":
 
     runner = unittest.TextTestRunner(verbosity=2)
-    runner.run(suite())
+    runner.run(test_suite())
