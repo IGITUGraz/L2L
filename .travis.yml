@@ -18,4 +18,4 @@ install:
    - source install.sh 
 
 script:
-  nosetests l2l/tests/test_all.py
+  nosetests -v --cover-packge=l2l/tests
