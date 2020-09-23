@@ -1,22 +1,21 @@
 dist: bionic
-language: python
 sudo: false
-
 addons:
    apt:
-     update: true
-
+      update: true
+      
+language: python
 python: 
   - "3.6"
   - "3.7"
   - "3.8"
 
-  install:
-    - pip install -r requirements.txt
-    - pip -V
-    - python setup.py install
-    - pip install nose
-    - source install.sh 
+install:
+   - pip install -r requirements.txt
+   - pip -V
+   - python setup.py install
+   - pip install nose
+   - source install.sh 
 
 script:
   nosetests l2l/tests/test_all.py
