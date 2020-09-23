@@ -18,4 +18,4 @@ install:
    - source install.sh 
 
 script:
-  nosetests -v --cover-packge=l2l/tests
+  nosetests -v --cover-package=l2l/tests
