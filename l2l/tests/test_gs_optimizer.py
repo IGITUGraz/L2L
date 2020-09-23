@@ -19,8 +19,6 @@ class GSOptimizerTestCase(OptimizerTestCase):
                                         optimizee_fitness_weights=(-0.1,),
                                         parameters=optimizer_parameters)
         self.assertIsNotNone(optimizer.parameters)
-        self.experiment = Experiment(root_dir_path='../../results')
-
         try:
 
             self.experiment.run_experiment(optimizee=self.optimizee,

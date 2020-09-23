@@ -2,7 +2,6 @@ import unittest
 
 from l2l.tests.test_optimizer import OptimizerTestCase
 from l2l.optimizers.evolution import GeneticAlgorithmOptimizer, GeneticAlgorithmParameters
-from l2l.utils.experiment import Experiment
 
 
 class GAOptimizerTestCase(OptimizerTestCase):
@@ -20,7 +19,6 @@ class GAOptimizerTestCase(OptimizerTestCase):
                                               parameters=optimizer_parameters)
 
         self.assertIsNotNone(optimizer.parameters)
-        self.experiment = Experiment(root_dir_path='../../results')
         try:
 
             self.experiment.run_experiment(optimizee=self.optimizee,

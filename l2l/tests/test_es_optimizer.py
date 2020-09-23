@@ -3,7 +3,6 @@ import unittest
 import numpy as np
 from l2l.tests.test_optimizer import OptimizerTestCase
 from l2l.optimizers.evolutionstrategies import EvolutionStrategiesParameters, EvolutionStrategiesOptimizer
-from l2l.utils.experiment import Experiment
 
 
 class ESOptimizerTestCase(OptimizerTestCase):
@@ -28,7 +27,6 @@ class ESOptimizerTestCase(OptimizerTestCase):
             optimizee_bounding_func=self.optimizee.bounding_func)
 
         self.assertIsNotNone(optimizer.parameters)
-        self.experiment = Experiment(root_dir_path='../../results')
         try:
 
             self.experiment.run_experiment(optimizee=self.optimizee,

@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 import numpy as np
-from sklearn.datasets import load_digits, fetch_mldata
+from sklearn.datasets import load_digits, fetch_openml
 
 from l2l.optimizees.optimizee import Optimizee
 from .nn import NeuralNetworkClassifier
@@ -34,7 +34,7 @@ class MNISTOptimizee(Optimizee):
             data_targets = mnist_digits.target
         else:
             # 28 x 28 images
-            mnist_digits = fetch_mldata('MNIST original')
+            mnist_digits = fetch_openml('MNIST original')
             n_input = np.prod(mnist_digits.data.shape[1:])
             data_images = mnist_digits.data / 255.  # -> 70000 x 284
             n_images = len(data_images)

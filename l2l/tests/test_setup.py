@@ -16,7 +16,9 @@ class SetupTestCase(unittest.TestCase):
     def setUp(self):
         self.name = "test_trajectory"
         try:
-            with open('../../bin/path.conf') as f:
+            pathfile = os.path.abspath('bin/path.conf')
+            print('File path', pathfile)
+            with open(pathfile) as f:
                 root_dir_path = f.read().strip()
         except FileNotFoundError:
             self.fail("L2L is not well configured. Missing path file.")
