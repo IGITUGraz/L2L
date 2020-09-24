@@ -16,7 +16,7 @@ class Experiment(object):
         :param root_dir_path: str, Path to the results folder. Accepts relative
         paths. Will check if the folder exists and create if not.
         """
-        self.root_dir_path = root_dir_path
+        self.root_dir_path = os.path.abspath(root_dir_path)
         self.logger = logging.getLogger('bin.l2l')
         self.paths = None
         self.env = None
@@ -106,7 +106,7 @@ class Experiment(object):
             "out_file": "stdout",
             "tasks_per_job": "1",
             "exec": "python3 " + os.path.join(self.paths.simulation_path,
-                                             "run_files/run_optimizee.py"),
+                                              "run_files/run_optimizee.py"),
             "ready_file": os.path.join(self.paths.root_dir_path,
                                        "ready_files/ready_w_"),
             "work_path": self.paths.root_dir_path,

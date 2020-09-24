@@ -4,7 +4,6 @@ from l2l.tests.test_optimizer import OptimizerTestCase
 import numpy as np
 from l2l.optimizers.simulatedannealing.optimizer import SimulatedAnnealingParameters, SimulatedAnnealingOptimizer, AvailableCoolingSchedules
 
-
 class SAOptimizerTestCase(OptimizerTestCase):
 
     def test_sa(self):

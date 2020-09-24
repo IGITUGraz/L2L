@@ -1,6 +1,13 @@
 L2L Gradient-free Optimization Framework
 ++++++++++++++++++++++++++++++++++++++++
 
+.. image:: https://travis-ci.org/Meta-optimization/L2L.svg?branch=master
+    :target: https://travis-ci.org/Meta-optimization/L2L
+    
+.. image:: https://coveralls.io/repos/github/Meta-optimization/L2L/badge.svg?branch=master
+    :target: https://coveralls.io/github/Meta-optimization/L2L?branch=master
+
+
 About
 *****
 

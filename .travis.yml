@@ -1,0 +1,21 @@
+dist: bionic
+sudo: false
+addons:
+   apt:
+      update: true
+      
+language: python
+python: 
+  - "3.6"
+  - "3.7"
+  - "3.8"
+
+install:
+   - pip install -r requirements.txt
+   - pip -V
+   - python setup.py install
+   - pip install coverage coveralls nose
+   - source install.sh 
+
+script:
+  nosetests -v --with-coverage --cover-package=l2l/
