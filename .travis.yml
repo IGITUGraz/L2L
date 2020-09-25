@@ -19,3 +19,5 @@ install:
 
 script:
   nosetests -v --with-coverage --cover-package=l2l/
+after_success:
+  - coveralls
