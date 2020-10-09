@@ -13,6 +13,8 @@ class Experiment(object):
         """
         Prepares and starts the l2l simulation.
 
+        For an example see `L2L/bin/l2l-template.py`
+
         :param root_dir_path: str, Path to the results folder. Accepts relative
         paths. Will check if the folder exists and create if not.
         """
@@ -34,9 +36,9 @@ class Experiment(object):
             - jube_parameter: dict, User specified parameter for jube.
                 See notes section for default jube parameter
             - multiprocessing, bool, enable multiprocessing, Default: False
+        :return traj, trajectory object
         :return all_jube_params, dict, a dictionary with all parameters for jube
             given by the user and default ones
-        :return traj, trajectory object
 
         :notes
            Default JUBE parameters are:
@@ -119,7 +121,7 @@ class Experiment(object):
         # Go through the parameter dictionary and add to the trajcectory
         if kwargs.get('jube_parameter'):
             for k, v in kwargs['jube_parameter'].items():
-                self.traj.f_add_parameter_group("JUBE_params", k, v)
+                self.traj.f_add_parameter_to_group("JUBE_params", k, v)
                 all_jube_params[k] = v
         # Default parameter are added if they are not already set by the user
         for k, v in default_jube_params.items():
@@ -141,8 +143,6 @@ class Experiment(object):
         :param optimizee_parameters: Namedtuple, parameters of the optimizee
         :param optimizer: optimizer object
         :param optimizer_parameters: Namedtuple, parameters of the optimizer
-        :return traj, trajectory object
-        :return path, Path object
         """
         self.optimizee = optimizee
         self.optimizer = optimizer
@@ -156,6 +156,13 @@ class Experiment(object):
         self.env.run(optimizee.simulate)
 
     def end_experiment(self, optimizer):
+        """
+        Ends the experiment and disables the logging
+
+        :param optimizer: optimizer object
+        :return traj, trajectory object
+        :return path, Path object
+        """
         # Outer-loop optimizer end
         optimizer.end(self.traj)
         # Finally disable logging and close all log-files
