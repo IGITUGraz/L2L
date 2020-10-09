@@ -121,7 +121,7 @@ class Experiment(object):
         # Go through the parameter dictionary and add to the trajcectory
         if kwargs.get('jube_parameter'):
             for k, v in kwargs['jube_parameter'].items():
-                self.traj.f_add_parameter_group("JUBE_params", k, v)
+                self.traj.f_add_parameter_to_group("JUBE_params", k, v)
                 all_jube_params[k] = v
         # Default parameter are added if they are not already set by the user
         for k, v in default_jube_params.items():
