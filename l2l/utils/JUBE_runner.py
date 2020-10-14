@@ -202,7 +202,8 @@ class JUBERunner():
         args.append(self.filename)
         self.done = False
         ready_files = []
-        path_ready = os.path.join(self.work_paths["ready_files"], "ready_%d_"%generation)
+        path_ready = os.path.join(self.work_paths["ready_files"],
+                                  "ready_%d_" % generation)
         self.prepare_run_file(path_ready)
 
         # Dump all trajectories for each optimizee run in the generation
@@ -221,7 +222,7 @@ class JUBERunner():
 
         # Wait for ready files to be written
         while not self.is_done(ready_files):
-            time.sleep(5)
+            time.sleep(20)
 
         # Touch done generation
         logger.info("JUBE finished generation: " + str(self.generation))

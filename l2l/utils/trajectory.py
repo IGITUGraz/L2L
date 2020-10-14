@@ -32,6 +32,23 @@ class Trajectory:
         self.individuals = {}
         self.v_idx = 0
 
+    def copy(self):
+        from copy import copy as cp
+        t = Trajectory()
+        if hasattr(self, '_name'):
+            t._name = cp(self._name)
+
+        t._timestamp = cp(self._timestamp)
+        t._parameters = cp(self._parameters)
+        t._results = cp(self._results)
+        t.individual = cp(self.individual)
+        t.results = cp(self._results)
+        t.current_results = cp(self.current_results)
+        t.individuals = cp(self.individuals)
+        t.v_idx = cp(self.v_idx)
+
+        return t
+
     def f_add_parameter_group(self, name, comment=""):
         """
         Adds a new parameter group
@@ -100,11 +117,12 @@ class Trajectory:
         ind_idx = []
         for key in build_dict.keys():
             if key == 'generation':
-                gen = build_dict['generation']
+                gen[:] = build_dict['generation']
             elif key == 'ind_idx':
                 ind_idx = build_dict['ind_idx']
             else:
                 params[key] = build_dict[key]
+
         # TODO: Could/Should the build dictionary have more than one generation in it?
         generation = gen[0]
         self.individuals[generation] = []

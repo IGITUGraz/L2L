@@ -32,8 +32,10 @@ class Optimizer:
                  optimizee_bounding_func,
                  parameters):
         # Creating Placeholders for individuals and results that are about to be explored
-        traj.f_add_parameter('generation', 0, comment='Current generation')
-        traj.f_add_parameter('ind_idx', 0, comment='Index of individual')
+        if 'generation' not in traj.par:
+            traj.f_add_parameter('generation', 0, comment='Current generation')
+        if 'ind_idx' not in traj.par:
+            traj.f_add_parameter('ind_idx', 0, comment='Index of individual')
 
         # Initializing basic variables
         self.optimizee_create_individual = optimizee_create_individual
