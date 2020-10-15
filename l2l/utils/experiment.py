@@ -112,7 +112,7 @@ class Experiment(object):
             "err_file": "stderr",
             "out_file": "stdout",
             "tasks_per_job": "1",
-            "exec": "python3 " + os.path.join(self.paths.simulation_path,
+            "exec": "python " + os.path.join(self.paths.simulation_path,
                                               "run_files/run_optimizee.py"),
             "ready_file": os.path.join(self.paths.root_dir_path,
                                        "ready_files/ready_w_"),
