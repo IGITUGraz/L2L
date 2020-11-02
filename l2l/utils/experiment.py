@@ -53,7 +53,12 @@ class Experiment(object):
             - mail_mode: ALL,
             - err_file: stderr,
             - out_file: stdout,
-            - tasks_per_job: 1
+            - tasks_per_job: 1,
+            - exec: python3 + self.paths.simulation_path +
+                "run_files/run_optimizee.py"
+            - ready_file: self.paths.root_dir_path + "ready_files/ready_w_"
+            - work_path: self.paths.root_dir_path,
+            - paths_obj: self.paths
         """
         name = kwargs.get('name', 'L2L-run')
         if not os.path.isdir(self.root_dir_path):
@@ -62,7 +67,7 @@ class Experiment(object):
 
         trajectory_name = kwargs.get('trajectory_name', 'trajectory')
 
-        self.paths = Paths(name, dict(run_num='test'),
+        self.paths = Paths(name, {},
                            root_dir_path=self.root_dir_path,
                            suffix="-" + trajectory_name)
 
@@ -107,7 +112,7 @@ class Experiment(object):
             "err_file": "stderr",
             "out_file": "stdout",
             "tasks_per_job": "1",
-            "exec": "python3 " + os.path.join(self.paths.simulation_path,
+            "exec": "python " + os.path.join(self.paths.simulation_path,
                                               "run_files/run_optimizee.py"),
             "ready_file": os.path.join(self.paths.root_dir_path,
                                        "ready_files/ready_w_"),
@@ -118,11 +123,17 @@ class Experiment(object):
         all_jube_params = {}
         self.traj.f_add_parameter_group("JUBE_params",
                                         "Contains JUBE parameters")
-        # Go through the parameter dictionary and add to the trajcectory
+        # Go through the parameter dictionary and add to the trajectory
         if kwargs.get('jube_parameter'):
             for k, v in kwargs['jube_parameter'].items():
-                self.traj.f_add_parameter_to_group("JUBE_params", k, v)
-                all_jube_params[k] = v
+                if k == "exec":
+                    val = v + " " + os.path.join(self.paths.simulation_path,
+                                                 "run_files/run_optimizee.py")
+                    self.traj.f_add_parameter_to_group("JUBE_params", k, val)
+                    all_jube_params[k] = val
+                else:
+                    self.traj.f_add_parameter_to_group("JUBE_params", k, v)
+                    all_jube_params[k] = v
         # Default parameter are added if they are not already set by the user
         for k, v in default_jube_params.items():
             if k not in kwargs.get('jube_parameter').keys():
