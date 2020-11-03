@@ -1,7 +1,6 @@
 numpy
 scipy
 pyyaml
-matplotlib<3.1
 sphinx
 sphinxjp.themes.basicstrap
 sklearn
