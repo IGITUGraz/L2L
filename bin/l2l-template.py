@@ -56,6 +56,7 @@ def main():
                               optimizee_parameters=optimizee_parameters,
                               optimizer=optimizer,
                               optimizer_parameters=optimizer_parameters)
+    experiment.end(optimizer)
 
 
 if __name__ == '__main__':
