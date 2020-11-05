@@ -34,7 +34,7 @@ def main():
                    "cpu_pp": "1"}
     traj, all_jube_params = experiment.prepare_experiment(name='L2L',
                                                           log_stdout=True,
-                                                          **jube_params)
+                                                          jube_parameter=jube_params)
 
     ## Innerloop simulator
     # TODO when using the template: Change the optimizee to the appropriate
@@ -56,6 +56,7 @@ def main():
                               optimizee_parameters=optimizee_parameters,
                               optimizer=optimizer,
                               optimizer_parameters=optimizer_parameters)
+    experiment.end(optimizer)
 
 
 if __name__ == '__main__':
