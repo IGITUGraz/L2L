@@ -2,23 +2,9 @@
 This file is a typical example of a script used to run a L2L experiment. Read the comments in the file for more
 explanations
 """
-
-import logging.config
-import os
-
-from l2l.utils.environment import Environment
 from l2l.utils.experiment import Experiment
-
-from l2l.logging_tools import create_shared_logger_data, configure_loggers
 from l2l.optimizees.optimizee import Optimizee, OptimizeeParameters
 from l2l.optimizers.optimizer import Optimizer, OptimizerParameters
-from l2l.paths import Paths
-
-from l2l.utils import JUBE_runner as jube
-
-# We first setup the logger and read the logging config which controls the verbosity and destination of the logs from
-# various parts of the code.
-logger = logging.getLogger('bin.l2l-optimizee-optimizer')
 
 
 def main():
@@ -56,7 +42,7 @@ def main():
                               optimizee_parameters=optimizee_parameters,
                               optimizer=optimizer,
                               optimizer_parameters=optimizer_parameters)
-    experiment.end(optimizer)
+    experiment.end_experiment(optimizer)
 
 
 if __name__ == '__main__':

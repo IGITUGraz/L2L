@@ -136,14 +136,17 @@ class Experiment(object):
                     all_jube_params[k] = v
         # Default parameter are added if they are not already set by the user
         for k, v in default_jube_params.items():
-            if k not in kwargs.get('jube_parameter').keys():
+            if kwargs.get('jube_parameter'):
+                if k not in kwargs.get('jube_parameter').keys():
+                    self.traj.f_add_parameter_to_group("JUBE_params", k, v)
+            else:
                 self.traj.f_add_parameter_to_group("JUBE_params", k, v)
-                all_jube_params[k] = v
+            all_jube_params[k] = v
         print('JUBE parameters used: {}'.format(all_jube_params))
         return self.traj, all_jube_params
 
-    def run_experiment(self, optimizee, optimizee_parameters, optimizer,
-                       optimizer_parameters):
+    def run_experiment(self, optimizer, optimizee,
+                       optimizer_parameters=None, optimizee_parameters=None):
         """
         Runs the simulation with all parameter combinations
 
@@ -151,9 +154,9 @@ class Experiment(object):
         as namedtuples.
 
         :param optimizee: optimizee object
-        :param optimizee_parameters: Namedtuple, parameters of the optimizee
+        :param optimizee_parameters: Namedtuple, optional, parameters of the optimizee
         :param optimizer: optimizer object
-        :param optimizer_parameters: Namedtuple, parameters of the optimizer
+        :param optimizer_parameters: Namedtuple, optional, parameters of the optimizer
         """
         self.optimizee = optimizee
         self.optimizer = optimizer

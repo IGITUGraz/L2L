@@ -13,32 +13,17 @@ from l2l.optimizers.face.optimizer import FACEOptimizer, FACEParameters
 from l2l.optimizers.gradientdescent.optimizer import GradientDescentOptimizer, RMSPropParameters, ClassicGDParameters, \
     AdamParameters, StochasticGDParameters
 from l2l.optimizers.gridsearch import GridSearchOptimizer, GridSearchParameters
-from l2l.paths import Paths
-from l2l.utils import JUBE_runner as jube
-
-from l2l.logging_tools import create_shared_logger_data, configure_loggers
-
-logger = logging.getLogger('bin.l2l-fun-all')
+from l2l.utils.experiment import Experiment
 
 
 def main():
+    experiment = Experiment(root_dir_path='../results')
     name = 'L2L-FUNALL'
-    try:
-        with open('bin/path.conf') as f:
-            root_dir_path = f.read().strip()
-    except FileNotFoundError:
-        raise FileNotFoundError(
-            "You have not set the root path to store your results."
-            " Write the path to a path.conf text file in the bin directory"
-            " before running the simulation"
-        )
-    paths = Paths(name, dict(run_no='test'), root_dir_path=root_dir_path)
-
-    print("All output logs can be found in directory ", paths.logs_path)
-
-    traj_file = os.path.join(paths.output_dir_path, 'data.h5')
-
+    jube_params = {}
+    traj, _ = experiment.prepare_experiment(name=name, log_stdout=True,
+                                            jube_parameter=jube_params)
     n_iterations = 100
+    seed = 1
 
     # NOTE: Need to use lambdas here since we want the distributions within CE, FACE etc. optimizers to be reinitialized
     #  afresh each time since it seems like they are stateful.
@@ -47,23 +32,24 @@ def main():
          lambda: CrossEntropyParameters(pop_size=50, rho=0.2, smoothing=0.0, temp_decay=0,
                                         n_iteration=n_iterations,
                                         distribution=NoisyGaussian(noise_decay=0.95),
-                                        stop_criterion=np.inf, seed=102)),
+                                        stop_criterion=np.inf, seed=seed)),
         (FACEOptimizer,
          lambda: FACEParameters(min_pop_size=20, max_pop_size=50, n_elite=10, smoothing=0.2, temp_decay=0,
-                                n_iteration=n_iterations, distribution=Gaussian(), n_expand=5)),
+                                n_iteration=n_iterations, distribution=Gaussian(), n_expand=5,
+                                seed=seed, stop_criterion=np.inf)),
         (GradientDescentOptimizer,
-         lambda: RMSPropParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, momentum_decay=0.5,
-                                   n_iteration=n_iterations, stop_criterion=np.Inf)),
+         lambda: RMSPropParameters(learning_rate=0.01, exploration_step_size=0.01, n_random_steps=5, momentum_decay=0.5,
+                                   n_iteration=n_iterations, stop_criterion=np.Inf, seed=seed)),
         (GradientDescentOptimizer,
-         lambda: ClassicGDParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5,
-                                     n_iteration=n_iterations, stop_criterion=np.Inf)),
+         lambda: ClassicGDParameters(learning_rate=0.01, exploration_step_size=0.01, n_random_steps=5,
+                                     n_iteration=n_iterations, stop_criterion=np.Inf, seed=seed)),
         (GradientDescentOptimizer,
-         lambda: AdamParameters(learning_rate=0.01, exploration_rate=0.01, n_random_steps=5, first_order_decay=0.8,
-                                second_order_decay=0.8, n_iteration=n_iterations, stop_criterion=np.Inf)),
+         lambda: AdamParameters(learning_rate=0.01, exploration_step_size=0.01, n_random_steps=5, first_order_decay=0.8,
+                                second_order_decay=0.8, n_iteration=n_iterations, stop_criterion=np.Inf, seed=seed)),
         (GradientDescentOptimizer,
          lambda: StochasticGDParameters(learning_rate=0.01, stochastic_deviation=1, stochastic_decay=0.99,
-                                        exploration_rate=0.01, n_random_steps=5, n_iteration=n_iterations,
-                                        stop_criterion=np.Inf))
+                                        exploration_step_size=0.01, n_random_steps=5, n_iteration=n_iterations,
+                                        stop_criterion=np.Inf, seed=seed))
     ]
 
     # NOTE: Benchmark functions
@@ -71,44 +57,12 @@ def main():
     function_ids = range(len(bench_functs.function_name_map))
 
     for function_id, (optimizer_class, optimizer_parameters_fn) in itertools.product(function_ids, optimizers):
-        logger.info("Running benchmark for %s optimizer and function id %d", optimizer_class, function_id)
         optimizer_parameters = optimizer_parameters_fn()
-
-        # Create an environment that handles running our simulation
-        # This initializes an environment
-        env = Environment(trajectory=name, filename=traj_file, file_title='{} data'.format(name),
-                          comment='{} data'.format(name),
-                          # freeze_input=True,
-                          # multiproc=True,
-                          # use_scoop=True,
-                          # wrap_mode=pypetconstants.WRAP_MODE_LOCAL,
-                          add_time=True,
-                          automatic_storing=True,
-                          log_stdout=False,  # Sends stdout to logs
-                          )
-        create_shared_logger_data(logger_names=['bin', 'optimizers'],
-                                  log_levels=['INFO', 'INFO'],
-                                  log_to_consoles=[True, True],
-                                  sim_name=name,
-                                  log_directory=paths.logs_path)
-        configure_loggers()
-
-        # Get the trajectory from the environment
-        traj = env.trajectory
-        # Set JUBE params
-        traj.f_add_parameter_group("JUBE_params", "Contains JUBE parameters")
-        # Execution command
-        traj.f_add_parameter_to_group("JUBE_params", "exec", "python " +
-                                      os.path.join(paths.simulation_path, "run_files/run_optimizee.py"))
-        # Paths
-        traj.f_add_parameter_to_group("JUBE_params", "paths", paths)
 
         (benchmark_name, benchmark_function), benchmark_parameters = \
             bench_functs.get_function_by_index(function_id, noise=True)
 
         optimizee = FunctionGeneratorOptimizee(traj, benchmark_function, seed=100)
-        # Prepare optimizee for jube runs
-        jube.prepare_optimizee(optimizee, paths.simulation_path)
 
         optimizee_fitness_weights = -1.
         # Gradient descent does descent!
@@ -125,17 +79,12 @@ def main():
                                     parameters=optimizer_parameters,
                                     optimizee_bounding_func=optimizee.bounding_func)
 
-        # Add post processing
-        env.add_postprocessing(optimizer.post_process)
+        experiment.run_experiment(optimizee=optimizee,
+                                  optimizee_parameters=None,
+                                  optimizer=optimizer,
+                                  optimizer_parameters=optimizer_parameters)
 
-        # Run the simulation with all parameter combinations
-        env.run(optimizee.simulate)
-
-        # NOTE: Outerloop optimizer end
-        optimizer.end(traj)
-
-        # Finally disable logging and close all log-files
-        env.disable_logging()
+        experiment.end_experiment(optimizer)
 
 
 if __name__ == '__main__':
