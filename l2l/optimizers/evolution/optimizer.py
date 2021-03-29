@@ -12,17 +12,18 @@ from l2l.optimizers.optimizer import Optimizer
 logger = logging.getLogger("l2l-ga")
 
 GeneticAlgorithmParameters = namedtuple('GeneticAlgorithmParameters',
-                                        ['seed', 'popsize', 'CXPB', 'MUTPB', 'NGEN', 'indpb', 'tournsize', 'matepar',
-                                         'mutpar'])
+                                        ['seed', 'pop_size', 'cx_prob', 'mut_prob', 'n_iteration', 'ind_prob', 'tourn_size', 'mate_par',
+                                         'mut_par'])
 GeneticAlgorithmParameters.__doc__ = """
 :param seed: Random seed
-:param popsize: Size of the population
-:param CXPB: Crossover probability
-:param MUTPB: Mutation probability
-:param NGEN: Number of generations simulation should run for
-:param indpb: Probability of mutation of each element in individual
-:param tournsize: Size of the tournamaent used for fitness evaluation and selection
-:param matepar: Paramter used for blending two values during mating
+:param pop_size: Size of the population
+:param cx_prob: Crossover probability
+:param mut_prob: Mutation probability
+:param n_iteration: Number of generations simulation should run for
+:param ind_prob: Probability of mutation of each element in individual
+:param tourn_size: Size of the tournamaent used for fitness evaluation and selection
+:param mate_par: Parameter used for blending two values during mating
+:param mut_par: Standard deviation for the gaussian addition mutation.
 """
 
 
@@ -53,13 +54,13 @@ class GeneticAlgorithmOptimizer(Optimizer):
         __, self.optimizee_individual_dict_spec = dict_to_list(optimizee_create_individual(), get_dict_spec=True)
 
         traj.f_add_parameter('seed', parameters.seed, comment='Seed for RNG')
-        traj.f_add_parameter('popsize', parameters.popsize, comment='Population size')  # 185
-        traj.f_add_parameter('CXPB', parameters.CXPB, comment='Crossover term')
-        traj.f_add_parameter('MUTPB', parameters.MUTPB, comment='Mutation probability')
-        traj.f_add_parameter('n_iteration', parameters.NGEN, comment='Number of generations')
+        traj.f_add_parameter('pop_size', parameters.pop_size, comment='Population size')  # 185
+        traj.f_add_parameter('cx_prob', parameters.cx_prob, comment='Crossover term')
+        traj.f_add_parameter('mut_prob', parameters.mut_prob, comment='Mutation probability')
+        traj.f_add_parameter('n_iteration', parameters.n_iteration, comment='Number of generations')
 
-        traj.f_add_parameter('indpb', parameters.indpb, comment='Mutation parameter')
-        traj.f_add_parameter('tournsize', parameters.tournsize, comment='Selection parameter')
+        traj.f_add_parameter('ind_prob', parameters.ind_prob, comment='Mutation parameter')
+        traj.f_add_parameter('tourn_size', parameters.tourn_size, comment='Selection parameter')
 
         # ------- Create and register functions with DEAP ------- #
         # delay_rate, slope, std_err, max_fraction_active
@@ -92,15 +93,15 @@ class GeneticAlgorithmOptimizer(Optimizer):
 
             return bounding_wrapper
 
-        toolbox.register("mate", tools.cxBlend, alpha=parameters.matepar)
+        toolbox.register("mate", tools.cxBlend, alpha=parameters.mate_par)
         toolbox.decorate("mate", bounding_decorator)
-        toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=parameters.mutpar, indpb=traj.indpb)
+        toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=parameters.mut_par, indpb=traj.ind_prob)
         toolbox.decorate("mutate", bounding_decorator)
-        toolbox.register("select", tools.selTournament, tournsize=traj.tournsize)
+        toolbox.register("select", tools.selTournament, tournsize=traj.tourn_size)
 
         # ------- Initialize Population and Trajectory -------- #
         # NOTE: The Individual object implements the list interface.
-        self.pop = toolbox.population(n=traj.popsize)
+        self.pop = toolbox.population(n=traj.pop_size)
         self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness.valid]
         self.eval_pop = [list_to_dict(ind, self.optimizee_individual_dict_spec)
                          for ind in self.eval_pop_inds]
@@ -116,7 +117,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
         """
         See :meth:`~l2l.optimizers.optimizer.Optimizer.post_process`
         """
-        CXPB, MUTPB, NGEN = traj.CXPB, traj.MUTPB, traj.n_iteration
+        CXPB, MUTPB, NGEN = traj.cx_prob, traj.mut_prob, traj.n_iteration
 
         logger.info("  Evaluating %i individuals" % len(fitnesses_results))
 
