@@ -23,7 +23,7 @@ If you are developing a new Optimizee or want to try out a new Optimizee with th
 L2L as a python package. See section `Installing the L2L Package`_ for details on how to install the package (this
 automatically installs all requirements).
 
-Documentation is available at `<https://igitugraz.github.io/L2L/>`_.
+Documentation is available at `<https://meta-optimization.github.io/L2L/>`_.
 
 
 Installing the L2L Package
