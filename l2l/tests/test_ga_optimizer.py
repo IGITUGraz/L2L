@@ -8,10 +8,10 @@ class GAOptimizerTestCase(OptimizerTestCase):
 
     def test_setup(self):
 
-        optimizer_parameters = GeneticAlgorithmParameters(seed=0, popsize=1, CXPB=0.5,
-                                                          MUTPB=0.3, NGEN=1, indpb=0.02,
-                                                          tournsize=1, matepar=0.5,
-                                                          mutpar=1
+        optimizer_parameters = GeneticAlgorithmParameters(seed=0, pop_size=1, cx_prob=0.5,
+                                                          mut_prob=0.3, n_iteration=1, ind_prob=0.02,
+                                                          tourn_size=1, mate_par=0.5,
+                                                          mut_par=1
                                                           )
 
         optimizer = GeneticAlgorithmOptimizer(self.trajectory, optimizee_create_individual=self.optimizee.create_individual,
