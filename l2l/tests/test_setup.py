@@ -12,7 +12,8 @@ import os
 class SetupTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.experiment = Experiment(root_dir_path='../../results')
+        self.root_dir_path = '../../results'
+        self.experiment = Experiment(root_dir_path=self.root_dir_path)
         jube_params = {}
         try:
             self.trajectory, _ = self.experiment.prepare_experiment(
@@ -30,6 +31,7 @@ class SetupTestCase(unittest.TestCase):
     def test_paths(self):
         self.assertIsNotNone(self.paths)
         self.assertIsNotNone(Paths.simulation_path)
+        self.assertTrue(os.path.exists(self.root_dir_path))
 
     def test_environment_trajectory_setup(self):
         self.assertIsNotNone(self.trajectory.individual)

@@ -20,6 +20,8 @@ class CEOptimizerTestCase(OptimizerTestCase):
                                           optimizee_bounding_func=self.optimizee.bounding_func)
 
         self.assertIsNotNone(optimizer.parameters)
+        self.assertIsNotNone(self.experiment)
+
         try:
 
             self.experiment.run_experiment(optimizee=self.optimizee,

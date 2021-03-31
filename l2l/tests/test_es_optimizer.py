@@ -27,6 +27,8 @@ class ESOptimizerTestCase(OptimizerTestCase):
             optimizee_bounding_func=self.optimizee.bounding_func)
 
         self.assertIsNotNone(optimizer.parameters)
+        self.assertIsNotNone(self.experiment)
+
         try:
 
             self.experiment.run_experiment(optimizee=self.optimizee,
@@ -42,7 +44,7 @@ class ESOptimizerTestCase(OptimizerTestCase):
 
 
 def suite():
-    suite = unittest.makeSuite(CEOptimizerTestCase, 'test')
+    suite = unittest.makeSuite(ESOptimizerTestCase, 'test')
     return suite
 
 
