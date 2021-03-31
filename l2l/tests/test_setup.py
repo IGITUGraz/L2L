@@ -1,9 +1,6 @@
 import unittest
 
-from l2l.utils.environment import Environment
-
 import l2l.utils.JUBE_runner as jube
-from l2l.logging_tools import create_shared_logger_data, configure_loggers
 from l2l.paths import Paths
 from l2l.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from l2l.optimizees.functions.optimizee import FunctionGeneratorOptimizee
@@ -15,7 +12,8 @@ import os
 class SetupTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.experiment = Experiment(root_dir_path='../../results')
+        self.root_dir_path = '../../results'
+        self.experiment = Experiment(root_dir_path=self.root_dir_path)
         jube_params = {}
         try:
             self.trajectory, _ = self.experiment.prepare_experiment(
@@ -33,6 +31,7 @@ class SetupTestCase(unittest.TestCase):
     def test_paths(self):
         self.assertIsNotNone(self.paths)
         self.assertIsNotNone(Paths.simulation_path)
+        self.assertTrue(os.path.exists(self.root_dir_path))
 
     def test_environment_trajectory_setup(self):
         self.assertIsNotNone(self.trajectory.individual)

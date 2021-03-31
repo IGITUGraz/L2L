@@ -19,6 +19,8 @@ class GSOptimizerTestCase(OptimizerTestCase):
                                         optimizee_fitness_weights=(-0.1,),
                                         parameters=optimizer_parameters)
         self.assertIsNotNone(optimizer.parameters)
+        self.assertIsNotNone(self.experiment)
+
         try:
 
             self.experiment.run_experiment(optimizee=self.optimizee,

@@ -19,6 +19,8 @@ class GAOptimizerTestCase(OptimizerTestCase):
                                               parameters=optimizer_parameters)
 
         self.assertIsNotNone(optimizer.parameters)
+        self.assertIsNotNone(self.experiment)
+
         try:
 
             self.experiment.run_experiment(optimizee=self.optimizee,
