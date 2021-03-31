@@ -1,9 +1,6 @@
 import unittest
 
-from l2l.utils.environment import Environment
-
 import l2l.utils.JUBE_runner as jube
-from l2l.logging_tools import create_shared_logger_data, configure_loggers
 from l2l.paths import Paths
 from l2l.optimizees.functions.benchmarked_functions import BenchmarkedFunctions
 from l2l.optimizees.functions.optimizee import FunctionGeneratorOptimizee

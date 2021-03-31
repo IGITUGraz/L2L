@@ -1,4 +1,6 @@
+import os
 import unittest
+import shutil
 
 
 from l2l.tests import test_ce_optimizer
@@ -27,4 +29,7 @@ def test_suite():
 if __name__ == "__main__":
 
     runner = unittest.TextTestRunner(verbosity=2)
+    root_dir_path = '../../results'
     runner.run(test_suite())
+    if os.path.exists(root_dir_path):
+        shutil.rmtree(root_dir_path)
