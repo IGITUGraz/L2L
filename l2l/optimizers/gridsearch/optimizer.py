@@ -105,7 +105,7 @@ class GridSearchOptimizer(Optimizer):
         #: The current generation number
         self.g = 0
         # Expanding the trajectory
-        grouped_params_dict = {'individual.' + key: value for key, value in self.param_list.items()}
+        grouped_params_dict = {key: value for key, value in self.param_list.items()}
         final_params_dict = {'generation': [self.g],
                              'ind_idx': range(self.size)}
         final_params_dict.update(grouped_params_dict)
@@ -128,7 +128,7 @@ class GridSearchOptimizer(Optimizer):
         fitness_array = np.array([x[1] for x in fitnesses_results])
         optimizee_fitness_weights = np.reshape(np.array(self.optimizee_fitness_weights), (-1, 1))
 
-        weighted_fitness_array = np.matmul(fitness_array, optimizee_fitness_weights).ravel()
+        weighted_fitness_array = np.multiply(fitness_array, optimizee_fitness_weights).ravel()
         max_fitness_indiv_index = np.argmax(weighted_fitness_array)
 
         logger.info('Storing Results')
@@ -146,8 +146,9 @@ class GridSearchOptimizer(Optimizer):
         individual = traj.individual
         self.best_individual = {}
         for param_name, _, _ in self.optimizee_individual_dict_spec:
-            logger.info('  %s: %s', param_name, individual[param_name])
-            self.best_individual[param_name] = individual[param_name]
+            param_value = self.param_list[param_name][max_fitness_indiv_index]
+            logger.info('  %s: %s', param_name, param_value)
+            self.best_individual[param_name] = param_value
 
         self.best_fitness = fitness_array[max_fitness_indiv_index]
         logger.info('  with fitness: %s', fitness_array[max_fitness_indiv_index])
