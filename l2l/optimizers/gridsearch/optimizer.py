@@ -105,7 +105,7 @@ class GridSearchOptimizer(Optimizer):
         #: The current generation number
         self.g = 0
         # Expanding the trajectory
-        grouped_params_dict = {key: value for key, value in self.param_list.items()}
+        grouped_params_dict = {'individual.' + key: value for key, value in self.param_list.items()}
         final_params_dict = {'generation': [self.g],
                              'ind_idx': range(self.size)}
         final_params_dict.update(grouped_params_dict)
