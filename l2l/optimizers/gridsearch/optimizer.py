@@ -92,9 +92,9 @@ class GridSearchOptimizer(Optimizer):
                 curr_param_list = [x.ravel() for x in curr_param_list]
                 curr_param_list = np.stack(curr_param_list, axis=-1)
                 self.param_list[param_name] = curr_param_list
-            self.size = len(self.param_list[param_name])
 
         self.param_list = cartesian_product(self.param_list, tuple(sorted(optimizee_param_grid.keys())))
+        self.size = len(self.param_list[list(self.param_list.keys())[0]])
 
         # Adding the bounds information to the trajectory
         traj.f_add_parameter_group('grid_spec')
